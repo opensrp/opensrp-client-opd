@@ -1,4 +1,4 @@
-package org.smartregister.opd;
+package org.smartregister.opd.sample;
 
 import org.junit.Test;
 

@@ -3,8 +3,8 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "org.smartregister.opd"
-        minSdkVersion 15
+        applicationId "org.smartregister.opd.sample"
+        minSdkVersion 18
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
