@@ -187,4 +187,4 @@ task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'crea
     ])
 }
 
-apply from: '../maven.gradle'
+//apply from: '../maven.gradle'
