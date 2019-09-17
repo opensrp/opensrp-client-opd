@@ -5,31 +5,21 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
-import com.vijay.jsonwizard.constants.JsonFormConstants;
-import com.vijay.jsonwizard.domain.Form;
-
 import org.json.JSONObject;
-import org.smartregister.AllConstants;
-import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
-import org.smartregister.opd.fragment.OpdRegisterFragment;
+import org.smartregister.opd.fragment.BaseOpdRegisterFragment;
 import org.smartregister.opd.model.OpdRegisterActivityModel;
 import org.smartregister.opd.presenter.OpdRegisterActivityPresenter;
-import org.smartregister.util.Utils;
 import org.smartregister.view.activity.BaseRegisterActivity;
-import org.smartregister.view.activity.DrishtiApplication;
 import org.smartregister.view.fragment.BaseRegisterFragment;
 
-import java.util.Arrays;
 import java.util.List;
-
-import timber.log.Timber;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-13
  */
 
-public class OpdRegisterActivity extends BaseRegisterActivity implements OpdRegisterActivityContract.View {
+public class BaseOpdRegisterActivity extends BaseRegisterActivity implements OpdRegisterActivityContract.View {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +39,7 @@ public class OpdRegisterActivity extends BaseRegisterActivity implements OpdRegi
 
     @Override
     protected BaseRegisterFragment getRegisterFragment() {
-        return new OpdRegisterFragment();
+        return new BaseOpdRegisterFragment();
     }
 
     @Override
@@ -118,7 +108,7 @@ public class OpdRegisterActivity extends BaseRegisterActivity implements OpdRegi
 
     @Override
     public void switchToBaseFragment() {
-        Intent intent = new Intent(this, OpdRegisterActivity.class);
+        Intent intent = new Intent(this, BaseOpdRegisterActivity.class);
         startActivity(intent);
         finish();
     }
