@@ -3,6 +3,7 @@ package org.smartregister.opd.provider;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -126,17 +127,19 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
 
         String registerType = Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.REGISTER_TYPE, false);
 
-        if (registerType.contains("child")) {
-            viewHolder.showCareGiveName();
+        if (registerType.contains("Child")) {
+            viewHolder.showCareGiverName();
 
-            String parentFirstName = Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.FAMILY_FIRST_NAME, true);
-            String parentLastName = Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.FAMILY_LAST_NAME, true);
-            String parentMiddleName = Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.FAMILY_MIDDLE_NAME, true);
+            String parentFirstName = Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.MOTHER_FIRST_NAME, true);
+            String parentLastName = Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.MOTHER_LAST_NAME, true);
+            String parentMiddleName = Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.MOTHER_MIDDLE_NAME, true);
 
             String parentName = context.getResources().getString(R.string.care_giver_initials)
                     + ": "
                     + org.smartregister.util.Utils.getName(parentFirstName, parentMiddleName + " " + parentLastName);
             fillValue(viewHolder.textViewParentName, WordUtils.capitalize(parentName));
+        } else {
+            viewHolder.removeCareGiverName();
         }
 
         String firstName = Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.FIRST_NAME, true);
@@ -147,6 +150,7 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
         String dobString = Utils.getDuration(Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.DOB, false));
         //dobString = dobString.contains("y") ? dobString.substring(0, dobString.indexOf("y")) : dobString;
         fillValue(viewHolder.textViewChildName, WordUtils.capitalize(childName) + ", " + WordUtils.capitalize(OpdUtils.getTranslatedDate(dobString, context)));
+        fillValue(viewHolder.tvRegisterType, registerType);
         setAddressAndGender(pc, viewHolder);
 
         addButtonClickListeners(client, viewHolder);
@@ -165,9 +169,16 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
     }
 
     public void setAddressAndGender(CommonPersonObjectClient pc, OpdRegisterViewHolder viewHolder) {
-        String address = Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.FAMILY_HOME_ADDRESS, true);
+        String address = Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.HOME_ADDRESS, true);
         String gender = Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.GENDER, true);
-        fillValue(viewHolder.textViewAddressGender, address + " \u00B7 " + gender);
+        fillValue(viewHolder.textViewGender, gender);
+
+        if (TextUtils.isEmpty(address)) {
+            viewHolder.removePersonLocation();
+        } else {
+            viewHolder.showPersonLocation();
+            fillValue(viewHolder.tvLocation, address);
+        }
     }
 
     public void addButtonClickListeners(SmartRegisterClient client, OpdRegisterViewHolder viewHolder) {

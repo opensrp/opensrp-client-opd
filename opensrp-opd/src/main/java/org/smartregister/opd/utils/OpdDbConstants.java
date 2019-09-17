@@ -8,10 +8,10 @@ public interface OpdDbConstants {
     
     interface KEY {
 
-        String FAMILY_FIRST_NAME = "family_first_name";
-        String FAMILY_MIDDLE_NAME = "family_middle_name";
-        String FAMILY_LAST_NAME = "family_last_name";
-        String FAMILY_HOME_ADDRESS = "family_home_address";
+        String MOTHER_FIRST_NAME = "mother_first_name";
+        String MOTHER_MIDDLE_NAME = "mother_middle_name";
+        String MOTHER_LAST_NAME = "mother_last_name";
+        String HOME_ADDRESS = "home_address";
 
         String REGISTER_TYPE = "register_type";
 

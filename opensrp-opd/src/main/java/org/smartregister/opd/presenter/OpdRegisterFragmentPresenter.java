@@ -12,7 +12,8 @@ import org.smartregister.configurableviews.model.Field;
 import org.smartregister.configurableviews.model.RegisterConfiguration;
 import org.smartregister.configurableviews.model.View;
 import org.smartregister.configurableviews.model.ViewConfiguration;
-import org.smartregister.opd.utils.OpdDbConstants;
+import org.smartregister.opd.pojos.QueryTable;
+import org.smartregister.opd.pojos.InnerJoinObject;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -20,7 +21,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class OpdRegisterFragmentPresenter implements OpdRegisterFragmentContract.Presenter {
-
 
     protected Set<View> visibleColumns = new TreeSet<>();
     private WeakReference<OpdRegisterFragmentContract.View> viewReference;
@@ -54,18 +54,50 @@ public class OpdRegisterFragmentPresenter implements OpdRegisterFragmentContract
 
     @Override
     public void initializeQueries(String mainCondition) {
-/*
-        String countSelect = model.countSelect(CoreConstants.TABLE_NAME.CHILD, mainCondition);
-        String mainSelect = model.mainSelect(CoreConstants.TABLE_NAME.CHILD, CoreConstants.TABLE_NAME.FAMILY, CoreConstants.TABLE_NAME.FAMILY_MEMBER, mainCondition);
+        QueryTable[] queryTables = new QueryTable[2];
+        QueryTable childQueryTable = new QueryTable();
+        childQueryTable.setTableName("ec_child");
+        childQueryTable.setColNames(new String[]{
+                "first_name",
+                "last_name",
+                "middle_name",
+                "gender",
+                "home_address",
+                "'Child' AS register_type"
+        });
 
-        getView().initializeQueryParams(CoreConstants.TABLE_NAME.CHILD, countSelect, mainSelect);
-        getView().initializeAdapter(visibleColumns);
+        queryTables[0] = childQueryTable;
 
-        getView().countExecute();
-        getView().filterandSortInInitializeQueries();*/
+        QueryTable womanQueryTable = new QueryTable();
+        womanQueryTable.setTableName("ec_mother");
+        womanQueryTable.setColNames(new String[]{
+                "first_name",
+                "last_name",
+                "middle_name",
+                "'Female' AS gender",
+                "home_address",
+                "'ANC' AS register_type"
+        });
+        queryTables[1] = womanQueryTable;
+        String countSelect = model.countSelect(queryTables);
 
-        String countSelect = model.countSelect("ec_child", mainCondition);
-        String mainSelect = model.mainSelect("ec_child", null, null, mainCondition);
+        InnerJoinObject[] innerJoinObjects = new InnerJoinObject[1];
+        InnerJoinObject childTableInnerJoinMotherTable = new InnerJoinObject();
+        childTableInnerJoinMotherTable.setFirstTable(childQueryTable);
+
+        QueryTable innerJoinMotherTable = new QueryTable();
+        innerJoinMotherTable.setTableName("ec_mother");
+        innerJoinMotherTable.setColNames(new String[]{
+                "first_name AS mother_first_name",
+                "last_name AS mother_last_name",
+                "middle_name AS mother_middle_name"
+        });
+
+        childTableInnerJoinMotherTable.innerJoinOn("ec_child.relational_id = ec_mother.base_entity_id");
+        childTableInnerJoinMotherTable.innerJoinTable(innerJoinMotherTable);
+        innerJoinObjects[0] = childTableInnerJoinMotherTable;
+
+        String mainSelect = model.mainSelect(innerJoinObjects, new QueryTable[]{innerJoinMotherTable});
 
         getView().initializeQueryParams("ec_child", countSelect, mainSelect);
         getView().initializeAdapter(visibleColumns);
@@ -92,6 +124,7 @@ public class OpdRegisterFragmentPresenter implements OpdRegisterFragmentContract
         if (viewReference != null) {
             return viewReference.get();
         } else {
+
             return null;
         }
     }
@@ -130,5 +163,58 @@ public class OpdRegisterFragmentPresenter implements OpdRegisterFragmentContract
 
     public void setModel(OpdRegisterFragmentContract.Model model) {
         this.model = model;
+    }
+
+    @Override
+    public String getWhereInQuery() {
+        QueryTable[] tableCols = new QueryTable[2];
+        QueryTable childTableCol = new QueryTable();
+        childTableCol.setTableName("ec_child");
+        childTableCol.setColNames(new String[]{
+                "first_name",
+                "last_name",
+                "middle_name",
+                "gender",
+                "dob",
+                "home_address",
+                "'Child' AS register_type",
+                "relational_id AS relationalid"
+        });
+
+        tableCols[0] = childTableCol;
+
+        QueryTable womanTableCol = new QueryTable();
+        womanTableCol.setTableName("ec_mother");
+        womanTableCol.setColNames(new String[]{
+                "first_name",
+                "last_name",
+                "middle_name",
+                "'Female' AS gender",
+                "dob",
+                "home_address",
+                "'ANC' AS register_type",
+                "NULL AS mother_first_name",
+                "NULL AS mother_last_name",
+                "NULL AS mother_middle_name",
+                "relationalid"
+        });
+        tableCols[1] = womanTableCol;
+
+        InnerJoinObject[] tablesWithInnerJoins = new InnerJoinObject[1];
+        InnerJoinObject tableColsInnerJoin = new InnerJoinObject();
+        tableColsInnerJoin.setFirstTable(childTableCol);
+
+        QueryTable innerJoinMotherTable = new QueryTable();
+        innerJoinMotherTable.setTableName("ec_mother");
+        innerJoinMotherTable.setColNames(new String[]{
+                "first_name AS mother_first_name",
+                "last_name AS mother_last_name",
+                "middle_name AS mother_middle_name"
+        });
+        tableColsInnerJoin.innerJoinOn("ec_child.relational_id = ec_mother.base_entity_id");
+        tableColsInnerJoin.innerJoinTable(innerJoinMotherTable);
+        tablesWithInnerJoins[0] = tableColsInnerJoin;
+
+        return model.mainSelectWhereIdsIn(tablesWithInnerJoins, new QueryTable[]{womanTableCol});
     }
 }

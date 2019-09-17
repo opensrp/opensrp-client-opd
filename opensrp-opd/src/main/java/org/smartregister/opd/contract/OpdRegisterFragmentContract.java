@@ -1,11 +1,15 @@
 package org.smartregister.opd.contract;
 
 
+import android.support.annotation.NonNull;
+
 import org.json.JSONArray;
 import org.smartregister.configurableviews.model.Field;
 import org.smartregister.configurableviews.model.RegisterConfiguration;
 import org.smartregister.configurableviews.model.ViewConfiguration;
 import org.smartregister.domain.Response;
+import org.smartregister.opd.pojos.QueryTable;
+import org.smartregister.opd.pojos.InnerJoinObject;
 import org.smartregister.view.contract.BaseRegisterFragmentContract;
 
 import java.util.List;
@@ -38,6 +42,8 @@ public interface OpdRegisterFragmentContract {
 
         String getDueFilterCondition();
 
+        String getWhereInQuery();
+
     }
 
     interface Model {
@@ -48,9 +54,11 @@ public interface OpdRegisterFragmentContract {
 
         Set<org.smartregister.configurableviews.model.View> getRegisterActiveColumns(String viewConfigurationIdentifier);
 
-        String countSelect(String tableName, String mainCondition);
+        String countSelect(@NonNull QueryTable[] queryTables);
 
-        String mainSelect(String tableName, String familyTableName, String familyMemberTableName, String mainCondition);
+        String mainSelect(@NonNull InnerJoinObject[] tableColsInnerJoins, @NonNull QueryTable[] tableCols);
+
+        String mainSelectWhereIdsIn(@NonNull InnerJoinObject[] tableColsInnerJoins, @NonNull QueryTable[] tableCols);
 
         String getFilterText(List<Field> filterList, String filter);
 

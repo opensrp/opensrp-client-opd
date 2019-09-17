@@ -1,12 +1,12 @@
 package org.smartregister.opd.fragment;
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.AppCompatTextView;
-import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -20,7 +20,6 @@ import org.smartregister.cursoradapter.RecyclerViewPaginatedAdapter;
 import org.smartregister.cursoradapter.SmartRegisterQueryBuilder;
 import org.smartregister.domain.FetchStatus;
 import org.smartregister.opd.R;
-import org.smartregister.opd.activity.OpdRegisterActivity;
 import org.smartregister.opd.contract.OpdRegisterFragmentContract;
 import org.smartregister.opd.dialog.NoMatchDialogFragment;
 import org.smartregister.opd.model.OpdRegisterFragmentModel;
@@ -30,8 +29,6 @@ import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.receiver.SyncStatusBroadcastReceiver;
 import org.smartregister.util.Utils;
 import org.smartregister.view.activity.BaseRegisterActivity;
-import org.smartregister.view.customcontrols.CustomFontTextView;
-import org.smartregister.view.customcontrols.FontVariant;
 import org.smartregister.view.fragment.BaseRegisterFragment;
 
 import java.util.HashMap;
@@ -321,41 +318,51 @@ public class OpdRegisterFragment extends BaseRegisterFragment implements OpdRegi
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        if (StringUtils.isBlank(filters)) {
-            return super.onCreateLoader(id, args);
-        } else {
-            if (id == LOADER_ID) {// Returns a new CursorLoader
-                return new CursorLoader(getActivity()) {
-                    @Override
-                    public Cursor loadInBackground() {
-                        // Count query
-                        String query = "SELECT * FROM ec_child";
-                        // Select register query
-                        //query = filterandSortQuery();
-                        return commonRepository().rawCustomQueryForAdapter(query);
-                    }
-                };
-            }// An invalid id was passed in
-            return null;
-        }
+    public Loader<Cursor> onCreateLoader(int id, final Bundle args) {
+
+        if (id == LOADER_ID) {// Returns a new CursorLoader
+            return new CursorLoader(getActivity()) {
+                @Override
+                public Cursor loadInBackground() {
+                    // Count query
+                    // Select register query
+                    String query = filterAndSortQuery();
+                    return commonRepository().rawCustomQueryForAdapter(query);
+                }
+            };
+        }// An invalid id was passed in
+        return null;
     }
-/*
-    private String filterandSortQuery() {
+
+    private String filterAndSortQuery() {
         SmartRegisterQueryBuilder sqb = new SmartRegisterQueryBuilder(mainSelect);
 
         String query = "";
         try {
             if (isValidFilterForFts(commonRepository())) {
-                String sql = ChildDBConstants.childMainFilter(mainCondition, presenter().getMainCondition(CommonFtsObject.searchTableName(CoreConstants.TABLE_NAME.FAMILY_MEMBER)), filters, Sortqueries, clientAdapter.getCurrentlimit(), clientAdapter.getCurrentoffset());
+                String sql;
+                if (TextUtils.isEmpty(filters)) {
+                    sql = "SELECT object_id FROM (SELECT object_id, last_interacted_with FROM ec_child_search UNION ALL SELECT object_id, last_interacted_with FROM ec_mother_search ORDER BY last_interacted_with DESC) ORDER BY last_interacted_with";
+                } else {
+                    sql = "SELECT object_id FROM (SELECT object_id, last_interacted_with FROM ec_child_search WHERE date_removed IS NULL AND phrase MATCH '%s*' UNION ALL SELECT object_id, last_interacted_with FROM ec_mother_search WHERE date_removed IS NULL AND phrase MATCH '%s*') ORDER BY last_interacted_with";
+                    sql = sql.replace("%s", filters);
+                }
+
+                sql = sqb.addlimitandOffset(sql, clientAdapter.getCurrentlimit(), clientAdapter.getCurrentoffset());
+
                 List<String> ids = commonRepository().findSearchIds(sql);
-                query = sqb.toStringFts(ids, tablename, CommonRepository.ID_COLUMN,
-                        Sortqueries);
-                query = sqb.Endquery(query);
+                //query = "SELECT "
+
+                query = presenter().getWhereInQuery();
+
+                String joinedIds = "'" + StringUtils.join(ids, "','") + "'";
+                return query.replace("%s", joinedIds);
             } else {
                 sqb.addCondition(filters);
                 query = sqb.orderbyCondition(Sortqueries);
-                query = sqb.Endquery(sqb.addlimitandOffset(query, clientAdapter.getCurrentlimit(), clientAdapter.getCurrentoffset()));
+                query = sqb.Endquery(sqb.addlimitandOffset(query
+                        , clientAdapter.getCurrentlimit()
+                        , clientAdapter.getCurrentoffset()));
 
             }
         } catch (Exception e) {
@@ -363,5 +370,37 @@ public class OpdRegisterFragment extends BaseRegisterFragment implements OpdRegi
         }
 
         return query;
-    }*/
+    }
+
+    @Override
+    public void countExecute() {
+        Cursor c = null;
+
+        try {
+            SmartRegisterQueryBuilder sqb = new SmartRegisterQueryBuilder(countSelect);
+            String query = "";
+
+
+            String sql = sqb.countQueryFts("ec_child", null, null, filters);
+            Timber.i(query);
+            int totalCount = commonRepository().countSearchIds(sql);
+
+            sql = sqb.countQueryFts("ec_mother", null, null, filters);
+            Timber.i(query);
+            totalCount += commonRepository().countSearchIds(sql);
+
+            clientAdapter.setTotalcount(totalCount);
+            Timber.i("total count here %d", clientAdapter.getTotalcount());
+
+            clientAdapter.setCurrentlimit(20);
+            clientAdapter.setCurrentoffset(0);
+
+        } catch (Exception e) {
+            Timber.e(e);
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+    }
 }

@@ -15,28 +15,45 @@ import org.smartregister.opd.R;
 public class OpdRegisterViewHolder extends RecyclerView.ViewHolder {
     public TextView textViewParentName;
     public TextView textViewChildName;
-    public TextView textViewAddressGender;
+    public TextView textViewGender;
     public Button dueButton;
     public View dueButtonLayout;
     public View childColumn;
-    private TextView tvRegisterType;
-    private TextView tvLocation;
+    public TextView tvRegisterType;
+    public TextView tvLocation;
+
+    public TextView secondDotDivider;
 
     public OpdRegisterViewHolder(View itemView) {
         super(itemView);
 
         textViewParentName = itemView.findViewById(R.id.tv_opdRegisterListRow_parentName);
         textViewChildName = itemView.findViewById(R.id.tv_opdRegisterListRow_childName);
-        textViewAddressGender = itemView.findViewById(R.id.tv_opdRegisterListRow_gender);
+        textViewGender = itemView.findViewById(R.id.tv_opdRegisterListRow_gender);
         dueButton = itemView.findViewById(R.id.btn_opdRegisterListRow_clientAction);
         dueButtonLayout = itemView.findViewById(R.id.ll_opdRegisterListRow_clientActionWrapper);
         tvRegisterType = itemView.findViewById(R.id.tv_opdRegisterListRow_registerType);
         tvLocation = itemView.findViewById(R.id.tv_opdRegisterListRow_location);
 
         childColumn = itemView.findViewById(R.id.child_column);
+        secondDotDivider = itemView.findViewById(R.id.tv_opdRegisterListRow_secondDotDivider);
     }
 
-    public void showCareGiveName() {
+    public void showCareGiverName() {
         textViewParentName.setVisibility(View.VISIBLE);
+    }
+
+    public void removeCareGiverName() {
+        textViewParentName.setVisibility(View.GONE);
+    }
+
+    public void showPersonLocation() {
+        tvLocation.setVisibility(View.GONE);
+        secondDotDivider.setVisibility(View.GONE);
+    }
+
+    public void removePersonLocation() {
+        tvLocation.setVisibility(View.VISIBLE);
+        secondDotDivider.setVisibility(View.VISIBLE);
     }
 }
