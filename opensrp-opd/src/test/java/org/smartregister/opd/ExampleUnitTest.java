@@ -1,4 +1,4 @@
-package com.example.opensrpopd;
+package org.smartregister.opd;
 
 import org.junit.Test;
 

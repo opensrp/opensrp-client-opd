@@ -2,13 +2,7 @@ package org.smartregister.opd.interactor;
 
 
 import android.support.annotation.VisibleForTesting;
-import android.util.Pair;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Triple;
-import org.smartregister.clientandeventmodel.Client;
-import org.smartregister.clientandeventmodel.Event;
-import org.smartregister.domain.UniqueId;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
 import org.smartregister.opd.utils.AppExecutors;
