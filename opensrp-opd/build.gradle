@@ -71,7 +71,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
-    api ('org.smartregister:opensrp-client-core:1.7.16-ANC_LIB-SNAPSHOT@aar') {
+    api ('org.smartregister:opensrp-client-core:1.7.18-ANC_LIB-SNAPSHOT@aar') {
         transitive = true
         exclude group: 'com.github.bmelnychuk', module: 'atv'
         exclude group: 'com.google.guava', module: 'guava'

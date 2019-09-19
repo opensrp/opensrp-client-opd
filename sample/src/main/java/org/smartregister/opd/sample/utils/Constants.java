@@ -6,7 +6,8 @@ package org.smartregister.opd.sample.utils;
 
 public interface Constants {
 
-    String TABLE_NAME = "ec_client";
+    String TABLE_NAME = "ec_child";
+    String TABLE_NAME2 = "ec_mother";
 
     interface Columns {
 
@@ -15,6 +16,7 @@ public interface Constants {
         String MIDDLE_NAME = "middle_name";
         String DOB = "dob";
         String DOD = "dod";
+        String LAST_INTERACTED_WITH = "last_interacted_with";
 
     }
 }

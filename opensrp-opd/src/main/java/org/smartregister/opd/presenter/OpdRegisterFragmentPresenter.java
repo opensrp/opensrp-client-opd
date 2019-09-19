@@ -64,7 +64,8 @@ public class OpdRegisterFragmentPresenter implements OpdRegisterFragmentContract
                 "gender",
                 "home_address",
                 "'Child' AS register_type",
-                "relational_id AS relationalid"
+                "relational_id AS relationalid",
+                "last_interacted_with"
         });
 
         queryTables[0] = childQueryTable;
@@ -81,7 +82,8 @@ public class OpdRegisterFragmentPresenter implements OpdRegisterFragmentContract
                 "NULL AS mother_first_name",
                 "NULL AS mother_last_name",
                 "NULL AS mother_middle_name",
-                "relationalid"
+                "relationalid",
+                "last_interacted_with"
         });
         queryTables[1] = womanQueryTable;
         String countSelect = model.countSelect(queryTables);

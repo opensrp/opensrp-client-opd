@@ -1,7 +1,5 @@
 package org.smartregister.opd.sample.application;
 
-import com.evernote.android.job.JobManager;
-
 import org.smartregister.Context;
 import org.smartregister.CoreLibrary;
 import org.smartregister.commonregistry.CommonFtsObject;
@@ -43,13 +41,16 @@ public class OpdSampleApplication extends org.smartregister.view.activity.Drisht
     }
 
     private static String[] getFtsTables() {
-        return new String[]{Constants.TABLE_NAME};
+        return new String[]{Constants.TABLE_NAME, Constants.TABLE_NAME2};
     }
 
     private static String[] getFtsSearchFields(String tableName) {
         if (tableName.equals(Constants.TABLE_NAME)) {
-            return new String[]{Constants.Columns.FIRST_NAME, Constants.Columns.MIDDLE_NAME, Constants.Columns.LAST_NAME, Constants.Columns.DOB};
+            return new String[]{Constants.Columns.FIRST_NAME, Constants.Columns.MIDDLE_NAME, Constants.Columns.LAST_NAME, Constants.Columns.DOB, Constants.Columns.LAST_INTERACTED_WITH};
+        } else if (tableName.equals(Constants.TABLE_NAME2)) {
+            return new String[]{Constants.Columns.FIRST_NAME, Constants.Columns.MIDDLE_NAME, Constants.Columns.LAST_NAME, Constants.Columns.DOB, Constants.Columns.LAST_INTERACTED_WITH};
         }
+
         return null;
     }
 
