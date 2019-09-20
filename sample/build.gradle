@@ -49,6 +49,8 @@ android {
             buildConfigField "int", "MAX_SYNC_RETRIES", '3'
         }
     }
+
+    lintOptions.abortOnError false
 }
 
 dependencies {
