@@ -69,4 +69,9 @@ public class OpdLibrary {
         }
         return syncHelper;
     }
+
+    @NonNull
+    public OpdConfiguration getOpdConfiguration() {
+        return opdConfiguration;
+    }
 }

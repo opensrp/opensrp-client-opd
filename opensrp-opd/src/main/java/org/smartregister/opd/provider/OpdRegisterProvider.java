@@ -12,8 +12,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.apache.commons.lang3.text.WordUtils;
+import org.smartregister.opd.OpdLibrary;
+import org.smartregister.opd.configuration.OpdRegisterProviderMetadata;
 import org.smartregister.opd.holders.FooterViewHolder;
-import org.smartregister.opd.utils.OpdDbConstants;
+import org.smartregister.opd.utils.ConfigurationInstancesHelper;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.cursoradapter.RecyclerViewProvider;
 import org.smartregister.opd.R;
@@ -28,6 +30,7 @@ import org.smartregister.view.dialog.SortOption;
 import org.smartregister.view.viewholder.OnClickFormLauncher;
 
 import java.text.MessageFormat;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -42,6 +45,8 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
     private View.OnClickListener paginationClickListener;
     private Context context;
 
+    private OpdRegisterProviderMetadata opdRegisterProviderMetadata;
+
     public OpdRegisterProvider(Context context, Set visibleColumns, View.OnClickListener onClickListener, View.OnClickListener paginationClickListener) {
 
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -49,6 +54,11 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
         this.onClickListener = onClickListener;
         this.paginationClickListener = paginationClickListener;
         this.context = context;
+
+        // Get the configuration
+        this.opdRegisterProviderMetadata = ConfigurationInstancesHelper.newInstance(OpdLibrary.getInstance()
+                .getOpdConfiguration()
+                .getOpdRegisterProviderMetadata());
     }
 
     @Override
@@ -57,8 +67,6 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
         if (visibleColumns.isEmpty()) {
             populatePatientColumn(pc, client, viewHolder);
             populateIdentifierColumn(pc, viewHolder);
-
-            return;
         }
     }
 
@@ -127,14 +135,14 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
 
     public void populatePatientColumn(CommonPersonObjectClient pc, SmartRegisterClient client, OpdRegisterViewHolder viewHolder) {
 
-        String registerType = Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.REGISTER_TYPE, false);
+        Map<String, String> patientColumnMaps = pc.getColumnmaps();
 
-        if (registerType.contains("Child")) {
+        if (opdRegisterProviderMetadata.isClientHaveGuardianDetails(patientColumnMaps)) {
             viewHolder.showCareGiverName();
 
-            String parentFirstName = Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.MOTHER_FIRST_NAME, true);
-            String parentLastName = Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.MOTHER_LAST_NAME, true);
-            String parentMiddleName = Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.MOTHER_MIDDLE_NAME, true);
+            String parentFirstName = opdRegisterProviderMetadata.getGuardianFirstName(patientColumnMaps);
+            String parentLastName = opdRegisterProviderMetadata.getGuardianLastName(patientColumnMaps);
+            String parentMiddleName = opdRegisterProviderMetadata.getGuardianMiddleName(patientColumnMaps);
 
             String parentName = context.getResources().getString(R.string.care_giver_initials)
                     + ": "
@@ -144,19 +152,25 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
             viewHolder.removeCareGiverName();
         }
 
-        String firstName = Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.FIRST_NAME, true);
-        String middleName = Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.MIDDLE_NAME, true);
-        String lastName = Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.LAST_NAME, true);
+        String firstName = opdRegisterProviderMetadata.getClientFirstName(patientColumnMaps);
+        String middleName = opdRegisterProviderMetadata.getClientMiddleName(patientColumnMaps);
+        String lastName = opdRegisterProviderMetadata.getClientLastName(patientColumnMaps);
         String childName = org.smartregister.util.Utils.getName(firstName, middleName + " " + lastName);
 
-        String dobString = Utils.getDuration(Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.DOB, false));
+        String dobString = Utils.getDuration(opdRegisterProviderMetadata.getDob(patientColumnMaps));
         //dobString = dobString.contains("y") ? dobString.substring(0, dobString.indexOf("y")) : dobString;
         fillValue(viewHolder.textViewChildName, WordUtils.capitalize(childName) + ", " + WordUtils.capitalize(OpdUtils.getTranslatedDate(dobString, context)));
-        fillValue(viewHolder.tvRegisterType, registerType);
+        String registerType = opdRegisterProviderMetadata.getRegisterType(patientColumnMaps);
+
+        if (registerType != null) {
+            viewHolder.showRegisterType();
+            fillValue(viewHolder.tvRegisterType, registerType);
+        } else {
+            viewHolder.hideRegisterType();
+        }
+
         setAddressAndGender(pc, viewHolder);
-
         addButtonClickListeners(client, viewHolder);
-
     }
 
     public void populateIdentifierColumn(CommonPersonObjectClient pc, OpdRegisterViewHolder viewHolder) {
@@ -167,12 +181,13 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
         if (v != null) {
             v.setText(value);
         }
-
     }
 
     public void setAddressAndGender(CommonPersonObjectClient pc, OpdRegisterViewHolder viewHolder) {
-        String address = Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.HOME_ADDRESS, true);
-        String gender = Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.GENDER, true);
+        Map<String, String> patientColumnMaps = pc.getColumnmaps();
+        String address = opdRegisterProviderMetadata.getHomeAddress(patientColumnMaps);
+        String gender = opdRegisterProviderMetadata.getGender(patientColumnMaps);
+
         fillValue(viewHolder.textViewGender, gender);
 
         if (TextUtils.isEmpty(address)) {

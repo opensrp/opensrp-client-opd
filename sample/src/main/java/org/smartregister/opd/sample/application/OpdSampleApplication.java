@@ -81,7 +81,7 @@ public class OpdSampleApplication extends org.smartregister.view.activity.Drisht
 
         //Initialize Modules
         CoreLibrary.init(context, new SampleSyncConfiguration());
-        OpdLibrary.init(context, getRepository(), new OpdConfiguration());
+        OpdLibrary.init(context, getRepository(), new OpdConfiguration.Builder().build());
 
         //Auto login by default
         context.session().start(context.session().lengthInMilliseconds());

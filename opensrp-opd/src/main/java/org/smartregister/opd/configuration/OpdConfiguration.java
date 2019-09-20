@@ -33,8 +33,7 @@ public class OpdConfiguration {
         private Builder builder;
         private Class<? extends OpdRegisterProviderMetadata> opdRegisterProviderMetadata;
 
-        public Builder(@NonNull String tableName) {
-            this.tableName = tableName;
+        public Builder() {
         }
 
         public Builder setTableName(String tableName) {
@@ -45,6 +44,10 @@ public class OpdConfiguration {
         public Builder setOpdRegisterProviderMetadata(@Nullable Class<? extends OpdRegisterProviderMetadata> opdRegisterProviderMetadata) {
             this.opdRegisterProviderMetadata = opdRegisterProviderMetadata;
             return this;
+        }
+
+        public OpdConfiguration build() {
+            return new OpdConfiguration(this);
         }
     }
 }
