@@ -107,7 +107,7 @@ public class OpdRegisterFragmentPresenter implements OpdRegisterFragmentContract
         String mainSelect = model.mainSelect(innerJoinObjects, new QueryTable[]{womanQueryTable});
 
         getView().initializeQueryParams("ec_child", countSelect, mainSelect);
-        getView().initializeAdapter(visibleColumns);
+        getView().initializeAdapter();
 
         getView().countExecute();
         getView().filterandSortInInitializeQueries();

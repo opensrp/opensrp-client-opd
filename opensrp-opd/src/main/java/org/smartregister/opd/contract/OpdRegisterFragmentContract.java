@@ -24,7 +24,7 @@ public interface OpdRegisterFragmentContract {
 
     interface View extends BaseRegisterFragmentContract.View {
 
-        void initializeAdapter(Set<org.smartregister.configurableviews.model.View> visibleColumns);
+        void initializeAdapter();
 
         Presenter presenter();
 

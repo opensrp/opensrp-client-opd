@@ -23,26 +23,36 @@ public class OpdConfiguration {
         }
     }
 
+    @NonNull
     public Class<? extends OpdRegisterProviderMetadata> getOpdRegisterProviderMetadata() {
         return builder.opdRegisterProviderMetadata;
     }
 
+    @Nullable
+    public Class<? extends OpdRegisterRowOptions> getOpdRegisterRowOptions() {
+        return builder.opdRegisterRowOptions;
+    }
+
     public static class Builder {
 
-        private String tableName;
         private Builder builder;
+
+        @Nullable
         private Class<? extends OpdRegisterProviderMetadata> opdRegisterProviderMetadata;
+
+        @Nullable
+        private Class<? extends OpdRegisterRowOptions> opdRegisterRowOptions;
 
         public Builder() {
         }
 
-        public Builder setTableName(String tableName) {
-            this.tableName = tableName;
+        public Builder setOpdRegisterProviderMetadata(@Nullable Class<? extends OpdRegisterProviderMetadata> opdRegisterProviderMetadata) {
+            this.opdRegisterProviderMetadata = opdRegisterProviderMetadata;
             return this;
         }
 
-        public Builder setOpdRegisterProviderMetadata(@Nullable Class<? extends OpdRegisterProviderMetadata> opdRegisterProviderMetadata) {
-            this.opdRegisterProviderMetadata = opdRegisterProviderMetadata;
+        public Builder setOpdRegisterRowOptions(@Nullable Class<? extends OpdRegisterRowOptions> opdRegisterRowOptions) {
+            this.opdRegisterRowOptions = opdRegisterRowOptions;
             return this;
         }
 

@@ -1,11 +1,14 @@
 package org.smartregister.opd.sample.application;
 
+import com.evernote.android.job.JobManager;
+
 import org.smartregister.Context;
 import org.smartregister.CoreLibrary;
 import org.smartregister.commonregistry.CommonFtsObject;
 import org.smartregister.location.helper.LocationHelper;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.configuration.OpdConfiguration;
+import org.smartregister.opd.job.SampleOpdJobCreator;
 import org.smartregister.opd.sample.configuration.SampleSyncConfiguration;
 import org.smartregister.opd.sample.repository.SampleRepository;
 import org.smartregister.opd.sample.utils.Constants;
@@ -91,7 +94,8 @@ public class OpdSampleApplication extends org.smartregister.view.activity.Drisht
         SyncStatusBroadcastReceiver.init(this);
         LocationHelper.init(Utils.ALLOWED_LEVELS, Utils.DEFAULT_LOCATION_LEVEL);
 
-
+        //init Job Manager
+        JobManager.create(this).addJobCreator(new SampleOpdJobCreator());
         sampleUniqueIds();
     }
 
