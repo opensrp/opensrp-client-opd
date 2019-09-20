@@ -2,6 +2,7 @@ package org.smartregister.opd.fragment;
 
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.AppCompatTextView;
@@ -23,6 +24,7 @@ import org.smartregister.opd.model.OpdRegisterFragmentModel;
 import org.smartregister.opd.presenter.OpdRegisterFragmentPresenter;
 import org.smartregister.opd.provider.OpdRegisterProvider;
 import org.smartregister.opd.utils.OpdUtils;
+import org.smartregister.opd.utils.OpdViewConstants;
 import org.smartregister.receiver.SyncStatusBroadcastReceiver;
 import org.smartregister.util.Utils;
 import org.smartregister.view.activity.BaseRegisterActivity;
@@ -37,7 +39,7 @@ import timber.log.Timber;
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-13
  */
 
-public class BaseOpdRegisterFragment extends BaseRegisterFragment implements OpdRegisterFragmentContract.View {
+public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment implements OpdRegisterFragmentContract.View {
 
     public static final String CLICK_VIEW_NORMAL = "click_view_normal";
     public static final String CLICK_VIEW_DOSAGE_STATUS = "click_view_dosage_status";
@@ -123,10 +125,7 @@ public class BaseOpdRegisterFragment extends BaseRegisterFragment implements Opd
             return;
         }
 
-        //String viewConfigurationIdentifier = ((BaseRegisterActivity) getActivity()).getViewIdentifiers().get(0);
-        //presenter = new OpdRegisterFragmentPresenter(this, new OpdRegisterFragmentModel(), viewConfigurationIdentifier);
         presenter = new OpdRegisterFragmentPresenter(this, new OpdRegisterFragmentModel(), "");
-
     }
 
     @Override
@@ -161,10 +160,7 @@ public class BaseOpdRegisterFragment extends BaseRegisterFragment implements Opd
     }
 
     @Override
-    protected void startRegistration() {
-        //((OpdRegisterActivity) getActivity()).startFormActivity(CoreConstants.JSON_FORM.getChildRegister(), null, null);
-        //getActivity().startFormActivity(Utils.metadata().familyRegister.formName, null, null);
-    }
+    abstract protected void startRegistration();
 
     @Override
     protected void onViewClicked(View view) {
@@ -173,14 +169,29 @@ public class BaseOpdRegisterFragment extends BaseRegisterFragment implements Opd
             return;
         }
 
-        if (view.getTag() != null && view.getTag(R.id.VIEW_ID) == CLICK_VIEW_NORMAL) {
-            if (view.getTag() instanceof CommonPersonObjectClient) {
-                goToChildDetailActivity((CommonPersonObjectClient) view.getTag(), false);
-            }
-        } else if (view.getId() == R.id.due_only_layout) {
+        if (view.getId() == R.id.due_only_layout) {
             toggleFilterSelection(view);
+        } else if (view.getTag(R.id.VIEW_TYPE) != null) {
+            Object viewClient = view.getTag(R.id.VIEW_CLIENT);
+
+            if (viewClient != null) {
+                if (viewClient instanceof CommonPersonObjectClient) {
+                    if (view.getTag(R.id.VIEW_TYPE).equals(OpdViewConstants.Provider.CHILD_COLUMN)) {
+
+                        goToClientDetailActivity((CommonPersonObjectClient) view.getTag());
+                    } else if (view.getTag(R.id.VIEW_TYPE).equals(OpdViewConstants.Provider.ACTION_BUTTON_COLUMN)) {
+                        performPatientAction((CommonPersonObjectClient) viewClient);
+                    }
+                } else {
+                    Timber.e(new Exception(), "Value for key[%d] is not a CommonPersonObjectClient but is of type %s"
+                            , R.id.VIEW_CLIENT
+                            , viewClient.getClass().getName());
+                }
+            }
         }
     }
+
+    abstract protected void performPatientAction(@NonNull CommonPersonObjectClient commonPersonObjectClient);
 
     @Override
     public void onSyncInProgress(FetchStatus fetchStatus) {
@@ -195,7 +206,8 @@ public class BaseOpdRegisterFragment extends BaseRegisterFragment implements Opd
 
     @Override
     public void onSyncComplete(FetchStatus fetchStatus) {
-        if (!SyncStatusBroadcastReceiver.getInstance().isSyncing() && (FetchStatus.fetched.equals(fetchStatus) || FetchStatus.nothingFetched.equals(fetchStatus)) && (dueFilterActive && dueOnlyLayout != null)) {
+        if (!SyncStatusBroadcastReceiver.getInstance().isSyncing() && (FetchStatus.fetched.equals(fetchStatus)
+                || FetchStatus.nothingFetched.equals(fetchStatus)) && (dueFilterActive && dueOnlyLayout != null)) {
             dueFilter(dueOnlyLayout);
             Utils.showShortToast(getActivity(), getString(R.string.sync_complete));
             refreshSyncProgressSpinner();
@@ -231,17 +243,7 @@ public class BaseOpdRegisterFragment extends BaseRegisterFragment implements Opd
         }
     }
 
-    public void goToChildDetailActivity(CommonPersonObjectClient patient,
-                                        boolean launchDialog) {
-/*
-        if (launchDialog) {
-            Timber.i(patient.name);
-        }
-
-        Intent intent = new Intent(getActivity(), CoreChildProfileActivity.class);
-        intent.putExtra(org.smartregister.family.util.Constants.INTENT_KEY.BASE_ENTITY_ID, patient.getCaseId());
-        startActivity(intent);*/
-    }
+    abstract protected void goToClientDetailActivity(CommonPersonObjectClient commonPersonObjectClient);
 
     public void toggleFilterSelection(View dueOnlyLayout) {
         if (dueOnlyLayout != null) {
@@ -370,8 +372,6 @@ public class BaseOpdRegisterFragment extends BaseRegisterFragment implements Opd
 
     @Override
     public void countExecute() {
-        Cursor c = null;
-
         try {
             SmartRegisterQueryBuilder sqb = new SmartRegisterQueryBuilder(countSelect);
             String query = "";
@@ -393,10 +393,6 @@ public class BaseOpdRegisterFragment extends BaseRegisterFragment implements Opd
 
         } catch (Exception e) {
             Timber.e(e);
-        } finally {
-            if (c != null) {
-                c.close();
-            }
         }
     }
 }

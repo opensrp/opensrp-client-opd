@@ -1,5 +1,8 @@
 package org.smartregister.opd.presenter;
 
+import android.support.annotation.NonNull;
+
+import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.opd.R;
 import org.smartregister.opd.contract.OpdRegisterFragmentContract;
 
@@ -223,5 +226,15 @@ public class OpdRegisterFragmentPresenter implements OpdRegisterFragmentContract
         tablesWithInnerJoins[0] = tableColsInnerJoin;
 
         return model.mainSelectWhereIdsIn(tablesWithInnerJoins, new QueryTable[]{womanTableCol});
+    }
+
+    @Override
+    public void onClientClicked(@NonNull CommonPersonObjectClient commonPersonObjectClient) {
+
+    }
+
+    @Override
+    public void onActionButtonClicked(@NonNull CommonPersonObjectClient commonPersonObjectClient) {
+
     }
 }

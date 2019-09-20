@@ -11,13 +11,12 @@ import java.util.List;
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-13
  */
 
-public class OpdRegisterActivityPresenter implements OpdRegisterActivityContract.Presenter, OpdRegisterActivityContract.InteractorCallBack {
-    public static final String TAG = OpdRegisterActivityPresenter.class.getName();
+public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterActivityContract.Presenter, OpdRegisterActivityContract.InteractorCallBack {
     private WeakReference<OpdRegisterActivityContract.View> viewReference;
     private OpdRegisterActivityContract.Interactor interactor;
     private OpdRegisterActivityContract.Model model;
 
-    public OpdRegisterActivityPresenter(OpdRegisterActivityContract.View view, OpdRegisterActivityContract.Model model) {
+    public BaseOpdRegisterActivityPresenter(OpdRegisterActivityContract.View view, OpdRegisterActivityContract.Model model) {
         viewReference = new WeakReference<>(view);
         interactor = new OpdRegisterActivityInteractor();
         this.model = model;
@@ -74,10 +73,5 @@ public class OpdRegisterActivityPresenter implements OpdRegisterActivityContract
     public void saveLanguage(String language) {
         model.saveLanguage(language);
         getView().displayToast(language + " selected");
-    }
-
-    @Override
-    public void saveForm(String jsonString, boolean isEditMode) {
-
     }
 }

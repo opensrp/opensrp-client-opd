@@ -4,6 +4,7 @@ package org.smartregister.opd.contract;
 import android.support.annotation.NonNull;
 
 import org.json.JSONArray;
+import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.configurableviews.model.Field;
 import org.smartregister.configurableviews.model.RegisterConfiguration;
 import org.smartregister.configurableviews.model.ViewConfiguration;
@@ -43,6 +44,10 @@ public interface OpdRegisterFragmentContract {
         String getDueFilterCondition();
 
         String getWhereInQuery();
+
+        void onClientClicked(@NonNull CommonPersonObjectClient commonPersonObjectClient);
+
+        void onActionButtonClicked(@NonNull CommonPersonObjectClient commonPersonObjectClient);
 
     }
 

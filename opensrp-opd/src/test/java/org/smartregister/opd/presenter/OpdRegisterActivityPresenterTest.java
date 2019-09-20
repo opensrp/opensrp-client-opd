@@ -17,7 +17,7 @@ public class OpdRegisterActivityPresenterTest extends BaseTest {
     @Mock
     private OpdRegisterActivityContract.Interactor interactor;
 
-    private OpdRegisterActivityPresenter presenter;
+    private BaseOpdRegisterActivityPresenter presenter;
 
     @Mock
     private OpdRegisterActivityContract.View view;
@@ -28,7 +28,7 @@ public class OpdRegisterActivityPresenterTest extends BaseTest {
 
     @Before
     public void setUp() throws Exception {
-        presenter = new OpdRegisterActivityPresenter(view, model);
+        presenter = new BaseOpdRegisterActivityPresenter(view, model);
         ReflectionHelpers.setField(presenter, "interactor", interactor);
     }
 

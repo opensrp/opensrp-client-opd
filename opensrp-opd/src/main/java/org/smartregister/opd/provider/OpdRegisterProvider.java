@@ -22,6 +22,7 @@ import org.smartregister.cursoradapter.RecyclerViewProvider;
 import org.smartregister.opd.R;
 import org.smartregister.opd.holders.OpdRegisterViewHolder;
 import org.smartregister.opd.utils.OpdUtils;
+import org.smartregister.opd.utils.OpdViewConstants;
 import org.smartregister.util.Utils;
 import org.smartregister.view.contract.SmartRegisterClient;
 import org.smartregister.view.contract.SmartRegisterClients;
@@ -49,7 +50,7 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
     @Nullable
     private OpdRegisterRowOptions opdRegisterRowOptions;
 
-    public OpdRegisterProvider(Context context, View.OnClickListener onClickListener, View.OnClickListener paginationClickListener) {
+    public OpdRegisterProvider(@NonNull Context context, @NonNull View.OnClickListener onClickListener, @NonNull View.OnClickListener paginationClickListener) {
 
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.onClickListener = onClickListener;
@@ -78,7 +79,6 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
             opdRegisterRowOptions.populateClientRow(cursor, pc, client, viewHolder);
         } else {
             populatePatientColumn(pc, client, viewHolder);
-            populateIdentifierColumn(pc, viewHolder);
 
             if (opdRegisterRowOptions != null) {
                 opdRegisterRowOptions.populateClientRow(cursor, pc, client, viewHolder);
@@ -161,8 +161,8 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
         return viewHolder instanceof FooterViewHolder;
     }
 
-    public void populatePatientColumn(CommonPersonObjectClient pc, SmartRegisterClient client, OpdRegisterViewHolder viewHolder) {
-        Map<String, String> patientColumnMaps = pc.getColumnmaps();
+    public void populatePatientColumn(CommonPersonObjectClient commonPersonObjectClient, SmartRegisterClient smartRegisterClient, OpdRegisterViewHolder viewHolder) {
+        Map<String, String> patientColumnMaps = commonPersonObjectClient.getColumnmaps();
 
         if (opdRegisterProviderMetadata.isClientHaveGuardianDetails(patientColumnMaps)) {
             viewHolder.showCareGiverName();
@@ -196,12 +196,8 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
             viewHolder.hideRegisterType();
         }
 
-        setAddressAndGender(pc, viewHolder);
-        addButtonClickListeners(client, viewHolder);
-    }
-
-    public void populateIdentifierColumn(CommonPersonObjectClient pc, OpdRegisterViewHolder viewHolder) {
-        //fillValue(viewHolder.ancId, String.format(context.getString(R.string.unique_id_text), uniqueId));
+        setAddressAndGender(commonPersonObjectClient, viewHolder);
+        addButtonClickListeners(commonPersonObjectClient, viewHolder);
     }
 
     public static void fillValue(@Nullable TextView v, @NonNull String value) {
@@ -225,42 +221,15 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
         }
     }
 
-    public void addButtonClickListeners(SmartRegisterClient client, OpdRegisterViewHolder viewHolder) {
+    public void addButtonClickListeners(@NonNull CommonPersonObjectClient client, OpdRegisterViewHolder viewHolder) {
         View patient = viewHolder.childColumn;
-        attachPatientOnclickListener(patient, client);
+        attachPatientOnclickListener(OpdViewConstants.Provider.CHILD_COLUMN, patient, client);
+        attachPatientOnclickListener(OpdViewConstants.Provider.ACTION_BUTTON_COLUMN, viewHolder.dueButton, client);
     }
 
-    public void attachPatientOnclickListener(View view, SmartRegisterClient client) {
+    public void attachPatientOnclickListener(@NonNull String viewType, @NonNull View view, @NonNull CommonPersonObjectClient client) {
         view.setOnClickListener(onClickListener);
-        view.setTag(client);
-        //view.setTag(R.id.VIEW_ID, BaseFamilyRegisterFragment.CLICK_VIEW_NORMAL);
-    }
-
-    public LayoutInflater getInflater() {
-        return inflater;
-    }
-
-    public View.OnClickListener getOnClickListener() {
-        return onClickListener;
-    }
-
-    public void setOnClickListener(View.OnClickListener onClickListener) {
-        this.onClickListener = onClickListener;
-    }
-
-    public View.OnClickListener getPaginationClickListener() {
-        return paginationClickListener;
-    }
-
-    public void setPaginationClickListener(View.OnClickListener paginationClickListener) {
-        this.paginationClickListener = paginationClickListener;
-    }
-
-    public Context getContext() {
-        return context;
-    }
-
-    public void setContext(Context context) {
-        this.context = context;
+        view.setTag(R.id.VIEW_TYPE, viewType);
+        view.setTag(R.id.VIEW_CLIENT, client);
     }
 }
