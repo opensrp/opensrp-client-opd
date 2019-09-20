@@ -88,7 +88,6 @@ public class OpdRegisterFragmentModel implements OpdRegisterFragmentContract.Mod
             query.append(countQueryBuilder.getSelectquery());
         }
 
-
         for (int i = 0; i < tableCols.length; i++) {
             QueryTable tableCol = tableCols[i];
 

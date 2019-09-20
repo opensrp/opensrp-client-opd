@@ -28,7 +28,7 @@ public class OpdRegisterActivityPresenterTest extends BaseTest {
 
     @Before
     public void setUp() throws Exception {
-        presenter = new BaseOpdRegisterActivityPresenter(view, model);
+        presenter = new TestOpdRegisterActivityPresenter(view, model);
         ReflectionHelpers.setField(presenter, "interactor", interactor);
     }
 

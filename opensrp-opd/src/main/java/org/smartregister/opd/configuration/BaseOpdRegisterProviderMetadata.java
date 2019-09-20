@@ -69,7 +69,7 @@ public class BaseOpdRegisterProviderMetadata implements OpdRegisterProviderMetad
     @Nullable
     @Override
     public String getRegisterType(@NonNull Map<String, String> columnMaps) {
-        return Utils.getValue(columnMaps, OpdDbConstants.KEY.MOTHER_MIDDLE_NAME, true);
+        return Utils.getValue(columnMaps, OpdDbConstants.KEY.REGISTER_TYPE, true);
     }
 
     @NonNull
