@@ -6,8 +6,6 @@ import android.support.annotation.NonNull;
 import org.json.JSONArray;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.configurableviews.model.Field;
-import org.smartregister.configurableviews.model.RegisterConfiguration;
-import org.smartregister.configurableviews.model.ViewConfiguration;
 import org.smartregister.domain.Response;
 import org.smartregister.opd.pojos.QueryTable;
 import org.smartregister.opd.pojos.InnerJoinObject;
@@ -53,14 +51,6 @@ public interface OpdRegisterFragmentContract {
 
     interface Model {
 
-        RegisterConfiguration defaultRegisterConfiguration();
-
-        ViewConfiguration getViewConfiguration(String viewConfigurationIdentifier);
-
-        Set<org.smartregister.configurableviews.model.View> getRegisterActiveColumns(String viewConfigurationIdentifier);
-
-        String countSelect(@NonNull QueryTable[] queryTables);
-
         String mainSelect(@NonNull InnerJoinObject[] tableColsInnerJoins, @NonNull QueryTable[] tableCols);
 
         String mainSelectWhereIdsIn(@NonNull InnerJoinObject[] tableColsInnerJoins, @NonNull QueryTable[] tableCols);
@@ -72,6 +62,4 @@ public interface OpdRegisterFragmentContract {
         JSONArray getJsonArray(Response<String> response);
 
     }
-
-
 }

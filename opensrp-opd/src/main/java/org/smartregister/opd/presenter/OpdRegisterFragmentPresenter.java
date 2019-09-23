@@ -28,14 +28,12 @@ public class OpdRegisterFragmentPresenter implements OpdRegisterFragmentContract
     protected Set<View> visibleColumns = new TreeSet<>();
     private WeakReference<OpdRegisterFragmentContract.View> viewReference;
     private OpdRegisterFragmentContract.Model model;
-    private RegisterConfiguration config;
     private String viewConfigurationIdentifier;
 
     public OpdRegisterFragmentPresenter(OpdRegisterFragmentContract.View view, OpdRegisterFragmentContract.Model model, String viewConfigurationIdentifier) {
         this.viewReference = new WeakReference<>(view);
         this.model = model;
         this.viewConfigurationIdentifier = viewConfigurationIdentifier;
-        this.config = model.defaultRegisterConfiguration();
     }
 
     @Override
@@ -43,21 +41,10 @@ public class OpdRegisterFragmentPresenter implements OpdRegisterFragmentContract
         if (StringUtils.isBlank(viewConfigurationIdentifier)) {
             return;
         }
-
-        ViewConfiguration viewConfiguration = model.getViewConfiguration(viewConfigurationIdentifier);
-        if (viewConfiguration != null) {
-            config = (RegisterConfiguration) viewConfiguration.getMetadata();
-            setVisibleColumns(model.getRegisterActiveColumns(viewConfigurationIdentifier));
-        }
-
-        if (config.getSearchBarText() != null && getView() != null) {
-            getView().updateSearchBarHint(getView().getContext().getString(R.string.search_name_or_id));
-        }
     }
 
     @Override
     public void initializeQueries(String mainCondition) {
-        QueryTable[] queryTables = new QueryTable[2];
         QueryTable childQueryTable = new QueryTable();
         childQueryTable.setTableName("ec_child");
         childQueryTable.setColNames(new String[]{
@@ -70,8 +57,6 @@ public class OpdRegisterFragmentPresenter implements OpdRegisterFragmentContract
                 "relational_id AS relationalid",
                 "last_interacted_with"
         });
-
-        queryTables[0] = childQueryTable;
 
         QueryTable womanQueryTable = new QueryTable();
         womanQueryTable.setTableName("ec_mother");
@@ -88,8 +73,6 @@ public class OpdRegisterFragmentPresenter implements OpdRegisterFragmentContract
                 "relationalid",
                 "last_interacted_with"
         });
-        queryTables[1] = womanQueryTable;
-        String countSelect = model.countSelect(queryTables);
 
         InnerJoinObject[] innerJoinObjects = new InnerJoinObject[1];
         InnerJoinObject childTableInnerJoinMotherTable = new InnerJoinObject();
@@ -109,7 +92,7 @@ public class OpdRegisterFragmentPresenter implements OpdRegisterFragmentContract
 
         String mainSelect = model.mainSelect(innerJoinObjects, new QueryTable[]{womanQueryTable});
 
-        getView().initializeQueryParams("ec_child", countSelect, mainSelect);
+        getView().initializeQueryParams("ec_child", null, mainSelect);
         getView().initializeAdapter();
 
         getView().countExecute();
@@ -177,7 +160,6 @@ public class OpdRegisterFragmentPresenter implements OpdRegisterFragmentContract
 
     @Override
     public String getWhereInQuery() {
-        QueryTable[] tableCols = new QueryTable[2];
         QueryTable childTableCol = new QueryTable();
         childTableCol.setTableName("ec_child");
         childTableCol.setColNames(new String[]{
@@ -190,8 +172,6 @@ public class OpdRegisterFragmentPresenter implements OpdRegisterFragmentContract
                 "'Child' AS register_type",
                 "relational_id AS relationalid"
         });
-
-        tableCols[0] = childTableCol;
 
         QueryTable womanTableCol = new QueryTable();
         womanTableCol.setTableName("ec_mother");
@@ -208,7 +188,6 @@ public class OpdRegisterFragmentPresenter implements OpdRegisterFragmentContract
                 "NULL AS mother_middle_name",
                 "relationalid"
         });
-        tableCols[1] = womanTableCol;
 
         InnerJoinObject[] tablesWithInnerJoins = new InnerJoinObject[1];
         InnerJoinObject tableColsInnerJoin = new InnerJoinObject();
