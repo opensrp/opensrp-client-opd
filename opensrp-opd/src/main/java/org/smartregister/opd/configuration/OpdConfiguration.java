@@ -40,8 +40,6 @@ public class OpdConfiguration {
 
     public static class Builder {
 
-        private Builder builder;
-
         @Nullable
         private Class<? extends OpdRegisterProviderMetadata> opdRegisterProviderMetadata;
 

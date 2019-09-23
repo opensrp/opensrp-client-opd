@@ -1,11 +1,7 @@
 package org.smartregister.opd.presenter;
 
-import android.support.annotation.NonNull;
-import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.configurableviews.model.Field;
 import org.smartregister.opd.contract.OpdRegisterFragmentContract;
-import org.smartregister.opd.pojos.InnerJoinObject;
-import org.smartregister.opd.pojos.QueryTable;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -113,26 +109,11 @@ public class OpdRegisterFragmentPresenter implements OpdRegisterFragmentContract
     }
 
     @Override
-    public String getDefaultSortQuery() {
-        return "last_interacted_with DESC";
-    }
-
-    @Override
     public String getDueFilterCondition() {
         return "";
     }
 
     public void setModel(OpdRegisterFragmentContract.Model model) {
         this.model = model;
-    }
-
-    @Override
-    public void onClientClicked(@NonNull CommonPersonObjectClient commonPersonObjectClient) {
-
-    }
-
-    @Override
-    public void onActionButtonClicked(@NonNull CommonPersonObjectClient commonPersonObjectClient) {
-
     }
 }

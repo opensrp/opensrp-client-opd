@@ -60,12 +60,6 @@ public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment imple
         super.setupViews(view);
 
         this.view = view;
-        /*
-        Toolbar toolbar = view.findViewById(org.smartregister.R.id.register_toolbar);
-        toolbar.setContentInsetsAbsolute(0, 0);
-        toolbar.setContentInsetsRelative(0, 0);
-        toolbar.setContentInsetStartWithNavigation(0);
-        NavigationMenu.getInstance(getActivity(), null, toolbar);*/
 
         // Update top left icon
         qrCodeScanImageView = view.findViewById(org.smartregister.R.id.scanQrCode);
@@ -161,7 +155,7 @@ public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment imple
 
     @Override
     protected String getDefaultSortQuery() {
-        return presenter().getDefaultSortQuery();
+        return "";
     }
 
     @Override
@@ -183,7 +177,7 @@ public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment imple
                 if (viewClient instanceof CommonPersonObjectClient) {
                     if (view.getTag(R.id.VIEW_TYPE).equals(OpdViewConstants.Provider.CHILD_COLUMN)) {
 
-                        goToClientDetailActivity((CommonPersonObjectClient) view.getTag());
+                        goToClientDetailActivity((CommonPersonObjectClient) viewClient);
                     } else if (view.getTag(R.id.VIEW_TYPE).equals(OpdViewConstants.Provider.ACTION_BUTTON_COLUMN)) {
                         performPatientAction((CommonPersonObjectClient) viewClient);
                     }
@@ -231,13 +225,6 @@ public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment imple
     @Override
     public void onResume() {
         super.onResume();
-        /*
-        Toolbar toolbar = view.findViewById(R.id.register_toolbar);
-        toolbar.setContentInsetsAbsolute(0, 0);
-        toolbar.setContentInsetsRelative(0, 0);
-        toolbar.setContentInsetStartWithNavigation(0);
-        NavigationMenu.getInstance(getActivity(), null, toolbar);
-        */
     }
 
     @Override

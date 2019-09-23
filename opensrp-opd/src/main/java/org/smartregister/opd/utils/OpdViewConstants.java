@@ -10,6 +10,4 @@ public interface OpdViewConstants {
         String CHILD_COLUMN = "child_column";
         String ACTION_BUTTON_COLUMN = "action_button_column";
     }
-
-
 }

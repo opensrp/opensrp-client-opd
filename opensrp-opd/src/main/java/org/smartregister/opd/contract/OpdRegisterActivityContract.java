@@ -46,12 +46,6 @@ public interface OpdRegisterActivityContract {
 
     }
 
-    interface Interactor {
-
-        void onDestroy(boolean isChangingConfiguration);
-
-    }
-
     interface InteractorCallBack {
 
     }

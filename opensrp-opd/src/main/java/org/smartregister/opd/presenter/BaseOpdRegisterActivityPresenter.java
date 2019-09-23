@@ -2,7 +2,6 @@ package org.smartregister.opd.presenter;
 
 
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
-import org.smartregister.opd.interactor.OpdRegisterActivityInteractor;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -13,21 +12,15 @@ import java.util.List;
 
 public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterActivityContract.Presenter, OpdRegisterActivityContract.InteractorCallBack {
     private WeakReference<OpdRegisterActivityContract.View> viewReference;
-    private OpdRegisterActivityContract.Interactor interactor;
     private OpdRegisterActivityContract.Model model;
 
     public BaseOpdRegisterActivityPresenter(OpdRegisterActivityContract.View view, OpdRegisterActivityContract.Model model) {
         viewReference = new WeakReference<>(view);
-        interactor = new OpdRegisterActivityInteractor();
         this.model = model;
     }
 
     public void setModel(OpdRegisterActivityContract.Model model) {
         this.model = model;
-    }
-
-    public void setInteractor(OpdRegisterActivityContract.Interactor interactor) {
-        this.interactor = interactor;
     }
 
     @Override
@@ -42,13 +35,8 @@ public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterAct
 
     @Override
     public void onDestroy(boolean isChangingConfiguration) {
-
-        viewReference = null;//set to null on destroy
-        // Inform interactor
-        interactor.onDestroy(isChangingConfiguration);
-        // Activity destroyed set interactor to null
+        viewReference = null;//set to null on destroy\
         if (!isChangingConfiguration) {
-            interactor = null;
             model = null;
         }
     }

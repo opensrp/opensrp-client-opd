@@ -2,7 +2,7 @@ package org.smartregister.opd.utils;
 
 import android.support.annotation.NonNull;
 
-import org.smartregister.opd.NewInstanceException;
+import org.smartregister.opd.exception.NewInstanceException;
 
 import timber.log.Timber;
 

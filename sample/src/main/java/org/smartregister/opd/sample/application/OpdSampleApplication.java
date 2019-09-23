@@ -8,7 +8,7 @@ import org.smartregister.commonregistry.CommonFtsObject;
 import org.smartregister.location.helper.LocationHelper;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.configuration.OpdConfiguration;
-import org.smartregister.opd.job.SampleOpdJobCreator;
+import org.smartregister.opd.sample.job.SampleOpdJobCreator;
 import org.smartregister.opd.sample.configuration.SampleSyncConfiguration;
 import org.smartregister.opd.sample.repository.SampleRepository;
 import org.smartregister.opd.sample.utils.Constants;

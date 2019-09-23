@@ -63,14 +63,6 @@ public class OpdLibrary {
     }
 
     @NonNull
-    public ECSyncHelper getEcSyncHelper() {
-        if (syncHelper == null) {
-            syncHelper = ECSyncHelper.getInstance(context().applicationContext());
-        }
-        return syncHelper;
-    }
-
-    @NonNull
     public OpdConfiguration getOpdConfiguration() {
         return opdConfiguration;
     }

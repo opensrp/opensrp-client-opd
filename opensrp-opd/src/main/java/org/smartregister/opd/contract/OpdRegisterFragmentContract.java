@@ -1,10 +1,7 @@
 package org.smartregister.opd.contract;
 
 
-import android.support.annotation.NonNull;
-
 import org.json.JSONArray;
-import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.configurableviews.model.Field;
 import org.smartregister.domain.Response;
 import org.smartregister.view.contract.BaseRegisterFragmentContract;
@@ -30,13 +27,7 @@ public interface OpdRegisterFragmentContract {
 
         void updateSortAndFilter(List<Field> filterList, Field sortField);
 
-        String getDefaultSortQuery();
-
         String getDueFilterCondition();
-
-        void onClientClicked(@NonNull CommonPersonObjectClient commonPersonObjectClient);
-
-        void onActionButtonClicked(@NonNull CommonPersonObjectClient commonPersonObjectClient);
 
     }
 
