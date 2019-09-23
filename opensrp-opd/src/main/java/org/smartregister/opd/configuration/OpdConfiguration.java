@@ -33,6 +33,11 @@ public class OpdConfiguration {
         return builder.opdRegisterRowOptions;
     }
 
+    @NonNull
+    public Class<? extends OpdRegisterQueryProviderContract> getOpdRegisterQueryProvider() {
+        return builder.opdRegisterQueryProvider;
+    }
+
     public static class Builder {
 
         private Builder builder;
@@ -43,7 +48,11 @@ public class OpdConfiguration {
         @Nullable
         private Class<? extends OpdRegisterRowOptions> opdRegisterRowOptions;
 
-        public Builder() {
+        @NonNull
+        private Class<? extends OpdRegisterQueryProviderContract> opdRegisterQueryProvider;
+
+        public Builder(@NonNull Class<? extends OpdRegisterQueryProviderContract> opdRegisterQueryProvider) {
+            this.opdRegisterQueryProvider = opdRegisterQueryProvider;
         }
 
         public Builder setOpdRegisterProviderMetadata(@Nullable Class<? extends OpdRegisterProviderMetadata> opdRegisterProviderMetadata) {

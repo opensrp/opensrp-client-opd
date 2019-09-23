@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.AppCompatTextView;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -17,12 +16,15 @@ import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.cursoradapter.RecyclerViewPaginatedAdapter;
 import org.smartregister.cursoradapter.SmartRegisterQueryBuilder;
 import org.smartregister.domain.FetchStatus;
+import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
+import org.smartregister.opd.configuration.OpdRegisterQueryProviderContract;
 import org.smartregister.opd.contract.OpdRegisterFragmentContract;
 import org.smartregister.opd.dialog.NoMatchDialogFragment;
 import org.smartregister.opd.model.OpdRegisterFragmentModel;
 import org.smartregister.opd.presenter.OpdRegisterFragmentPresenter;
 import org.smartregister.opd.provider.OpdRegisterProvider;
+import org.smartregister.opd.utils.ConfigurationInstancesHelper;
 import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.opd.utils.OpdViewConstants;
 import org.smartregister.receiver.SyncStatusBroadcastReceiver;
@@ -41,13 +43,17 @@ import timber.log.Timber;
 
 public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment implements OpdRegisterFragmentContract.View {
 
-    public static final String CLICK_VIEW_NORMAL = "click_view_normal";
-    public static final String CLICK_VIEW_DOSAGE_STATUS = "click_view_dosage_status";
     private static final String DUE_FILTER_TAG = "PRESSED";
     private View view;
     private View dueOnlyLayout;
     private boolean dueFilterActive = false;
+    private OpdRegisterQueryProviderContract opdRegisterQueryProvider;
 
+    public BaseOpdRegisterFragment() {
+        super();
+
+        opdRegisterQueryProvider = ConfigurationInstancesHelper.newInstance(OpdLibrary.getInstance().getOpdConfiguration().getOpdRegisterQueryProvider());
+    }
 
     @Override
     public void setupViews(View view) {
@@ -116,7 +122,6 @@ public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment imple
         dueOnlyLayout = view.findViewById(R.id.due_only_layout);
         dueOnlyLayout.setVisibility(View.VISIBLE);
         dueOnlyLayout.setOnClickListener(registerActionHandler);
-
     }
 
     @Override
@@ -125,7 +130,7 @@ public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment imple
             return;
         }
 
-        presenter = new OpdRegisterFragmentPresenter(this, new OpdRegisterFragmentModel(), "");
+        presenter = new OpdRegisterFragmentPresenter(this, new OpdRegisterFragmentModel());
     }
 
     @Override
@@ -151,7 +156,7 @@ public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment imple
 
     @Override
     protected String getMainCondition() {
-        return presenter().getMainCondition();
+        return "";
     }
 
     @Override
@@ -258,7 +263,7 @@ public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment imple
     }
 
     private void normalFilter(View dueOnlyLayout) {
-        filter(searchText(), "", presenter().getMainCondition());
+        filter(searchText(), "", "");
         dueOnlyLayout.setTag(null);
         switchViews(dueOnlyLayout, false);
     }
@@ -338,20 +343,11 @@ public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment imple
         String query = "";
         try {
             if (isValidFilterForFts(commonRepository())) {
-                String sql;
-                if (TextUtils.isEmpty(filters)) {
-                    sql = "SELECT object_id FROM (SELECT object_id, last_interacted_with FROM ec_child_search UNION ALL SELECT object_id, last_interacted_with FROM ec_mother_search ORDER BY last_interacted_with DESC) ORDER BY last_interacted_with";
-                } else {
-                    sql = "SELECT object_id FROM (SELECT object_id, last_interacted_with FROM ec_child_search WHERE date_removed IS NULL AND phrase MATCH '%s*' UNION ALL SELECT object_id, last_interacted_with FROM ec_mother_search WHERE date_removed IS NULL AND phrase MATCH '%s*') ORDER BY last_interacted_with";
-                    sql = sql.replace("%s", filters);
-                }
-
+                String sql = opdRegisterQueryProvider.getObjectIdsQuery(filters);
                 sql = sqb.addlimitandOffset(sql, clientAdapter.getCurrentlimit(), clientAdapter.getCurrentoffset());
 
                 List<String> ids = commonRepository().findSearchIds(sql);
-                //query = "SELECT "
-
-                query = presenter().getWhereInQuery();
+                query = opdRegisterQueryProvider.mainSelectWhereIDsIn();
 
                 String joinedIds = "'" + StringUtils.join(ids, "','") + "'";
                 return query.replace("%s", joinedIds);
@@ -373,24 +369,17 @@ public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment imple
     @Override
     public void countExecute() {
         try {
-            SmartRegisterQueryBuilder sqb = new SmartRegisterQueryBuilder(countSelect);
-            String query = "";
-
-
-            String sql = sqb.countQueryFts("ec_child", null, null, filters);
-            Timber.i(query);
-            int totalCount = commonRepository().countSearchIds(sql);
-
-            sql = sqb.countQueryFts("ec_mother", null, null, filters);
-            Timber.i(query);
-            totalCount += commonRepository().countSearchIds(sql);
+            int totalCount = 0;
+            for (String sql: opdRegisterQueryProvider.countExecuteQueries(filters)) {
+                Timber.i(sql);
+                totalCount += commonRepository().countSearchIds(sql);
+            }
 
             clientAdapter.setTotalcount(totalCount);
-            Timber.i("total count here %d", clientAdapter.getTotalcount());
+            Timber.i("Total Register Count %d", clientAdapter.getTotalcount());
 
             clientAdapter.setCurrentlimit(20);
             clientAdapter.setCurrentoffset(0);
-
         } catch (Exception e) {
             Timber.e(e);
         }
