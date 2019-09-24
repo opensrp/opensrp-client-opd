@@ -159,7 +159,7 @@ public class OpdRegisterActivityInteractor implements OpdRegisterActivityContrac
             if (baseClient != null) {
                 try {
                     String newOpenSRPId = baseClient.getIdentifier(JsonFormUtils.MER_ID).replace("-", "");
-                    String currentOpenSRPId = JsonFormUtils.getString(jsonString, JsonFormUtils.CURRENT_ZEIR_ID).replace("-", "");
+                    String currentOpenSRPId = JsonFormUtils.getString(jsonString, JsonFormUtils.CURRENT_MER_ID).replace("-", "");
                     if (!newOpenSRPId.equals(currentOpenSRPId)) {
                         //OPENSRP ID was changed
                         getUniqueIdRepository().open(currentOpenSRPId);

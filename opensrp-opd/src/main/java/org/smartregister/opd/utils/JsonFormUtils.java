@@ -69,11 +69,9 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
     public static final String CURRENT_OPENSRP_ID = "current_opensrp_id";
     public static final String READ_ONLY = "read_only";
     public static final String STEP2 = "step2";
-    public static final String MOTHER_DEFAULT_DOB = "01-01-1960";
     public static final String RELATIONAL_ID = "relational_id";
-    public static final String CURRENT_ZEIR_ID = "current_zeir_id";
+    public static final String CURRENT_MER_ID = "current_mer_id";
     public static final String MER_ID = "MER_ID";
-    public static final String BCG_SCAR_EVENT = "Bcg Scar";
     public static final SimpleDateFormat DATE_FORMAT =
             new SimpleDateFormat(com.vijay.jsonwizard.utils.FormUtils.NATIIVE_FORM_DATE_FORMAT_PATTERN);
     public static final String GENDER = "gender";
@@ -103,7 +101,7 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
                 entityId = entityId.replace("-", "");
             }
 
-            JsonFormUtils.addRegLocHierarchyQuestions(form, "", LocationHierarchy.ENTIRE_TREE);
+            JsonFormUtils.addRegLocHierarchyQuestions(form, Constants.JSON_FORM_KEY.ADDRESS_WIDGET_KEY , LocationHierarchy.ENTIRE_TREE);
 
             // Inject OPenSrp id into the form
             JSONObject stepOne = form.getJSONObject(JsonFormUtils.STEP1);
@@ -606,7 +604,7 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
                 form.put(JsonFormUtils.ENTITY_ID, Details.get(Constants.KEY.BASE_ENTITY_ID));
                 form.put(JsonFormUtils.ENCOUNTER_TYPE, Utils.metadata().getUpdateEventType());
                 form.put(JsonFormUtils.RELATIONAL_ID, Details.get(RELATIONAL_ID));
-                form.put(JsonFormUtils.CURRENT_ZEIR_ID,
+                form.put(JsonFormUtils.CURRENT_MER_ID,
                         Utils.getValue(Details, Constants.KEY.ZEIR_ID, true).replace("-", ""));
                 form.put(JsonFormUtils.CURRENT_OPENSRP_ID,
                         Utils.getValue(Details, Constants.JSON_FORM_KEY.UNIQUE_ID, false));
