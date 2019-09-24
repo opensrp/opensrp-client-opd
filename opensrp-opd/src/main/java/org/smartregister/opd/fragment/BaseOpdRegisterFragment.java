@@ -19,6 +19,7 @@ import org.smartregister.commonregistry.CommonRepository;
 import org.smartregister.cursoradapter.RecyclerViewPaginatedAdapter;
 import org.smartregister.cursoradapter.SmartRegisterQueryBuilder;
 import org.smartregister.domain.FetchStatus;
+import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
 import org.smartregister.opd.contract.OpdRegisterFragmentContract;
 import org.smartregister.opd.dialog.NoMatchDialogFragment;
@@ -56,12 +57,6 @@ public class BaseOpdRegisterFragment extends BaseRegisterFragment implements Opd
         super.setupViews(view);
 
         this.view = view;
-        /*
-        Toolbar toolbar = view.findViewById(org.smartregister.R.id.register_toolbar);
-        toolbar.setContentInsetsAbsolute(0, 0);
-        toolbar.setContentInsetsRelative(0, 0);
-        toolbar.setContentInsetStartWithNavigation(0);
-        NavigationMenu.getInstance(getActivity(), null, toolbar);*/
 
         // Update top left icon
         qrCodeScanImageView = view.findViewById(org.smartregister.R.id.scanQrCode);
@@ -126,10 +121,7 @@ public class BaseOpdRegisterFragment extends BaseRegisterFragment implements Opd
         if (getActivity() == null) {
             return;
         }
-
-        //String viewConfigurationIdentifier = ((BaseRegisterActivity) getActivity()).getViewIdentifiers().get(0);
-        //presenter = new OpdRegisterFragmentPresenter(this, new OpdRegisterFragmentModel(), viewConfigurationIdentifier);
-        presenter = new OpdRegisterFragmentPresenter(this, new OpdRegisterFragmentModel(), "");
+        presenter = new OpdRegisterFragmentPresenter(this, new OpdRegisterFragmentModel(), OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata().getConfig());
 
     }
 
@@ -166,20 +158,18 @@ public class BaseOpdRegisterFragment extends BaseRegisterFragment implements Opd
 
     @Override
     protected void startRegistration() {
-        //((OpdRegisterActivity) getActivity()).startFormActivity(CoreConstants.JSON_FORM.getChildRegister(), null, null);
-        //getActivity().startFormActivity(Utils.metadata().familyRegister.formName, null, null);
+        //Do Nothing
     }
 
     @Override
     protected void onViewClicked(View view) {
-        // TODO: Abstract
         if (getActivity() == null) {
             return;
         }
 
         if (view.getTag() != null && view.getTag(R.id.VIEW_ID) == CLICK_VIEW_NORMAL) {
             if (view.getTag() instanceof CommonPersonObjectClient) {
-                goToChildDetailActivity((CommonPersonObjectClient) view.getTag(), false);
+                //
             }
         } else if (view.getId() == R.id.due_only_layout) {
             toggleFilterSelection(view);
@@ -218,13 +208,6 @@ public class BaseOpdRegisterFragment extends BaseRegisterFragment implements Opd
     @Override
     public void onResume() {
         super.onResume();
-        /*
-        Toolbar toolbar = view.findViewById(R.id.register_toolbar);
-        toolbar.setContentInsetsAbsolute(0, 0);
-        toolbar.setContentInsetsRelative(0, 0);
-        toolbar.setContentInsetStartWithNavigation(0);
-        NavigationMenu.getInstance(getActivity(), null, toolbar);
-        */
     }
 
     @Override
@@ -233,18 +216,6 @@ public class BaseOpdRegisterFragment extends BaseRegisterFragment implements Opd
         if (syncButton != null) {
             syncButton.setVisibility(View.GONE);
         }
-    }
-
-    public void goToChildDetailActivity(CommonPersonObjectClient patient,
-                                        boolean launchDialog) {
-/*
-        if (launchDialog) {
-            Timber.i(patient.name);
-        }
-
-        Intent intent = new Intent(getActivity(), CoreChildProfileActivity.class);
-        intent.putExtra(org.smartregister.family.util.Constants.INTENT_KEY.BASE_ENTITY_ID, patient.getCaseId());
-        startActivity(intent);*/
     }
 
     public void toggleFilterSelection(View dueOnlyLayout) {

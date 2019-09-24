@@ -2,12 +2,23 @@ package org.smartregister.opd.configuration;
 
 import android.support.annotation.NonNull;
 
+import org.smartregister.opd.pojos.OpdMetadata;
+
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-13
  */
 
 public class OpdConfiguration {
 
+    private OpdMetadata opdMetadata;
+
+    public OpdMetadata getOpdMetadata() {
+        return opdMetadata;
+    }
+
+    public void setOpdMetadata(OpdMetadata opdMetadata) {
+        this.opdMetadata = opdMetadata;
+    }
 
     public static class Builder {
 

@@ -1,17 +1,17 @@
 package org.smartregister.opd.model;
 
-import android.util.Pair;
-
 import org.json.JSONObject;
-import org.smartregister.clientandeventmodel.Client;
-import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.configurableviews.ConfigurableViewsLibrary;
+import org.smartregister.domain.tag.FormTag;
 import org.smartregister.location.helper.LocationHelper;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
+import org.smartregister.opd.pojos.OpdEventClient;
+import org.smartregister.opd.utils.JsonFormUtils;
 import org.smartregister.util.FormUtils;
 import org.smartregister.util.Utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import timber.log.Timber;
@@ -22,7 +22,6 @@ import timber.log.Timber;
 
 public class OpdRegisterActivityModel implements OpdRegisterActivityContract.Model {
     private FormUtils formUtils;
-
     @Override
     public void registerViewConfigurations(List<String> viewIdentifiers) {
         if (viewIdentifiers != null) {
@@ -44,24 +43,29 @@ public class OpdRegisterActivityModel implements OpdRegisterActivityContract.Mod
         //Utils.saveLanguage(Utils.getKeyByValue(langs, language));
     }
 
-    /*private Map<String, String> getAvailableLanguagesMap() {
-        return null;
-        //return AncApplication.getJsonSpecHelper().getAvailableLanguagesMap();
-    }*/
-
     @Override
     public String getLocationId(String locationName) {
         return LocationHelper.getInstance().getOpenMrsLocationId(locationName);
     }
 
     @Override
-    public Pair<Client, Event> processRegistration(String jsonString) {
-        return null;
+    public List<OpdEventClient> processRegistration(String jsonString, FormTag formTag) {
+        List<OpdEventClient> opdEventClientList = new ArrayList<>();
+        OpdEventClient opdEventClient = JsonFormUtils.processOpdDetailsForm(jsonString, formTag);
+        if (opdEventClient == null) {
+            return null;
+        }
+        opdEventClientList.add(opdEventClient);
+        return opdEventClientList;
     }
 
     @Override
-    public JSONObject getFormAsJson(String formName, String entityId, String currentLocationId, String familyId) throws Exception {
-        return null;
+    public JSONObject getFormAsJson(String formName, String entityId, String currentLocationId) throws Exception {
+        JSONObject form = getFormUtils().getFormJson(formName);
+        if (form == null) {
+            return null;
+        }
+        return JsonFormUtils.getFormAsJson(form, formName, entityId, currentLocationId);
     }
 
     @Override

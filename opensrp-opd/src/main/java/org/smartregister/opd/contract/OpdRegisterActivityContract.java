@@ -6,6 +6,10 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.json.JSONObject;
 import org.smartregister.clientandeventmodel.Client;
 import org.smartregister.clientandeventmodel.Event;
+import org.smartregister.domain.tag.FormTag;
+import org.smartregister.opd.pojos.OpdEventClient;
+import org.smartregister.opd.pojos.UpdateRegisterParams;
+import org.smartregister.opd.presenter.OpdRegisterActivityPresenter;
 import org.smartregister.view.contract.BaseRegisterContract;
 
 import java.util.List;
@@ -24,8 +28,9 @@ public interface OpdRegisterActivityContract {
 
         void saveLanguage(String language);
 
-        void saveForm(String jsonString, boolean isEditMode);
+        void saveForm(String jsonString, UpdateRegisterParams updateRegisterParams);
 
+        void startForm(String formName, String entityId, String metaData, String locationId);
     }
 
     interface Model {
@@ -38,22 +43,27 @@ public interface OpdRegisterActivityContract {
 
         String getLocationId(String locationName);
 
-        Pair<Client, Event> processRegistration(String jsonString);
+        List<OpdEventClient> processRegistration(String jsonString, FormTag formTag);
 
         JSONObject getFormAsJson(String formName, String entityId,
-                                 String currentLocationId, String familyId) throws Exception;
+                                 String currentLocationId) throws Exception;
 
         String getInitials();
 
     }
 
     interface Interactor {
+        void getNextUniqueId(Triple<String, String, String> triple, OpdRegisterActivityContract.InteractorCallBack callBack);
 
         void onDestroy(boolean isChangingConfiguration);
 
+        void saveRegistration(List<OpdEventClient> opdEventClientList, String jsonString, UpdateRegisterParams updateRegisterParams, OpdRegisterActivityPresenter opdRegisterActivityPresenter);
     }
 
     interface InteractorCallBack {
 
+        void onNoUniqueId();
+
+        void onUniqueIdFetched(Triple<String, String, String> triple, String entityId);
     }
 }
