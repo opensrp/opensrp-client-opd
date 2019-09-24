@@ -68,4 +68,9 @@ public abstract class BaseOpdRegisterActivity extends BaseRegisterActivity imple
     public OpdRegisterActivityContract.Presenter presenter() {
         return (OpdRegisterActivityContract.Presenter) presenter;
     }
+
+    @Override
+    public void startFormActivity(String s, String s1, String s2) {
+
+    }
 }

@@ -18,6 +18,7 @@ public class OpdRegisterFragment extends BaseOpdRegisterFragment {
     @Override
     protected void startRegistration() {
         // Do nothing here
+        Timber.i("Start registration has been clicked");
     }
 
     @Override
@@ -27,7 +28,7 @@ public class OpdRegisterFragment extends BaseOpdRegisterFragment {
     }
 
     @Override
-    protected void goToClientDetailActivity(CommonPersonObjectClient commonPersonObjectClient) {
+    protected void goToClientDetailActivity(@NonNull CommonPersonObjectClient commonPersonObjectClient) {
         // Do nothing
         Timber.i("Client was clicked on OPD Register: %s", new Gson().toJson(commonPersonObjectClient));
     }

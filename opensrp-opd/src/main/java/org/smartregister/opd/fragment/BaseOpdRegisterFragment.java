@@ -116,6 +116,13 @@ public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment imple
         dueOnlyLayout = view.findViewById(R.id.due_only_layout);
         dueOnlyLayout.setVisibility(View.VISIBLE);
         dueOnlyLayout.setOnClickListener(registerActionHandler);
+
+        topRightLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startRegistration();
+            }
+        });
     }
 
     @Override
@@ -235,7 +242,7 @@ public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment imple
         }
     }
 
-    abstract protected void goToClientDetailActivity(CommonPersonObjectClient commonPersonObjectClient);
+    abstract protected void goToClientDetailActivity(@NonNull CommonPersonObjectClient commonPersonObjectClient);
 
     public void toggleFilterSelection(View dueOnlyLayout) {
         if (dueOnlyLayout != null) {

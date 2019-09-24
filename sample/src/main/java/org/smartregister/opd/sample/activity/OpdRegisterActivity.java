@@ -29,11 +29,6 @@ public class OpdRegisterActivity extends BaseOpdRegisterActivity {
     }
 
     @Override
-    public void startFormActivity(String s, String s1, String s2) {
-
-    }
-
-    @Override
     public void startFormActivity(JSONObject jsonObject) {
 
     }

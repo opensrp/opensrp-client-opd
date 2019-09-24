@@ -8,6 +8,7 @@ import org.smartregister.commonregistry.CommonFtsObject;
 import org.smartregister.location.helper.LocationHelper;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.configuration.OpdConfiguration;
+import org.smartregister.opd.sample.configuration.OpdRegisterQueryProvider;
 import org.smartregister.opd.sample.job.SampleOpdJobCreator;
 import org.smartregister.opd.sample.configuration.SampleSyncConfiguration;
 import org.smartregister.opd.sample.repository.SampleRepository;
@@ -84,7 +85,7 @@ public class OpdSampleApplication extends org.smartregister.view.activity.Drisht
 
         //Initialize Modules
         CoreLibrary.init(context, new SampleSyncConfiguration());
-        OpdLibrary.init(context, getRepository(), new OpdConfiguration.Builder().build());
+        OpdLibrary.init(context, getRepository(), new OpdConfiguration.Builder(OpdRegisterQueryProvider.class).build());
 
         //Auto login by default
         context.session().start(context.session().lengthInMilliseconds());
