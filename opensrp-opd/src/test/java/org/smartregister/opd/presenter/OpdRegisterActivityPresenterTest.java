@@ -14,9 +14,6 @@ import org.smartregister.opd.contract.OpdRegisterActivityContract;
 
 public class OpdRegisterActivityPresenterTest extends BaseTest {
 
-    @Mock
-    private OpdRegisterActivityContract.Interactor interactor;
-
     private BaseOpdRegisterActivityPresenter presenter;
 
     @Mock
@@ -29,14 +26,6 @@ public class OpdRegisterActivityPresenterTest extends BaseTest {
     @Before
     public void setUp() throws Exception {
         presenter = new TestOpdRegisterActivityPresenter(view, model);
-        ReflectionHelpers.setField(presenter, "interactor", interactor);
-    }
-
-    @Test
-    public void onDestroyShouldCallInteractorOnDestroy() {
-        presenter.onDestroy(false);
-        Mockito.verify(interactor)
-                .onDestroy(Mockito.eq(false));
     }
 
     @Test

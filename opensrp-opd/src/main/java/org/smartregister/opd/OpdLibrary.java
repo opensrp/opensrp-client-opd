@@ -6,7 +6,6 @@ import org.smartregister.Context;
 import org.smartregister.opd.configuration.OpdConfiguration;
 import org.smartregister.repository.Repository;
 import org.smartregister.repository.UniqueIdRepository;
-import org.smartregister.sync.helper.ECSyncHelper;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-13
@@ -19,7 +18,6 @@ public class OpdLibrary {
     private static OpdLibrary instance;
     private OpdConfiguration opdConfiguration;
     private final Repository repository;
-    private ECSyncHelper syncHelper;
 
     private UniqueIdRepository uniqueIdRepository;
 
@@ -42,10 +40,10 @@ public class OpdLibrary {
 
     public static OpdLibrary getInstance() {
         if (instance == null) {
-            throw new IllegalStateException(" Instance does not exist!!! Call "
+            throw new IllegalStateException("Instance does not exist!!! Call "
                     + OpdLibrary.class.getName()
                     + ".init method in the onCreate method of "
-                    + "your Application class ");
+                    + "your Application class");
         }
         return instance;
     }
