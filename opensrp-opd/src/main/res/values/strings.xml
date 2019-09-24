@@ -17,4 +17,8 @@
     <string name="no_unique_id">No unique Id found</string>
     <string name="error_unable_to_start_form">Unable to start form</string>
     <string name="saving_dialog_title">Saving</string>
+    <string name="tap_to_view">Tap to view</string>
+    <string name="client_matches">%1$d results found  person.</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="undo_lookup">Undo LookUp</string>
 </resources>

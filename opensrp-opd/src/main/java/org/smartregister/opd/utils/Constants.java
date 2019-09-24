@@ -55,6 +55,7 @@ public class Constants extends AllConstants {
 
         public static final String AGE_ENTERED = "age_entered" ;
         public static final String DOB_ENTERED = "dob_entered";
+        public static final String ADDRESS_WIDGET_KEY = "home_address";
     }
 
     public static class JSON_FORM_EXTRA {
@@ -93,6 +94,8 @@ public class Constants extends AllConstants {
         public static final String GENDER = "gender";
         public static final String UNIQUE_ID = "unique_id";
         public static final String ZEIR_ID = "zeir_id";
+        public static final String MER_ID = "mer_id";
+
         public static final String LAST_INTERACTED_WITH = "last_interacted_with";
         public static final String ACTIVE = "active";
         public static final String INACTIVE = "inactive";
