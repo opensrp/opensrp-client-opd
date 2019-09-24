@@ -131,18 +131,6 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
 
         View view = inflater.inflate(resId, parent, false);
 
-        /*
-        ConfigurableViewsHelper helper = ConfigurableViewsLibrary.getInstance().getConfigurableViewsHelper();
-        if (helper.isJsonViewsEnabled()) {
-
-            ViewConfiguration viewConfiguration = helper.getViewConfiguration(Constants.CONFIGURATION.HOME_REGISTER_ROW);
-            ViewConfiguration commonConfiguration = helper.getViewConfiguration(COMMON_REGISTER_ROW);
-
-            if (viewConfiguration != null) {
-                return helper.inflateDynamicView(viewConfiguration, commonConfiguration, view, R.id.register_columns, false);
-            }
-        }*/
-
         if (opdRegisterRowOptions != null && opdRegisterRowOptions.isCustomViewHolder()) {
             return opdRegisterRowOptions.createCustomViewHolder(parent);
         } else {
