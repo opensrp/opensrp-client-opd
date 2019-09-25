@@ -8,6 +8,8 @@ import org.smartregister.commonregistry.CommonFtsObject;
 import org.smartregister.location.helper.LocationHelper;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.configuration.OpdConfiguration;
+import org.smartregister.opd.sample.configuration.OpdRegisterQueryProvider;
+import org.smartregister.opd.sample.job.SampleOpdJobCreator;
 import org.smartregister.opd.sample.configuration.SampleSyncConfiguration;
 import org.smartregister.opd.sample.repository.SampleRepository;
 import org.smartregister.opd.sample.utils.Constants;
@@ -43,13 +45,16 @@ public class OpdSampleApplication extends org.smartregister.view.activity.Drisht
     }
 
     private static String[] getFtsTables() {
-        return new String[]{Constants.TABLE_NAME};
+        return new String[]{Constants.TABLE_NAME, Constants.TABLE_NAME2};
     }
 
     private static String[] getFtsSearchFields(String tableName) {
         if (tableName.equals(Constants.TABLE_NAME)) {
-            return new String[]{Constants.Columns.FIRST_NAME, Constants.Columns.MIDDLE_NAME, Constants.Columns.LAST_NAME, Constants.Columns.DOB};
+            return new String[]{Constants.Columns.FIRST_NAME, Constants.Columns.MIDDLE_NAME, Constants.Columns.LAST_NAME, Constants.Columns.DOB, Constants.Columns.LAST_INTERACTED_WITH};
+        } else if (tableName.equals(Constants.TABLE_NAME2)) {
+            return new String[]{Constants.Columns.FIRST_NAME, Constants.Columns.MIDDLE_NAME, Constants.Columns.LAST_NAME, Constants.Columns.DOB, Constants.Columns.LAST_INTERACTED_WITH};
         }
+
         return null;
     }
 
@@ -80,7 +85,7 @@ public class OpdSampleApplication extends org.smartregister.view.activity.Drisht
 
         //Initialize Modules
         CoreLibrary.init(context, new SampleSyncConfiguration());
-        OpdLibrary.init(context, getRepository(), new OpdConfiguration());
+        OpdLibrary.init(context, getRepository(), new OpdConfiguration.Builder(OpdRegisterQueryProvider.class).build());
 
         //Auto login by default
         context.session().start(context.session().lengthInMilliseconds());
@@ -90,7 +95,8 @@ public class OpdSampleApplication extends org.smartregister.view.activity.Drisht
         SyncStatusBroadcastReceiver.init(this);
         LocationHelper.init(Utils.ALLOWED_LEVELS, Utils.DEFAULT_LOCATION_LEVEL);
 
-
+        //init Job Manager
+        JobManager.create(this).addJobCreator(new SampleOpdJobCreator());
         sampleUniqueIds();
     }
 

@@ -2,30 +2,31 @@ package org.smartregister.opd.fragment;
 
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.AppCompatTextView;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.apache.commons.lang3.StringUtils;
-import org.smartregister.commonregistry.CommonFtsObject;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
-import org.smartregister.commonregistry.CommonRepository;
 import org.smartregister.cursoradapter.RecyclerViewPaginatedAdapter;
 import org.smartregister.cursoradapter.SmartRegisterQueryBuilder;
 import org.smartregister.domain.FetchStatus;
+import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
+import org.smartregister.opd.configuration.OpdRegisterQueryProviderContract;
 import org.smartregister.opd.contract.OpdRegisterFragmentContract;
 import org.smartregister.opd.dialog.NoMatchDialogFragment;
 import org.smartregister.opd.model.OpdRegisterFragmentModel;
 import org.smartregister.opd.presenter.OpdRegisterFragmentPresenter;
 import org.smartregister.opd.provider.OpdRegisterProvider;
+import org.smartregister.opd.utils.ConfigurationInstancesHelper;
 import org.smartregister.opd.utils.OpdUtils;
+import org.smartregister.opd.utils.OpdViewConstants;
 import org.smartregister.receiver.SyncStatusBroadcastReceiver;
 import org.smartregister.util.Utils;
 import org.smartregister.view.activity.BaseRegisterActivity;
@@ -33,7 +34,6 @@ import org.smartregister.view.fragment.BaseRegisterFragment;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 import timber.log.Timber;
 
@@ -41,27 +41,25 @@ import timber.log.Timber;
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-13
  */
 
-public class BaseOpdRegisterFragment extends BaseRegisterFragment implements OpdRegisterFragmentContract.View {
+public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment implements OpdRegisterFragmentContract.View {
 
-    public static final String CLICK_VIEW_NORMAL = "click_view_normal";
-    public static final String CLICK_VIEW_DOSAGE_STATUS = "click_view_dosage_status";
     private static final String DUE_FILTER_TAG = "PRESSED";
     private View view;
     private View dueOnlyLayout;
     private boolean dueFilterActive = false;
+    private OpdRegisterQueryProviderContract opdRegisterQueryProvider;
 
+    public BaseOpdRegisterFragment() {
+        super();
+
+        opdRegisterQueryProvider = ConfigurationInstancesHelper.newInstance(OpdLibrary.getInstance().getOpdConfiguration().getOpdRegisterQueryProvider());
+    }
 
     @Override
     public void setupViews(View view) {
         super.setupViews(view);
 
         this.view = view;
-        /*
-        Toolbar toolbar = view.findViewById(org.smartregister.R.id.register_toolbar);
-        toolbar.setContentInsetsAbsolute(0, 0);
-        toolbar.setContentInsetsRelative(0, 0);
-        toolbar.setContentInsetStartWithNavigation(0);
-        NavigationMenu.getInstance(getActivity(), null, toolbar);*/
 
         // Update top left icon
         qrCodeScanImageView = view.findViewById(org.smartregister.R.id.scanQrCode);
@@ -119,6 +117,12 @@ public class BaseOpdRegisterFragment extends BaseRegisterFragment implements Opd
         dueOnlyLayout.setVisibility(View.VISIBLE);
         dueOnlyLayout.setOnClickListener(registerActionHandler);
 
+        topRightLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startRegistration();
+            }
+        });
     }
 
     @Override
@@ -127,10 +131,7 @@ public class BaseOpdRegisterFragment extends BaseRegisterFragment implements Opd
             return;
         }
 
-        //String viewConfigurationIdentifier = ((BaseRegisterActivity) getActivity()).getViewIdentifiers().get(0);
-        //presenter = new OpdRegisterFragmentPresenter(this, new OpdRegisterFragmentModel(), viewConfigurationIdentifier);
-        presenter = new OpdRegisterFragmentPresenter(this, new OpdRegisterFragmentModel(), "");
-
+        presenter = new OpdRegisterFragmentPresenter(this, new OpdRegisterFragmentModel());
     }
 
     @Override
@@ -156,19 +157,16 @@ public class BaseOpdRegisterFragment extends BaseRegisterFragment implements Opd
 
     @Override
     protected String getMainCondition() {
-        return presenter().getMainCondition();
+        return "";
     }
 
     @Override
     protected String getDefaultSortQuery() {
-        return presenter().getDefaultSortQuery();
+        return "";
     }
 
     @Override
-    protected void startRegistration() {
-        //((OpdRegisterActivity) getActivity()).startFormActivity(CoreConstants.JSON_FORM.getChildRegister(), null, null);
-        //getActivity().startFormActivity(Utils.metadata().familyRegister.formName, null, null);
-    }
+    abstract protected void startRegistration();
 
     @Override
     protected void onViewClicked(View view) {
@@ -177,14 +175,29 @@ public class BaseOpdRegisterFragment extends BaseRegisterFragment implements Opd
             return;
         }
 
-        if (view.getTag() != null && view.getTag(R.id.VIEW_ID) == CLICK_VIEW_NORMAL) {
-            if (view.getTag() instanceof CommonPersonObjectClient) {
-                goToChildDetailActivity((CommonPersonObjectClient) view.getTag(), false);
-            }
-        } else if (view.getId() == R.id.due_only_layout) {
+        if (view.getId() == R.id.due_only_layout) {
             toggleFilterSelection(view);
+        } else if (view.getTag(R.id.VIEW_TYPE) != null) {
+            Object viewClient = view.getTag(R.id.VIEW_CLIENT);
+
+            if (viewClient != null) {
+                if (viewClient instanceof CommonPersonObjectClient) {
+                    if (view.getTag(R.id.VIEW_TYPE).equals(OpdViewConstants.Provider.CHILD_COLUMN)) {
+
+                        goToClientDetailActivity((CommonPersonObjectClient) viewClient);
+                    } else if (view.getTag(R.id.VIEW_TYPE).equals(OpdViewConstants.Provider.ACTION_BUTTON_COLUMN)) {
+                        performPatientAction((CommonPersonObjectClient) viewClient);
+                    }
+                } else {
+                    Timber.e(new Exception(), "Value for key[%d] is not a CommonPersonObjectClient but is of type %s"
+                            , R.id.VIEW_CLIENT
+                            , viewClient.getClass().getName());
+                }
+            }
         }
     }
+
+    abstract protected void performPatientAction(@NonNull CommonPersonObjectClient commonPersonObjectClient);
 
     @Override
     public void onSyncInProgress(FetchStatus fetchStatus) {
@@ -199,7 +212,8 @@ public class BaseOpdRegisterFragment extends BaseRegisterFragment implements Opd
 
     @Override
     public void onSyncComplete(FetchStatus fetchStatus) {
-        if (!SyncStatusBroadcastReceiver.getInstance().isSyncing() && (FetchStatus.fetched.equals(fetchStatus) || FetchStatus.nothingFetched.equals(fetchStatus)) && (dueFilterActive && dueOnlyLayout != null)) {
+        if (!SyncStatusBroadcastReceiver.getInstance().isSyncing() && (FetchStatus.fetched.equals(fetchStatus)
+                || FetchStatus.nothingFetched.equals(fetchStatus)) && (dueFilterActive && dueOnlyLayout != null)) {
             dueFilter(dueOnlyLayout);
             Utils.showShortToast(getActivity(), getString(R.string.sync_complete));
             refreshSyncProgressSpinner();
@@ -218,13 +232,6 @@ public class BaseOpdRegisterFragment extends BaseRegisterFragment implements Opd
     @Override
     public void onResume() {
         super.onResume();
-        /*
-        Toolbar toolbar = view.findViewById(R.id.register_toolbar);
-        toolbar.setContentInsetsAbsolute(0, 0);
-        toolbar.setContentInsetsRelative(0, 0);
-        toolbar.setContentInsetStartWithNavigation(0);
-        NavigationMenu.getInstance(getActivity(), null, toolbar);
-        */
     }
 
     @Override
@@ -235,17 +242,7 @@ public class BaseOpdRegisterFragment extends BaseRegisterFragment implements Opd
         }
     }
 
-    public void goToChildDetailActivity(CommonPersonObjectClient patient,
-                                        boolean launchDialog) {
-/*
-        if (launchDialog) {
-            Timber.i(patient.name);
-        }
-
-        Intent intent = new Intent(getActivity(), CoreChildProfileActivity.class);
-        intent.putExtra(org.smartregister.family.util.Constants.INTENT_KEY.BASE_ENTITY_ID, patient.getCaseId());
-        startActivity(intent);*/
-    }
+    abstract protected void goToClientDetailActivity(@NonNull CommonPersonObjectClient commonPersonObjectClient);
 
     public void toggleFilterSelection(View dueOnlyLayout) {
         if (dueOnlyLayout != null) {
@@ -260,7 +257,7 @@ public class BaseOpdRegisterFragment extends BaseRegisterFragment implements Opd
     }
 
     private void normalFilter(View dueOnlyLayout) {
-        filter(searchText(), "", presenter().getMainCondition());
+        filter(searchText(), "", "");
         dueOnlyLayout.setTag(null);
         switchViews(dueOnlyLayout, false);
     }
@@ -293,8 +290,8 @@ public class BaseOpdRegisterFragment extends BaseRegisterFragment implements Opd
     }
 
     @Override
-    public void initializeAdapter(Set<org.smartregister.configurableviews.model.View> visibleColumns) {
-        OpdRegisterProvider childRegisterProvider = new OpdRegisterProvider(getActivity(), visibleColumns, registerActionHandler, paginationViewHandler);
+    public void initializeAdapter() {
+        OpdRegisterProvider childRegisterProvider = new OpdRegisterProvider(getActivity(), registerActionHandler, paginationViewHandler);
         clientAdapter = new RecyclerViewPaginatedAdapter(null, childRegisterProvider, context().commonrepository(this.tablename));
         clientAdapter.setCurrentlimit(20);
         clientsView.setAdapter(clientAdapter);
@@ -340,20 +337,11 @@ public class BaseOpdRegisterFragment extends BaseRegisterFragment implements Opd
         String query = "";
         try {
             if (isValidFilterForFts(commonRepository())) {
-                String sql;
-                if (TextUtils.isEmpty(filters)) {
-                    sql = "SELECT object_id FROM (SELECT object_id, last_interacted_with FROM ec_child_search UNION ALL SELECT object_id, last_interacted_with FROM ec_mother_search ORDER BY last_interacted_with DESC) ORDER BY last_interacted_with";
-                } else {
-                    sql = "SELECT object_id FROM (SELECT object_id, last_interacted_with FROM ec_child_search WHERE date_removed IS NULL AND phrase MATCH '%s*' UNION ALL SELECT object_id, last_interacted_with FROM ec_mother_search WHERE date_removed IS NULL AND phrase MATCH '%s*') ORDER BY last_interacted_with";
-                    sql = sql.replace("%s", filters);
-                }
-
+                String sql = opdRegisterQueryProvider.getObjectIdsQuery(filters);
                 sql = sqb.addlimitandOffset(sql, clientAdapter.getCurrentlimit(), clientAdapter.getCurrentoffset());
 
                 List<String> ids = commonRepository().findSearchIds(sql);
-                //query = "SELECT "
-
-                query = presenter().getWhereInQuery();
+                query = opdRegisterQueryProvider.mainSelectWhereIDsIn();
 
                 String joinedIds = "'" + StringUtils.join(ids, "','") + "'";
                 return query.replace("%s", joinedIds);
@@ -374,33 +362,20 @@ public class BaseOpdRegisterFragment extends BaseRegisterFragment implements Opd
 
     @Override
     public void countExecute() {
-        Cursor c = null;
-
         try {
-            SmartRegisterQueryBuilder sqb = new SmartRegisterQueryBuilder(countSelect);
-            String query = "";
-
-
-            String sql = sqb.countQueryFts("ec_child", null, null, filters);
-            Timber.i(query);
-            int totalCount = commonRepository().countSearchIds(sql);
-
-            sql = sqb.countQueryFts("ec_mother", null, null, filters);
-            Timber.i(query);
-            totalCount += commonRepository().countSearchIds(sql);
+            int totalCount = 0;
+            for (String sql: opdRegisterQueryProvider.countExecuteQueries(filters)) {
+                Timber.i(sql);
+                totalCount += commonRepository().countSearchIds(sql);
+            }
 
             clientAdapter.setTotalcount(totalCount);
-            Timber.i("total count here %d", clientAdapter.getTotalcount());
+            Timber.i("Total Register Count %d", clientAdapter.getTotalcount());
 
             clientAdapter.setCurrentlimit(20);
             clientAdapter.setCurrentoffset(0);
-
         } catch (Exception e) {
             Timber.e(e);
-        } finally {
-            if (c != null) {
-                c.close();
-            }
         }
     }
 }

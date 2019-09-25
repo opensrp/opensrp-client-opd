@@ -44,11 +44,6 @@ public class OpdRegisterActivityModel implements OpdRegisterActivityContract.Mod
         //Utils.saveLanguage(Utils.getKeyByValue(langs, language));
     }
 
-    /*private Map<String, String> getAvailableLanguagesMap() {
-        return null;
-        //return AncApplication.getJsonSpecHelper().getAvailableLanguagesMap();
-    }*/
-
     @Override
     public String getLocationId(String locationName) {
         return LocationHelper.getInstance().getOpenMrsLocationId(locationName);

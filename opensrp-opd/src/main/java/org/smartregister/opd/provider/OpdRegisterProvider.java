@@ -2,6 +2,8 @@ package org.smartregister.opd.provider;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -10,13 +12,17 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.apache.commons.lang3.text.WordUtils;
+import org.smartregister.opd.OpdLibrary;
+import org.smartregister.opd.configuration.OpdRegisterProviderMetadata;
+import org.smartregister.opd.configuration.OpdRegisterRowOptions;
 import org.smartregister.opd.holders.FooterViewHolder;
-import org.smartregister.opd.utils.OpdDbConstants;
+import org.smartregister.opd.utils.ConfigurationInstancesHelper;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.cursoradapter.RecyclerViewProvider;
 import org.smartregister.opd.R;
 import org.smartregister.opd.holders.OpdRegisterViewHolder;
 import org.smartregister.opd.utils.OpdUtils;
+import org.smartregister.opd.utils.OpdViewConstants;
 import org.smartregister.util.Utils;
 import org.smartregister.view.contract.SmartRegisterClient;
 import org.smartregister.view.contract.SmartRegisterClients;
@@ -26,7 +32,7 @@ import org.smartregister.view.dialog.SortOption;
 import org.smartregister.view.viewholder.OnClickFormLauncher;
 
 import java.text.MessageFormat;
-import java.util.Set;
+import java.util.Map;
 
 
 /**
@@ -35,28 +41,48 @@ import java.util.Set;
 
 public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterViewHolder> {
     private final LayoutInflater inflater;
-    private Set<org.smartregister.configurableviews.model.View> visibleColumns;
     private View.OnClickListener onClickListener;
     private View.OnClickListener paginationClickListener;
     private Context context;
 
-    public OpdRegisterProvider(Context context, Set visibleColumns, View.OnClickListener onClickListener, View.OnClickListener paginationClickListener) {
+    private OpdRegisterProviderMetadata opdRegisterProviderMetadata;
+
+    @Nullable
+    private OpdRegisterRowOptions opdRegisterRowOptions;
+
+    public OpdRegisterProvider(@NonNull Context context, @NonNull View.OnClickListener onClickListener, @NonNull View.OnClickListener paginationClickListener) {
 
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        this.visibleColumns = visibleColumns;
         this.onClickListener = onClickListener;
         this.paginationClickListener = paginationClickListener;
         this.context = context;
+
+        // Get the configuration
+        this.opdRegisterProviderMetadata = ConfigurationInstancesHelper
+                .newInstance(OpdLibrary.getInstance()
+                        .getOpdConfiguration()
+                        .getOpdRegisterProviderMetadata());
+
+        Class<? extends OpdRegisterRowOptions> opdRegisterRowOptionsClass = OpdLibrary.getInstance()
+                .getOpdConfiguration()
+                .getOpdRegisterRowOptions();
+        if (opdRegisterRowOptionsClass != null) {
+            this.opdRegisterRowOptions = ConfigurationInstancesHelper.newInstance(opdRegisterRowOptionsClass);
+        }
     }
 
     @Override
     public void getView(Cursor cursor, SmartRegisterClient client, OpdRegisterViewHolder viewHolder) {
         CommonPersonObjectClient pc = (CommonPersonObjectClient) client;
-        if (visibleColumns.isEmpty()) {
-            populatePatientColumn(pc, client, viewHolder);
-            populateIdentifierColumn(pc, viewHolder);
 
-            return;
+        if (opdRegisterRowOptions != null && opdRegisterRowOptions.isDefaultPopulatePatientColumn()) {
+            opdRegisterRowOptions.populateClientRow(cursor, pc, client, viewHolder);
+        } else {
+            populatePatientColumn(pc, client, viewHolder);
+
+            if (opdRegisterRowOptions != null) {
+                opdRegisterRowOptions.populateClientRow(cursor, pc, client, viewHolder);
+            }
         }
     }
 
@@ -95,21 +121,21 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
 
     @Override
     public OpdRegisterViewHolder createViewHolder(ViewGroup parent) {
-        View view = inflater.inflate(R.layout.opd_register_list_row, parent, false);
+        int resId = R.layout.opd_register_list_row;
 
-        /*
-        ConfigurableViewsHelper helper = ConfigurableViewsLibrary.getInstance().getConfigurableViewsHelper();
-        if (helper.isJsonViewsEnabled()) {
+        if (opdRegisterRowOptions != null
+                && opdRegisterRowOptions.useCustomViewLayout()
+                && opdRegisterRowOptions.getCustomViewLayoutId() != 0) {
+            resId = opdRegisterRowOptions.getCustomViewLayoutId();
+        }
 
-            ViewConfiguration viewConfiguration = helper.getViewConfiguration(Constants.CONFIGURATION.HOME_REGISTER_ROW);
-            ViewConfiguration commonConfiguration = helper.getViewConfiguration(COMMON_REGISTER_ROW);
+        View view = inflater.inflate(resId, parent, false);
 
-            if (viewConfiguration != null) {
-                return helper.inflateDynamicView(viewConfiguration, commonConfiguration, view, R.id.register_columns, false);
-            }
-        }*/
-
-        return new OpdRegisterViewHolder(view);
+        if (opdRegisterRowOptions != null && opdRegisterRowOptions.isCustomViewHolder()) {
+            return opdRegisterRowOptions.createCustomViewHolder(parent);
+        } else {
+            return new OpdRegisterViewHolder(view);
+        }
     }
 
     @Override
@@ -123,16 +149,15 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
         return viewHolder instanceof FooterViewHolder;
     }
 
-    public void populatePatientColumn(CommonPersonObjectClient pc, SmartRegisterClient client, OpdRegisterViewHolder viewHolder) {
+    public void populatePatientColumn(CommonPersonObjectClient commonPersonObjectClient, SmartRegisterClient smartRegisterClient, OpdRegisterViewHolder viewHolder) {
+        Map<String, String> patientColumnMaps = commonPersonObjectClient.getColumnmaps();
 
-        String registerType = Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.REGISTER_TYPE, false);
-
-        if (registerType.contains("Child")) {
+        if (opdRegisterProviderMetadata.isClientHaveGuardianDetails(patientColumnMaps)) {
             viewHolder.showCareGiverName();
 
-            String parentFirstName = Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.MOTHER_FIRST_NAME, true);
-            String parentLastName = Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.MOTHER_LAST_NAME, true);
-            String parentMiddleName = Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.MOTHER_MIDDLE_NAME, true);
+            String parentFirstName = opdRegisterProviderMetadata.getGuardianFirstName(patientColumnMaps);
+            String parentLastName = opdRegisterProviderMetadata.getGuardianLastName(patientColumnMaps);
+            String parentMiddleName = opdRegisterProviderMetadata.getGuardianMiddleName(patientColumnMaps);
 
             String parentName = context.getResources().getString(R.string.care_giver_initials)
                     + ": "
@@ -142,35 +167,38 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
             viewHolder.removeCareGiverName();
         }
 
-        String firstName = Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.FIRST_NAME, true);
-        String middleName = Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.MIDDLE_NAME, true);
-        String lastName = Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.LAST_NAME, true);
+        String firstName = opdRegisterProviderMetadata.getClientFirstName(patientColumnMaps);
+        String middleName = opdRegisterProviderMetadata.getClientMiddleName(patientColumnMaps);
+        String lastName = opdRegisterProviderMetadata.getClientLastName(patientColumnMaps);
         String childName = org.smartregister.util.Utils.getName(firstName, middleName + " " + lastName);
 
-        String dobString = Utils.getDuration(Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.DOB, false));
+        String dobString = Utils.getDuration(opdRegisterProviderMetadata.getDob(patientColumnMaps));
         //dobString = dobString.contains("y") ? dobString.substring(0, dobString.indexOf("y")) : dobString;
         fillValue(viewHolder.textViewChildName, WordUtils.capitalize(childName) + ", " + WordUtils.capitalize(OpdUtils.getTranslatedDate(dobString, context)));
-        fillValue(viewHolder.tvRegisterType, registerType);
-        setAddressAndGender(pc, viewHolder);
+        String registerType = opdRegisterProviderMetadata.getRegisterType(patientColumnMaps);
 
-        addButtonClickListeners(client, viewHolder);
+        if (!TextUtils.isEmpty(registerType)) {
+            viewHolder.showRegisterType();
+            fillValue(viewHolder.tvRegisterType, registerType);
+        } else {
+            viewHolder.hideRegisterType();
+        }
 
+        setAddressAndGender(commonPersonObjectClient, viewHolder);
+        addButtonClickListeners(commonPersonObjectClient, viewHolder);
     }
 
-    public void populateIdentifierColumn(CommonPersonObjectClient pc, OpdRegisterViewHolder viewHolder) {
-        //fillValue(viewHolder.ancId, String.format(context.getString(R.string.unique_id_text), uniqueId));
-    }
-
-    public static void fillValue(TextView v, String value) {
+    public static void fillValue(@Nullable TextView v, @NonNull String value) {
         if (v != null) {
             v.setText(value);
         }
-
     }
 
     public void setAddressAndGender(CommonPersonObjectClient pc, OpdRegisterViewHolder viewHolder) {
-        String address = Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.HOME_ADDRESS, true);
-        String gender = Utils.getValue(pc.getColumnmaps(), OpdDbConstants.KEY.GENDER, true);
+        Map<String, String> patientColumnMaps = pc.getColumnmaps();
+        String address = opdRegisterProviderMetadata.getHomeAddress(patientColumnMaps);
+        String gender = opdRegisterProviderMetadata.getGender(patientColumnMaps);
+
         fillValue(viewHolder.textViewGender, gender);
 
         if (TextUtils.isEmpty(address)) {
@@ -181,42 +209,15 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
         }
     }
 
-    public void addButtonClickListeners(SmartRegisterClient client, OpdRegisterViewHolder viewHolder) {
+    public void addButtonClickListeners(@NonNull CommonPersonObjectClient client, OpdRegisterViewHolder viewHolder) {
         View patient = viewHolder.childColumn;
-        attachPatientOnclickListener(patient, client);
+        attachPatientOnclickListener(OpdViewConstants.Provider.CHILD_COLUMN, patient, client);
+        attachPatientOnclickListener(OpdViewConstants.Provider.ACTION_BUTTON_COLUMN, viewHolder.dueButton, client);
     }
 
-    public void attachPatientOnclickListener(View view, SmartRegisterClient client) {
+    public void attachPatientOnclickListener(@NonNull String viewType, @NonNull View view, @NonNull CommonPersonObjectClient client) {
         view.setOnClickListener(onClickListener);
-        view.setTag(client);
-        //view.setTag(R.id.VIEW_ID, BaseFamilyRegisterFragment.CLICK_VIEW_NORMAL);
-    }
-
-    public LayoutInflater getInflater() {
-        return inflater;
-    }
-
-    public View.OnClickListener getOnClickListener() {
-        return onClickListener;
-    }
-
-    public void setOnClickListener(View.OnClickListener onClickListener) {
-        this.onClickListener = onClickListener;
-    }
-
-    public View.OnClickListener getPaginationClickListener() {
-        return paginationClickListener;
-    }
-
-    public void setPaginationClickListener(View.OnClickListener paginationClickListener) {
-        this.paginationClickListener = paginationClickListener;
-    }
-
-    public Context getContext() {
-        return context;
-    }
-
-    public void setContext(Context context) {
-        this.context = context;
+        view.setTag(R.id.VIEW_TYPE, viewType);
+        view.setTag(R.id.VIEW_CLIENT, client);
     }
 }

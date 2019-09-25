@@ -23,6 +23,7 @@ public class OpdRegisterViewHolder extends RecyclerView.ViewHolder {
     public TextView tvLocation;
 
     public TextView secondDotDivider;
+    public TextView firstDotDivider;
 
     public OpdRegisterViewHolder(View itemView) {
         super(itemView);
@@ -37,6 +38,7 @@ public class OpdRegisterViewHolder extends RecyclerView.ViewHolder {
 
         childColumn = itemView.findViewById(R.id.child_column);
         secondDotDivider = itemView.findViewById(R.id.tv_opdRegisterListRow_secondDotDivider);
+        firstDotDivider = itemView.findViewById(R.id.tv_opdRegisterListRow_firstDotDivider);
     }
 
     public void showCareGiverName() {
@@ -55,5 +57,15 @@ public class OpdRegisterViewHolder extends RecyclerView.ViewHolder {
     public void removePersonLocation() {
         tvLocation.setVisibility(View.VISIBLE);
         secondDotDivider.setVisibility(View.VISIBLE);
+    }
+
+    public void showRegisterType() {
+        tvRegisterType.setVisibility(View.VISIBLE);
+        firstDotDivider.setVisibility(View.VISIBLE);
+    }
+
+    public void hideRegisterType() {
+        tvRegisterType.setVisibility(View.GONE);
+        firstDotDivider.setVisibility(View.GONE);
     }
 }
