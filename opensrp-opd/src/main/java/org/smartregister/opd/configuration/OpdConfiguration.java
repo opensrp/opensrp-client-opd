@@ -38,6 +38,10 @@ public class OpdConfiguration {
         return builder.opdRegisterQueryProvider;
     }
 
+    public boolean isBottomNavigationEnabled() {
+        return builder.isBottomNavigationEnabled;
+    }
+
     public static class Builder {
 
         @Nullable
@@ -48,6 +52,8 @@ public class OpdConfiguration {
 
         @NonNull
         private Class<? extends OpdRegisterQueryProviderContract> opdRegisterQueryProvider;
+
+        private boolean isBottomNavigationEnabled;
 
         public Builder(@NonNull Class<? extends OpdRegisterQueryProviderContract> opdRegisterQueryProvider) {
             this.opdRegisterQueryProvider = opdRegisterQueryProvider;
@@ -60,6 +66,11 @@ public class OpdConfiguration {
 
         public Builder setOpdRegisterRowOptions(@Nullable Class<? extends OpdRegisterRowOptions> opdRegisterRowOptions) {
             this.opdRegisterRowOptions = opdRegisterRowOptions;
+            return this;
+        }
+
+        public Builder setBottomNavigationEnabled(boolean isBottomNavigationEnabled) {
+            this.isBottomNavigationEnabled = isBottomNavigationEnabled;
             return this;
         }
 

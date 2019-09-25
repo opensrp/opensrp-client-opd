@@ -5,7 +5,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.view.View;
 
+import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
 import org.smartregister.opd.model.OpdRegisterActivityModel;
 import org.smartregister.opd.presenter.BaseOpdRegisterActivityPresenter;
@@ -22,12 +24,15 @@ public abstract class BaseOpdRegisterActivity extends BaseRegisterActivity imple
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //NavigationMenu.getInstance(this, null, null);
     }
 
     @Override
     protected void registerBottomNavigation() {
-        // Do nothing
+        bottomNavigationView = findViewById(org.smartregister.R.id.bottom_navigation);
+
+        if (bottomNavigationView != null && !OpdLibrary.getInstance().getOpdConfiguration().isBottomNavigationEnabled()) {
+            bottomNavigationView.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -53,7 +58,6 @@ public abstract class BaseOpdRegisterActivity extends BaseRegisterActivity imple
 
     @Override
     public List<String> getViewIdentifiers() {
-        //return Arrays.asList(Utils.metadata().familyRegister.config);
         return null;
     }
 
