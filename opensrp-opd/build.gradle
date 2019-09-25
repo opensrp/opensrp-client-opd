@@ -31,6 +31,7 @@ android {
         versionName "1.0"
         minSdkVersion androidMinSdkVersion
         targetSdkVersion androidTargetSdkVersion
+        multiDexEnabled true
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -56,6 +57,8 @@ android {
         }
     }
 
+    lintOptions.abortOnError false
+
 }
 
 tasks.withType(Test) {
@@ -70,8 +73,9 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    implementation 'com.android.support:multidex:1.0.0'
 
-    api ('org.smartregister:opensrp-client-core:1.7.16-ANC_LIB-SNAPSHOT@aar') {
+    api ('org.smartregister:opensrp-client-core:1.7.18-ANC_LIB-SNAPSHOT@aar') {
         transitive = true
         exclude group: 'com.github.bmelnychuk', module: 'atv'
         exclude group: 'com.google.guava', module: 'guava'
@@ -185,6 +189,10 @@ task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'crea
     executionData = fileTree(dir: project.buildDir, includes: [
             'jacoco/testDebugUnitTest.exec', 'outputs/code-coverage/connected/*coverage.ec'
     ])
+}
+
+coveralls {
+    jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/merged.xml"
 }
 
 //apply from: '../maven.gradle'

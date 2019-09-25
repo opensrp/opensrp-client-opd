@@ -57,10 +57,10 @@ public class OpdLibrary {
 
     public static OpdLibrary getInstance() {
         if (instance == null) {
-            throw new IllegalStateException(" Instance does not exist!!! Call "
+            throw new IllegalStateException("Instance does not exist!!! Call "
                     + OpdLibrary.class.getName()
                     + ".init method in the onCreate method of "
-                    + "your Application class ");
+                    + "your Application class");
         }
         return instance;
     }
@@ -72,10 +72,6 @@ public class OpdLibrary {
         return uniqueIdRepository;
     }
 
-    public OpdConfiguration getOpdConfiguration() {
-        return opdConfiguration;
-    }
-
     public void setOpdConfiguration(OpdConfiguration opdConfiguration) {
         this.opdConfiguration = opdConfiguration;
     }
@@ -85,12 +81,18 @@ public class OpdLibrary {
         return repository;
     }
 
+
     @NonNull
     public ECSyncHelper getEcSyncHelper() {
         if (syncHelper == null) {
             syncHelper = ECSyncHelper.getInstance(context().applicationContext());
         }
         return syncHelper;
+    }
+
+    @NonNull
+    public OpdConfiguration getOpdConfiguration() {
+        return opdConfiguration;
     }
 
 

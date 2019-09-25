@@ -13,9 +13,9 @@ public class OpdRegisterQueryBuilder extends SmartRegisterQueryBuilder {
 
 
     @Override
-    public String SelectInitiateMainTableCounts(String tablename) {
+    public String SelectInitiateMainTableCounts(String tableName) {
         String selectQuery = "SELECT COUNT(*) as sub_count";
-        selectQuery = selectQuery + " FROM " + tablename;
+        selectQuery = selectQuery + " FROM " + tableName;
 
         setSelectquery(selectQuery);
         return selectQuery;

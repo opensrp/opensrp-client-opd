@@ -1,15 +1,10 @@
 package org.smartregister.opd.contract;
 
-import android.util.Pair;
-
 import org.apache.commons.lang3.tuple.Triple;
 import org.json.JSONObject;
-import org.smartregister.clientandeventmodel.Client;
-import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.domain.tag.FormTag;
 import org.smartregister.opd.pojos.OpdEventClient;
 import org.smartregister.opd.pojos.UpdateRegisterParams;
-import org.smartregister.opd.presenter.OpdRegisterActivityPresenter;
 import org.smartregister.view.contract.BaseRegisterContract;
 
 import java.util.List;

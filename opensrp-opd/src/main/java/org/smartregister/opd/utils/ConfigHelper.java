@@ -1,6 +1,7 @@
 package org.smartregister.opd.utils;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 
 import org.smartregister.configurableviews.model.Field;
 import org.smartregister.configurableviews.model.RegisterConfiguration;
@@ -15,7 +16,7 @@ import java.util.List;
 
 public class ConfigHelper {
 
-    public static RegisterConfiguration defaultRegisterConfiguration(Context context) {
+    public static RegisterConfiguration defaultRegisterConfiguration(@Nullable Context context) {
         if (context == null) {
             return null;
         }
