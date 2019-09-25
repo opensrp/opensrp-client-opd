@@ -2,7 +2,6 @@ package org.smartregister.opd.presenter;
 
 
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
-import org.smartregister.opd.interactor.OpdRegisterActivityInteractor;
 import org.smartregister.opd.pojos.UpdateRegisterParams;
 
 import java.lang.ref.WeakReference;

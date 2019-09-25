@@ -22,11 +22,6 @@ public class OpdConfiguration {
         this.opdMetadata = opdMetadata;
     }
 
-    public static class Builder {
-
-        private String tableName;
-        private Builder builder;
-
     private OpdConfiguration(@NonNull Builder builder) {
         this.builder = builder;
 

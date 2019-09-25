@@ -92,7 +92,6 @@ public class OpdFormFragment extends JsonFormFragment implements ClientLookUpLis
             new Listener<List<CommonPersonObject>>() {
                 @Override
                 public void onEvent(List<CommonPersonObject> data) {
-                    Timber.e("testing ");
                     if (!lookedUp) {
                         showClientLookUp(data);
                     }

@@ -1002,7 +1002,6 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
             processReminder(fields);
 
             Client baseClient = org.smartregister.util.JsonFormUtils.createBaseClient(fields, formTag, entityId);
-//            baseClient.setRelationalBaseEntityId(getString(jsonForm, Constants.KEY.RELATIONAL_ID));//mama
 
             Event baseEvent = org.smartregister.util.JsonFormUtils
                     .createEvent(fields, getJSONObject(jsonForm, METADATA), formTag, entityId,

@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import org.smartregister.domain.tag.FormTag;
 import org.smartregister.opd.pojos.OpdEventClient;
 import org.smartregister.opd.pojos.UpdateRegisterParams;
+import org.smartregister.opd.presenter.BaseOpdRegisterActivityPresenter;
 import org.smartregister.view.contract.BaseRegisterContract;
 
 import java.util.List;
@@ -52,7 +53,7 @@ public interface OpdRegisterActivityContract {
 
         void onDestroy(boolean isChangingConfiguration);
 
-        void saveRegistration(List<OpdEventClient> opdEventClientList, String jsonString, UpdateRegisterParams updateRegisterParams, OpdRegisterActivityPresenter opdRegisterActivityPresenter);
+        void saveRegistration(List<OpdEventClient> opdEventClientList, String jsonString, UpdateRegisterParams updateRegisterParams, BaseOpdRegisterActivityPresenter opdRegisterActivityPresenter);
     }
 
     interface InteractorCallBack {
