@@ -63,7 +63,8 @@ public class OpdRegisterFragmentPresenter implements OpdRegisterFragmentContract
                 "middle_name",
                 "gender",
                 "home_address",
-                "'Child' AS register_type"
+                "'Child' AS register_type",
+                "relational_id AS relationalid"
         });
 
         queryTables[0] = childQueryTable;
@@ -76,7 +77,11 @@ public class OpdRegisterFragmentPresenter implements OpdRegisterFragmentContract
                 "middle_name",
                 "'Female' AS gender",
                 "home_address",
-                "'ANC' AS register_type"
+                "'ANC' AS register_type",
+                "NULL AS mother_first_name",
+                "NULL AS mother_last_name",
+                "NULL AS mother_middle_name",
+                "relationalid"
         });
         queryTables[1] = womanQueryTable;
         String countSelect = model.countSelect(queryTables);
@@ -97,7 +102,7 @@ public class OpdRegisterFragmentPresenter implements OpdRegisterFragmentContract
         childTableInnerJoinMotherTable.innerJoinTable(innerJoinMotherTable);
         innerJoinObjects[0] = childTableInnerJoinMotherTable;
 
-        String mainSelect = model.mainSelect(innerJoinObjects, new QueryTable[]{innerJoinMotherTable});
+        String mainSelect = model.mainSelect(innerJoinObjects, new QueryTable[]{womanQueryTable});
 
         getView().initializeQueryParams("ec_child", countSelect, mainSelect);
         getView().initializeAdapter(visibleColumns);
