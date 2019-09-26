@@ -44,7 +44,6 @@ public class OpdFormFragment extends JsonFormFragment implements ClientLookUpLis
     private boolean lookedUp = false;
     private Snackbar snackbar = null;
     private AlertDialog alertDialog = null;
-    private ClientLookUpListAdapter clientLookUpListAdapter;
 
     public static OpdFormFragment getFormFragment(String stepName) {
         OpdFormFragment jsonFormFragment = new OpdFormFragment();
@@ -120,7 +119,13 @@ public class OpdFormFragment extends JsonFormFragment implements ClientLookUpLis
         builder.setCancelable(true);
         alertDialog = builder.create();
         //
-        clientLookUpListAdapter = new ClientLookUpListAdapter(data, getActivity());
+        setUpDialog(recyclerView, data);
+        //
+        alertDialog.show();
+    }
+
+    private void setUpDialog(RecyclerView recyclerView, List<CommonPersonObject> data) {
+        ClientLookUpListAdapter clientLookUpListAdapter = new ClientLookUpListAdapter(data, getActivity());
         recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setHasFixedSize(true);
@@ -128,8 +133,6 @@ public class OpdFormFragment extends JsonFormFragment implements ClientLookUpLis
         recyclerView.setAdapter(clientLookUpListAdapter);
         clientLookUpListAdapter.notifyDataSetChanged();
         clientLookUpListAdapter.setOnClickListener(this);
-        //
-        alertDialog.show();
     }
 
     private void lookupDialogDismissed(CommonPersonObjectClient client) {
