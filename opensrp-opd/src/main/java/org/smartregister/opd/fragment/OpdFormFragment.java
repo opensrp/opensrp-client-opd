@@ -171,7 +171,7 @@ public class OpdFormFragment extends JsonFormFragment implements ClientLookUpLis
                 actionView.performClick();
             }
         });
-//        textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_error, 0, 0, 0);
+        textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_error, 0, 0, 0);
         textView.setCompoundDrawablePadding(paddingInt);
         textView.setPadding(paddingInt, 0, 0, 0);
         textView.setTextColor(getResources().getColor(R.color.white));

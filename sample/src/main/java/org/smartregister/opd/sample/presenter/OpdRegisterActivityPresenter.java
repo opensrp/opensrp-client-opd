@@ -1,6 +1,8 @@
 package org.smartregister.opd.sample.presenter;
 
+import org.apache.commons.lang3.tuple.Triple;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
+import org.smartregister.opd.pojos.UpdateRegisterParams;
 import org.smartregister.opd.presenter.BaseOpdRegisterActivityPresenter;
 
 /**
@@ -14,7 +16,22 @@ public class OpdRegisterActivityPresenter extends BaseOpdRegisterActivityPresent
     }
 
     @Override
-    public void saveForm(String jsonString, boolean isEditMode) {
+    public void saveForm(String jsonString, UpdateRegisterParams updateRegisterParams) {
+        // Do nothing
+    }
+
+    @Override
+    public void startForm(String formName, String entityId, String metaData, String locationId) {
+        // Do nothing
+    }
+
+    @Override
+    public void onNoUniqueId() {
+        // Do nothing
+    }
+
+    @Override
+    public void onUniqueIdFetched(Triple<String, String, String> triple, String entityId) {
         // Do nothing
     }
 }
