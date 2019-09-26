@@ -10,7 +10,6 @@ import org.smartregister.commonregistry.CommonPersonObject;
 import org.smartregister.commonregistry.CommonRepository;
 import org.smartregister.cursoradapter.SmartRegisterQueryBuilder;
 import org.smartregister.event.Listener;
-import org.smartregister.opd.pojos.EntityLookUp;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +19,7 @@ import timber.log.Timber;
 
 
 public class LookUpUtils {
-    public static void lookUp(final Context context, final EntityLookUp entityLookUp, final Listener<List<CommonPersonObject>> listener, Object o) {
+    public static void lookUp(final Context context, final Map<String, String> entityLookUp, final Listener<List<CommonPersonObject>> listener, Object o) {
         org.smartregister.util.Utils
                 .startAsyncTask(new AsyncTask<Void, Void, List<CommonPersonObject>>() {
                     @Override
@@ -45,7 +44,7 @@ public class LookUpUtils {
                     }
                 }, null);
     }
-    private static List<CommonPersonObject> clientLookUp(Context context, EntityLookUp entityLookUp) {
+    private static List<CommonPersonObject> clientLookUp(Context context, Map<String, String> entityLookUp) {
         List<CommonPersonObject> results = new ArrayList<>();
         if (context == null) {
             return results;
@@ -59,7 +58,7 @@ public class LookUpUtils {
         String tableName = Utils.metadata().getTableName();
 
         CommonRepository commonRepository = context.commonrepository(tableName);
-        String query = lookUpQuery(entityLookUp.getMap(), tableName);
+        String query = lookUpQuery(entityLookUp, tableName);
 
         Cursor cursor = null;
         try {
@@ -88,7 +87,7 @@ public class LookUpUtils {
     private static String lookUpQuery(Map<String, String> entityMap, String tableName) {
         SmartRegisterQueryBuilder queryBUilder = new SmartRegisterQueryBuilder();
         queryBUilder.SelectInitiateMainTable(tableName,
-                new String[]{"relationalid",Constants.KEY.MER_ID, Constants.KEY.FIRST_NAME, Constants.KEY.LAST_NAME,
+                new String[]{Constants.KEY.RELATIONALID,Constants.KEY.MER_ID, Constants.KEY.FIRST_NAME, Constants.KEY.LAST_NAME,
                         AllConstants.ChildRegistrationFields.GENDER, Constants.KEY.DOB,
                         Constants.KEY.BASE_ENTITY_ID}
 

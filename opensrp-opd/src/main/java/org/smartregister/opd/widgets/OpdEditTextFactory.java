@@ -26,21 +26,7 @@ public class OpdEditTextFactory extends EditTextFactory {
         if (jsonObject.has(Constants.KEY.LOOK_UP) &&
                 jsonObject.get(Constants.KEY.LOOK_UP).toString().equalsIgnoreCase(Boolean.TRUE.toString())) {
 
-            String entityId = jsonObject.getString(Constants.KEY.ENTITY_ID);
-
-            Map<String, List<View>> lookupMap = formFragment.getLookUpMap();
-
-            List<View> lookUpViews = new ArrayList<>();
-            if (lookupMap.containsKey(entityId)) {
-                lookUpViews = lookupMap.get(entityId);
-            }
-
-            if (!lookUpViews.contains(editText)) {
-                lookUpViews.add(editText);
-            }
-            lookupMap.put(entityId, lookUpViews);
-
-            editText.addTextChangedListener(new LookUpTextWatcher(formFragment, editText, entityId));
+            editText.addTextChangedListener(new LookUpTextWatcher(formFragment, editText));
             editText.setTag(com.vijay.jsonwizard.R.id.after_look_up, false);
         }
 

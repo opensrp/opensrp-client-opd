@@ -1,6 +1,7 @@
 package org.smartregister.opd.fragment;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
@@ -9,7 +10,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.InputType;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -17,16 +17,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.rengwuxian.materialedittext.MaterialEditText;
 import com.vijay.jsonwizard.activities.JsonFormActivity;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.domain.Form;
 import com.vijay.jsonwizard.fragments.JsonFormFragment;
-import com.vijay.jsonwizard.utils.FormUtils;
 import com.vijay.jsonwizard.utils.ValidationStatus;
 import com.vijay.jsonwizard.viewstates.JsonFormFragmentViewState;
 
-import org.apache.commons.lang3.StringUtils;
 import org.smartregister.commonregistry.CommonPersonObject;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.event.Listener;
@@ -37,13 +34,7 @@ import org.smartregister.opd.interactor.OpdFormInteractor;
 import org.smartregister.opd.presenter.OpdFormFragmentPresenter;
 import org.smartregister.opd.utils.Constants;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import timber.log.Timber;
-
-import static org.smartregister.util.Utils.getValue;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -142,90 +133,11 @@ public class OpdFormFragment extends JsonFormFragment implements ClientLookUpLis
     }
 
     private void lookupDialogDismissed(CommonPersonObjectClient client) {
-        if (client != null) {
-
-            Map<String, List<View>> lookupMap = getLookUpMap();
-            if (lookupMap.containsKey(Constants.CLIENT_TYPE)) {
-                List<View> lookUpViews = lookupMap.get(Constants.CLIENT_TYPE);
-                if (lookUpViews != null && !lookUpViews.isEmpty()) {
-
-                    for (View view : lookUpViews) {
-
-                        String key = (String) view.getTag(com.vijay.jsonwizard.R.id.key);
-                        String text = "";
-
-                        if (StringUtils.containsIgnoreCase(key, Constants.KEY.FIRST_NAME)) {
-                            text = getValue(client.getColumnmaps(), Constants.KEY.FIRST_NAME, true);
-                        }
-
-                        if (StringUtils.containsIgnoreCase(key, Constants.KEY.LAST_NAME)) {
-                            text = getValue(client.getColumnmaps(), Constants.KEY.LAST_NAME, true);
-                        }
-
-                        if (view instanceof MaterialEditText) {
-                            MaterialEditText materialEditText = (MaterialEditText) view;
-                            materialEditText.setEnabled(false);
-                            materialEditText.setTag(com.vijay.jsonwizard.R.id.after_look_up, true);
-                            materialEditText.setText(text);
-                            materialEditText.setInputType(InputType.TYPE_NULL);
-                            toggleEditText(materialEditText, false);
-                        }
-                    }
-
-                    Map<String, String> metadataMap = new HashMap<>();
-                    metadataMap.put(Constants.KEY.ENTITY_ID, Constants.CLIENT_TYPE);
-                    metadataMap
-                            .put(Constants.KEY.VALUE, getValue(client.getColumnmaps(), Constants.KEY.BASE_ENTITY_ID, false));
-
-                    writeMetaDataValue(FormUtils.LOOK_UP_JAVAROSA_PROPERTY, metadataMap);
-
-                    lookedUp = true;
-                    clearView();
-                }
-            }
-        }
+        //Another impl
     }
 
     private void clearView() {
-        snackbar = Snackbar.make(getMainView(), R.string.undo_lookup, Snackbar.LENGTH_INDEFINITE);
-        snackbar.setAction(R.string.cancel, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                snackbar.dismiss();
-                clearMotherLookUp();
-            }
-        });
-        show(snackbar, 30000);
-    }
-
-    private void clearMotherLookUp() {
-        Map<String, List<View>> lookupMap = getLookUpMap();
-        if (lookupMap.containsKey(Constants.CLIENT_TYPE)) {
-            List<View> lookUpViews = lookupMap.get(Constants.CLIENT_TYPE);
-            if (lookUpViews != null && !lookUpViews.isEmpty()) {
-                for (View view : lookUpViews) {
-                    if (view instanceof MaterialEditText) {
-                        MaterialEditText materialEditText = (MaterialEditText) view;
-                        materialEditText.setEnabled(true);
-                        toggleEditText(materialEditText, true);
-                        materialEditText.setTag(com.vijay.jsonwizard.R.id.after_look_up, false);
-                        materialEditText.setText("");
-                    }
-                }
-
-                Map<String, String> metadataMap = new HashMap<>();
-                metadataMap.put(Constants.KEY.ENTITY_ID, "");
-                metadataMap.put(Constants.KEY.VALUE, "");
-
-                writeMetaDataValue(FormUtils.LOOK_UP_JAVAROSA_PROPERTY, metadataMap);
-
-                lookedUp = false;
-            }
-        }
-    }
-
-    private void toggleEditText(MaterialEditText materialEditText, boolean status) {
-        materialEditText.setEnabled(status);
+            //Undo lookup
     }
 
     private void show(final Snackbar snackbar, int duration) {
@@ -326,9 +238,19 @@ public class OpdFormFragment extends JsonFormFragment implements ClientLookUpLis
             }
 
             if (client != null) {
-                lookupDialogDismissed(client);
+                //startActivityOnLookUp(client);
             }
         }
+    }
+
+    private void startActivityOnLookUp(CommonPersonObjectClient client) {
+        Intent intent= new Intent(getActivity(), getActivityForLookUpResult());
+        intent.putExtra(Constants.CLIENT_TYPE, client);
+        startActivity(intent);
+    }
+
+    protected Class getActivityForLookUpResult(){
+        return null;
     }
 
 }

@@ -11,8 +11,6 @@ import org.smartregister.commonregistry.CommonPersonObject;
 import org.smartregister.event.Listener;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.fragment.OpdFormFragment;
-import org.smartregister.opd.pojos.EntityLookUp;
-import org.smartregister.opd.utils.Constants;
 import org.smartregister.opd.utils.LookUpUtils;
 
 import java.util.HashMap;
@@ -20,18 +18,16 @@ import java.util.List;
 import java.util.Map;
 
 public class LookUpTextWatcher implements TextWatcher {
-    private static Map<String, EntityLookUp> lookUpMap;
+    private static Map<String, String> lookUpFields;
 
     private final View mView;
     private final JsonFormFragment formFragment;
-    private final String mEntityId;
 
 
-    public LookUpTextWatcher(JsonFormFragment formFragment, View view, String entityId) {
+    public LookUpTextWatcher(JsonFormFragment formFragment, View view) {
         this.formFragment = formFragment;
         mView = view;
-        mEntityId = entityId;
-        lookUpMap = new HashMap<>();
+        lookUpFields = new HashMap<>();
 
     }
 
@@ -57,21 +53,13 @@ public class LookUpTextWatcher implements TextWatcher {
             return;
         }
 
-        EntityLookUp entityLookUp = new EntityLookUp();
-        if (lookUpMap.containsKey(mEntityId)) {
-            entityLookUp = lookUpMap.get(mEntityId);
-        }
-
-        if (StringUtils.isBlank(text)) {
-            if (entityLookUp.containsKey(key)) {
-                entityLookUp.remove(key);
+        if(lookUpFields.containsKey(key)){
+            if(text.trim().isEmpty()){
+                lookUpFields.remove(key);
+                return;
             }
-        } else {
-            entityLookUp.put(key, text);
         }
-
-        lookUpMap.put(mEntityId, entityLookUp);
-
+        lookUpFields.put(key, text);
 
         Listener<List<CommonPersonObject>> listener = null;
         if (formFragment instanceof OpdFormFragment) {
@@ -79,9 +67,7 @@ public class LookUpTextWatcher implements TextWatcher {
             listener = OpdFormFragment.lookUpListener();
         }
 
-        if (mEntityId.equalsIgnoreCase(Constants.CLIENT_TYPE)) {
-            LookUpUtils.lookUp(OpdLibrary.getInstance().context(), lookUpMap.get(mEntityId), listener, null);
-        }
+        LookUpUtils.lookUp(OpdLibrary.getInstance().context(), lookUpFields, listener, null);
 
     }
 
