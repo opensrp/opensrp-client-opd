@@ -2,7 +2,6 @@ package org.smartregister.opd.sample.job;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.evernote.android.job.Job;
 import com.evernote.android.job.JobCreator;
@@ -12,6 +11,10 @@ import org.smartregister.job.PullUniqueIdsServiceJob;
 import org.smartregister.job.SyncServiceJob;
 import org.smartregister.job.ValidateSyncDataServiceJob;
 import org.smartregister.sync.intent.SyncIntentService;
+
+import java.util.NoSuchElementException;
+
+import timber.log.Timber;
 
 public class SampleOpdJobCreator implements JobCreator {
 
@@ -29,7 +32,7 @@ public class SampleOpdJobCreator implements JobCreator {
             case ValidateSyncDataServiceJob.TAG:
                 return new ValidateSyncDataServiceJob();
             default:
-                Log.w(SampleOpdJobCreator.class.getCanonicalName(), tag + " is not declared in Job Creator");
+               Timber.w(new NoSuchElementException(tag + " is not declared in Job Creator"));
                 return null;
         }
     }

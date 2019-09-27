@@ -45,13 +45,13 @@ public class OpdSampleApplication extends org.smartregister.view.activity.Drisht
     }
 
     private static String[] getFtsTables() {
-        return new String[]{Constants.TABLE_NAME, Constants.TABLE_NAME2};
+        return new String[]{Constants.Table.CHILD, Constants.Table.MOTHER};
     }
 
     private static String[] getFtsSearchFields(String tableName) {
-        if (tableName.equals(Constants.TABLE_NAME)) {
+        if (tableName.equals(Constants.Table.CHILD)) {
             return new String[]{Constants.Columns.FIRST_NAME, Constants.Columns.MIDDLE_NAME, Constants.Columns.LAST_NAME, Constants.Columns.DOB, Constants.Columns.LAST_INTERACTED_WITH};
-        } else if (tableName.equals(Constants.TABLE_NAME2)) {
+        } else if (tableName.equals(Constants.Table.MOTHER)) {
             return new String[]{Constants.Columns.FIRST_NAME, Constants.Columns.MIDDLE_NAME, Constants.Columns.LAST_NAME, Constants.Columns.DOB, Constants.Columns.LAST_INTERACTED_WITH};
         }
 
@@ -59,7 +59,7 @@ public class OpdSampleApplication extends org.smartregister.view.activity.Drisht
     }
 
     private static String[] getFtsSortFields(String tableName) {
-        if (tableName.equals(Constants.TABLE_NAME)) {
+        if (tableName.equals(Constants.Table.CHILD)) {
             List<String> names = new ArrayList<>();
             names.add(Constants.Columns.FIRST_NAME);
             names.add(Constants.Columns.MIDDLE_NAME);

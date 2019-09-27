@@ -14,6 +14,8 @@ import org.smartregister.repository.Repository;
 import org.smartregister.repository.SettingsRepository;
 import org.smartregister.repository.UniqueIdRepository;
 
+import timber.log.Timber;
+
 /**
  *
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-18
@@ -82,7 +84,7 @@ public class SampleRepository extends Repository {
             }
             return readableDatabase;
         } catch (Exception e) {
-            Log.e(TAG, "Database Error. " + e.getMessage());
+            Timber.e(e);
             return null;
         }
 
