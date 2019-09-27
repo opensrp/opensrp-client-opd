@@ -4,9 +4,15 @@ import android.support.annotation.NonNull;
 
 import org.smartregister.Context;
 import org.smartregister.opd.configuration.OpdConfiguration;
+import org.smartregister.opd.utils.FilePath;
 import org.smartregister.repository.Repository;
 import org.smartregister.repository.UniqueIdRepository;
+import org.smartregister.view.activity.DrishtiApplication;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
 import org.smartregister.sync.helper.ECSyncHelper;
+import org.yaml.snakeyaml.Yaml;
 
 import id.zelory.compressor.Compressor;
 
@@ -25,6 +31,7 @@ public class OpdLibrary {
     private Compressor compressor;
     private int applicationVersion;
     private int databaseVersion;
+    private Yaml yaml;
 
     protected OpdLibrary(@NonNull Context context, @NonNull OpdConfiguration opdConfiguration
             , @NonNull Repository repository, int applicationVersion, int databaseVersion) {
@@ -97,5 +104,11 @@ public class OpdLibrary {
 
     public int getApplicationVersion() {
         return applicationVersion;
+    }
+
+    public Iterable<Object> readYaml(String filename) throws IOException {
+        InputStreamReader inputStreamReader = new InputStreamReader(
+                DrishtiApplication.getInstance().getApplicationContext().getAssets().open((FilePath.FOLDER.CONFIG_FOLDER_PATH + filename)));
+        return yaml.loadAll(inputStreamReader);
     }
 }

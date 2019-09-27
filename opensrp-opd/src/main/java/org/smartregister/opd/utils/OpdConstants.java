@@ -59,4 +59,10 @@ public class OpdConstants extends AllConstants {
         public static final String OPD_REGISTRATION = "Opd Registration";
         public static final String UPDATE_OPD_REGISTRATION = "Update Opd Registration";
     }
+
+
+    interface IntentKey {
+        String BASE_ENTITY_ID = "base-entity-id";
+    }
+
 }

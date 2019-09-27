@@ -21,9 +21,12 @@ public interface OpdDbConstants {
         String DOB = "dob";
 
         String GENDER = "gender";
+
+        String REG_ID = "reg_id";
+        String BASE_ENTITY_ID = "base_entity_id";
+
         String TABLE = "ec_client";
         String OPENSRP_ID = "opensrp_id";
-        String BASE_ENTITY_ID = "base_entity_id";
         String LAST_INTERACTED_WITH = "last_interacted_with";
         String DATE_REMOVED = "date_removed";
     }
