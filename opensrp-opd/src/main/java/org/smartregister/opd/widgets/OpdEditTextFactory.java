@@ -12,9 +12,6 @@ import org.json.JSONObject;
 import org.smartregister.opd.listener.LookUpTextWatcher;
 import org.smartregister.opd.utils.Constants;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 public class OpdEditTextFactory extends EditTextFactory {
 
