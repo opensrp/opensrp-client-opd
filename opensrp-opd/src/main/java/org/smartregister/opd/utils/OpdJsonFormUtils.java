@@ -1,12 +1,8 @@
 package org.smartregister.opd.utils;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
-import android.telephony.TelephonyManager;
 import android.text.TextUtils;
-import android.util.Pair;
 
 import com.google.common.reflect.TypeToken;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
@@ -22,7 +18,6 @@ import org.json.JSONObject;
 import org.smartregister.clientandeventmodel.Client;
 import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.clientandeventmodel.FormEntityConstants;
-import org.smartregister.clientandeventmodel.Obs;
 import org.smartregister.domain.Photo;
 import org.smartregister.domain.ProfileImage;
 import org.smartregister.domain.form.FormLocation;
@@ -32,12 +27,9 @@ import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.enums.LocationHierarchy;
 import org.smartregister.opd.pojos.OpdEventClient;
 import org.smartregister.repository.AllSharedPreferences;
-import org.smartregister.repository.BaseRepository;
 import org.smartregister.repository.ImageRepository;
 import org.smartregister.repository.UniqueIdRepository;
-import org.smartregister.sync.helper.ECSyncHelper;
 import org.smartregister.util.AssetHandler;
-import org.smartregister.util.FormUtils;
 import org.smartregister.util.ImageUtils;
 import org.smartregister.view.activity.DrishtiApplication;
 
@@ -50,8 +42,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -65,17 +55,12 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
     public static final String METADATA = "metadata";
     public static final String ENCOUNTER_TYPE = "encounter_type";
     public static final int REQUEST_CODE_GET_JSON = 2244;
-    public static final String CURRENT_OPENSRP_ID = "current_opensrp_id";
     public static final String READ_ONLY = "read_only";
     public static final String STEP2 = "step2";
-    public static final String RELATIONAL_ID = "relational_id";
     public static final String CURRENT_MER_ID = "current_mer_id";
     public static final String MER_ID = "MER_ID";
     public static final SimpleDateFormat DATE_FORMAT =
             new SimpleDateFormat(com.vijay.jsonwizard.utils.FormUtils.NATIIVE_FORM_DATE_FORMAT_PATTERN);
-    public static final String GENDER = "gender";
-    private static final String ENCOUNTER = "encounter";
-    private static final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public static JSONObject getFormAsJson(JSONObject form, String formName, String id, String currentLocationId)
             throws Exception {
@@ -260,84 +245,6 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
         } catch (JSONException e) {
             Timber.e(e, "OpdJsonFormUtils --> addLocationDefault");
         }
-    }
-
-    private static void updateMetadata(JSONObject metadata, Event event) {
-        if (metadata != null) {
-            Iterator<?> keys = metadata.keys();
-
-            while (keys.hasNext()) {
-                String key = (String) keys.next();
-                JSONObject jsonObject = getJSONObject(metadata, key);
-                String value = getString(jsonObject, VALUE);
-                if (StringUtils.isNotBlank(value)) {
-                    String entityVal = getString(jsonObject, OPENMRS_ENTITY);
-                    if (entityVal != null) {
-                        if (entityVal.equals(CONCEPT)) {
-                            addToJSONObject(jsonObject, KEY, key);
-                            addObservation(event, jsonObject);
-                        } else if (entityVal.equals(ENCOUNTER)) {
-                            String entityIdVal = getString(jsonObject, OPENMRS_ENTITY_ID);
-                            if (entityIdVal.equals(FormEntityConstants.Encounter.encounter_date.name())) {
-                                Date eDate = formatDate(value, false);
-                                if (eDate != null) {
-                                    event.setEventDate(eDate);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private static void processClients(Context context, AllSharedPreferences allSharedPreferences, ECSyncHelper ecSyncHelper) throws Exception {
-        long lastSyncTimeStamp = allSharedPreferences.fetchLastUpdatedAtDate(0);
-        Date lastSyncDate = new Date(lastSyncTimeStamp);
-        OpdLibrary.getInstance().getClientProcessorForJava().getInstance(context).processClient(
-                ecSyncHelper.getEvents(lastSyncDate, BaseRepository.TYPE_Unsynced));
-        allSharedPreferences.saveLastUpdatedAtDate(lastSyncDate.getTime());
-    }
-
-    private static Event getEvent(String providerId, String locationId, String entityId, String encounterType, Date encounterDate, String Type) {
-        return (Event) new Event().withBaseEntityId(entityId) //should be different for main and subform
-                .withEventDate(encounterDate).withEventType(encounterType).withLocationId(locationId)
-                .withProviderId(providerId).withEntityType(Type)
-                .withFormSubmissionId(generateRandomUUIDString()).withDateCreated(new Date());
-    }
-
-    public static Event addMetaData(Context context, Event event, Date start) throws JSONException {
-        Map<String, String> metaFields = new HashMap<>();
-        metaFields.put("deviceid", "163149AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-        metaFields.put("end", "163138AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-        metaFields.put("start", "163137AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-        Calendar calendar = Calendar.getInstance();
-
-        String end = DATE_TIME_FORMAT.format(calendar.getTime());
-
-        Obs obs = new Obs();
-        obs.setFieldCode("163137AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-        obs.setValue(DATE_TIME_FORMAT.format(start));
-        obs.setFieldType("concept");
-        obs.setFieldDataType("start");
-        event.addObs(obs);
-
-
-        obs.setFieldCode("163137AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-        obs.setValue(end);
-        obs.setFieldDataType("end");
-        event.addObs(obs);
-
-        TelephonyManager mTelephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-
-        @SuppressLint("MissingPermission") String deviceId =
-                mTelephonyManager.getSimSerialNumber(); //Aready handded by native form
-
-        obs.setFieldCode("163137AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-        obs.setValue(deviceId);
-        obs.setFieldDataType("deviceid");
-        event.addObs(obs);
-        return event;
     }
 
     protected static Event tagSyncMetadata(Event event) {
@@ -548,51 +455,6 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
 
     }
 
-    public static String getMetadataForEditForm(Context context, Map<String, String> Details) {
-        return getMetadataForEditForm(context, Details, new ArrayList<String>());
-    }
-
-    public static String getMetadataForEditForm(Context context, Map<String, String> Details, List<String> nonEditableFields) {
-
-        try {
-            JSONObject form = new FormUtils(context).getFormJson(OpdUtils.metadata().getFormName());
-
-            if (form != null) {
-
-                OpdJsonFormUtils.addRegLocHierarchyQuestions(form, "", LocationHierarchy.ENTIRE_TREE);
-                Timber.d("Form is %s", form.toString());
-
-                form.put(OpdJsonFormUtils.ENTITY_ID, Details.get(OpdConstants.KEY.BASE_ENTITY_ID));
-                form.put(OpdJsonFormUtils.ENCOUNTER_TYPE, OpdUtils.metadata().getUpdateEventType());
-                form.put(OpdJsonFormUtils.RELATIONAL_ID, Details.get(RELATIONAL_ID));
-                form.put(OpdJsonFormUtils.CURRENT_MER_ID,
-                        OpdUtils.getValue(Details, OpdConstants.KEY.ZEIR_ID, true).replace("-", ""));
-                form.put(OpdJsonFormUtils.CURRENT_OPENSRP_ID,
-                        OpdUtils.getValue(Details, OpdConstants.JSON_FORM_KEY.UNIQUE_ID, false));
-
-                JSONObject metadata = form.getJSONObject(OpdJsonFormUtils.METADATA);
-
-                metadata.put(OpdJsonFormUtils.ENCOUNTER_LOCATION,
-                        OpdLibrary.getInstance().getLocationPickerView(context).getSelectedItem());
-
-
-                //inject zeir id into the form
-                JSONObject stepOne = form.getJSONObject(OpdJsonFormUtils.STEP1);
-                JSONArray jsonArray = stepOne.getJSONArray(OpdJsonFormUtils.FIELDS);
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject jsonObject = jsonArray.getJSONObject(i);
-                    setFormFieldValues(Details, nonEditableFields, jsonObject);
-                }
-
-                return form.toString();
-            }
-        } catch (Exception e) {
-            Timber.e(e, "OpdJsonFormUtils --> getMetadataForEditForm");
-        }
-
-        return "";
-    }
-
     private static void setFormFieldValues(Map<String, String> Details, List<String> nonEditableFields, JSONObject jsonObject) throws JSONException {
         String prefix = jsonObject.has(OpdJsonFormUtils.ENTITY_ID) && jsonObject.getString(OpdJsonFormUtils.ENTITY_ID).equalsIgnoreCase("mother") ? "mother_" : "";
 
@@ -725,143 +587,6 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
         return getFieldValue(fields, key);
 
     }
-
-    @NotNull
-    private static Map<String, String> getIdentifierMap(JSONArray fields, Client parent, String bindType) {
-        Map<String, String> identifiers = extractIdentifiers(fields, bindType);
-        String parentIdentifier = parent.getIdentifier(MER_ID);
-        if (StringUtils.isNotBlank(parentIdentifier)) {
-            String identifier = parentIdentifier.concat("_").concat(bindType);
-            identifiers.put(MER_ID, identifier);
-        }
-        return identifiers;
-    }
-
-    private static boolean isDateApprox(String approxDate) {
-        boolean dateApprox = false;
-        if (!StringUtils.isEmpty(approxDate) && NumberUtils.isNumber(approxDate)) {
-            int date = 0;
-            try {
-                date = Integer.parseInt(approxDate);
-            } catch (Exception e) {
-                Timber.e(e);
-            }
-            dateApprox = date > 0;
-        }
-        return dateApprox;
-    }
-
-
-    private static JSONArray getOutOFCatchmentJsonArray(JSONObject jsonObject, String clients) throws JSONException {
-        return jsonObject.has(clients) ? jsonObject.getJSONArray(clients) : new JSONArray();
-    }
-
-    private static List<Pair<Event, JSONObject>> createEventList(JSONArray events) throws JSONException {
-        List<Pair<Event, JSONObject>> eventList = new ArrayList<>();
-        for (int i = 0; i < events.length(); i++) {
-            JSONObject jsonEvent = events.getJSONObject(i);
-            Event event = OpdLibrary.getInstance().getEcSyncHelper().convert(jsonEvent, Event.class);
-            if (event == null) {
-                continue;
-            }
-
-            // Skip previous move to catchment events
-//            if (MoveToMyCatchmentUtils.MOVE_TO_CATCHMENT_EVENT.equals(event.getEventType())) {
-//                continue;
-//            }
-
-            if (OpdConstants.EventType.BITRH_REGISTRATION.equals(event.getEventType())) {
-                eventList.add(0, Pair.create(event, jsonEvent));
-            } else if (!eventList.isEmpty() && OpdConstants.EventType.NEW_WOMAN_REGISTRATION.equals(event.getEventType())) {
-                eventList.add(1, Pair.create(event, jsonEvent));
-            } else {
-                eventList.add(Pair.create(event, jsonEvent));
-            }
-
-        }
-
-        return eventList;
-    }
-
-    private static void createMoveToCatchmentEvent(Context context, String toProviderId, String toLocationId, Event event, String fromLocationId) {
-        //Create move to catchment event;
-        Event moveToCatchmentEvent = OpdJsonFormUtils
-                .createMoveToCatchmentEvent(context, event, fromLocationId, toProviderId, toLocationId);
-        if (moveToCatchmentEvent != null) {
-            JSONObject moveToCatchmentJsonEvent =
-                    OpdLibrary.getInstance().getEcSyncHelper().convertToJson(moveToCatchmentEvent);
-            if (moveToCatchmentJsonEvent != null) {
-                OpdLibrary.getInstance().getEcSyncHelper()
-                        .addEvent(moveToCatchmentEvent.getBaseEntityId(), moveToCatchmentJsonEvent);
-            }
-        }
-    }
-
-    private static String updateHomeFacility(String toLocationId, Event event, String fromLocationId) {
-        // Update home facility
-        String locationId = fromLocationId;
-        for (Obs obs : event.getObs()) {
-            if (obs.getFormSubmissionField().equals(OpdConstants.HOME_FACILITY)) {
-                locationId = obs.getValue().toString();
-                List<Object> values = new ArrayList<>();
-                values.add(toLocationId);
-                obs.setValues(values);
-            }
-        }
-        return locationId;
-    }
-
-    public static Event createMoveToCatchmentEvent(Context context, Event referenceEvent, String fromLocationId,
-                                                   String toProviderId, String toLocationId) {
-
-        try {
-
-            //Same location/provider, no need to move
-            if (toLocationId.equals(fromLocationId) || referenceEvent.getProviderId().equals(toProviderId)) {
-                return null;
-            }
-
-            final String FORM_SUBMISSION_FIELD = "formsubmissionField";
-            final String DATA_TYPE = "text";
-
-            Event event = getEvent(referenceEvent.getProviderId(), fromLocationId, referenceEvent.getBaseEntityId(), "MOVE_TO_CATCHMENT_EVENT", new Date(), "client");
-
-
-            String formSubmissionField = "From_ProviderId";
-            List<Object> vall = new ArrayList<>();
-            vall.add(referenceEvent.getProviderId());
-            event.addObs(new Obs(FORM_SUBMISSION_FIELD, DATA_TYPE, formSubmissionField, "", vall, new ArrayList<>(), null,
-                    formSubmissionField));
-
-            formSubmissionField = "From_LocationId";
-            vall = new ArrayList<>();
-            vall.add(fromLocationId);
-            event.addObs(new Obs(FORM_SUBMISSION_FIELD, DATA_TYPE, formSubmissionField, "", vall, new ArrayList<>(), null,
-                    formSubmissionField));
-
-            formSubmissionField = "To_ProviderId";
-            vall = new ArrayList<>();
-            vall.add(toProviderId);
-            event.addObs(new Obs(FORM_SUBMISSION_FIELD, DATA_TYPE, formSubmissionField, "", vall, new ArrayList<>(), null,
-                    formSubmissionField));
-
-            formSubmissionField = "To_LocationId";
-            vall = new ArrayList<>();
-            vall.add(toLocationId);
-            event.addObs(new Obs(FORM_SUBMISSION_FIELD, DATA_TYPE, formSubmissionField, "", vall, new ArrayList<>(), null,
-                    formSubmissionField));
-
-            addMetaData(context, event, new Date());
-
-            OpdJsonFormUtils.tagSyncMetadata(event);
-            return event;
-
-        } catch (Exception e) {
-            Timber.e(e, "OpdJsonFormUtils --> createMoveToCatchmentEvent");
-            return null;
-        }
-    }
-
 
     public static OpdEventClient processOpdDetailsForm(String jsonString,FormTag formTag) {
         try {
