@@ -2,7 +2,7 @@ package org.smartregister.opd.sample.presenter;
 
 import org.apache.commons.lang3.tuple.Triple;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
-import org.smartregister.opd.pojos.UpdateRegisterParams;
+import org.smartregister.opd.pojos.RegisterParams;
 import org.smartregister.opd.presenter.BaseOpdRegisterActivityPresenter;
 
 /**
@@ -16,7 +16,7 @@ public class OpdRegisterActivityPresenter extends BaseOpdRegisterActivityPresent
     }
 
     @Override
-    public void saveForm(String jsonString, UpdateRegisterParams updateRegisterParams) {
+    public void saveForm(String jsonString, RegisterParams registerParams) {
         // Do nothing
     }
 

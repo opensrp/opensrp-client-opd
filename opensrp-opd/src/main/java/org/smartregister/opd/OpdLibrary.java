@@ -3,15 +3,14 @@ package org.smartregister.opd;
 import android.support.annotation.NonNull;
 
 import org.smartregister.Context;
-import org.smartregister.CoreLibrary;
 import org.smartregister.opd.configuration.OpdConfiguration;
 import org.smartregister.repository.EventClientRepository;
 import org.smartregister.repository.Repository;
 import org.smartregister.repository.UniqueIdRepository;
 import org.smartregister.sync.ClientProcessorForJava;
 import org.smartregister.sync.helper.ECSyncHelper;
-import org.smartregister.util.AppProperties;
 import org.smartregister.view.LocationPickerView;
+import org.smartregister.view.activity.DrishtiApplication;
 
 import id.zelory.compressor.Compressor;
 
@@ -22,18 +21,13 @@ import id.zelory.compressor.Compressor;
 public class OpdLibrary {
 
     private final Context context;
-
     private static OpdLibrary instance;
     private OpdConfiguration opdConfiguration;
     private final Repository repository;
     private ECSyncHelper syncHelper;
-
     private UniqueIdRepository uniqueIdRepository;
     private int applicationVersion;
     private int databaseVersion;
-
-    private EventClientRepository eventClientRepository;
-
     private ClientProcessorForJava clientProcessorForJava;
     private Compressor compressor;
     private LocationPickerView locationPickerView;
@@ -72,10 +66,6 @@ public class OpdLibrary {
         return uniqueIdRepository;
     }
 
-    public void setOpdConfiguration(OpdConfiguration opdConfiguration) {
-        this.opdConfiguration = opdConfiguration;
-    }
-
     @NonNull
     public Repository getRepository() {
         return repository;
@@ -98,13 +88,9 @@ public class OpdLibrary {
 
     public ClientProcessorForJava getClientProcessorForJava() {
         if (clientProcessorForJava == null) {
-            clientProcessorForJava = ClientProcessorForJava.getInstance(context().applicationContext());
+            clientProcessorForJava = DrishtiApplication.getInstance().getClientProcessor();
         }
         return clientProcessorForJava;
-    }
-
-    public void setClientProcessorForJava(ClientProcessorForJava clientProcessorForJava) {
-        this.clientProcessorForJava = clientProcessorForJava;
     }
 
     public Compressor getCompressor() {
@@ -122,35 +108,12 @@ public class OpdLibrary {
         return locationPickerView;
     }
 
-    public AppProperties getProperties() {
-        return CoreLibrary.getInstance().context().getAppProperties();
-    }
-
-    public void setUniqueIdRepository(UniqueIdRepository uniqueIdRepository) {
-        this.uniqueIdRepository = uniqueIdRepository;
-    }
-
-    public EventClientRepository getEventClientRepository() {
-        return eventClientRepository;
-    }
-
-    public void setEventClientRepository(EventClientRepository eventClientRepository) {
-        this.eventClientRepository = eventClientRepository;
-    }
 
     public int getApplicationVersion() {
         return applicationVersion;
     }
 
-    public void setApplicationVersion(int applicationVersion) {
-        this.applicationVersion = applicationVersion;
-    }
-
     public int getDatabaseVersion() {
         return databaseVersion;
-    }
-
-    public void setDatabaseVersion(int databaseVersion) {
-        this.databaseVersion = databaseVersion;
     }
 }

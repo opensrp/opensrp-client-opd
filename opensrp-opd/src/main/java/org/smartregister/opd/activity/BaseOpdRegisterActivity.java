@@ -74,6 +74,6 @@ public abstract class BaseOpdRegisterActivity extends BaseRegisterActivity imple
 
     @Override
     public void startFormActivity(String formName, String entityId, String metaData) {
-
+        //do nothing
     }
 }

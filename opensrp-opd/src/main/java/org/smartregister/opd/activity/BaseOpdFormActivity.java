@@ -16,9 +16,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
-import org.smartregister.opd.fragment.OpdFormFragment;
-import org.smartregister.opd.utils.Constants;
-import org.smartregister.opd.utils.JsonFormUtils;
+import org.smartregister.opd.fragment.BaseOpdFormFragment;
+import org.smartregister.opd.utils.OpdConstants;
+import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.util.LangUtils;
 
 import java.util.List;
@@ -26,7 +26,8 @@ import java.util.List;
 import timber.log.Timber;
 
 public class BaseOpdFormActivity extends JsonWizardFormActivity {
-    private OpdFormFragment opdFormFragment;
+
+    private BaseOpdFormFragment opdFormFragment;
     private String TAG = BaseOpdFormActivity.class.getCanonicalName();
     private boolean enableOnCloseDialog = true;
     private JSONObject form;
@@ -47,7 +48,7 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
             Timber.e(e);
         }
 
-        enableOnCloseDialog = getIntent().getBooleanExtra(Constants.FormActivity.EnableOnCloseDialog, true);
+        enableOnCloseDialog = getIntent().getBooleanExtra(OpdConstants.FormActivity.EnableOnCloseDialog, true);
 
     }
 
@@ -55,15 +56,11 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
     protected void onResume() {
         super.onResume();
         try {
-
-            String et = form.getString(JsonFormUtils.ENCOUNTER_TYPE);
-
+            String encounterType = form.getString(OpdJsonFormUtils.ENCOUNTER_TYPE);
             confirmCloseTitle = getString(R.string.confirm_form_close);
-            confirmCloseMessage = et.trim().toLowerCase().contains("update") ? this.getString(R.string.any_changes_you_make) : this.getString(R.string.confirm_form_close_explanation);
-
+            confirmCloseMessage = encounterType.trim().toLowerCase().contains("update") ? this.getString(R.string.any_changes_you_make) : this.getString(R.string.confirm_form_close_explanation);
             setConfirmCloseTitle(confirmCloseTitle);
             setConfirmCloseMessage(confirmCloseMessage);
-
 
         } catch (JSONException e) {
             Timber.e(e);
@@ -76,7 +73,7 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
     }
 
     protected void initializeFormFragmentCore() {
-        opdFormFragment = OpdFormFragment.getFormFragment(JsonFormConstants.FIRST_STEP_NAME);
+        opdFormFragment = BaseOpdFormFragment.getFormFragment(JsonFormConstants.FIRST_STEP_NAME);
         getSupportFragmentManager().beginTransaction().add(com.vijay.jsonwizard.R.id.container, opdFormFragment).commit();
     }
 
@@ -155,8 +152,8 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
 
     public void validateActivateNext() {
         Fragment fragment = getVisibleFragment();
-        if (fragment != null && fragment instanceof OpdFormFragment) {
-            ((OpdFormFragment) fragment).validateActivateNext();
+        if (fragment != null && fragment instanceof BaseOpdFormFragment) {
+            ((BaseOpdFormFragment) fragment).validateActivateNext();
         }
     }
 

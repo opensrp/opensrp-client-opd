@@ -21,5 +21,6 @@ public interface OpdDbConstants {
         String DOB = "dob";
 
         String GENDER = "gender";
-    } 
+        String TABLE = "ec_client";
+    }
 }

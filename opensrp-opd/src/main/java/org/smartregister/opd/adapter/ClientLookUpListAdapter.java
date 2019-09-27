@@ -28,7 +28,7 @@ public class ClientLookUpListAdapter extends RecyclerView.Adapter<ClientLookUpLi
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View itemView = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.lookup_item, viewGroup, false);
+        View itemView = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.opd_lookup_item, viewGroup, false);
         return new MyViewHolder(itemView);
     }
 
@@ -37,9 +37,12 @@ public class ClientLookUpListAdapter extends RecyclerView.Adapter<ClientLookUpLi
         CommonPersonObject commonPersonObject = data.get(i);
         String firstName = Utils.getValue(commonPersonObject.getColumnmaps(), "first_name", true);
         String lastName = Utils.getValue(commonPersonObject.getColumnmaps(), "last_name", true);
+        String nationalId = Utils.getValue(commonPersonObject.getColumnmaps(), "national_id", true);
         String fullname =  firstName + " " + lastName;
+        String details = context.getString(R.string.national_id)+" - "+nationalId;
         holder.txtName.setText(fullname);
         holder.itemView.setTag(Utils.convert(commonPersonObject));
+        holder.txtDetails.setText(details);
 
     }
 
@@ -54,7 +57,7 @@ public class ClientLookUpListAdapter extends RecyclerView.Adapter<ClientLookUpLi
         private MyViewHolder(View view) {
             super(view);
             txtName = view.findViewById(R.id.txtName);
-//            view.setTag(Utils.convert());
+            txtDetails = view.findViewById(R.id.txtDetails);
             view.setOnClickListener(this);
         }
 

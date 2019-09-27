@@ -4,7 +4,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.json.JSONObject;
 import org.smartregister.domain.tag.FormTag;
 import org.smartregister.opd.pojos.OpdEventClient;
-import org.smartregister.opd.pojos.UpdateRegisterParams;
+import org.smartregister.opd.pojos.RegisterParams;
 import org.smartregister.opd.presenter.BaseOpdRegisterActivityPresenter;
 import org.smartregister.view.contract.BaseRegisterContract;
 
@@ -24,7 +24,7 @@ public interface OpdRegisterActivityContract {
 
         void saveLanguage(String language);
 
-        void saveForm(String jsonString, UpdateRegisterParams updateRegisterParams);
+        void saveForm(String jsonString, RegisterParams registerParams);
 
         void startForm(String formName, String entityId, String metaData, String locationId);
     }
@@ -53,7 +53,7 @@ public interface OpdRegisterActivityContract {
 
         void onDestroy(boolean isChangingConfiguration);
 
-        void saveRegistration(List<OpdEventClient> opdEventClientList, String jsonString, UpdateRegisterParams updateRegisterParams, BaseOpdRegisterActivityPresenter opdRegisterActivityPresenter);
+        void saveRegistration(List<OpdEventClient> opdEventClientList, String jsonString, RegisterParams registerParams, BaseOpdRegisterActivityPresenter opdRegisterActivityPresenter);
     }
 
     interface InteractorCallBack {

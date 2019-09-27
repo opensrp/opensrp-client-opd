@@ -2,7 +2,7 @@ package org.smartregister.opd.presenter;
 
 
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
-import org.smartregister.opd.pojos.UpdateRegisterParams;
+import org.smartregister.opd.pojos.RegisterParams;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -23,10 +23,6 @@ public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterAct
 
     public void setModel(OpdRegisterActivityContract.Model model) {
         this.model = model;
-    }
-
-    public void setInteractor(OpdRegisterActivityContract.Interactor interactor) {
-        this.interactor = interactor;
     }
 
     @Override
@@ -70,7 +66,7 @@ public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterAct
     }
 
     @Override
-    public void saveForm(String jsonString, UpdateRegisterParams updateRegisterParams) {
+    public void saveForm(String jsonString, RegisterParams registerParams) {
 
     }
 }

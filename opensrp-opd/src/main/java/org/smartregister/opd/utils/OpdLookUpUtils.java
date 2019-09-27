@@ -18,7 +18,8 @@ import java.util.Map;
 import timber.log.Timber;
 
 
-public class LookUpUtils {
+public class OpdLookUpUtils {
+
     public static void lookUp(final Context context, final Map<String, String> entityLookUp, final Listener<List<CommonPersonObject>> listener, Object o) {
         org.smartregister.util.Utils
                 .startAsyncTask(new AsyncTask<Void, Void, List<CommonPersonObject>>() {
@@ -44,6 +45,7 @@ public class LookUpUtils {
                     }
                 }, null);
     }
+
     private static List<CommonPersonObject> clientLookUp(Context context, Map<String, String> entityLookUp) {
         List<CommonPersonObject> results = new ArrayList<>();
         if (context == null) {
@@ -55,7 +57,7 @@ public class LookUpUtils {
             return results;
         }
 
-        String tableName = Utils.metadata().getTableName();
+        String tableName = OpdUtils.metadata().getTableName();
 
         CommonRepository commonRepository = context.commonrepository(tableName);
         String query = lookUpQuery(entityLookUp, tableName);
@@ -87,9 +89,9 @@ public class LookUpUtils {
     private static String lookUpQuery(Map<String, String> entityMap, String tableName) {
         SmartRegisterQueryBuilder queryBUilder = new SmartRegisterQueryBuilder();
         queryBUilder.SelectInitiateMainTable(tableName,
-                new String[]{Constants.KEY.RELATIONALID,Constants.KEY.MER_ID, Constants.KEY.FIRST_NAME, Constants.KEY.LAST_NAME,
-                        AllConstants.ChildRegistrationFields.GENDER, Constants.KEY.DOB,
-                        Constants.KEY.BASE_ENTITY_ID}
+                new String[]{OpdConstants.KEY.RELATIONALID, OpdConstants.KEY.MER_ID, OpdConstants.KEY.FIRST_NAME, OpdConstants.KEY.LAST_NAME,
+                        AllConstants.ChildRegistrationFields.GENDER, OpdConstants.KEY.DOB,
+                        OpdConstants.KEY.BASE_ENTITY_ID}
 
         );
         String query = queryBUilder.mainCondition(getMainConditionString(entityMap));

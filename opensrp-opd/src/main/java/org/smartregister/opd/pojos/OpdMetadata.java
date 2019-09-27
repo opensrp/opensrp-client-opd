@@ -5,19 +5,11 @@ public class OpdMetadata {
 
     private String tableName;
 
-    private String motherTableName;
-
     private String registerEventType;
 
     private String updateEventType;
 
-    private String outOfCatchmentServiceEventType;
-
     private String config;
-
-    private String childCareGiverRelationKey;
-
-    private String outOfCatchmentFormName;
 
     private Class opdFormActivity;
 
@@ -25,16 +17,12 @@ public class OpdMetadata {
 
     private boolean formWizardValidateRequiredFieldsBefore;
 
-    public OpdMetadata(String formName, String tableName, String motherTableName, String registerEventType, String updateEventType, String outOfCatchmentServiceEventType, String config, String childCareGiverRelationKey, String outOfCatchmentFormName, Class opdFormActivity, Class profileActivity, boolean formWizardValidateRequiredFieldsBefore) {
+    public OpdMetadata(String formName, String tableName, String registerEventType, String updateEventType, String config, Class opdFormActivity, Class profileActivity, boolean formWizardValidateRequiredFieldsBefore) {
         this.formName = formName;
         this.tableName = tableName;
-        this.motherTableName = motherTableName;
         this.registerEventType = registerEventType;
         this.updateEventType = updateEventType;
-        this.outOfCatchmentServiceEventType = outOfCatchmentServiceEventType;
         this.config = config;
-        this.childCareGiverRelationKey = childCareGiverRelationKey;
-        this.outOfCatchmentFormName = outOfCatchmentFormName;
         this.opdFormActivity = opdFormActivity;
         this.profileActivity = profileActivity;
         this.formWizardValidateRequiredFieldsBefore = formWizardValidateRequiredFieldsBefore;
@@ -56,14 +44,6 @@ public class OpdMetadata {
         this.tableName = tableName;
     }
 
-    public String getMotherTableName() {
-        return motherTableName;
-    }
-
-    public void setMotherTableName(String motherTableName) {
-        this.motherTableName = motherTableName;
-    }
-
     public String getRegisterEventType() {
         return registerEventType;
     }
@@ -80,36 +60,12 @@ public class OpdMetadata {
         this.updateEventType = updateEventType;
     }
 
-    public String getOutOfCatchmentServiceEventType() {
-        return outOfCatchmentServiceEventType;
-    }
-
-    public void setOutOfCatchmentServiceEventType(String outOfCatchmentServiceEventType) {
-        this.outOfCatchmentServiceEventType = outOfCatchmentServiceEventType;
-    }
-
     public String getConfig() {
         return config;
     }
 
     public void setConfig(String config) {
         this.config = config;
-    }
-
-    public String getChildCareGiverRelationKey() {
-        return childCareGiverRelationKey;
-    }
-
-    public void setChildCareGiverRelationKey(String childCareGiverRelationKey) {
-        this.childCareGiverRelationKey = childCareGiverRelationKey;
-    }
-
-    public String getOutOfCatchmentFormName() {
-        return outOfCatchmentFormName;
-    }
-
-    public void setOutOfCatchmentFormName(String outOfCatchmentFormName) {
-        this.outOfCatchmentFormName = outOfCatchmentFormName;
     }
 
     public Class getOpdFormActivity() {

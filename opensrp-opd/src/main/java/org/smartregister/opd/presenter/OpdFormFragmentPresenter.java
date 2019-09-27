@@ -4,7 +4,7 @@ import com.vijay.jsonwizard.fragments.JsonFormFragment;
 import com.vijay.jsonwizard.interactors.JsonFormInteractor;
 import com.vijay.jsonwizard.presenters.JsonFormFragmentPresenter;
 
-import org.smartregister.opd.utils.Constants;
+import org.smartregister.opd.utils.OpdConstants;
 
 public class OpdFormFragmentPresenter extends JsonFormFragmentPresenter {
 
@@ -19,6 +19,6 @@ public class OpdFormFragmentPresenter extends JsonFormFragmentPresenter {
 
 
     public boolean intermediatePage() {
-        return this.mStepDetails != null && this.mStepDetails.has(Constants.JSON_FORM_EXTRA.NEXT);
+        return this.mStepDetails != null && this.mStepDetails.has(OpdConstants.JSON_FORM_EXTRA.NEXT);
     }
 }

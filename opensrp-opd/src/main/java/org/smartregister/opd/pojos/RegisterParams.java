@@ -3,10 +3,7 @@ package org.smartregister.opd.pojos;
 import org.smartregister.domain.tag.FormTag;
 import org.smartregister.repository.BaseRepository;
 
-/**
- * Created by ndegwamartin on 05/05/2019.
- */
-public class UpdateRegisterParams {
+public class RegisterParams {
 
 
     private String status = BaseRepository.TYPE_Unsynced;

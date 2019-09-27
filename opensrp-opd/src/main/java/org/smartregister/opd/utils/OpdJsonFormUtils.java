@@ -62,7 +62,7 @@ import timber.log.Timber;
 /**
  * Created by ndegwamartin on 26/02/2019.
  */
-public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
+public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
     public static final String METADATA = "metadata";
     public static final String ENCOUNTER_TYPE = "encounter_type";
     public static final int REQUEST_CODE_GET_JSON = 2244;
@@ -87,12 +87,12 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
         String entityId = id;
         form.getJSONObject(METADATA).put(ENCOUNTER_LOCATION, currentLocationId);
 
-        if (Utils.metadata().getFormName().equals(formName)) {
+        if (OpdUtils.metadata().getFormName().equals(formName)) {
             if (StringUtils.isBlank(entityId)) {
                 UniqueIdRepository uniqueIdRepo = OpdLibrary.getInstance().getUniqueIdRepository();
                 entityId = uniqueIdRepo.getNextUniqueId() != null ? uniqueIdRepo.getNextUniqueId().getOpenmrsId() : "";
                 if (entityId.isEmpty()) {
-                    Timber.e("JsonFormUtils --> UniqueIds are empty");
+                    Timber.e("OpdJsonFormUtils --> UniqueIds are empty");
                     return null;
                 }
             }
@@ -101,48 +101,23 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
                 entityId = entityId.replace("-", "");
             }
 
-            JsonFormUtils.addRegLocHierarchyQuestions(form, Constants.JSON_FORM_KEY.ADDRESS_WIDGET_KEY , LocationHierarchy.ENTIRE_TREE);
+            OpdJsonFormUtils.addRegLocHierarchyQuestions(form, OpdConstants.JSON_FORM_KEY.ADDRESS_WIDGET_KEY , LocationHierarchy.ENTIRE_TREE);
 
             // Inject OPenSrp id into the form
-            JSONObject stepOne = form.getJSONObject(JsonFormUtils.STEP1);
-            JSONArray jsonArray = stepOne.getJSONArray(JsonFormUtils.FIELDS);
+            JSONObject stepOne = form.getJSONObject(OpdJsonFormUtils.STEP1);
+            JSONArray jsonArray = stepOne.getJSONArray(OpdJsonFormUtils.FIELDS);
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                if (jsonObject.getString(JsonFormUtils.KEY).equalsIgnoreCase(JsonFormUtils.MER_ID)) {
-                    jsonObject.remove(JsonFormUtils.VALUE);
-                    jsonObject.put(JsonFormUtils.VALUE, entityId);
+                if (jsonObject.getString(OpdJsonFormUtils.KEY).equalsIgnoreCase(OpdJsonFormUtils.MER_ID)) {
+                    jsonObject.remove(OpdJsonFormUtils.VALUE);
+                    jsonObject.put(OpdJsonFormUtils.VALUE, entityId);
                 }
             }
-
-        } else if (formName.equals(Utils.metadata().getOutOfCatchmentFormName())) {
-            if (StringUtils.isNotBlank(entityId)) {
-
-                entityId = entityId.replace("-", "");
-            } else {
-                JSONArray fields = form.getJSONObject(JsonFormUtils.STEP1).getJSONArray(JsonFormUtils.FIELDS);
-                for (int i = 0; i < fields.length(); i++) {
-                    if (fields.getJSONObject(i).getString(JsonFormUtils.KEY).equals(JsonFormUtils.MER_ID)) {
-                        fields.getJSONObject(i).put(READ_ONLY, false);
-                        break;
-                    }
-                }
-            }
-
-            JSONObject stepOne = form.getJSONObject(JsonFormUtils.STEP1);
-            JSONArray jsonArray = stepOne.getJSONArray(JsonFormUtils.FIELDS);
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                if (jsonObject.getString(JsonFormUtils.KEY).equalsIgnoreCase(JsonFormUtils.MER_ID)) {
-                    jsonObject.remove(JsonFormUtils.VALUE);
-                    jsonObject.put(JsonFormUtils.VALUE, entityId);
-                }
-            }
-
 
         } else {
-            Timber.w("JsonFormUtils --> Unsupported form requested for launch %s", formName);
+            Timber.w("OpdJsonFormUtils --> Unsupported form requested for launch %s", formName);
         }
-        Timber.d("JsonFormUtils --> form is %s", form.toString());
+        Timber.d("OpdJsonFormUtils --> form is %s", form.toString());
         return form;
     }
 
@@ -202,7 +177,7 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
             }
 
         } catch (Exception e) {
-            Timber.e(e, "JsonFormUtils --> addRegLocHierarchyQuestions");
+            Timber.e(e, "OpdJsonFormUtils --> addRegLocHierarchyQuestions");
         }
     }
 
@@ -274,7 +249,7 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
                 widget.put("tree", new JSONArray(updateString));
             }
         } catch (JSONException e) {
-            Timber.e(e, "JsonFormUtils --> addLocationTree");
+            Timber.e(e, "OpdJsonFormUtils --> addLocationTree");
         }
     }
 
@@ -284,7 +259,7 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
                 widget.put("default", new JSONArray(updateString));
             }
         } catch (JSONException e) {
-            Timber.e(e, "JsonFormUtils --> addLocationDefault");
+            Timber.e(e, "OpdJsonFormUtils --> addLocationDefault");
         }
     }
 
@@ -367,7 +342,7 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
     }
 
     protected static Event tagSyncMetadata(Event event) {
-        AllSharedPreferences allSharedPreferences = Utils.getAllSharedPreferences();
+        AllSharedPreferences allSharedPreferences = OpdUtils.getAllSharedPreferences();
         String providerId = allSharedPreferences.fetchRegisteredANM();
         event.setProviderId(providerId);
         event.setLocationId(locationId(allSharedPreferences));
@@ -397,19 +372,6 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
         return null;
     }
 
-    public static void updateDateOfRemoval(String baseEntityId, String dateOfRemovalString) {
-
-        ContentValues contentValues = new ContentValues();
-
-        if (dateOfRemovalString != null) {
-            contentValues.put(Constants.KEY.DATE_REMOVED, dateOfRemovalString);
-        }
-
-        OpdLibrary.getInstance().context().getEventClientRepository().getWritableDatabase()
-                .update(Utils.metadata().getTableName(), contentValues, Constants.KEY.BASE_ENTITY_ID + " = ?",
-                        new String[]{baseEntityId});
-    }
-
     public static String locationId(AllSharedPreferences allSharedPreferences) {
         String providerId = allSharedPreferences.fetchRegisteredANM();
         String userLocationId = allSharedPreferences.fetchUserLocalityId(providerId);
@@ -431,7 +393,7 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
         try {
             //TO DO Will need re-architecting later to support more languages, perhaps update the selector widget
 
-            JSONObject genderObject = getFieldJSONObject(fields, Constants.SEX);
+            JSONObject genderObject = getFieldJSONObject(fields, OpdConstants.SEX);
             String genderValue = "";
 
             String rawGender = genderObject.getString(JsonFormConstants.VALUE);
@@ -452,9 +414,9 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
 
             }
 
-            genderObject.put(Constants.KEY.VALUE, genderValue);
+            genderObject.put(OpdConstants.KEY.VALUE, genderValue);
         } catch (JSONException e) {
-            Timber.e(e, "JsonFormUtils --> processGender");
+            Timber.e(e, "OpdJsonFormUtils --> processGender");
         }
     }
 
@@ -479,41 +441,41 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
     protected static void lastInteractedWith(JSONArray fields) {
         try {
             JSONObject lastInteractedWith = new JSONObject();
-            lastInteractedWith.put(Constants.KEY.KEY, Constants.JSON_FORM_KEY.LAST_INTERACTED_WITH);
-            lastInteractedWith.put(Constants.KEY.VALUE, Calendar.getInstance().getTimeInMillis());
+            lastInteractedWith.put(OpdConstants.KEY.KEY, OpdConstants.JSON_FORM_KEY.LAST_INTERACTED_WITH);
+            lastInteractedWith.put(OpdConstants.KEY.VALUE, Calendar.getInstance().getTimeInMillis());
             fields.put(lastInteractedWith);
         } catch (JSONException e) {
-            Timber.e(e, "JsonFormUtils --> lastInteractedWith");
+            Timber.e(e, "OpdJsonFormUtils --> lastInteractedWith");
         }
     }
 
     protected static void dobUnknownUpdateFromAge(JSONArray fields) {
         try {
-            JSONObject dobUnknownObject = getFieldJSONObject(fields, Constants.JSON_FORM_KEY.DOB_UNKNOWN);
-            JSONArray options = getJSONArray(dobUnknownObject, Constants.JSON_FORM_KEY.OPTIONS);
+            JSONObject dobUnknownObject = getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.DOB_UNKNOWN);
+            JSONArray options = getJSONArray(dobUnknownObject, OpdConstants.JSON_FORM_KEY.OPTIONS);
             JSONObject option = getJSONObject(options, 0);
             String dobUnKnownString = option != null ? option.getString(VALUE) : null;
             if (StringUtils.isNotBlank(dobUnKnownString) && Boolean.valueOf(dobUnKnownString)) {
 
-                String ageString = getFieldValue(fields, Constants.JSON_FORM_KEY.AGE_ENTERED);
+                String ageString = getFieldValue(fields, OpdConstants.JSON_FORM_KEY.AGE_ENTERED);
                 if (StringUtils.isNotBlank(ageString) && NumberUtils.isNumber(ageString)) {
                     int age = Integer.valueOf(ageString);
-                    JSONObject dobJSONObject = getFieldJSONObject(fields, Constants.JSON_FORM_KEY.DOB_ENTERED);
-                    dobJSONObject.put(VALUE, Utils.getDob(age));
+                    JSONObject dobJSONObject = getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.DOB_ENTERED);
+                    dobJSONObject.put(VALUE, OpdUtils.getDob(age));
 
                     //Mark the birth date as an approximation
                     JSONObject isBirthdateApproximate = new JSONObject();
-                    isBirthdateApproximate.put(Constants.KEY.KEY, FormEntityConstants.Person.birthdate_estimated);
-                    isBirthdateApproximate.put(Constants.KEY.VALUE, Constants.BOOLEAN_INT.TRUE);
+                    isBirthdateApproximate.put(OpdConstants.KEY.KEY, FormEntityConstants.Person.birthdate_estimated);
+                    isBirthdateApproximate.put(OpdConstants.KEY.VALUE, OpdConstants.BOOLEAN_INT.TRUE);
                     isBirthdateApproximate
-                            .put(Constants.OPENMRS.ENTITY, Constants.ENTITY.PERSON);//Required for value to be processed
-                    isBirthdateApproximate.put(Constants.OPENMRS.ENTITY_ID, FormEntityConstants.Person.birthdate_estimated);
+                            .put(OpdConstants.OPENMRS.ENTITY, OpdConstants.ENTITY.PERSON);//Required for value to be processed
+                    isBirthdateApproximate.put(OpdConstants.OPENMRS.ENTITY_ID, FormEntityConstants.Person.birthdate_estimated);
                     fields.put(isBirthdateApproximate);
 
                 }
             }
         } catch (JSONException e) {
-            Timber.e(e, "JsonFormUtils --> dobUnknownUpdateFromAge");
+            Timber.e(e, "OpdJsonFormUtils --> dobUnknownUpdateFromAge");
         }
     }
 
@@ -569,18 +531,18 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
                 profileImage.setFilepath(absoluteFileName);
                 profileImage.setFilecategory("profilepic");
                 profileImage.setSyncStatus(ImageRepository.TYPE_Unsynced);
-                ImageRepository imageRepo = Utils.context().imageRepository();
+                ImageRepository imageRepo = OpdUtils.context().imageRepository();
                 imageRepo.add(profileImage);
             }
 
         } catch (FileNotFoundException e) {
-            Timber.e(e, "JsonFormUtils --> Failed to save static image to disk");
+            Timber.e(e, "OpdJsonFormUtils --> Failed to save static image to disk");
         } finally {
             if (os != null) {
                 try {
                     os.close();
                 } catch (IOException e) {
-                    Timber.e(e, "JsonFormUtils --> Failed to close static images output stream after attempting to write image");
+                    Timber.e(e, "OpdJsonFormUtils --> Failed to close static images output stream after attempting to write image");
                 }
             }
         }
@@ -594,30 +556,30 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
     public static String getMetadataForEditForm(Context context, Map<String, String> Details, List<String> nonEditableFields) {
 
         try {
-            JSONObject form = new FormUtils(context).getFormJson(Utils.metadata().getFormName());
+            JSONObject form = new FormUtils(context).getFormJson(OpdUtils.metadata().getFormName());
 
             if (form != null) {
 
-                JsonFormUtils.addRegLocHierarchyQuestions(form, "", LocationHierarchy.ENTIRE_TREE);
+                OpdJsonFormUtils.addRegLocHierarchyQuestions(form, "", LocationHierarchy.ENTIRE_TREE);
                 Timber.d("Form is %s", form.toString());
 
-                form.put(JsonFormUtils.ENTITY_ID, Details.get(Constants.KEY.BASE_ENTITY_ID));
-                form.put(JsonFormUtils.ENCOUNTER_TYPE, Utils.metadata().getUpdateEventType());
-                form.put(JsonFormUtils.RELATIONAL_ID, Details.get(RELATIONAL_ID));
-                form.put(JsonFormUtils.CURRENT_MER_ID,
-                        Utils.getValue(Details, Constants.KEY.ZEIR_ID, true).replace("-", ""));
-                form.put(JsonFormUtils.CURRENT_OPENSRP_ID,
-                        Utils.getValue(Details, Constants.JSON_FORM_KEY.UNIQUE_ID, false));
+                form.put(OpdJsonFormUtils.ENTITY_ID, Details.get(OpdConstants.KEY.BASE_ENTITY_ID));
+                form.put(OpdJsonFormUtils.ENCOUNTER_TYPE, OpdUtils.metadata().getUpdateEventType());
+                form.put(OpdJsonFormUtils.RELATIONAL_ID, Details.get(RELATIONAL_ID));
+                form.put(OpdJsonFormUtils.CURRENT_MER_ID,
+                        OpdUtils.getValue(Details, OpdConstants.KEY.ZEIR_ID, true).replace("-", ""));
+                form.put(OpdJsonFormUtils.CURRENT_OPENSRP_ID,
+                        OpdUtils.getValue(Details, OpdConstants.JSON_FORM_KEY.UNIQUE_ID, false));
 
-                JSONObject metadata = form.getJSONObject(JsonFormUtils.METADATA);
+                JSONObject metadata = form.getJSONObject(OpdJsonFormUtils.METADATA);
 
-                metadata.put(JsonFormUtils.ENCOUNTER_LOCATION,
+                metadata.put(OpdJsonFormUtils.ENCOUNTER_LOCATION,
                         OpdLibrary.getInstance().getLocationPickerView(context).getSelectedItem());
 
 
                 //inject zeir id into the form
-                JSONObject stepOne = form.getJSONObject(JsonFormUtils.STEP1);
-                JSONArray jsonArray = stepOne.getJSONArray(JsonFormUtils.FIELDS);
+                JSONObject stepOne = form.getJSONObject(OpdJsonFormUtils.STEP1);
+                JSONArray jsonArray = stepOne.getJSONArray(OpdJsonFormUtils.FIELDS);
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                     setFormFieldValues(Details, nonEditableFields, jsonObject);
@@ -626,43 +588,43 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
                 return form.toString();
             }
         } catch (Exception e) {
-            Timber.e(e, "JsonFormUtils --> getMetadataForEditForm");
+            Timber.e(e, "OpdJsonFormUtils --> getMetadataForEditForm");
         }
 
         return "";
     }
 
     private static void setFormFieldValues(Map<String, String> Details, List<String> nonEditableFields, JSONObject jsonObject) throws JSONException {
-        String prefix = jsonObject.has(JsonFormUtils.ENTITY_ID) && jsonObject.getString(JsonFormUtils.ENTITY_ID).equalsIgnoreCase("mother") ? "mother_" : "";
+        String prefix = jsonObject.has(OpdJsonFormUtils.ENTITY_ID) && jsonObject.getString(OpdJsonFormUtils.ENTITY_ID).equalsIgnoreCase("mother") ? "mother_" : "";
 
-        if (jsonObject.getString(JsonFormUtils.KEY).equalsIgnoreCase(Constants.KEY.PHOTO)) {
-            processPhoto(Details.get(Constants.KEY.BASE_ENTITY_ID), jsonObject);
-        } else if (jsonObject.getString(JsonFormUtils.KEY).equalsIgnoreCase(Constants.JSON_FORM_KEY.DOB_UNKNOWN)) {
-            JSONObject optionsObject = jsonObject.getJSONArray(Constants.JSON_FORM_KEY.OPTIONS).getJSONObject(0);
-            optionsObject.put(JsonFormUtils.VALUE, Utils.getValue(Details, Constants.JSON_FORM_KEY.DOB_UNKNOWN, false));
-        } else if (jsonObject.getString(JsonFormUtils.KEY).equalsIgnoreCase(Constants.JSON_FORM_KEY.AGE)) {
-            processAge(Utils.getValue(Details, Constants.JSON_FORM_KEY.DOB, false), jsonObject);
+        if (jsonObject.getString(OpdJsonFormUtils.KEY).equalsIgnoreCase(OpdConstants.KEY.PHOTO)) {
+            processPhoto(Details.get(OpdConstants.KEY.BASE_ENTITY_ID), jsonObject);
+        } else if (jsonObject.getString(OpdJsonFormUtils.KEY).equalsIgnoreCase(OpdConstants.JSON_FORM_KEY.DOB_UNKNOWN)) {
+            JSONObject optionsObject = jsonObject.getJSONArray(OpdConstants.JSON_FORM_KEY.OPTIONS).getJSONObject(0);
+            optionsObject.put(OpdJsonFormUtils.VALUE, OpdUtils.getValue(Details, OpdConstants.JSON_FORM_KEY.DOB_UNKNOWN, false));
+        } else if (jsonObject.getString(OpdJsonFormUtils.KEY).equalsIgnoreCase(OpdConstants.JSON_FORM_KEY.AGE)) {
+            processAge(OpdUtils.getValue(Details, OpdConstants.JSON_FORM_KEY.DOB, false), jsonObject);
         } else if (jsonObject.getString(JsonFormConstants.TYPE).equalsIgnoreCase(JsonFormConstants.DATE_PICKER)) {
             processDate(Details, prefix, jsonObject);
-        } else if (jsonObject.getString(JsonFormUtils.OPENMRS_ENTITY).equalsIgnoreCase(JsonFormUtils.PERSON_INDENTIFIER)) {
-            jsonObject.put(JsonFormUtils.VALUE, Utils.getValue(Details, jsonObject.getString(JsonFormUtils.OPENMRS_ENTITY_ID).toLowerCase(), false).replace("-", ""));
+        } else if (jsonObject.getString(OpdJsonFormUtils.OPENMRS_ENTITY).equalsIgnoreCase(OpdJsonFormUtils.PERSON_INDENTIFIER)) {
+            jsonObject.put(OpdJsonFormUtils.VALUE, OpdUtils.getValue(Details, jsonObject.getString(OpdJsonFormUtils.OPENMRS_ENTITY_ID).toLowerCase(), false).replace("-", ""));
         } else if (jsonObject.has(JsonFormConstants.TREE)) {
-            processTree(jsonObject, Utils.getValue(Details, jsonObject.getString(JsonFormUtils.OPENMRS_ENTITY).equalsIgnoreCase(JsonFormUtils.PERSON_ADDRESS) ? jsonObject.getString(JsonFormUtils.OPENMRS_ENTITY_ID) : jsonObject.getString(JsonFormUtils.KEY), false));
-        } else if (jsonObject.getString(JsonFormUtils.OPENMRS_ENTITY).equalsIgnoreCase(JsonFormUtils.CONCEPT)) {
-            jsonObject.put(JsonFormUtils.VALUE, getMappedValue(jsonObject.getString(JsonFormUtils.KEY), Details));
+            processTree(jsonObject, OpdUtils.getValue(Details, jsonObject.getString(OpdJsonFormUtils.OPENMRS_ENTITY).equalsIgnoreCase(OpdJsonFormUtils.PERSON_ADDRESS) ? jsonObject.getString(OpdJsonFormUtils.OPENMRS_ENTITY_ID) : jsonObject.getString(OpdJsonFormUtils.KEY), false));
+        } else if (jsonObject.getString(OpdJsonFormUtils.OPENMRS_ENTITY).equalsIgnoreCase(OpdJsonFormUtils.CONCEPT)) {
+            jsonObject.put(OpdJsonFormUtils.VALUE, getMappedValue(jsonObject.getString(OpdJsonFormUtils.KEY), Details));
         } else if (jsonObject.has(JsonFormConstants.OPTIONS_FIELD_NAME)) {
-            String val = getMappedValue(prefix + jsonObject.getString(JsonFormUtils.KEY), Details);
-            String key = prefix + jsonObject.getString(JsonFormUtils.KEY);
+            String val = getMappedValue(prefix + jsonObject.getString(OpdJsonFormUtils.KEY), Details);
+            String key = prefix + jsonObject.getString(OpdJsonFormUtils.KEY);
 
             if (!TextUtils.isEmpty(val)) {
                 JSONArray array = new JSONArray(val.charAt(0) == '[' ? val : "[" + key + "]");
                 jsonObject.put(JsonFormConstants.VALUE, array);
             }
         } else {
-            jsonObject.put(JsonFormUtils.VALUE, getMappedValue(prefix + jsonObject.getString(JsonFormUtils.OPENMRS_ENTITY_ID), Details));
+            jsonObject.put(OpdJsonFormUtils.VALUE, getMappedValue(prefix + jsonObject.getString(OpdJsonFormUtils.OPENMRS_ENTITY_ID), Details));
         }
 
-        jsonObject.put(JsonFormUtils.READ_ONLY, nonEditableFields.contains(jsonObject.getString(JsonFormUtils.KEY)));
+        jsonObject.put(OpdJsonFormUtils.READ_ONLY, nonEditableFields.contains(jsonObject.getString(OpdJsonFormUtils.KEY)));
     }
 
     private static void processTree(JSONObject jsonObject, String entity) throws JSONException {
@@ -681,41 +643,41 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
         String birthFacilityHierarchyString = AssetHandler.javaToJsonString(entityHierarchy, new TypeToken<List<String>>() {
         }.getType());
         if (StringUtils.isNotBlank(birthFacilityHierarchyString)) {
-            jsonObject.put(JsonFormUtils.VALUE, birthFacilityHierarchyString);
+            jsonObject.put(OpdJsonFormUtils.VALUE, birthFacilityHierarchyString);
         }
 
     }
 
     protected static void processPhoto(String baseEntityId, JSONObject jsonObject) throws JSONException {
-        Photo photo = ImageUtils.profilePhotoByClientID(baseEntityId, Utils.getProfileImageResourceIDentifier());
+        Photo photo = ImageUtils.profilePhotoByClientID(baseEntityId, OpdUtils.getProfileImageResourceIDentifier());
 
         if (StringUtils.isNotBlank(photo.getFilePath())) {
-            jsonObject.put(JsonFormUtils.VALUE, photo.getFilePath());
+            jsonObject.put(OpdJsonFormUtils.VALUE, photo.getFilePath());
 
         }
     }
 
     protected static void processAge(String dobString, JSONObject jsonObject) throws JSONException {
         if (StringUtils.isNotBlank(dobString)) {
-            jsonObject.put(JsonFormUtils.VALUE, Utils.getAgeFromDate(dobString));
+            jsonObject.put(OpdJsonFormUtils.VALUE, OpdUtils.getAgeFromDate(dobString));
         }
     }
 
     protected static void processDate(Map<String, String> Details, String prefix, JSONObject jsonObject)
             throws JSONException {
-        String dateString = Utils.getValue(Details, jsonObject.getString(JsonFormUtils.OPENMRS_ENTITY_ID)
+        String dateString = OpdUtils.getValue(Details, jsonObject.getString(OpdJsonFormUtils.OPENMRS_ENTITY_ID)
                 .equalsIgnoreCase(FormEntityConstants.Person.birthdate.toString()) ? prefix + "dob" :
-                jsonObject.getString(JsonFormUtils.KEY), false);
-        Date date = Utils.dobStringToDate(dateString);
+                jsonObject.getString(OpdJsonFormUtils.KEY), false);
+        Date date = OpdUtils.dobStringToDate(dateString);
         if (StringUtils.isNotBlank(dateString) && date != null) {
-            jsonObject.put(JsonFormUtils.VALUE, DATE_FORMAT.format(date));
+            jsonObject.put(OpdJsonFormUtils.VALUE, DATE_FORMAT.format(date));
         }
     }
 
     protected static String getMappedValue(String key, Map<String, String> Details) {
 
-        String value = Utils.getValue(Details, key, false);
-        return !TextUtils.isEmpty(value) ? value : Utils.getValue(Details, key.toLowerCase(), false);
+        String value = OpdUtils.getValue(Details, key, false);
+        return !TextUtils.isEmpty(value) ? value : OpdUtils.getValue(Details, key.toLowerCase(), false);
     }
 
     protected static Triple<Boolean, JSONObject, JSONArray> validateParameters(String jsonString, String step) {
@@ -737,7 +699,7 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
             return step1.has(FIELDS) ? step1.getJSONArray(FIELDS) : null;
 
         } catch (JSONException e) {
-            Timber.e(e, "JsonFormUtils --> fields");
+            Timber.e(e, "OpdJsonFormUtils --> fields");
         }
         return null;
     }
@@ -758,28 +720,11 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
 
         JSONArray fields = fields(jsonForm, step);
         if (fields == null) {
-            return null;
-        }
+        return null;
+    }
 
         return getFieldValue(fields, key);
 
-    }
-
-    private static Map<String, String> createClientMap(JSONArray fields, String bindType, String relationalId) {
-        String entityId = TextUtils.isEmpty(relationalId) ? generateRandomUUIDString() : relationalId;
-        String firstName = getSubFormFieldValue(fields, FormEntityConstants.Person.first_name, bindType);
-        String middleName = getSubFormFieldValue(fields, FormEntityConstants.Person.middle_name, bindType);
-        String lastName = getSubFormFieldValue(fields, FormEntityConstants.Person.last_name, bindType);
-        String gender = getSubFormFieldValue(fields, FormEntityConstants.Person.gender, bindType);
-
-        Map<String, String> client = new HashMap<>();
-        client.put(Constants.ENTITY_ID, entityId);
-        client.put(Constants.FIRST_NAME, firstName);
-        client.put(Constants.MIDDLE_NAME, middleName);
-        client.put(Constants.LAST_NAME, lastName);
-        client.put(GENDER, gender);
-        client.put(Constants.BIND_TYPE, bindType);
-        return client;
     }
 
     @NotNull
@@ -808,31 +753,6 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
     }
 
 
-
-    public static boolean processMoveToCatchment(Context context, AllSharedPreferences allSharedPreferences,
-                                                 JSONObject jsonObject) {
-
-        try {
-            int eventsCount = jsonObject.has(Constants.NO_OF_EVENTS) ? jsonObject.getInt(Constants.NO_OF_EVENTS) : 0;
-            if (eventsCount == 0) {
-                return false;
-            }
-
-            JSONArray events = getOutOFCatchmentJsonArray(jsonObject, Constants.EVENTS);
-            JSONArray clients = getOutOFCatchmentJsonArray(jsonObject, Constants.CLIENTS);
-
-            OpdLibrary.getInstance().getEcSyncHelper().batchSave(events, clients);
-            addProcessMoveToCatchment(context, allSharedPreferences, createEventList(events));
-            processClients(context, allSharedPreferences, OpdLibrary.getInstance().getEcSyncHelper());
-
-            return true;
-        } catch (Exception e) {
-            Timber.e(e, "JsonFormUtils --> processMoveToCatchment");
-        }
-
-        return false;
-    }
-
     private static JSONArray getOutOFCatchmentJsonArray(JSONObject jsonObject, String clients) throws JSONException {
         return jsonObject.has(clients) ? jsonObject.getJSONArray(clients) : new JSONArray();
     }
@@ -851,9 +771,9 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
 //                continue;
 //            }
 
-            if (Constants.EventType.BITRH_REGISTRATION.equals(event.getEventType())) {
+            if (OpdConstants.EventType.BITRH_REGISTRATION.equals(event.getEventType())) {
                 eventList.add(0, Pair.create(event, jsonEvent));
-            } else if (!eventList.isEmpty() && Constants.EventType.NEW_WOMAN_REGISTRATION.equals(event.getEventType())) {
+            } else if (!eventList.isEmpty() && OpdConstants.EventType.NEW_WOMAN_REGISTRATION.equals(event.getEventType())) {
                 eventList.add(1, Pair.create(event, jsonEvent));
             } else {
                 eventList.add(Pair.create(event, jsonEvent));
@@ -864,40 +784,9 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
         return eventList;
     }
 
-    private static void addProcessMoveToCatchment(Context context, AllSharedPreferences allSharedPreferences, List<Pair<Event, JSONObject>> eventList) {
-        String providerId = allSharedPreferences.fetchRegisteredANM();
-        String locationId = allSharedPreferences.fetchDefaultLocalityId(providerId);
-        for (Pair<Event, JSONObject> pair : eventList) {
-            Event event = pair.first;
-            JSONObject jsonEvent = pair.second;
-
-            String fromLocationId = null;
-            if (Utils.metadata().getRegisterEventType().equals(event.getEventType())) {
-                fromLocationId = updateHomeFacility(locationId, event, fromLocationId);
-
-            }
-
-
-            if (Constants.EventType.BITRH_REGISTRATION.equals(event.getEventType()) ||
-                    Constants.EventType.NEW_WOMAN_REGISTRATION.equals(event.getEventType())) {
-                createMoveToCatchmentEvent(context, providerId, locationId, event, fromLocationId);
-
-            }
-
-            // Update providerId, locationId and Save unsynced event
-            event.setProviderId(providerId);
-            event.setLocationId(locationId);
-            event.setVersion(System.currentTimeMillis());
-            JSONObject updatedJsonEvent = OpdLibrary.getInstance().getEcSyncHelper().convertToJson(event);
-            jsonEvent = JsonFormUtils.merge(jsonEvent, updatedJsonEvent);
-
-            OpdLibrary.getInstance().getEcSyncHelper().addEvent(event.getBaseEntityId(), jsonEvent);
-        }
-    }
-
     private static void createMoveToCatchmentEvent(Context context, String toProviderId, String toLocationId, Event event, String fromLocationId) {
         //Create move to catchment event;
-        Event moveToCatchmentEvent = JsonFormUtils
+        Event moveToCatchmentEvent = OpdJsonFormUtils
                 .createMoveToCatchmentEvent(context, event, fromLocationId, toProviderId, toLocationId);
         if (moveToCatchmentEvent != null) {
             JSONObject moveToCatchmentJsonEvent =
@@ -913,7 +802,7 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
         // Update home facility
         String locationId = fromLocationId;
         for (Obs obs : event.getObs()) {
-            if (obs.getFormSubmissionField().equals(Constants.HOME_FACILITY)) {
+            if (obs.getFormSubmissionField().equals(OpdConstants.HOME_FACILITY)) {
                 locationId = obs.getValue().toString();
                 List<Object> values = new ArrayList<>();
                 values.add(toLocationId);
@@ -965,11 +854,11 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
 
             addMetaData(context, event, new Date());
 
-            JsonFormUtils.tagSyncMetadata(event);
+            OpdJsonFormUtils.tagSyncMetadata(event);
             return event;
 
         } catch (Exception e) {
-            Timber.e(e, "JsonFormUtils --> createMoveToCatchmentEvent");
+            Timber.e(e, "OpdJsonFormUtils --> createMoveToCatchmentEvent");
             return null;
         }
     }
@@ -1005,13 +894,13 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
 
             Event baseEvent = org.smartregister.util.JsonFormUtils
                     .createEvent(fields, getJSONObject(jsonForm, METADATA), formTag, entityId,
-                            Utils.metadata().getRegisterEventType(), Utils.metadata().getTableName());
+                            OpdUtils.metadata().getRegisterEventType(), OpdUtils.metadata().getTableName());
 
-            JsonFormUtils.tagSyncMetadata(baseEvent);// tag docs
+            OpdJsonFormUtils.tagSyncMetadata(baseEvent);// tag docs
 
             return new OpdEventClient(baseClient, baseEvent);
         } catch (Exception e) {
-            Timber.e(e, "JsonFormUtils --> processDetailsForm");
+            Timber.e(e, "OpdJsonFormUtils --> processDetailsForm");
             return null;
         }
     }
@@ -1019,13 +908,13 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
     private static void processReminder(JSONArray fields) {
         try {
             JSONObject reminderObject = getFieldJSONObject(fields, "reminders");
-            JSONArray options = getJSONArray(reminderObject, Constants.JSON_FORM_KEY.OPTIONS);
+            JSONArray options = getJSONArray(reminderObject, OpdConstants.JSON_FORM_KEY.OPTIONS);
             JSONObject option = getJSONObject(options, 0);
             String value = option.optString(JsonFormConstants.VALUE);
             int result = value.equals(Boolean.toString(false)) ? 0 : 1;
-            reminderObject.put(Constants.KEY.VALUE, result);
+            reminderObject.put(OpdConstants.KEY.VALUE, result);
         } catch (JSONException e) {
-            Timber.e(e, "JsonFormUtils --> processReminder");
+            Timber.e(e, "OpdJsonFormUtils --> processReminder");
         }
     }
 }

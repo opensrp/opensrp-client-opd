@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -22,7 +21,6 @@ import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.domain.Form;
 import com.vijay.jsonwizard.fragments.JsonFormFragment;
 import com.vijay.jsonwizard.utils.ValidationStatus;
-import com.vijay.jsonwizard.viewstates.JsonFormFragmentViewState;
 
 import org.smartregister.commonregistry.CommonPersonObject;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
@@ -30,37 +28,61 @@ import org.smartregister.event.Listener;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
 import org.smartregister.opd.adapter.ClientLookUpListAdapter;
-import org.smartregister.opd.interactor.OpdFormInteractor;
 import org.smartregister.opd.presenter.OpdFormFragmentPresenter;
-import org.smartregister.opd.utils.Constants;
+import org.smartregister.opd.utils.OpdConstants;
 
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class OpdFormFragment extends JsonFormFragment implements ClientLookUpListAdapter.ClickListener {
+public class BaseOpdFormFragment extends JsonFormFragment implements ClientLookUpListAdapter.ClickListener {
 
     private boolean lookedUp = false;
     private Snackbar snackbar = null;
     private AlertDialog alertDialog = null;
 
-    public static OpdFormFragment getFormFragment(String stepName) {
-        OpdFormFragment jsonFormFragment = new OpdFormFragment();
+    public static BaseOpdFormFragment getFormFragment(String stepName) {
+        BaseOpdFormFragment jsonFormFragment = new BaseOpdFormFragment();
         Bundle bundle = new Bundle();
         bundle.putString(JsonFormConstants.JSON_FORM_KEY.STEPNAME, stepName);
         jsonFormFragment.setArguments(bundle);
         return jsonFormFragment;
     }
 
-    @Override
-    protected JsonFormFragmentViewState createViewState() {
-        return new JsonFormFragmentViewState();
+    public void validateActivateNext() {
+        if (!isVisible()) { //form fragment is initializing or not the last page
+            return;
+        }
+
+        Form form = getForm();
+        if (form == null || !form.isWizard()) {
+            return;
+        }
+
+        ValidationStatus validationStatus = null;
+        for (View dataView : getJsonApi().getFormDataViews()) {
+            validationStatus = getPresenter().validate(this, dataView, false);
+            if (!validationStatus.isValid()) {
+                break;
+            }
+        }
+
+        if (validationStatus != null && validationStatus.isValid()) {
+            if (!getPresenter().intermediatePage()) {
+                getMenu().findItem(com.vijay.jsonwizard.R.id.action_save).setVisible(true);
+            }
+        } else {
+            if (!getPresenter().intermediatePage()) {
+                getMenu().findItem(com.vijay.jsonwizard.R.id.action_save).setVisible(false);
+            }
+        }
     }
 
-    @Override
-    protected OpdFormFragmentPresenter createPresenter() {
-        return new OpdFormFragmentPresenter(this, OpdFormInteractor.getOpdInteractorInstance());
+    private Form getForm() {
+        return this.getActivity() != null && this.getActivity() instanceof JsonFormActivity ?
+                ((JsonFormActivity) this.getActivity()).getForm() : null;
+    }
+
+    public OpdFormFragmentPresenter getPresenter() {
+        return (OpdFormFragmentPresenter) presenter;
     }
 
     @Override
@@ -72,12 +94,6 @@ public class OpdFormFragment extends JsonFormFragment implements ClientLookUpLis
             this.getMenu().findItem(com.vijay.jsonwizard.R.id.action_save).setVisible(save);
         }
     }
-
-    private Form getForm() {
-        return this.getActivity() != null && this.getActivity() instanceof JsonFormActivity ?
-                ((JsonFormActivity) this.getActivity()).getForm() : null;
-    }
-
     private final Listener<List<CommonPersonObject>> lookUpListener =
             new Listener<List<CommonPersonObject>>() {
                 @Override
@@ -112,9 +128,9 @@ public class OpdFormFragment extends JsonFormFragment implements ClientLookUpLis
 
     private void updateResultDialog(final List<CommonPersonObject> data) {
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.lookup_results, null);
-        RecyclerView recyclerView = view.findViewById(R.id.lookup_recyclerview);
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.PathDialog);
+        View view = inflater.inflate(R.layout.opd_lookup_results, null);
+        RecyclerView recyclerView = view.findViewById(R.id.opd_lookup_recyclerview);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.OpdDialog);
         builder.setView(view).setNegativeButton(R.string.dismiss, null);
         builder.setCancelable(true);
         alertDialog = builder.create();
@@ -140,7 +156,7 @@ public class OpdFormFragment extends JsonFormFragment implements ClientLookUpLis
     }
 
     private void clearView() {
-            //Undo lookup
+        //Undo lookup
     }
 
     private void show(final Snackbar snackbar, int duration) {
@@ -198,39 +214,6 @@ public class OpdFormFragment extends JsonFormFragment implements ClientLookUpLis
         return lookUpListener;
     }
 
-    public void validateActivateNext() {
-        if (!isVisible()) { //form fragment is initializing or not the last page
-            return;
-        }
-
-        Form form = getForm();
-        if (form == null || !form.isWizard()) {
-            return;
-        }
-
-        ValidationStatus validationStatus = null;
-        for (View dataView : getJsonApi().getFormDataViews()) {
-            validationStatus = getPresenter().validate(this, dataView, false);
-            if (!validationStatus.isValid()) {
-                break;
-            }
-        }
-
-        if (validationStatus != null && validationStatus.isValid()) {
-            if (!getPresenter().intermediatePage()) {
-                getMenu().findItem(com.vijay.jsonwizard.R.id.action_save).setVisible(true);
-            }
-        } else {
-            if (!getPresenter().intermediatePage()) {
-                getMenu().findItem(com.vijay.jsonwizard.R.id.action_save).setVisible(false);
-            }
-        }
-    }
-
-    public OpdFormFragmentPresenter getPresenter() {
-        return (OpdFormFragmentPresenter) presenter;
-    }
-
     @Override
     public void onItemClick(View view) {
         if (alertDialog != null && alertDialog.isShowing()) {
@@ -241,19 +224,14 @@ public class OpdFormFragment extends JsonFormFragment implements ClientLookUpLis
             }
 
             if (client != null) {
-                //startActivityOnLookUp(client);
+                startActivityOnLookUp(client);
             }
         }
     }
 
-    private void startActivityOnLookUp(CommonPersonObjectClient client) {
-        Intent intent= new Intent(getActivity(), getActivityForLookUpResult());
-        intent.putExtra(Constants.CLIENT_TYPE, client);
+    protected void startActivityOnLookUp(CommonPersonObjectClient client) {
+        Intent intent= new Intent(getActivity(), null);
+        intent.putExtra(OpdConstants.CLIENT_TYPE, client);
         startActivity(intent);
     }
-
-    protected Class getActivityForLookUpResult(){
-        return null;
-    }
-
 }

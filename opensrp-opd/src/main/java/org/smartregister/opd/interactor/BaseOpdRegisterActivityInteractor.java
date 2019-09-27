@@ -7,7 +7,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
 import org.smartregister.opd.pojos.OpdEventClient;
-import org.smartregister.opd.pojos.UpdateRegisterParams;
+import org.smartregister.opd.pojos.RegisterParams;
 import org.smartregister.opd.presenter.BaseOpdRegisterActivityPresenter;
 import org.smartregister.opd.utils.AppExecutors;
 import org.smartregister.repository.AllSharedPreferences;
@@ -47,7 +47,7 @@ public class BaseOpdRegisterActivityInteractor implements OpdRegisterActivityCon
     }
 
     @Override
-    public void saveRegistration(List<OpdEventClient> opdEventClientList, String jsonString, UpdateRegisterParams updateRegisterParams, BaseOpdRegisterActivityPresenter opdRegisterActivityPresenter) {
+    public void saveRegistration(List<OpdEventClient> opdEventClientList, String jsonString, RegisterParams registerParams, BaseOpdRegisterActivityPresenter opdRegisterActivityPresenter) {
 
     }
 

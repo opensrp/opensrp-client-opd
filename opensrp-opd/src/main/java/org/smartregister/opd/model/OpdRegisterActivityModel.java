@@ -7,7 +7,7 @@ import org.smartregister.location.helper.LocationHelper;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
 import org.smartregister.opd.pojos.OpdEventClient;
-import org.smartregister.opd.utils.JsonFormUtils;
+import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.util.FormUtils;
 import org.smartregister.util.Utils;
 
@@ -51,7 +51,7 @@ public class OpdRegisterActivityModel implements OpdRegisterActivityContract.Mod
     @Override
     public List<OpdEventClient> processRegistration(String jsonString, FormTag formTag) {
         List<OpdEventClient> opdEventClientList = new ArrayList<>();
-        OpdEventClient opdEventClient = JsonFormUtils.processOpdDetailsForm(jsonString, formTag);
+        OpdEventClient opdEventClient = OpdJsonFormUtils.processOpdDetailsForm(jsonString, formTag);
         if (opdEventClient == null) {
             return null;
         }
@@ -65,7 +65,7 @@ public class OpdRegisterActivityModel implements OpdRegisterActivityContract.Mod
         if (form == null) {
             return null;
         }
-        return JsonFormUtils.getFormAsJson(form, formName, entityId, currentLocationId);
+        return OpdJsonFormUtils.getFormAsJson(form, formName, entityId, currentLocationId);
     }
 
     @Override
