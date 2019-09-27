@@ -11,6 +11,8 @@ import org.smartregister.opd.R;
 import org.smartregister.opd.pojos.OpdMetadata;
 import java.util.Date;
 
+import timber.log.Timber;
+
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-13
  */
@@ -49,6 +51,7 @@ public class OpdUtils extends org.smartregister.util.Utils {
             return new DateTime(dobString);
 
         } catch (Exception e) {
+            Timber.e(e);
             return null;
         }
     }

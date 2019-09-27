@@ -18,11 +18,11 @@ import org.json.JSONObject;
 import org.smartregister.clientandeventmodel.Client;
 import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.clientandeventmodel.FormEntityConstants;
-import org.smartregister.domain.Photo;
 import org.smartregister.domain.ProfileImage;
 import org.smartregister.domain.form.FormLocation;
 import org.smartregister.domain.tag.FormTag;
 import org.smartregister.location.helper.LocationHelper;
+import org.smartregister.opd.BuildConfig;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.enums.LocationHierarchy;
 import org.smartregister.opd.pojos.OpdEventClient;
@@ -30,7 +30,6 @@ import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.repository.ImageRepository;
 import org.smartregister.repository.UniqueIdRepository;
 import org.smartregister.util.AssetHandler;
-import org.smartregister.util.ImageUtils;
 import org.smartregister.view.activity.DrishtiApplication;
 
 import java.io.File;
@@ -41,21 +40,15 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import timber.log.Timber;
 
-/**
- * Created by ndegwamartin on 26/02/2019.
- */
 public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
     public static final String METADATA = "metadata";
     public static final String ENCOUNTER_TYPE = "encounter_type";
     public static final int REQUEST_CODE_GET_JSON = 2244;
-    public static final String READ_ONLY = "read_only";
     public static final String STEP2 = "step2";
     public static final String CURRENT_MER_ID = "current_mer_id";
     public static final String MER_ID = "MER_ID";
@@ -453,100 +446,6 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
             }
         }
 
-    }
-
-    private static void setFormFieldValues(Map<String, String> Details, List<String> nonEditableFields, JSONObject jsonObject) throws JSONException {
-        String prefix = jsonObject.has(OpdJsonFormUtils.ENTITY_ID) && jsonObject.getString(OpdJsonFormUtils.ENTITY_ID).equalsIgnoreCase("mother") ? "mother_" : "";
-
-        if (jsonObject.getString(OpdJsonFormUtils.KEY).equalsIgnoreCase(OpdConstants.KEY.PHOTO)) {
-            processPhoto(Details.get(OpdConstants.KEY.BASE_ENTITY_ID), jsonObject);
-        } else if (jsonObject.getString(OpdJsonFormUtils.KEY).equalsIgnoreCase(OpdConstants.JSON_FORM_KEY.DOB_UNKNOWN)) {
-            JSONObject optionsObject = jsonObject.getJSONArray(OpdConstants.JSON_FORM_KEY.OPTIONS).getJSONObject(0);
-            optionsObject.put(OpdJsonFormUtils.VALUE, OpdUtils.getValue(Details, OpdConstants.JSON_FORM_KEY.DOB_UNKNOWN, false));
-        } else if (jsonObject.getString(OpdJsonFormUtils.KEY).equalsIgnoreCase(OpdConstants.JSON_FORM_KEY.AGE)) {
-            processAge(OpdUtils.getValue(Details, OpdConstants.JSON_FORM_KEY.DOB, false), jsonObject);
-        } else if (jsonObject.getString(JsonFormConstants.TYPE).equalsIgnoreCase(JsonFormConstants.DATE_PICKER)) {
-            processDate(Details, prefix, jsonObject);
-        } else if (jsonObject.getString(OpdJsonFormUtils.OPENMRS_ENTITY).equalsIgnoreCase(OpdJsonFormUtils.PERSON_INDENTIFIER)) {
-            jsonObject.put(OpdJsonFormUtils.VALUE, OpdUtils.getValue(Details, jsonObject.getString(OpdJsonFormUtils.OPENMRS_ENTITY_ID).toLowerCase(), false).replace("-", ""));
-        } else if (jsonObject.has(JsonFormConstants.TREE)) {
-            processTree(jsonObject, OpdUtils.getValue(Details, jsonObject.getString(OpdJsonFormUtils.OPENMRS_ENTITY).equalsIgnoreCase(OpdJsonFormUtils.PERSON_ADDRESS) ? jsonObject.getString(OpdJsonFormUtils.OPENMRS_ENTITY_ID) : jsonObject.getString(OpdJsonFormUtils.KEY), false));
-        } else if (jsonObject.getString(OpdJsonFormUtils.OPENMRS_ENTITY).equalsIgnoreCase(OpdJsonFormUtils.CONCEPT)) {
-            jsonObject.put(OpdJsonFormUtils.VALUE, getMappedValue(jsonObject.getString(OpdJsonFormUtils.KEY), Details));
-        } else if (jsonObject.has(JsonFormConstants.OPTIONS_FIELD_NAME)) {
-            String val = getMappedValue(prefix + jsonObject.getString(OpdJsonFormUtils.KEY), Details);
-            String key = prefix + jsonObject.getString(OpdJsonFormUtils.KEY);
-
-            if (!TextUtils.isEmpty(val)) {
-                JSONArray array = new JSONArray(val.charAt(0) == '[' ? val : "[" + key + "]");
-                jsonObject.put(JsonFormConstants.VALUE, array);
-            }
-        } else {
-            jsonObject.put(OpdJsonFormUtils.VALUE, getMappedValue(prefix + jsonObject.getString(OpdJsonFormUtils.OPENMRS_ENTITY_ID), Details));
-        }
-
-        jsonObject.put(OpdJsonFormUtils.READ_ONLY, nonEditableFields.contains(jsonObject.getString(OpdJsonFormUtils.KEY)));
-    }
-
-    private static void processTree(JSONObject jsonObject, String entity) throws JSONException {
-        List<String> entityHierarchy = null;
-
-
-        if (entity != null) {
-            if (entity.equalsIgnoreCase("other")) {
-                entityHierarchy = new ArrayList<>();
-                entityHierarchy.add(entity);
-            } else {
-                entityHierarchy = LocationHelper.getInstance().getOpenMrsLocationHierarchy(entity, true);
-            }
-        }
-
-        String birthFacilityHierarchyString = AssetHandler.javaToJsonString(entityHierarchy, new TypeToken<List<String>>() {
-        }.getType());
-        if (StringUtils.isNotBlank(birthFacilityHierarchyString)) {
-            jsonObject.put(OpdJsonFormUtils.VALUE, birthFacilityHierarchyString);
-        }
-
-    }
-
-    protected static void processPhoto(String baseEntityId, JSONObject jsonObject) throws JSONException {
-        Photo photo = ImageUtils.profilePhotoByClientID(baseEntityId, OpdUtils.getProfileImageResourceIDentifier());
-
-        if (StringUtils.isNotBlank(photo.getFilePath())) {
-            jsonObject.put(OpdJsonFormUtils.VALUE, photo.getFilePath());
-
-        }
-    }
-
-    protected static void processAge(String dobString, JSONObject jsonObject) throws JSONException {
-        if (StringUtils.isNotBlank(dobString)) {
-            jsonObject.put(OpdJsonFormUtils.VALUE, OpdUtils.getAgeFromDate(dobString));
-        }
-    }
-
-    protected static void processDate(Map<String, String> Details, String prefix, JSONObject jsonObject)
-            throws JSONException {
-        String dateString = OpdUtils.getValue(Details, jsonObject.getString(OpdJsonFormUtils.OPENMRS_ENTITY_ID)
-                .equalsIgnoreCase(FormEntityConstants.Person.birthdate.toString()) ? prefix + "dob" :
-                jsonObject.getString(OpdJsonFormUtils.KEY), false);
-        Date date = OpdUtils.dobStringToDate(dateString);
-        if (StringUtils.isNotBlank(dateString) && date != null) {
-            jsonObject.put(OpdJsonFormUtils.VALUE, DATE_FORMAT.format(date));
-        }
-    }
-
-    protected static String getMappedValue(String key, Map<String, String> Details) {
-
-        String value = OpdUtils.getValue(Details, key, false);
-        return !TextUtils.isEmpty(value) ? value : OpdUtils.getValue(Details, key.toLowerCase(), false);
-    }
-
-    protected static Triple<Boolean, JSONObject, JSONArray> validateParameters(String jsonString, String step) {
-
-        JSONObject jsonForm = toJSONObject(jsonString);
-        JSONArray fields = fields(jsonForm, step);
-
-        return Triple.of(jsonForm != null && fields != null, jsonForm, fields);
     }
 
     public static JSONArray fields(JSONObject jsonForm, String step) {

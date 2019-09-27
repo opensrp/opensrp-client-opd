@@ -4,13 +4,9 @@ import android.support.annotation.NonNull;
 
 import org.smartregister.Context;
 import org.smartregister.opd.configuration.OpdConfiguration;
-import org.smartregister.repository.EventClientRepository;
 import org.smartregister.repository.Repository;
 import org.smartregister.repository.UniqueIdRepository;
-import org.smartregister.sync.ClientProcessorForJava;
 import org.smartregister.sync.helper.ECSyncHelper;
-import org.smartregister.view.LocationPickerView;
-import org.smartregister.view.activity.DrishtiApplication;
 
 import id.zelory.compressor.Compressor;
 
@@ -26,22 +22,23 @@ public class OpdLibrary {
     private final Repository repository;
     private ECSyncHelper syncHelper;
     private UniqueIdRepository uniqueIdRepository;
+    private Compressor compressor;
     private int applicationVersion;
     private int databaseVersion;
-    private ClientProcessorForJava clientProcessorForJava;
-    private Compressor compressor;
-    private LocationPickerView locationPickerView;
 
-    protected OpdLibrary(@NonNull Context context, @NonNull OpdConfiguration opdConfiguration, @NonNull Repository repository) {
+    protected OpdLibrary(@NonNull Context context, @NonNull OpdConfiguration opdConfiguration, @NonNull Repository repository, int applicationVersion, int databaseVersion) {
         this.context = context;
         this.opdConfiguration = opdConfiguration;
         this.repository = repository;
+        this.applicationVersion = applicationVersion;
+        this.databaseVersion = databaseVersion;
     }
 
-    public static void init(Context context, @NonNull Repository repository, @NonNull OpdConfiguration opdConfiguration) {
+    public static void init(Context context, @NonNull Repository repository, @NonNull OpdConfiguration opdConfiguration, int applicationVersion, int databaseVersion) {
         if (instance == null) {
-            instance = new OpdLibrary(context, opdConfiguration, repository);
+            instance = new OpdLibrary(context, opdConfiguration, repository, applicationVersion, databaseVersion);
         }
+
     }
 
     @NonNull
@@ -85,14 +82,6 @@ public class OpdLibrary {
         return opdConfiguration;
     }
 
-
-    public ClientProcessorForJava getClientProcessorForJava() {
-        if (clientProcessorForJava == null) {
-            clientProcessorForJava = DrishtiApplication.getInstance().getClientProcessor();
-        }
-        return clientProcessorForJava;
-    }
-
     public Compressor getCompressor() {
         if (compressor == null) {
             compressor = Compressor.getDefault(context().applicationContext());
@@ -100,20 +89,12 @@ public class OpdLibrary {
         return compressor;
     }
 
-    public LocationPickerView getLocationPickerView(android.content.Context context) {
-        if (locationPickerView == null) {
-            locationPickerView = new LocationPickerView(context);
-            locationPickerView.init();
-        }
-        return locationPickerView;
-    }
-
-
-    public int getApplicationVersion() {
-        return applicationVersion;
-    }
 
     public int getDatabaseVersion() {
         return databaseVersion;
+    }
+
+    public int getApplicationVersion() {
+        return applicationVersion;
     }
 }

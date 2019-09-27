@@ -32,16 +32,11 @@ public class OpdLookUpUtils {
                     @Override
                     protected void onPostExecute(List<CommonPersonObject> result) {
                         listener.onEvent(result);
-//                        if (progressBar != null) {
-//                            progressBar.setVisibility(View.GONE);
-//                        }
                     }
 
                     @Override
                     protected void onProgressUpdate(Void... values) {
-//                        if (progressBar != null) {
-//                            progressBar.setVisibility(VISIBLE);
-//                        }
+                        //show progress bar
                     }
                 }, null);
     }
