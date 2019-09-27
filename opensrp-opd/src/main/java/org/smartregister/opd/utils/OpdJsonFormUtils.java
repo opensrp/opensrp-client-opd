@@ -1,7 +1,6 @@
 package org.smartregister.opd.utils;
 
 import android.annotation.SuppressLint;
-import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;

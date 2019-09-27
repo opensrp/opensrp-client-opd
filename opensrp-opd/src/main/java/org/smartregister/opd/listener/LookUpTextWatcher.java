@@ -6,12 +6,11 @@ import android.view.View;
 
 import com.vijay.jsonwizard.fragments.JsonFormFragment;
 
-import org.apache.commons.lang3.StringUtils;
 import org.smartregister.commonregistry.CommonPersonObject;
 import org.smartregister.event.Listener;
 import org.smartregister.opd.OpdLibrary;
-import org.smartregister.opd.fragment.OpdFormFragment;
-import org.smartregister.opd.utils.LookUpUtils;
+import org.smartregister.opd.fragment.BaseOpdFormFragment;
+import org.smartregister.opd.utils.OpdLookUpUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -62,12 +61,12 @@ public class LookUpTextWatcher implements TextWatcher {
         lookUpFields.put(key, text);
 
         Listener<List<CommonPersonObject>> listener = null;
-        if (formFragment instanceof OpdFormFragment) {
-            OpdFormFragment OpdFormFragment = (OpdFormFragment) formFragment;
+        if (formFragment instanceof BaseOpdFormFragment) {
+            BaseOpdFormFragment OpdFormFragment = (BaseOpdFormFragment) formFragment;
             listener = OpdFormFragment.lookUpListener();
         }
 
-        LookUpUtils.lookUp(OpdLibrary.getInstance().context(), lookUpFields, listener, null);
+        OpdLookUpUtils.lookUp(OpdLibrary.getInstance().context(), lookUpFields, listener, null);
 
     }
 
