@@ -4,8 +4,13 @@ import android.support.annotation.NonNull;
 
 import org.smartregister.Context;
 import org.smartregister.opd.configuration.OpdConfiguration;
+import org.smartregister.opd.utils.FilePath;
 import org.smartregister.repository.Repository;
 import org.smartregister.repository.UniqueIdRepository;
+import org.smartregister.view.activity.DrishtiApplication;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-13
@@ -63,5 +68,11 @@ public class OpdLibrary {
     @NonNull
     public OpdConfiguration getOpdConfiguration() {
         return opdConfiguration;
+    }
+
+    public Iterable<Object> readYaml(String filename) throws IOException {
+        InputStreamReader inputStreamReader = new InputStreamReader(
+                DrishtiApplication.getInstance().getApplicationContext().getAssets().open((FilePath.FOLDER.CONFIG_FOLDER_PATH + filename)));
+        return yaml.loadAll(inputStreamReader);
     }
 }

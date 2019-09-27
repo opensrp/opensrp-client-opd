@@ -21,5 +21,8 @@ public interface OpdDbConstants {
         String DOB = "dob";
 
         String GENDER = "gender";
+
+        String REG_ID = "reg_id";
+        String BASE_ENTITY_ID = "base_entity_id";
     } 
 }
