@@ -8,12 +8,17 @@ import org.smartregister.commonregistry.CommonFtsObject;
 import org.smartregister.location.helper.LocationHelper;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.configuration.OpdConfiguration;
+import org.smartregister.opd.pojos.OpdMetadata;
+import org.smartregister.opd.sample.BuildConfig;
+import org.smartregister.opd.sample.activity.OpdFormActivity;
 import org.smartregister.opd.sample.configuration.OpdRegisterQueryProvider;
 import org.smartregister.opd.sample.job.SampleOpdJobCreator;
 import org.smartregister.opd.sample.configuration.SampleSyncConfiguration;
 import org.smartregister.opd.sample.repository.SampleRepository;
 import org.smartregister.opd.sample.utils.Constants;
 import org.smartregister.opd.sample.utils.Utils;
+import org.smartregister.opd.utils.OpdConstants;
+import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.receiver.SyncStatusBroadcastReceiver;
 import org.smartregister.repository.Repository;
 
@@ -85,7 +90,14 @@ public class OpdSampleApplication extends org.smartregister.view.activity.Drisht
 
         //Initialize Modules
         CoreLibrary.init(context, new SampleSyncConfiguration());
-        OpdLibrary.init(context, getRepository(), new OpdConfiguration.Builder(OpdRegisterQueryProvider.class).build());
+
+        //Opd Initialization
+        OpdConfiguration opdConfiguration = new OpdConfiguration.Builder(OpdRegisterQueryProvider.class).build();
+        OpdMetadata opdMetadata = new OpdMetadata(OpdConstants.JSON_FORM_KEY.NAME, OpdDbConstants.KEY.TABLE,
+                OpdConstants.EventType.OPD_REGISTRATION, OpdConstants.EventType.UPDATE_OPD_REGISTRATION,
+                OpdConstants.CONFIG, OpdFormActivity.class,null,true);
+        opdConfiguration.setOpdMetadata(opdMetadata);
+        OpdLibrary.init(context, getRepository(), opdConfiguration, BuildConfig.VERSION_CODE, BuildConfig.DATABASE_VERSION);
 
         //Auto login by default
         context.session().start(context.session().lengthInMilliseconds());

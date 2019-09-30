@@ -1,6 +1,7 @@
 package org.smartregister.opd.contract;
 
 import org.apache.commons.lang3.tuple.Triple;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.domain.tag.FormTag;
 import org.smartregister.opd.pojos.OpdEventClient;
@@ -42,7 +43,7 @@ public interface OpdRegisterActivityContract {
         List<OpdEventClient> processRegistration(String jsonString, FormTag formTag);
 
         JSONObject getFormAsJson(String formName, String entityId,
-                                 String currentLocationId) throws Exception;
+                                 String currentLocationId) throws JSONException;
 
         String getInitials();
 

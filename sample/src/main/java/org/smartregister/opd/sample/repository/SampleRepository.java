@@ -1,7 +1,6 @@
 package org.smartregister.opd.sample.repository;
 
 import android.content.Context;
-import android.util.Log;
 
 import net.sqlcipher.database.SQLiteDatabase;
 
@@ -25,7 +24,6 @@ import timber.log.Timber;
 public class SampleRepository extends Repository {
 
 
-    private static final String TAG = SampleRepository.class.getCanonicalName();
     public static String PASSWORD = "Sample_PASS";
     protected SQLiteDatabase readableDatabase;
     protected SQLiteDatabase writableDatabase;
