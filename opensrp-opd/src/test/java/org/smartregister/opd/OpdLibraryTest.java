@@ -26,7 +26,7 @@ public class OpdLibraryTest extends BaseTest {
     public void initShouldCreateNewLibraryInstanceWhenInstanceIsNull() {
         assertNull(ReflectionHelpers.getStaticField(OpdLibrary.class, "instance"));
 
-        OpdLibrary.init(Mockito.mock(Context.class), Mockito.mock(Repository.class), Mockito.mock(OpdConfiguration.class));
+        OpdLibrary.init(Mockito.mock(Context.class), Mockito.mock(Repository.class), Mockito.mock(OpdConfiguration.class), BuildConfig.VERSION_CODE, BuildConfig.DATABASE_VERSION);
 
         assertNotNull(ReflectionHelpers.getStaticField(OpdLibrary.class, "instance"));
     }
