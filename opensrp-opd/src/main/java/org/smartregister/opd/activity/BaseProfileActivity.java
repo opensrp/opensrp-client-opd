@@ -68,7 +68,7 @@ public abstract class BaseProfileActivity extends SecuredActivity
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
+       /* switch (view.getId()) {
             case R.id.btn_profile_registration_info:
 
                 String baseEntityId = getIntent().getStringExtra(OpdConstants.IntentKey.BASE_ENTITY_ID);
@@ -77,10 +77,10 @@ public abstract class BaseProfileActivity extends SecuredActivity
                 break;
             default:
                 break;
-        }
+        }*/
 
     }
-
+/*
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void startFormForEdit(ClientDetailsFetchedEvent event) {
         if (event != null && event.isEditMode()) {
@@ -109,7 +109,7 @@ public abstract class BaseProfileActivity extends SecuredActivity
             hideProgressDialog();
             finish();
         }
-    }
+    }*/
 
     @Override
     public void onResume() {
@@ -146,11 +146,11 @@ public abstract class BaseProfileActivity extends SecuredActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        AllSharedPreferences allSharedPreferences = CoreLibrary
+        /*AllSharedPreferences allSharedPreferences = CoreLibrary
         if (requestCode == JsonFormUtils.REQUEST_CODE_GET_JSON && resultCode == RESULT_OK) {
             mProfilePresenter.processFormDetailsSave(data, allSharedPreferences);
 
-        }
+        }*/
     }
 
     public void showProgressDialog(int saveMessageStringIdentifier) {
@@ -170,7 +170,6 @@ public abstract class BaseProfileActivity extends SecuredActivity
     }
 
     protected void registerEventBus() {
-
         EventBus.getDefault().register(this);
     }
 

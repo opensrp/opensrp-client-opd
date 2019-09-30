@@ -37,7 +37,7 @@ public interface OpdProfileActivityContract {
 
         void setProfileName(@NonNull String fullName);
 
-        void setProfileID(@NonNull String ancId);
+        void setProfileID(@NonNull String registerId);
 
         void setProfileAge(@NonNull String age);
 
