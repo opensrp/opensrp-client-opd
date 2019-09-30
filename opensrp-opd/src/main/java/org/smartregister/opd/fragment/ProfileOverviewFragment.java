@@ -84,9 +84,6 @@ public class ProfileOverviewFragment extends BaseProfileFragment {
             /*Toast.makeText(getActivity(), "Showing test data because the user has not check-ins", Toast.LENGTH_LONG)
                     .show();
             setTestData(facts);*/
-
-            // Fetch the data from the db
-
             Iterable<Object> ruleObjects = loadFile(FilePath.FILE.PROFILE_OVERVIEW);
 
             for (Object ruleObject : ruleObjects) {
@@ -105,7 +102,6 @@ public class ProfileOverviewFragment extends BaseProfileFragment {
                 List<YamlConfigItem> configItems = yamlConfig.getFields();
 
                 for (YamlConfigItem configItem : configItems) {
-
                     if (OpdLibrary.getInstance().getAncRulesEngineHelper()
                             .getRelevance(facts, configItem.getRelevance())) {
                         yamlConfigList.add(new YamlConfigWrapper(null, null, configItem));
@@ -142,7 +138,12 @@ public class ProfileOverviewFragment extends BaseProfileFragment {
         facts.put("visit_type", checkIn.getVisitType());
         facts.put("previous_appointment", checkIn.getAppointmentScheduledPreviously());
         facts.put("date_of_appointment", checkIn.getAppointmentDueDate());
-        facts.put("visit_to_appointment_date", "");
+        facts.put("visit_to_appointment_date", getVisitToAppointmentDateDuration(checkIn.getVisitId(), checkIn.getAppointmentDueDate()));
+    }
+
+    @NonNull
+    private String getVisitToAppointmentDateDuration(int visitId, @NonNull String appointmentDueDate) {
+        return null;
     }
 
     private void setTestData(@NonNull Facts facts) {

@@ -22,7 +22,7 @@ public interface OpdDbConstants {
 
         String GENDER = "gender";
 
-        String REG_ID = "reg_id";
+        String REGISTER_ID = "register_id";
         String BASE_ENTITY_ID = "base_entity_id";
 
         String TABLE = "ec_client";
