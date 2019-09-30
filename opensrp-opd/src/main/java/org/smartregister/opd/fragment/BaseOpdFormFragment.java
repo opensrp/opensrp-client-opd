@@ -35,7 +35,6 @@ import java.util.List;
 
 public class BaseOpdFormFragment extends JsonFormFragment implements ClientLookUpListAdapter.ClickListener {
 
-    private boolean lookedUp = false;
     private Snackbar snackbar = null;
     private AlertDialog alertDialog = null;
 
@@ -46,6 +45,7 @@ public class BaseOpdFormFragment extends JsonFormFragment implements ClientLookU
         jsonFormFragment.setArguments(bundle);
         return jsonFormFragment;
     }
+
 
     public void validateActivateNext() {
         if (!isVisible()) { //form fragment is initializing or not the last page
@@ -98,9 +98,7 @@ public class BaseOpdFormFragment extends JsonFormFragment implements ClientLookU
             new Listener<List<CommonPersonObject>>() {
                 @Override
                 public void onEvent(List<CommonPersonObject> data) {
-                    if (!lookedUp) {
-                        showClientLookUp(data);
-                    }
+                    showClientLookUp(data);
                 }
             };
 
@@ -149,14 +147,6 @@ public class BaseOpdFormFragment extends JsonFormFragment implements ClientLookU
         recyclerView.setAdapter(clientLookUpListAdapter);
         clientLookUpListAdapter.notifyDataSetChanged();
         clientLookUpListAdapter.setOnClickListener(this);
-    }
-
-    private void lookupDialogDismissed(CommonPersonObjectClient client) {
-        //Another impl
-    }
-
-    private void clearView() {
-        //Undo lookup
     }
 
     protected void show(final Snackbar snackbar, int duration) {
