@@ -24,5 +24,34 @@ public interface OpdDbConstants {
 
         String REG_ID = "reg_id";
         String BASE_ENTITY_ID = "base_entity_id";
-    } 
+    }
+
+    interface Table {
+
+        String CHECK_IN = "check_in";
+    }
+
+    interface Column {
+
+        interface CheckIn {
+            String ID = "_id";
+            String EVENT_ID = "event_id";
+            String VISIT_ID = "visit_id";
+            String BASE_ENTITY_ID = "base_entity_id";
+            String PREGNANCY_STATUS = "pregnancy_status";
+            String HAS_HIV_TEST_PREVIOUSLY = "has_hiv_test_previously";
+            String HIV_RESULTS_PREVIOUSLY = "hiv_results_previously";
+            String IS_TAKING_ART = "is_taking_art";
+            String CURRENT_HIV_RESULT = "current_hiv_result";
+            String VISIT_TYPE = "visit_type";
+            String APPOINTMENT_SCHEDULED_PREVIOUSLY = "appointment_scheduled_previously";
+            String APPOINTMENT_DUE_DATE = "appointment_due_date";
+            String CREATED_AT = "created_at";
+            String UPDATED_AT = "updated_at";
+        }
+
+        interface Visit {
+
+        }
+    }
 }
