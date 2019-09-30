@@ -26,7 +26,7 @@ public class OpdLibrary {
     private int applicationVersion;
     private int databaseVersion;
 
-    protected OpdLibrary(@NonNull Context context, @NonNull OpdConfiguration opdConfiguration, @NonNull Repository repository, int applicationVersion, int databaseVersion) {
+    protected OpdLibrary(@NonNull Context context, @NonNull OpdConfiguration opdConfiguration, @NonNull Repository repository,@NonNull int applicationVersion,@NonNull int databaseVersion) {
         this.context = context;
         this.opdConfiguration = opdConfiguration;
         this.repository = repository;
@@ -34,7 +34,7 @@ public class OpdLibrary {
         this.databaseVersion = databaseVersion;
     }
 
-    public static void init(Context context, @NonNull Repository repository, @NonNull OpdConfiguration opdConfiguration, int applicationVersion, int databaseVersion) {
+    public static void init(Context context, @NonNull Repository repository, @NonNull OpdConfiguration opdConfiguration,@NonNull int applicationVersion,@NonNull int databaseVersion) {
         if (instance == null) {
             instance = new OpdLibrary(context, opdConfiguration, repository, applicationVersion, databaseVersion);
         }

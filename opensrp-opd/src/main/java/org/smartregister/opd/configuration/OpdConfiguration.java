@@ -14,14 +14,6 @@ public class OpdConfiguration {
     private Builder builder;
     private OpdMetadata opdMetadata;
 
-    public OpdMetadata getOpdMetadata() {
-        return opdMetadata;
-    }
-
-    public void setOpdMetadata(OpdMetadata opdMetadata) {
-        this.opdMetadata = opdMetadata;
-    }
-
     private OpdConfiguration(@NonNull Builder builder) {
         this.builder = builder;
 
@@ -32,6 +24,11 @@ public class OpdConfiguration {
         if (builder.opdRegisterProviderMetadata == null) {
             builder.opdRegisterProviderMetadata = BaseOpdRegisterProviderMetadata.class;
         }
+    }
+
+    @NonNull
+    public OpdMetadata getOpdMetadata() {
+        return opdMetadata;
     }
 
     @NonNull
@@ -88,5 +85,9 @@ public class OpdConfiguration {
         public OpdConfiguration build() {
             return new OpdConfiguration(this);
         }
+    }
+
+    public void setOpdMetadata(@NonNull OpdMetadata opdMetadata) {
+        this.opdMetadata = opdMetadata;
     }
 }

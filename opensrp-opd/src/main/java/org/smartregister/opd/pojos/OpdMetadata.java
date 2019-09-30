@@ -1,5 +1,11 @@
 package org.smartregister.opd.pojos;
 
+import android.support.annotation.NonNull;
+
+import org.smartregister.opd.utils.OpdLocationUtils;
+
+import java.util.ArrayList;
+
 public class OpdMetadata {
     private String formName;
 
@@ -17,7 +23,12 @@ public class OpdMetadata {
 
     private boolean formWizardValidateRequiredFieldsBefore;
 
-    public OpdMetadata(String formName, String tableName, String registerEventType, String updateEventType, String config, Class opdFormActivity, Class profileActivity, boolean formWizardValidateRequiredFieldsBefore) {
+    private ArrayList<String> locationLevels;
+
+    private ArrayList<String> healthFacilityLevels;
+
+    public OpdMetadata(@NonNull String formName,@NonNull String tableName,@NonNull String registerEventType,@NonNull String updateEventType,
+                       @NonNull String config,@NonNull Class opdFormActivity, Class profileActivity, boolean formWizardValidateRequiredFieldsBefore) {
         this.formName = formName;
         this.tableName = tableName;
         this.registerEventType = registerEventType;
@@ -90,5 +101,21 @@ public class OpdMetadata {
 
     public void setFormWizardValidateRequiredFieldsBefore(boolean formWizardValidateRequiredFieldsBefore) {
         this.formWizardValidateRequiredFieldsBefore = formWizardValidateRequiredFieldsBefore;
+    }
+
+    public ArrayList<String> getLocationLevels() {
+        return OpdLocationUtils.getLocationLevels();
+    }
+
+    public void setLocationLevels(ArrayList<String> locationLevels) {
+        this.locationLevels = locationLevels;
+    }
+
+    public ArrayList<String> getHealthFacilityLevels() {
+        return OpdLocationUtils.getHealthFacilityLevels();
+    }
+
+    public void setHealthFacilityLevels(ArrayList<String> healthFacilityLevels) {
+        this.healthFacilityLevels = healthFacilityLevels;
     }
 }

@@ -140,7 +140,7 @@ public class BaseOpdFormFragment extends JsonFormFragment implements ClientLookU
         alertDialog.show();
     }
 
-    private void setUpDialog(RecyclerView recyclerView, List<CommonPersonObject> data) {
+    protected void setUpDialog(RecyclerView recyclerView, List<CommonPersonObject> data) {
         ClientLookUpListAdapter clientLookUpListAdapter = new ClientLookUpListAdapter(data, getActivity());
         recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -159,7 +159,7 @@ public class BaseOpdFormFragment extends JsonFormFragment implements ClientLookU
         //Undo lookup
     }
 
-    private void show(final Snackbar snackbar, int duration) {
+    protected void show(final Snackbar snackbar, int duration) {
         if (snackbar == null) {
             return;
         }

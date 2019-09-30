@@ -2,6 +2,8 @@ package org.smartregister.opd.utils;
 
 import android.database.Cursor;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
 import org.smartregister.AllConstants;
@@ -20,7 +22,7 @@ import timber.log.Timber;
 
 public class OpdLookUpUtils {
 
-    public static void lookUp(final Context context, final Map<String, String> entityLookUp, final Listener<List<CommonPersonObject>> listener, Object o) {
+    public static void lookUp(@NonNull final Context context, @NonNull  final Map<String, String> entityLookUp, @NonNull  final Listener<List<CommonPersonObject>> listener) {
         org.smartregister.util.Utils
                 .startAsyncTask(new AsyncTask<Void, Void, List<CommonPersonObject>>() {
                     @Override
@@ -41,7 +43,7 @@ public class OpdLookUpUtils {
                 }, null);
     }
 
-    private static List<CommonPersonObject> clientLookUp(Context context, Map<String, String> entityLookUp) {
+    private static List<CommonPersonObject> clientLookUp(@Nullable Context context,@NonNull Map<String, String> entityLookUp) {
         List<CommonPersonObject> results = new ArrayList<>();
         if (context == null) {
             return results;
@@ -81,7 +83,7 @@ public class OpdLookUpUtils {
         return results;
     }
 
-    private static String lookUpQuery(Map<String, String> entityMap, String tableName) {
+    private static String lookUpQuery(@NonNull Map<String, String> entityMap,@NonNull String tableName) {
         SmartRegisterQueryBuilder queryBUilder = new SmartRegisterQueryBuilder();
         queryBUilder.SelectInitiateMainTable(tableName,
                 new String[]{OpdConstants.KEY.RELATIONALID, OpdConstants.KEY.OPENSRP_ID, OpdConstants.KEY.FIRST_NAME, OpdConstants.KEY.LAST_NAME,
@@ -93,7 +95,7 @@ public class OpdLookUpUtils {
         return queryBUilder.Endquery(query);
     }
 
-    private static String getMainConditionString(Map<String, String> entityMap) {
+    private static String getMainConditionString(@NonNull Map<String, String> entityMap) {
         String mainConditionString = "";
         for (Map.Entry<String, String> entry : entityMap.entrySet()) {
             String key = entry.getKey();

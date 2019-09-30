@@ -63,7 +63,9 @@ public class ClientLookUpListAdapter extends RecyclerView.Adapter<ClientLookUpLi
 
         @Override
         public void onClick(View view) {
-            clickListener.onItemClick(view);
+            if(clickListener != null) {
+                clickListener.onItemClick(view);
+            }
         }
     }
 

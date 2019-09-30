@@ -5,17 +5,14 @@ import org.smartregister.AllConstants;
 public class OpdConstants extends AllConstants {
 
     public static final String SEX = "Sex";
-    public static final String HOME_FACILITY = "Home_Facility";
     public static final String CLIENT_TYPE = "client";
     public static final String CONFIG = "opd_register";
 
     public static class JSON_FORM_KEY {
         public static final String OPTIONS = "options";
-        public static final String UNIQUE_ID = "unique_id";
         public static final String LAST_INTERACTED_WITH = "last_interacted_with";
         public static final String DOB = "dob";
         public static final String DOB_UNKNOWN = "dob_unknown";
-        public static final String AGE = "age";
 
         public static final String AGE_ENTERED = "age_entered" ;
         public static final String DOB_ENTERED = "dob_entered";
@@ -42,9 +39,7 @@ public class OpdConstants extends AllConstants {
         public static final String LAST_NAME = "last_name";
         public static final String BASE_ENTITY_ID = "base_entity_id";
         public static final String DOB = "dob";//Date Of Birth
-        public static final String ZEIR_ID = "zeir_id";
         public static final String OPENSRP_ID = "opensrp_id";
-        public static final String DATE_REMOVED = "date_removed";
         public static final String RELATIONALID = "relationalid";
     }
 
@@ -61,9 +56,6 @@ public class OpdConstants extends AllConstants {
     }
 
     public static final class EventType {
-
-        public static final String BITRH_REGISTRATION = "Birth Registration";
-        public static final String NEW_WOMAN_REGISTRATION = "New Woman Registration";
         public static final String OPD_REGISTRATION = "Opd Registration";
         public static final String UPDATE_OPD_REGISTRATION = "Update Opd Registration";
     }

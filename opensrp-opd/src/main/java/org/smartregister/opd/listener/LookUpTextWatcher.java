@@ -66,7 +66,7 @@ public class LookUpTextWatcher implements TextWatcher {
             listener = OpdFormFragment.lookUpListener();
         }
 
-        OpdLookUpUtils.lookUp(OpdLibrary.getInstance().context(), lookUpFields, listener, null);
+        OpdLookUpUtils.lookUp(OpdLibrary.getInstance().context(), lookUpFields, listener);
 
     }
 
