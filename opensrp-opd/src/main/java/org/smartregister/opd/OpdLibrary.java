@@ -7,6 +7,7 @@ import org.smartregister.opd.configuration.OpdConfiguration;
 import org.smartregister.opd.domain.YamlConfig;
 import org.smartregister.opd.domain.YamlConfigItem;
 import org.smartregister.opd.helper.AncRulesEngineHelper;
+import org.smartregister.opd.repository.CheckInRepository;
 import org.smartregister.opd.utils.FilePath;
 import org.smartregister.repository.Repository;
 import org.smartregister.repository.UniqueIdRepository;
@@ -34,6 +35,8 @@ public class OpdLibrary {
     private final Repository repository;
     private ECSyncHelper syncHelper;
     private UniqueIdRepository uniqueIdRepository;
+    private CheckInRepository checkInRepository;
+
     private Compressor compressor;
     private int applicationVersion;
     private int databaseVersion;
@@ -75,11 +78,21 @@ public class OpdLibrary {
         return instance;
     }
 
+    @NonNull
     public UniqueIdRepository getUniqueIdRepository() {
         if (uniqueIdRepository == null) {
             uniqueIdRepository = new UniqueIdRepository(getRepository());
         }
         return uniqueIdRepository;
+    }
+
+    @NonNull
+    public CheckInRepository getCheckInRepository() {
+        if (checkInRepository == null) {
+            checkInRepository = new CheckInRepository(getRepository());
+        }
+
+        return checkInRepository;
     }
 
     @NonNull

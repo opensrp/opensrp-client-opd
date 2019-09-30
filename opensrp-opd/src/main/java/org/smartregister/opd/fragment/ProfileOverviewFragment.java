@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import org.jeasy.rules.api.Facts;
 import org.smartregister.opd.OpdLibrary;
@@ -17,6 +18,7 @@ import org.smartregister.opd.adapter.ProfileOverviewAdapter;
 import org.smartregister.opd.domain.YamlConfig;
 import org.smartregister.opd.domain.YamlConfigItem;
 import org.smartregister.opd.domain.YamlConfigWrapper;
+import org.smartregister.opd.pojos.CheckIn;
 import org.smartregister.opd.utils.FilePath;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.view.fragment.BaseProfileFragment;
@@ -70,7 +72,20 @@ public class ProfileOverviewFragment extends BaseProfileFragment {
         try {
             yamlConfigListGlobal = new ArrayList<>(); //This makes sure no data duplication happens
             Facts facts = new Facts();
-            setTestData(facts);
+
+            // TODO: Move this to a background thread once Benn has added his work with the AppExecutors
+            CheckIn checkIn = OpdLibrary.getInstance().getCheckInRepository().getLatestCheckIn(baseEntityId);
+
+            if (checkIn != null) {
+                setDataFromCheckIn(checkIn, facts);
+                setDataFromCheckIn(checkIn, facts);
+            }
+
+            /*Toast.makeText(getActivity(), "Showing test data because the user has not check-ins", Toast.LENGTH_LONG)
+                    .show();
+            setTestData(facts);*/
+
+            // Fetch the data from the db
 
             Iterable<Object> ruleObjects = loadFile(FilePath.FILE.PROFILE_OVERVIEW);
 
@@ -117,6 +132,17 @@ public class ProfileOverviewFragment extends BaseProfileFragment {
         } catch (IOException e) {
             Timber.e(e);
         }
+    }
+
+    private void setDataFromCheckIn(@NonNull CheckIn checkIn, @NonNull Facts facts) {
+        facts.put("pregnancy_status", checkIn.getPregnancyStatus());
+        facts.put("is_previously_tested_hiv", checkIn.getHasHivTestPreviously());
+        facts.put("patient_on_art", checkIn.getIsTakingArt());
+        facts.put("hiv_status", checkIn.getCurrentHivResult());
+        facts.put("visit_type", checkIn.getVisitType());
+        facts.put("previous_appointment", checkIn.getAppointmentScheduledPreviously());
+        facts.put("date_of_appointment", checkIn.getAppointmentDueDate());
+        facts.put("visit_to_appointment_date", "");
     }
 
     private void setTestData(@NonNull Facts facts) {

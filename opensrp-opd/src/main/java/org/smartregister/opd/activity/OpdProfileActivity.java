@@ -96,9 +96,11 @@ public class OpdProfileActivity extends BaseProfileActivity implements OpdProfil
     public boolean onOptionsItemSelected(final MenuItem item) {
         int itemId = item.getItemId();
         // When user click home menu item then quit this activity.
-        /*if (itemId == android.R.id.home) {
-            Utils.navigateToHomeRegister(this, false);
-        } else {
+        if (itemId == android.R.id.home) {
+            finish();
+        }
+
+        /*else {
 
             String contactButtonText = getString(R.string.start_contact);
 
