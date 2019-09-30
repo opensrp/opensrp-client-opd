@@ -149,7 +149,7 @@ public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment imple
     @Override
     protected void onResumption() {
         if (dueFilterActive && dueOnlyLayout != null) {
-            dueFilter(dueOnlyLayout);
+            enableDueOnlyFilter(dueOnlyLayout, dueFilterActive);
         } else {
             super.onResumption();
         }
@@ -202,7 +202,7 @@ public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment imple
     @Override
     public void onSyncInProgress(FetchStatus fetchStatus) {
         if (!SyncStatusBroadcastReceiver.getInstance().isSyncing() && (FetchStatus.fetched.equals(fetchStatus) || FetchStatus.nothingFetched.equals(fetchStatus)) && dueFilterActive && dueOnlyLayout != null) {
-            dueFilter(dueOnlyLayout);
+            enableDueOnlyFilter(dueOnlyLayout, dueFilterActive);
             Utils.showShortToast(getActivity(), getString(R.string.sync_complete));
             refreshSyncProgressSpinner();
         } else {
@@ -214,7 +214,7 @@ public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment imple
     public void onSyncComplete(FetchStatus fetchStatus) {
         if (!SyncStatusBroadcastReceiver.getInstance().isSyncing() && (FetchStatus.fetched.equals(fetchStatus)
                 || FetchStatus.nothingFetched.equals(fetchStatus)) && (dueFilterActive && dueOnlyLayout != null)) {
-            dueFilter(dueOnlyLayout);
+            enableDueOnlyFilter(dueOnlyLayout, dueFilterActive);
             Utils.showShortToast(getActivity(), getString(R.string.sync_complete));
             refreshSyncProgressSpinner();
         } else {
@@ -247,25 +247,24 @@ public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment imple
     public void toggleFilterSelection(View dueOnlyLayout) {
         if (dueOnlyLayout != null) {
             if (dueOnlyLayout.getTag() == null) {
+                // Let's enable the due-filter
                 dueFilterActive = true;
-                dueFilter(dueOnlyLayout);
+                enableDueOnlyFilter(dueOnlyLayout, true);
             } else if (dueOnlyLayout.getTag().toString().equals(DUE_FILTER_TAG)) {
+                // Let's disable the due-filter
                 dueFilterActive = false;
-                normalFilter(dueOnlyLayout);
+                enableDueOnlyFilter(dueOnlyLayout, false);
             }
         }
     }
 
-    private void normalFilter(View dueOnlyLayout) {
-        filter(searchText(), "", "");
-        dueOnlyLayout.setTag(null);
-        switchViews(dueOnlyLayout, false);
-    }
+    private void enableDueOnlyFilter(@NonNull View dueOnlyLayout, boolean enable) {
+        String tag = enable ? DUE_FILTER_TAG : null;
+        String mainConditionString = enable ? presenter().getDueFilterCondition() : "";
 
-    private void dueFilter(View dueOnlyLayout) {
-        filter(searchText(), "", presenter().getDueFilterCondition());
-        dueOnlyLayout.setTag(DUE_FILTER_TAG);
-        switchViews(dueOnlyLayout, true);
+        filter(searchText(), "", mainConditionString);
+        dueOnlyLayout.setTag(tag);
+        switchViews(dueOnlyLayout, false);
     }
 
     protected void filter(String filterString, String joinTableString, String mainConditionString) {
