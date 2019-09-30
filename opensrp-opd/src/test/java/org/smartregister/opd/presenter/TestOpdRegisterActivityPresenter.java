@@ -27,4 +27,9 @@ public class TestOpdRegisterActivityPresenter extends BaseOpdRegisterActivityPre
     public void onUniqueIdFetched(Triple<String, String, String> triple, String entityId) {
 
     }
+
+    @Override
+    public void onRegistrationSaved(boolean isEdit) {
+
+    }
 }
