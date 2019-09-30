@@ -129,7 +129,7 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
             Timber.e(e);
             getProfileView().setProfileGender("");
         }
-        getProfileView().setProfileID(Utils.getValue(client, OpdDbConstants.KEY.REG_ID, false));
+        getProfileView().setProfileID(Utils.getValue(client, OpdDbConstants.KEY.REGISTER_ID, false));
         getProfileView().setProfileImage(Utils.getValue(client, OpdDbConstants.KEY.BASE_ENTITY_ID, false));
     }
 
