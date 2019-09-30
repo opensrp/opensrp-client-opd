@@ -18,6 +18,7 @@ import org.mockito.Mockito;
 import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.opd.BaseTest;
+import org.smartregister.opd.BuildConfig;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.configuration.BaseOpdRegisterProviderMetadata;
 import org.smartregister.opd.configuration.OpdConfiguration;
@@ -64,7 +65,7 @@ public class OpdRegisterProviderTest extends BaseTest {
         .setOpdRegisterProviderMetadata(BaseOpdRegisterProviderMetadata.class)
         .build();
 
-        OpdLibrary.init(Mockito.mock(org.smartregister.Context.class), Mockito.mock(Repository.class), opdConfiguration);
+        OpdLibrary.init(Mockito.mock(org.smartregister.Context.class), Mockito.mock(Repository.class), opdConfiguration, BuildConfig.VERSION_CODE, BuildConfig.DATABASE_VERSION);
 
         opdRegisterProvider = new OpdRegisterProvider(context, onClickListener, paginationClickListener);
         ReflectionHelpers.setField(opdRegisterProvider, "opdRegisterProviderMetadata", opdRegisterProviderMetadata);
