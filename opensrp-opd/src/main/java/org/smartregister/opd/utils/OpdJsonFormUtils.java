@@ -22,7 +22,6 @@ import org.smartregister.domain.ProfileImage;
 import org.smartregister.domain.form.FormLocation;
 import org.smartregister.domain.tag.FormTag;
 import org.smartregister.location.helper.LocationHelper;
-import org.smartregister.opd.BuildConfig;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.enums.LocationHierarchy;
 import org.smartregister.opd.pojos.OpdEventClient;
@@ -37,7 +36,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -50,10 +48,8 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
     public static final String ENCOUNTER_TYPE = "encounter_type";
     public static final int REQUEST_CODE_GET_JSON = 2244;
     public static final String STEP2 = "step2";
-    public static final String CURRENT_MER_ID = "current_mer_id";
-    public static final String MER_ID = "MER_ID";
-    public static final SimpleDateFormat DATE_FORMAT =
-            new SimpleDateFormat(com.vijay.jsonwizard.utils.FormUtils.NATIIVE_FORM_DATE_FORMAT_PATTERN);
+    public static final String CURRENT_OPENSRP_ID = "current_opensrp_id";
+    public static final String OPENSRP_ID = "OPENSRP_ID";
 
     public static JSONObject getFormAsJson(JSONObject form, String formName, String id, String currentLocationId)
             throws Exception {
@@ -85,7 +81,7 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
             JSONArray jsonArray = stepOne.getJSONArray(OpdJsonFormUtils.FIELDS);
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                if (jsonObject.getString(OpdJsonFormUtils.KEY).equalsIgnoreCase(OpdJsonFormUtils.MER_ID)) {
+                if (jsonObject.getString(OpdJsonFormUtils.KEY).equalsIgnoreCase(OpdJsonFormUtils.OPENSRP_ID)) {
                     jsonObject.remove(OpdJsonFormUtils.VALUE);
                     jsonObject.put(OpdJsonFormUtils.VALUE, entityId);
                 }

@@ -2,8 +2,6 @@ package org.smartregister.opd.utils;
 
 import org.smartregister.AllConstants;
 
-import java.text.SimpleDateFormat;
-
 public class OpdConstants extends AllConstants {
 
     public static final String SEX = "Sex";
@@ -45,7 +43,7 @@ public class OpdConstants extends AllConstants {
         public static final String BASE_ENTITY_ID = "base_entity_id";
         public static final String DOB = "dob";//Date Of Birth
         public static final String ZEIR_ID = "zeir_id";
-        public static final String MER_ID = "mer_id";
+        public static final String OPENSRP_ID = "opensrp_id";
         public static final String DATE_REMOVED = "date_removed";
         public static final String RELATIONALID = "relationalid";
     }
