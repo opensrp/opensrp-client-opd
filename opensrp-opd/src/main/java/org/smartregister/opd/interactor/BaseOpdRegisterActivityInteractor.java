@@ -47,7 +47,7 @@ public class BaseOpdRegisterActivityInteractor implements OpdRegisterActivityCon
     }
 
     @Override
-    public void saveRegistration(List<OpdEventClient> opdEventClientList, String jsonString, RegisterParams registerParams, BaseOpdRegisterActivityPresenter opdRegisterActivityPresenter) {
+    public void saveRegistration(List<OpdEventClient> opdEventClientList, String jsonString, RegisterParams registerParams, OpdRegisterActivityContract.InteractorCallBack callBack) {
 
     }
 

@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Triple;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.smartregister.domain.FetchStatus;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
 import org.smartregister.opd.pojos.OpdEventClient;
 import org.smartregister.opd.pojos.RegisterParams;
@@ -86,6 +87,12 @@ public class OpdRegisterActivityPresenter extends BaseOpdRegisterActivityPresent
             Timber.e(e);
             getView().displayToast(R.string.error_unable_to_start_form);
         }
+    }
+
+    @Override
+    public void onRegistrationSaved(boolean isEdit) {
+        getView().refreshList(FetchStatus.fetched);
+        getView().hideProgressDialog();
     }
 
     private OpdRegisterActivityContract.View getView() {

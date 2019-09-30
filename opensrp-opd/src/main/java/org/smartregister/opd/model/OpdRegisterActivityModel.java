@@ -1,5 +1,6 @@
 package org.smartregister.opd.model;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.configurableviews.ConfigurableViewsLibrary;
 import org.smartregister.domain.tag.FormTag;
@@ -38,9 +39,6 @@ public class OpdRegisterActivityModel implements OpdRegisterActivityContract.Mod
 
     @Override
     public void saveLanguage(String language) {
-        // TODO Save Language
-        //Map<String, String> langs = getAvailableLanguagesMap();
-        //Utils.saveLanguage(Utils.getKeyByValue(langs, language));
     }
 
     @Override
@@ -60,7 +58,7 @@ public class OpdRegisterActivityModel implements OpdRegisterActivityContract.Mod
     }
 
     @Override
-    public JSONObject getFormAsJson(String formName, String entityId, String currentLocationId) throws Exception {
+    public JSONObject getFormAsJson(String formName, String entityId, String currentLocationId) throws JSONException {
         JSONObject form = getFormUtils().getFormJson(formName);
         if (form == null) {
             return null;

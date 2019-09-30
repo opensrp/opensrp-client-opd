@@ -69,7 +69,7 @@ public class OpdRegisterActivityInteractor extends BaseOpdRegisterActivityIntera
     }
 
     @Override
-    public void saveRegistration(final List<OpdEventClient> opdEventClientList, final String jsonString, final RegisterParams registerParams, BaseOpdRegisterActivityPresenter opdRegisterActivityPresenter) {
+    public void saveRegistration(final List<OpdEventClient> opdEventClientList, final String jsonString, final RegisterParams registerParams, final OpdRegisterActivityContract.InteractorCallBack callBack) {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -77,7 +77,7 @@ public class OpdRegisterActivityInteractor extends BaseOpdRegisterActivityIntera
                 appExecutors.mainThread().execute(new Runnable() {
                     @Override
                     public void run() {
-//                        callBack.onRegistrationSaved(registerParams.isEditMode());
+                        callBack.onRegistrationSaved(registerParams.isEditMode());
                     }
                 });
             }
