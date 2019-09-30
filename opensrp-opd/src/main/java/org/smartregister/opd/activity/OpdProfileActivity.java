@@ -2,45 +2,24 @@ package org.smartregister.opd.activity;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.apache.commons.lang3.StringUtils;
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
-import org.smartregister.CoreLibrary;
-import org.smartregister.anc.R;
-import org.smartregister.anc.adapter.ViewPagerAdapter;
-import org.smartregister.anc.application.AncApplication;
-import org.smartregister.anc.contract.ProfileContract;
-import org.smartregister.anc.event.ClientDetailsFetchedEvent;
-import org.smartregister.anc.event.PatientRemovedEvent;
-import org.smartregister.anc.fragment.ProfileContactsFragment;
-import org.smartregister.anc.fragment.ProfileOverviewFragment;
-import org.smartregister.anc.fragment.ProfileTasksFragment;
-import org.smartregister.anc.presenter.ProfilePresenter;
-import org.smartregister.anc.util.Constants;
-import org.smartregister.anc.util.DBConstants;
-import org.smartregister.anc.util.JsonFormUtils;
-import org.smartregister.anc.util.Utils;
-import org.smartregister.anc.view.CopyToClipboardDialog;
+import org.smartregister.commonregistry.CommonPersonObjectClient;
+import org.smartregister.opd.R;
+import org.smartregister.opd.adapter.ViewPagerAdapter;
 import org.smartregister.opd.contract.OpdProfileActivityContract;
+import org.smartregister.opd.fragment.ProfileVisitFragment;
+import org.smartregister.opd.fragment.ProfileOverviewFragment;
 import org.smartregister.opd.presenter.OpdProfileActivityPresenter;
 import org.smartregister.opd.utils.OpdConstants;
-import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.util.PermissionUtils;
 import org.smartregister.view.activity.BaseProfileActivity;
 
@@ -82,13 +61,11 @@ public class OpdProfileActivity extends BaseProfileActivity implements OpdProfil
     }
 
     private void getButtonAlertStatus() {
-
-        detailMap = (HashMap<String, String>) getIntent().getSerializableExtra(Constants.INTENT_KEY.CLIENT_MAP);
+        /*detailMap = (HashMap<String, String>) getIntent().getSerializableExtra(Constants.INTENT_KEY.CLIENT_MAP);
 
         buttonAlertStatus = Utils.processContactDoneToday(detailMap.get(DBConstants.KEY.LAST_CONTACT_RECORD_DATE),
                 Constants.ALERT_STATUS.ACTIVE.equals(detailMap.get(DBConstants.KEY.CONTACT_STATUS)) ?
-                        Constants.ALERT_STATUS.IN_PROGRESS : "");
-
+                        Constants.ALERT_STATUS.IN_PROGRESS : "");*/
     }
 
     @Override
@@ -96,12 +73,10 @@ public class OpdProfileActivity extends BaseProfileActivity implements OpdProfil
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
         ProfileOverviewFragment profileOverviewFragment = ProfileOverviewFragment.newInstance(this.getIntent().getExtras());
-        ProfileContactsFragment profileContactsFragment = ProfileContactsFragment.newInstance(this.getIntent().getExtras());
-        ProfileTasksFragment profileTasksFragment = ProfileTasksFragment.newInstance(this.getIntent().getExtras());
+        ProfileVisitFragment profileVisitsFragment = ProfileVisitFragment.newInstance(this.getIntent().getExtras());
 
         adapter.addFragment(profileOverviewFragment, this.getString(R.string.overview));
-        adapter.addFragment(profileContactsFragment, this.getString(R.string.contacts));
-        adapter.addFragment(profileTasksFragment, this.getString(R.string.tasks));
+        adapter.addFragment(profileVisitsFragment, this.getString(R.string.visits));
 
         viewPager.setAdapter(adapter);
 
@@ -110,15 +85,18 @@ public class OpdProfileActivity extends BaseProfileActivity implements OpdProfil
 
     @Override
     protected void fetchProfileData() {
-        String baseEntityId = getIntent().getStringExtra(Constants.INTENT_KEY.BASE_ENTITY_ID);
+        String baseEntityId = getIntent().getStringExtra(OpdConstants.IntentKey.BASE_ENTITY_ID);
         ((OpdProfileActivityPresenter) presenter).fetchProfileData(baseEntityId);
+        CommonPersonObjectClient commonPersonObjectClient = (CommonPersonObjectClient) getIntent()
+                .getSerializableExtra(OpdConstants.IntentKey.CLIENT_OBJECT);
+        ((OpdProfileActivityPresenter) presenter).refreshProfileTopSection(commonPersonObjectClient.getColumnmaps());
     }
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         int itemId = item.getItemId();
         // When user click home menu item then quit this activity.
-        if (itemId == android.R.id.home) {
+        /*if (itemId == android.R.id.home) {
             Utils.navigateToHomeRegister(this, false);
         } else {
 
@@ -170,39 +148,43 @@ public class OpdProfileActivity extends BaseProfileActivity implements OpdProfil
 
             });
             builderSingle.show();
-        }
+        }*/
         return super.onOptionsItemSelected(item);
     }
 
     private void continueToContact() {
-        if (!buttonAlertStatus.equals(Constants.ALERT_STATUS.TODAY)) {
+        /*if (!buttonAlertStatus.equals(Constants.ALERT_STATUS.TODAY)) {
 
             String baseEntityId = detailMap.get(DBConstants.KEY.BASE_ENTITY_ID);
 
             if (StringUtils.isNotBlank(baseEntityId)) {
                 Utils.proceedToContact(baseEntityId, detailMap, OpdProfileActivity.this);
             }
-        }
+        }*/
     }
-
+/*
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_profile_activity, menu);
         return true;
-    }
+    }*/
 
     @Override
     protected void onResumption() {
         super.onResumption();
         String baseEntityId = getIntent().getStringExtra(OpdConstants.IntentKey.BASE_ENTITY_ID);
         ((OpdProfileActivityPresenter) presenter).refreshProfileView(baseEntityId);
+
+        CommonPersonObjectClient commonPersonObjectClient = (CommonPersonObjectClient) getIntent()
+                .getSerializableExtra(OpdConstants.IntentKey.CLIENT_OBJECT);
+        ((OpdProfileActivityPresenter) presenter).refreshProfileTopSection(commonPersonObjectClient.getColumnmaps());
         registerEventBus();
     }
 
     @Override
     public void onPause() {
-        EventBus.getDefault().unregister(this);
+        //EventBus.getDefault().unregister(this);
         super.onPause();
     }
 
@@ -213,7 +195,7 @@ public class OpdProfileActivity extends BaseProfileActivity implements OpdProfil
 
     }
 
-    @Override
+    /*@Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         AllSharedPreferences allSharedPreferences = CoreLibrary.getInstance().context().allSharedPreferences();
         if (requestCode == JsonFormUtils.REQUEST_CODE_GET_JSON && resultCode == RESULT_OK) {
@@ -253,34 +235,34 @@ public class OpdProfileActivity extends BaseProfileActivity implements OpdProfil
             hideProgressDialog();
             finish();
         }
-    }
+    }*/
 
     @Override
-    public void setProfileName(String fullName) {
+    public void setProfileName(@NonNull String fullName) {
         this.patientName = fullName;
         nameView.setText(fullName);
     }
 
     @Override
-    public void setProfileID(String ancId) {
-        ancIdView.setText("ID: " + ancId);
+    public void setProfileID(@NonNull String registerId) {
+        ancIdView.setText(String.format(getString(R.string.id_detail), registerId));
     }
 
     @Override
-    public void setProfileAge(String age) {
-        ageView.setText("AGE " + age);
+    public void setProfileAge(@NonNull String age) {
+        ageView.setText(String.format(getString(R.string.age_details), age));
 
     }
 
     @Override
     public void setProfileGender(@NonNull String gender) {
-
+        genderView.setText(String.format(getString(R.string.gender_details), gender));
     }
 
 
     @Override
-    public void setProfileImage(String baseEntityId) {
-        imageRenderHelper.refreshProfileImage(baseEntityId, imageView, Utils.getProfileImageResourceIdentifier());
+    public void setProfileImage(@NonNull String baseEntityId) {
+        imageRenderHelper.refreshProfileImage(baseEntityId, imageView, R.drawable.avatar_woman);
     }
 
     @NonNull
@@ -294,12 +276,12 @@ public class OpdProfileActivity extends BaseProfileActivity implements OpdProfil
     }
 
     protected void registerEventBus() {
-        EventBus.getDefault().register(this);
+        //EventBus.getDefault().register(this);
     }
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.profile_overview_due_button) {
+        /*if (view.getId() == R.id.profile_overview_due_button) {
 
             String baseEntityId = getIntent().getStringExtra(Constants.INTENT_KEY.BASE_ENTITY_ID);
 
@@ -309,8 +291,8 @@ public class OpdProfileActivity extends BaseProfileActivity implements OpdProfil
 
         } else {
             super.onClick(view);
-        }
-
+        }*/
+        super.onClick(view);
     }
 
     private Activity getActivity() {

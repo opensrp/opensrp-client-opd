@@ -2,9 +2,6 @@ package org.smartregister.opd.tasks;
 
 import android.os.AsyncTask;
 
-import org.smartregister.anc.event.ClientDetailsFetchedEvent;
-import org.smartregister.anc.repository.PatientRepository;
-import org.smartregister.anc.util.Utils;
 import org.smartregister.util.Utils;
 
 import java.util.Map;

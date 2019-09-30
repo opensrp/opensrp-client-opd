@@ -4,10 +4,16 @@ import android.support.annotation.NonNull;
 
 import org.smartregister.Context;
 import org.smartregister.opd.configuration.OpdConfiguration;
+import org.smartregister.opd.domain.YamlConfig;
+import org.smartregister.opd.domain.YamlConfigItem;
+import org.smartregister.opd.helper.AncRulesEngineHelper;
 import org.smartregister.opd.utils.FilePath;
 import org.smartregister.repository.Repository;
 import org.smartregister.repository.UniqueIdRepository;
 import org.smartregister.view.activity.DrishtiApplication;
+import org.yaml.snakeyaml.TypeDescription;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -26,10 +32,17 @@ public class OpdLibrary {
 
     private UniqueIdRepository uniqueIdRepository;
 
+    private Yaml yaml;
+
+    private AncRulesEngineHelper ancRulesEngineHelper;
+
     protected OpdLibrary(@NonNull Context context, @NonNull OpdConfiguration opdConfiguration, @NonNull Repository repository) {
         this.context = context;
         this.opdConfiguration = opdConfiguration;
         this.repository = repository;
+
+        // Initialize configs processor
+        initializeYamlConfigs();
     }
 
     public static void init(Context context, @NonNull Repository repository, @NonNull OpdConfiguration opdConfiguration) {
@@ -70,9 +83,24 @@ public class OpdLibrary {
         return opdConfiguration;
     }
 
+    private void initializeYamlConfigs() {
+        Constructor constructor = new Constructor(YamlConfig.class);
+        TypeDescription customTypeDescription = new TypeDescription(YamlConfig.class);
+        customTypeDescription.addPropertyParameters(YamlConfigItem.FIELD_CONTACT_SUMMARY_ITEMS, YamlConfigItem.class);
+        constructor.addTypeDescription(customTypeDescription);
+        yaml = new Yaml(constructor);
+    }
+
     public Iterable<Object> readYaml(String filename) throws IOException {
         InputStreamReader inputStreamReader = new InputStreamReader(
                 DrishtiApplication.getInstance().getApplicationContext().getAssets().open((FilePath.FOLDER.CONFIG_FOLDER_PATH + filename)));
         return yaml.loadAll(inputStreamReader);
+    }
+
+    public AncRulesEngineHelper getAncRulesEngineHelper() {
+        if (ancRulesEngineHelper == null) {
+            ancRulesEngineHelper = new AncRulesEngineHelper(context.applicationContext().getApplicationContext());
+        }
+        return ancRulesEngineHelper;
     }
 }

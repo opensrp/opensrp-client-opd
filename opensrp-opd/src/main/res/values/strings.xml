@@ -11,4 +11,23 @@
     <string name="opd_register_title_name">All Clients</string>
 
     <string name="no_matching_record_found_on_this_device">No matching record found on this device.</string>
+    <string name="contact_number_due">Contact %1$d &#183; due %2$s</string>
+
+    <string name="overview">OVERVIEW</string>
+    <string name="visits">VISITS</string>
+
+    <string name="all_results">All results</string>
+    <string name="gender_details">GENDER: %s</string>
+    <string name="age_details">AGE: %s</string>
+    <string name="id_detail">ID: %s</string>
+
+
+    <string name="last_visit">LAST VISIT</string>
+    <string name="previous_visits">PREVIOUS VISITS</string>
+    <string name="recent_test">RECENT TEST: %1$s</string>
+    <string name="all_tests_results">All Tests Results</string>
+
+
+    <string name="no_openmrs_id">No unique ids found. Click on the sync button to get more and if this error persists contact the system admin.</string>
+
 </resources>

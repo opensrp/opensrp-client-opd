@@ -28,11 +28,11 @@ public abstract class BaseOpdRegisterActivity extends BaseRegisterActivity imple
 
     @Override
     protected void registerBottomNavigation() {
-        bottomNavigationView = findViewById(org.smartregister.R.id.bottom_navigation);
+       /* bottomNavigationView = findViewById(org.smartregister.R.id.bottom_navigation);
 
         if (bottomNavigationView != null && !OpdLibrary.getInstance().getOpdConfiguration().isBottomNavigationEnabled()) {
             bottomNavigationView.setVisibility(View.GONE);
-        }
+        }*/
     }
 
     @Override

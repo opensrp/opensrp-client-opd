@@ -14,11 +14,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.jeasy.rules.api.Facts;
+import org.smartregister.opd.OpdLibrary;
+import org.smartregister.opd.R;
 import org.smartregister.opd.contract.OpdProfileFragmentContract;
-import org.smartregister.opd.domain.YamlConfig;
-import org.smartregister.opd.domain.YamlConfigItem;
 import org.smartregister.opd.domain.YamlConfigWrapper;
 import org.smartregister.opd.presenter.ProfileFragmentPresenter;
+import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.util.JsonFormUtils;
 import org.smartregister.view.fragment.BaseProfileFragment;
 
@@ -34,8 +35,8 @@ import java.util.Locale;
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-27
  */
 
-public class ProfileContactsFragment extends BaseProfileFragment implements OpdProfileFragmentContract.View {
-    public static final String TAG = ProfileContactsFragment.class.getCanonicalName();
+public class ProfileVisitFragment extends BaseProfileFragment implements OpdProfileFragmentContract.View {
+    public static final String TAG = ProfileVisitFragment.class.getCanonicalName();
 
     private List<YamlConfigWrapper> lastContactDetails;
     private List<YamlConfigWrapper> lastContactTests;
@@ -49,9 +50,9 @@ public class ProfileContactsFragment extends BaseProfileFragment implements OpdP
     private String baseEntityId;
     private String contactNo;
 
-    public static ProfileContactsFragment newInstance(Bundle bundle) {
+    public static ProfileVisitFragment newInstance(Bundle bundle) {
         Bundle args = bundle;
-        ProfileContactsFragment fragment = new ProfileContactsFragment();
+        ProfileVisitFragment fragment = new ProfileVisitFragment();
         if (args == null) {
             args = new Bundle();
         }
@@ -88,15 +89,14 @@ public class ProfileContactsFragment extends BaseProfileFragment implements OpdP
         if (testsDisplayLayout != null) {
             testsDisplayLayout.removeAllViews();
         }
-        baseEntityId = getActivity().getIntent().getStringExtra(Constants.INTENT_KEY.BASE_ENTITY_ID);
+        baseEntityId = getActivity().getIntent().getStringExtra(OpdConstants.IntentKey.BASE_ENTITY_ID);
         HashMap<String, String> clientDetails =
-                (HashMap<String, String>) getActivity().getIntent().getSerializableExtra(Constants.INTENT_KEY.CLIENT_MAP);
-        contactNo = String.valueOf(Utils.getTodayContact(clientDetails.get(DBConstants.KEY.NEXT_CONTACT)));
+                (HashMap<String, String>) getActivity().getIntent().getSerializableExtra(OpdConstants.IntentKey.CLIENT_MAP);
         initializeLastContactDetails(clientDetails);
     }
 
     private void initializeLastContactDetails(HashMap<String, String> clientDetails) {
-        if (clientDetails != null) {
+        /*if (clientDetails != null) {
             try {
                 List<LastContactDetailsWrapper> lastContactDetailsWrapperList = new ArrayList<>();
                 List<LastContactDetailsWrapper> lastContactDetailsTestsWrapperList = new ArrayList<>();
@@ -138,7 +138,7 @@ public class ProfileContactsFragment extends BaseProfileFragment implements OpdP
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage(), e);
             }
-        }
+        }*/
     }
 
     private void addOtherRuleObjects(Facts facts) throws IOException {
@@ -198,7 +198,7 @@ public class ProfileContactsFragment extends BaseProfileFragment implements OpdP
             }
         }
     }*/
-
+/*
     private void setUpContactDetailsRecycler(List<LastContactDetailsWrapper> lastContactDetailsWrappers) {
         LastContactAdapter adapter = new LastContactAdapter(lastContactDetailsWrappers, getActivity());
         adapter.notifyDataSetChanged();
@@ -230,7 +230,7 @@ public class ProfileContactsFragment extends BaseProfileFragment implements OpdP
                 }
             }
         }
-    }
+    }*/
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -250,10 +250,10 @@ public class ProfileContactsFragment extends BaseProfileFragment implements OpdP
     }
 
     private Iterable<Object> loadFile(String filename) throws IOException {
-        return AncApplication.getInstance().readYaml(filename);
+        return OpdLibrary.getInstance().readYaml(filename);
     }
 
-    private void goToPreviousContacts() {
+    /*private void goToPreviousContacts() {
         Intent intent = new Intent(getActivity(), PreviousContactsDetailsActivity.class);
         String baseEntityId = getActivity().getIntent().getStringExtra(Constants.INTENT_KEY.BASE_ENTITY_ID);
         intent.putExtra(Constants.INTENT_KEY.BASE_ENTITY_ID, baseEntityId);
@@ -271,7 +271,7 @@ public class ProfileContactsFragment extends BaseProfileFragment implements OpdP
                 getActivity().getIntent().getSerializableExtra(Constants.INTENT_KEY.CLIENT_MAP));
 
         this.startActivity(intent);
-    }
+    }*/
 
     /**
      * Handles the Click actions on any of the section in the page.
@@ -280,9 +280,9 @@ public class ProfileContactsFragment extends BaseProfileFragment implements OpdP
         @Override
         public void onClick(View view) {
             if (view.getId() == R.id.last_contact_bottom && ! lastContactDetails.isEmpty()) {
-                goToPreviousContacts();
+                //goToPreviousContacts();
             } else if (view.getId() == R.id.tests_bottom && ! lastContactTests.isEmpty()) {
-                goToPreviousContactsTests();
+                //goToPreviousContactsTests();
             }
         }
 
