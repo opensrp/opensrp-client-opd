@@ -5,6 +5,8 @@ package org.smartregister.opd.utils;
  */
 
 public interface OpdDbConstants {
+
+    String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
     
     interface KEY {
 
@@ -34,6 +36,7 @@ public interface OpdDbConstants {
     interface Table {
 
         String CHECK_IN = "check_in";
+        String VISIT = "visit";
     }
 
     interface Column {
@@ -56,7 +59,12 @@ public interface OpdDbConstants {
         }
 
         interface Visit {
-
+            String ID = "_id";
+            String VISIT_DATE = "visit_date";
+            String PROVIDER_ID = "provider_id";
+            String LOCATION_ID = "location_id";
+            String BASE_ENTITY_ID = "base_entity_id";
+            String CREATED_AT = "created_at";
         }
     }
 }

@@ -25,7 +25,7 @@ import timber.log.Timber;
 public class CheckInRepository extends BaseRepository implements CheckInDao {
 
     private static final String CREATE_TABLE_SQL = "CREATE TABLE " + OpdDbConstants.Table.CHECK_IN + "("
-            + CheckIn.ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT"
+            + CheckIn.ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"
             + CheckIn.EVENT_ID + " VARCHAR NOT NULL, "
             + CheckIn.VISIT_ID + " INT NOT NULL, "
             + CheckIn.BASE_ENTITY_ID + " VARCHAR NOT NULL, "
@@ -109,6 +109,40 @@ public class CheckInRepository extends BaseRepository implements CheckInDao {
                         , CheckIn.CREATED_AT + " DESC"
                         , "1");
 
+                if (mCursor != null) {
+                    if (mCursor.moveToNext()) {
+                        checkIn = getCheckInResult(mCursor);
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            Timber.e(e);
+        } finally {
+            if (mCursor != null) {
+                mCursor.close();
+            }
+        }
+
+        return checkIn;
+    }
+
+    @Nullable
+    @Override
+    public org.smartregister.opd.pojos.CheckIn getCheckInByVisit(@NonNull int visitId) {
+
+        Cursor mCursor = null;
+        org.smartregister.opd.pojos.CheckIn checkIn = null;
+        try {
+            SQLiteDatabase db = getWritableDatabase();
+
+            if (visitId != 0) {
+                mCursor = db.query(OpdDbConstants.Table.CHECK_IN, columns, CheckIn.VISIT_ID + " = ?"
+                        , new String[]{visitId + ""}
+                        , null
+                        , null
+                        , CheckIn.CREATED_AT + " DESC"
+                        , "1");
 
                 if (mCursor != null) {
                     if (mCursor.moveToNext()) {
