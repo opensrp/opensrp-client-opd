@@ -20,6 +20,5 @@ public class OpdFormInteractor extends JsonFormInteractor {
     protected void registerWidgets() {
         super.registerWidgets();
         map.put(JsonFormConstants.EDIT_TEXT, new OpdEditTextFactory());
-        //map.put(JsonFormConstants.BARCODE, new OpdBarcodeFactory());
     }
 }

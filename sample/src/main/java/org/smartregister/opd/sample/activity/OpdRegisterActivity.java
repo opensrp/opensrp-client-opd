@@ -3,12 +3,13 @@ package org.smartregister.opd.sample.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
-import com.rey.material.drawable.NavigationDrawerDrawable;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.domain.Form;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.AllConstants;
 import org.smartregister.opd.OpdLibrary;
@@ -18,7 +19,6 @@ import org.smartregister.opd.fragment.BaseOpdRegisterFragment;
 import org.smartregister.opd.model.OpdRegisterActivityModel;
 import org.smartregister.opd.pojos.RegisterParams;
 import org.smartregister.opd.presenter.BaseOpdRegisterActivityPresenter;
-import org.smartregister.opd.sample.R;
 import org.smartregister.opd.sample.fragment.OpdRegisterFragment;
 import org.smartregister.opd.sample.presenter.OpdRegisterActivityPresenter;
 import org.smartregister.opd.utils.OpdConstants;
@@ -77,7 +77,7 @@ public class OpdRegisterActivity extends BaseOpdRegisterActivity {
                     presenter().saveForm(jsonString, registerParam);
                 }
 
-            } catch (Exception e) {
+            } catch (JSONException e) {
                 Timber.e(e);
             }
 
@@ -85,15 +85,10 @@ public class OpdRegisterActivity extends BaseOpdRegisterActivity {
     }
 
     @Override
-    public void startFormActivity(String formName, String entityId, String metaData) {
-        try {
-            if (mBaseFragment instanceof BaseOpdRegisterFragment) {
-                String locationId = OpdUtils.context().allSharedPreferences().getPreference(AllConstants.CURRENT_LOCATION_ID);
-                presenter().startForm(formName, entityId, metaData, locationId);
-            }
-        } catch (Exception e) {
-            Timber.e(e);
-            displayToast(getString(R.string.error_unable_to_start_form));
+    public void startFormActivity(@NonNull String formName, @Nullable String entityId, @Nullable String metaData) {
+        if (mBaseFragment instanceof BaseOpdRegisterFragment) {
+            String locationId = OpdUtils.context().allSharedPreferences().getPreference(AllConstants.CURRENT_LOCATION_ID);
+            presenter().startForm(formName, entityId, metaData, locationId);
         }
     }
 
@@ -104,6 +99,7 @@ public class OpdRegisterActivity extends BaseOpdRegisterActivity {
                 SampleConstants.KEY.OPD_REGISTRATION)) {
 //            OpdJsonFormUtils.addRegLocHierarchyQuestions(jsonForm, GizConstants.KEY.REGISTRATION_HOME_ADDRESS, LocationHierarchy.ENTIRE_TREE);
         }
+
         intent.putExtra(OpdConstants.JSON_FORM_EXTRA.JSON, jsonForm.toString());
 
         Form form = new Form();

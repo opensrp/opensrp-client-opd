@@ -1,5 +1,7 @@
 package org.smartregister.opd.model;
 
+import android.support.annotation.Nullable;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.configurableviews.ConfigurableViewsLibrary;
@@ -22,7 +24,9 @@ import timber.log.Timber;
  */
 
 public class OpdRegisterActivityModel implements OpdRegisterActivityContract.Model {
+
     private FormUtils formUtils;
+
     @Override
     public void registerViewConfigurations(List<String> viewIdentifiers) {
         if (viewIdentifiers != null) {
@@ -41,28 +45,38 @@ public class OpdRegisterActivityModel implements OpdRegisterActivityContract.Mod
     public void saveLanguage(String language) {
     }
 
+    @Nullable
     @Override
-    public String getLocationId(String locationName) {
+    public String getLocationId(@Nullable String locationName) {
         return LocationHelper.getInstance().getOpenMrsLocationId(locationName);
     }
 
+    @Nullable
     @Override
     public List<OpdEventClient> processRegistration(String jsonString, FormTag formTag) {
         List<OpdEventClient> opdEventClientList = new ArrayList<>();
         OpdEventClient opdEventClient = OpdJsonFormUtils.processOpdDetailsForm(jsonString, formTag);
+
         if (opdEventClient == null) {
             return null;
         }
+
         opdEventClientList.add(opdEventClient);
         return opdEventClientList;
     }
 
+    @Nullable
     @Override
     public JSONObject getFormAsJson(String formName, String entityId, String currentLocationId) throws JSONException {
+        if (getFormUtils() == null) {
+            return null;
+        }
+
         JSONObject form = getFormUtils().getFormJson(formName);
         if (form == null) {
             return null;
         }
+
         return OpdJsonFormUtils.getFormAsJson(form, formName, entityId, currentLocationId);
     }
 
@@ -71,6 +85,7 @@ public class OpdRegisterActivityModel implements OpdRegisterActivityContract.Mod
         return Utils.getUserInitials();
     }
 
+    @Nullable
     public FormUtils getFormUtils() {
         if (formUtils == null) {
             try {
@@ -80,9 +95,5 @@ public class OpdRegisterActivityModel implements OpdRegisterActivityContract.Mod
             }
         }
         return formUtils;
-    }
-
-    public void setFormUtils(FormUtils formUtils) {
-        this.formUtils = formUtils;
     }
 }

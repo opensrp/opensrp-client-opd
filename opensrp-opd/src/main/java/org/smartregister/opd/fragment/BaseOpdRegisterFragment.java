@@ -322,7 +322,7 @@ public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment imple
                 public Cursor loadInBackground() {
                     // Count query
                     // Select register query
-                    String query = getDefaultSortQuery();
+                    String query = filterAndSortQuery();
                     return commonRepository().rawCustomQueryForAdapter(query);
                 }
             };

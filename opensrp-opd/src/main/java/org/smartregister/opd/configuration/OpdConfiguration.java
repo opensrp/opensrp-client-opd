@@ -12,7 +12,6 @@ import org.smartregister.opd.pojos.OpdMetadata;
 public class OpdConfiguration {
 
     private Builder builder;
-    private OpdMetadata opdMetadata;
 
     private OpdConfiguration(@NonNull Builder builder) {
         this.builder = builder;
@@ -26,9 +25,9 @@ public class OpdConfiguration {
         }
     }
 
-    @NonNull
+    @Nullable
     public OpdMetadata getOpdMetadata() {
-        return opdMetadata;
+        return builder.opdMetadata;
     }
 
     @NonNull
@@ -63,6 +62,8 @@ public class OpdConfiguration {
 
         private boolean isBottomNavigationEnabled;
 
+        private OpdMetadata opdMetadata;
+
         public Builder(@NonNull Class<? extends OpdRegisterQueryProviderContract> opdRegisterQueryProvider) {
             this.opdRegisterQueryProvider = opdRegisterQueryProvider;
         }
@@ -82,12 +83,15 @@ public class OpdConfiguration {
             return this;
         }
 
+        public Builder setOpdMetadata(@NonNull OpdMetadata opdMetadata) {
+            this.opdMetadata = opdMetadata;
+            return this;
+        }
+
         public OpdConfiguration build() {
             return new OpdConfiguration(this);
         }
+
     }
 
-    public void setOpdMetadata(@NonNull OpdMetadata opdMetadata) {
-        this.opdMetadata = opdMetadata;
-    }
 }

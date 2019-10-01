@@ -15,10 +15,12 @@ public class OpdEventClient {
         this.event = event;
     }
 
+    @NonNull
     public Client getClient() {
         return client;
     }
 
+    @NonNull
     public Event getEvent() {
         return event;
     }

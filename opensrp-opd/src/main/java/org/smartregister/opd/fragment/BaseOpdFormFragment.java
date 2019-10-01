@@ -4,6 +4,8 @@ package org.smartregister.opd.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
@@ -28,6 +30,7 @@ import org.smartregister.event.Listener;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
 import org.smartregister.opd.adapter.ClientLookUpListAdapter;
+import org.smartregister.opd.pojos.OpdMetadata;
 import org.smartregister.opd.presenter.OpdFormFragmentPresenter;
 import org.smartregister.opd.utils.OpdConstants;
 
@@ -38,6 +41,14 @@ public class BaseOpdFormFragment extends JsonFormFragment implements ClientLookU
     private Snackbar snackbar = null;
     private AlertDialog alertDialog = null;
 
+    private final Listener<List<CommonPersonObject>> lookUpListener =
+            new Listener<List<CommonPersonObject>>() {
+                @Override
+                public void onEvent(List<CommonPersonObject> data) {
+                    showClientLookUp(data);
+                }
+            };
+
     public static BaseOpdFormFragment getFormFragment(String stepName) {
         BaseOpdFormFragment jsonFormFragment = new BaseOpdFormFragment();
         Bundle bundle = new Bundle();
@@ -45,7 +56,6 @@ public class BaseOpdFormFragment extends JsonFormFragment implements ClientLookU
         jsonFormFragment.setArguments(bundle);
         return jsonFormFragment;
     }
-
 
     public void validateActivateNext() {
         if (!isVisible()) { //form fragment is initializing or not the last page
@@ -66,16 +76,17 @@ public class BaseOpdFormFragment extends JsonFormFragment implements ClientLookU
         }
 
         if (validationStatus != null && validationStatus.isValid()) {
-            if (!getPresenter().intermediatePage()) {
+            if (!getPresenter().isIntermediatePage()) {
                 getMenu().findItem(com.vijay.jsonwizard.R.id.action_save).setVisible(true);
             }
         } else {
-            if (!getPresenter().intermediatePage()) {
+            if (!getPresenter().isIntermediatePage()) {
                 getMenu().findItem(com.vijay.jsonwizard.R.id.action_save).setVisible(false);
             }
         }
     }
 
+    @Nullable
     private Form getForm() {
         return this.getActivity() != null && this.getActivity() instanceof JsonFormActivity ?
                 ((JsonFormActivity) this.getActivity()).getForm() : null;
@@ -89,18 +100,13 @@ public class BaseOpdFormFragment extends JsonFormFragment implements ClientLookU
     public void updateVisibilityOfNextAndSave(boolean next, boolean save) {
         super.updateVisibilityOfNextAndSave(next, save);
         Form form = getForm();
-        if (form != null && form.isWizard() &&
-                !OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata().isFormWizardValidateRequiredFieldsBefore()) {
+        OpdMetadata opdMetadata = OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata();
+
+        if (form != null && form.isWizard() && opdMetadata != null
+                && !opdMetadata.isFormWizardValidateRequiredFieldsBefore()) {
             this.getMenu().findItem(com.vijay.jsonwizard.R.id.action_save).setVisible(save);
         }
     }
-    private final Listener<List<CommonPersonObject>> lookUpListener =
-            new Listener<List<CommonPersonObject>>() {
-                @Override
-                public void onEvent(List<CommonPersonObject> data) {
-                    showClientLookUp(data);
-                }
-            };
 
     private void showClientLookUp(List<CommonPersonObject> data) {
         if (!data.isEmpty()) {
@@ -200,6 +206,7 @@ public class BaseOpdFormFragment extends JsonFormFragment implements ClientLookU
         }, duration);
 
     }
+
     public Listener<List<CommonPersonObject>> lookUpListener() {
         return lookUpListener;
     }
@@ -219,8 +226,8 @@ public class BaseOpdFormFragment extends JsonFormFragment implements ClientLookU
         }
     }
 
-    protected void startActivityOnLookUp(CommonPersonObjectClient client) {
-        Intent intent= new Intent(getActivity(), null);
+    protected void startActivityOnLookUp(@NonNull CommonPersonObjectClient client) {
+        Intent intent = new Intent(getActivity(), null);
         intent.putExtra(OpdConstants.CLIENT_TYPE, client);
         startActivity(intent);
     }

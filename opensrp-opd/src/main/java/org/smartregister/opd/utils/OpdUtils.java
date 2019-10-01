@@ -2,6 +2,7 @@ package org.smartregister.opd.utils;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.DisplayMetrics;
 
 import org.smartregister.opd.OpdLibrary;
@@ -26,10 +27,12 @@ public class OpdUtils extends org.smartregister.util.Utils {
         return dp * ((float) context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
     }
 
+    @NonNull
     public static org.smartregister.Context context() {
         return OpdLibrary.getInstance().context();
     }
 
+    @Nullable
     public static OpdMetadata metadata() {
         return OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata();
     }

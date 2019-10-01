@@ -1,6 +1,7 @@
 package org.smartregister.opd.interactor;
 
 
+import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 
 import org.apache.commons.lang3.tuple.Triple;
@@ -8,7 +9,6 @@ import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
 import org.smartregister.opd.pojos.OpdEventClient;
 import org.smartregister.opd.pojos.RegisterParams;
-import org.smartregister.opd.presenter.BaseOpdRegisterActivityPresenter;
 import org.smartregister.opd.utils.AppExecutors;
 import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.repository.UniqueIdRepository;
@@ -52,18 +52,22 @@ public class BaseOpdRegisterActivityInteractor implements OpdRegisterActivityCon
     }
 
 
+    @NonNull
     public ECSyncHelper getSyncHelper() {
         return OpdLibrary.getInstance().getEcSyncHelper();
     }
 
+    @NonNull
     public AllSharedPreferences getAllSharedPreferences() {
         return OpdLibrary.getInstance().context().allSharedPreferences();
     }
 
+    @NonNull
     public ClientProcessorForJava getClientProcessorForJava() {
         return DrishtiApplication.getInstance().getClientProcessor();
     }
 
+    @NonNull
     public UniqueIdRepository getUniqueIdRepository() {
         return OpdLibrary.getInstance().getUniqueIdRepository();
     }

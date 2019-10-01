@@ -12,13 +12,7 @@ public class OpdFormFragmentPresenter extends JsonFormFragmentPresenter {
         super(formFragment, jsonFormInteractor);
     }
 
-    @Override
-    public void setUpToolBar() {
-        super.setUpToolBar();
-    }
-
-
-    public boolean intermediatePage() {
+    public boolean isIntermediatePage() {
         return this.mStepDetails != null && this.mStepDetails.has(OpdConstants.JSON_FORM_EXTRA.NEXT);
     }
 }
