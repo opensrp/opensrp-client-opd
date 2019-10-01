@@ -50,7 +50,7 @@ public class OpdSampleApplication extends org.smartregister.view.activity.Drisht
     }
 
     private static String[] getFtsTables() {
-        return new String[]{Constants.Table.CHILD, Constants.Table.MOTHER};
+        return new String[]{Constants.Table.CHILD, Constants.Table.MOTHER, OpdDbConstants.KEY.TABLE};
     }
 
     private static String[] getFtsSearchFields(String tableName) {
@@ -58,6 +58,8 @@ public class OpdSampleApplication extends org.smartregister.view.activity.Drisht
             return new String[]{Constants.Columns.FIRST_NAME, Constants.Columns.MIDDLE_NAME, Constants.Columns.LAST_NAME, Constants.Columns.DOB, Constants.Columns.LAST_INTERACTED_WITH};
         } else if (tableName.equals(Constants.Table.MOTHER)) {
             return new String[]{Constants.Columns.FIRST_NAME, Constants.Columns.MIDDLE_NAME, Constants.Columns.LAST_NAME, Constants.Columns.DOB, Constants.Columns.LAST_INTERACTED_WITH};
+        } else if (tableName.equals(OpdDbConstants.KEY.TABLE)) {
+            return new String[]{Constants.Columns.FIRST_NAME, Constants.Columns.LAST_NAME, Constants.Columns.DOB, Constants.Columns.LAST_INTERACTED_WITH};
         }
 
         return null;
@@ -72,6 +74,10 @@ public class OpdSampleApplication extends org.smartregister.view.activity.Drisht
             names.add(Constants.Columns.DOB);
 
             return names.toArray(new String[names.size()]);
+        } else if (tableName.equals(OpdDbConstants.KEY.TABLE)){
+
+            return new String[]{OpdDbConstants.KEY.BASE_ENTITY_ID, OpdDbConstants.KEY.FIRST_NAME, OpdDbConstants.KEY.LAST_NAME,
+                    OpdDbConstants.KEY.LAST_INTERACTED_WITH, OpdDbConstants.KEY.DATE_REMOVED};
         }
         return null;
     }
