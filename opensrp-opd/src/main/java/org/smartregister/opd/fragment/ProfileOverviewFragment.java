@@ -4,12 +4,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
 
 import org.jeasy.rules.api.Facts;
 import org.smartregister.opd.OpdLibrary;
@@ -19,14 +17,22 @@ import org.smartregister.opd.domain.YamlConfig;
 import org.smartregister.opd.domain.YamlConfigItem;
 import org.smartregister.opd.domain.YamlConfigWrapper;
 import org.smartregister.opd.pojos.CheckIn;
+import org.smartregister.opd.pojos.Visit;
 import org.smartregister.opd.utils.FilePath;
 import org.smartregister.opd.utils.OpdConstants;
+import org.smartregister.opd.utils.OpdDbConstants;
+import org.smartregister.util.DateUtil;
+import org.smartregister.util.Utils;
 import org.smartregister.view.fragment.BaseProfileFragment;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import timber.log.Timber;
 
@@ -74,11 +80,14 @@ public class ProfileOverviewFragment extends BaseProfileFragment {
             Facts facts = new Facts();
 
             // TODO: Move this to a background thread once Benn has added his work with the AppExecutors
-            CheckIn checkIn = OpdLibrary.getInstance().getCheckInRepository().getLatestCheckIn(baseEntityId);
+            Visit visit = OpdLibrary.getInstance().getVisitRepository().getLatestVisit(baseEntityId);
 
-            if (checkIn != null) {
-                setDataFromCheckIn(checkIn, facts);
-                setDataFromCheckIn(checkIn, facts);
+            if (visit != null) {
+                CheckIn checkIn = OpdLibrary.getInstance().getCheckInRepository().getCheckInByVisit(visit.getId());
+
+                if (checkIn != null) {
+                    setDataFromCheckIn(checkIn, visit, facts);
+                }
             }
 
             /*Toast.makeText(getActivity(), "Showing test data because the user has not check-ins", Toast.LENGTH_LONG)
@@ -130,7 +139,7 @@ public class ProfileOverviewFragment extends BaseProfileFragment {
         }
     }
 
-    private void setDataFromCheckIn(@NonNull CheckIn checkIn, @NonNull Facts facts) {
+    private void setDataFromCheckIn(@NonNull CheckIn checkIn, @NonNull Visit visit, @NonNull Facts facts) {
         facts.put("pregnancy_status", checkIn.getPregnancyStatus());
         facts.put("is_previously_tested_hiv", checkIn.getHasHivTestPreviously());
         facts.put("patient_on_art", checkIn.getIsTakingArt());
@@ -138,12 +147,20 @@ public class ProfileOverviewFragment extends BaseProfileFragment {
         facts.put("visit_type", checkIn.getVisitType());
         facts.put("previous_appointment", checkIn.getAppointmentScheduledPreviously());
         facts.put("date_of_appointment", checkIn.getAppointmentDueDate());
-        facts.put("visit_to_appointment_date", getVisitToAppointmentDateDuration(checkIn.getVisitId(), checkIn.getAppointmentDueDate()));
+        facts.put("visit_to_appointment_date", getVisitToAppointmentDateDuration(visit.getVisitDate(), checkIn.getAppointmentDueDate()));
     }
 
     @NonNull
-    private String getVisitToAppointmentDateDuration(int visitId, @NonNull String appointmentDueDate) {
-        return null;
+    private String getVisitToAppointmentDateDuration(@NonNull Date visitDate, @NonNull String appointmentDueDateString) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(OpdDbConstants.DATE_FORMAT, Locale.US);
+        try {
+            Date appointmentDueDate = dateFormat.parse(appointmentDueDateString);
+
+            return DateUtil.getDuration(appointmentDueDate.getTime() - visitDate.getTime());
+        } catch (ParseException e) {
+            Timber.e(e);
+            return "";
+        }
     }
 
     private void setTestData(@NonNull Facts facts) {

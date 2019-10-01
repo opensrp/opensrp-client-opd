@@ -66,6 +66,25 @@ where you should have implemented your own:
  3. Add your implemented `OpdRegisterActivity` to the `Android.manifest` file
  4. Call `OpdRegisterActivity` from your navigation menu
  
+ 5. Create the OPD repositories inside your application repository class.
+ 
+ This can be done by adding the following lines of code to your `ApplicationRepository#onCreate(SQLiteDatabase)`:
+ 
+ ```java
+ 
+    ...
+ 
+    public void onCreate(SQLiteDatabase database) {
+    
+        
+        ...
+ 
+        VisitRepository.createTable(database);
+        CheckInRepository.createTable(database);
+    }
+
+```
+ 
  
  ## 2. Required Implementations
  
