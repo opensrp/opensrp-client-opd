@@ -5,7 +5,10 @@ import android.support.annotation.NonNull;
 import com.google.gson.Gson;
 
 import org.smartregister.commonregistry.CommonPersonObjectClient;
+import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.fragment.BaseOpdRegisterFragment;
+import org.smartregister.opd.pojos.OpdMetadata;
+import org.smartregister.opd.sample.activity.OpdRegisterActivity;
 
 import timber.log.Timber;
 
@@ -17,8 +20,10 @@ public class OpdRegisterFragment extends BaseOpdRegisterFragment {
 
     @Override
     protected void startRegistration() {
-        // Do nothing here
-        Timber.i("Start registration has been clicked");
+        OpdMetadata opdMetadata = OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata();
+        if (getActivity() instanceof  OpdRegisterActivity && opdMetadata != null) {
+            ((OpdRegisterActivity) getActivity()).startFormActivity(opdMetadata.getOpdRegistrationFormName(), null, null);
+        }
     }
 
     @Override

@@ -1,7 +1,10 @@
 package org.smartregister.opd.presenter;
 
 
+import android.support.annotation.Nullable;
+
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
+import org.smartregister.opd.pojos.RegisterParams;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -11,7 +14,9 @@ import java.util.List;
  */
 
 public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterActivityContract.Presenter, OpdRegisterActivityContract.InteractorCallBack {
+
     private WeakReference<OpdRegisterActivityContract.View> viewReference;
+    private OpdRegisterActivityContract.Interactor interactor;
     private OpdRegisterActivityContract.Model model;
 
     public BaseOpdRegisterActivityPresenter(OpdRegisterActivityContract.View view, OpdRegisterActivityContract.Model model) {
@@ -44,11 +49,12 @@ public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterAct
     @Override
     public void updateInitials() {
         String initials = model.getInitials();
-        if (initials != null) {
+        if (initials != null && getView() != null) {
             getView().updateInitialsText(initials);
         }
     }
 
+    @Nullable
     private OpdRegisterActivityContract.View getView() {
         if (viewReference != null) {
             return viewReference.get();
@@ -60,6 +66,14 @@ public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterAct
     @Override
     public void saveLanguage(String language) {
         model.saveLanguage(language);
-        getView().displayToast(language + " selected");
+
+        if (getView() != null) {
+            getView().displayToast(language + " selected");
+        }
+    }
+
+    @Override
+    public void saveForm(String jsonString, RegisterParams registerParams) {
+
     }
 }

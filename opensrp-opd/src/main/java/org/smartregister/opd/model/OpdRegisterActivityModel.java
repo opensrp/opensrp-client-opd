@@ -1,17 +1,20 @@
 package org.smartregister.opd.model;
 
-import android.util.Pair;
+import android.support.annotation.Nullable;
 
+import org.json.JSONException;
 import org.json.JSONObject;
-import org.smartregister.clientandeventmodel.Client;
-import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.configurableviews.ConfigurableViewsLibrary;
+import org.smartregister.domain.tag.FormTag;
 import org.smartregister.location.helper.LocationHelper;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
+import org.smartregister.opd.pojos.OpdEventClient;
+import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.util.FormUtils;
 import org.smartregister.util.Utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import timber.log.Timber;
@@ -21,6 +24,7 @@ import timber.log.Timber;
  */
 
 public class OpdRegisterActivityModel implements OpdRegisterActivityContract.Model {
+
     private FormUtils formUtils;
 
     @Override
@@ -39,24 +43,41 @@ public class OpdRegisterActivityModel implements OpdRegisterActivityContract.Mod
 
     @Override
     public void saveLanguage(String language) {
-        // TODO Save Language
-        //Map<String, String> langs = getAvailableLanguagesMap();
-        //Utils.saveLanguage(Utils.getKeyByValue(langs, language));
     }
 
+    @Nullable
     @Override
-    public String getLocationId(String locationName) {
+    public String getLocationId(@Nullable String locationName) {
         return LocationHelper.getInstance().getOpenMrsLocationId(locationName);
     }
 
+    @Nullable
     @Override
-    public Pair<Client, Event> processRegistration(String jsonString) {
-        return null;
+    public List<OpdEventClient> processRegistration(String jsonString, FormTag formTag) {
+        List<OpdEventClient> opdEventClientList = new ArrayList<>();
+        OpdEventClient opdEventClient = OpdJsonFormUtils.processOpdDetailsForm(jsonString, formTag);
+
+        if (opdEventClient == null) {
+            return null;
+        }
+
+        opdEventClientList.add(opdEventClient);
+        return opdEventClientList;
     }
 
+    @Nullable
     @Override
-    public JSONObject getFormAsJson(String formName, String entityId, String currentLocationId, String familyId) throws Exception {
-        return null;
+    public JSONObject getFormAsJson(String formName, String entityId, String currentLocationId) throws JSONException {
+        if (getFormUtils() == null) {
+            return null;
+        }
+
+        JSONObject form = getFormUtils().getFormJson(formName);
+        if (form == null) {
+            return null;
+        }
+
+        return OpdJsonFormUtils.getFormAsJson(form, formName, entityId, currentLocationId);
     }
 
     @Override
@@ -64,6 +85,7 @@ public class OpdRegisterActivityModel implements OpdRegisterActivityContract.Mod
         return Utils.getUserInitials();
     }
 
+    @Nullable
     public FormUtils getFormUtils() {
         if (formUtils == null) {
             try {
@@ -73,9 +95,5 @@ public class OpdRegisterActivityModel implements OpdRegisterActivityContract.Mod
             }
         }
         return formUtils;
-    }
-
-    public void setFormUtils(FormUtils formUtils) {
-        this.formUtils = formUtils;
     }
 }

@@ -6,6 +6,10 @@ import org.smartregister.Context;
 import org.smartregister.opd.configuration.OpdConfiguration;
 import org.smartregister.repository.Repository;
 import org.smartregister.repository.UniqueIdRepository;
+import org.smartregister.sync.helper.ECSyncHelper;
+import org.smartregister.view.activity.DrishtiApplication;
+
+import id.zelory.compressor.Compressor;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-13
@@ -14,22 +18,28 @@ import org.smartregister.repository.UniqueIdRepository;
 public class OpdLibrary {
 
     private final Context context;
-
     private static OpdLibrary instance;
     private OpdConfiguration opdConfiguration;
     private final Repository repository;
-
+    private ECSyncHelper syncHelper;
     private UniqueIdRepository uniqueIdRepository;
+    private Compressor compressor;
+    private int applicationVersion;
+    private int databaseVersion;
 
-    protected OpdLibrary(@NonNull Context context, @NonNull OpdConfiguration opdConfiguration, @NonNull Repository repository) {
+    protected OpdLibrary(@NonNull Context context, @NonNull OpdConfiguration opdConfiguration
+            , @NonNull Repository repository, int applicationVersion, int databaseVersion) {
         this.context = context;
         this.opdConfiguration = opdConfiguration;
         this.repository = repository;
+        this.applicationVersion = applicationVersion;
+        this.databaseVersion = databaseVersion;
     }
 
-    public static void init(Context context, @NonNull Repository repository, @NonNull OpdConfiguration opdConfiguration) {
+    public static void init(Context context, @NonNull Repository repository, @NonNull OpdConfiguration opdConfiguration
+            , int applicationVersion, int databaseVersion) {
         if (instance == null) {
-            instance = new OpdLibrary(context, opdConfiguration, repository);
+            instance = new OpdLibrary(context, opdConfiguration, repository, applicationVersion, databaseVersion);
         }
     }
 
@@ -60,8 +70,33 @@ public class OpdLibrary {
         return repository;
     }
 
+
+    @NonNull
+    public ECSyncHelper getEcSyncHelper() {
+        if (syncHelper == null) {
+            syncHelper = ECSyncHelper.getInstance(context().applicationContext());
+        }
+        return syncHelper;
+    }
+
     @NonNull
     public OpdConfiguration getOpdConfiguration() {
         return opdConfiguration;
+    }
+
+    public Compressor getCompressor() {
+        if (compressor == null) {
+            compressor = Compressor.getDefault(context().applicationContext());
+        }
+        return compressor;
+    }
+
+
+    public int getDatabaseVersion() {
+        return databaseVersion;
+    }
+
+    public int getApplicationVersion() {
+        return applicationVersion;
     }
 }
