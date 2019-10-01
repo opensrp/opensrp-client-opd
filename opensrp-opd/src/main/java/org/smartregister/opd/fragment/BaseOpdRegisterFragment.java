@@ -162,7 +162,7 @@ public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment imple
 
     @Override
     protected String getDefaultSortQuery() {
-        return "";
+        return filterAndSortQuery();
     }
 
     @Override
@@ -322,7 +322,7 @@ public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment imple
                 public Cursor loadInBackground() {
                     // Count query
                     // Select register query
-                    String query = filterAndSortQuery();
+                    String query = getDefaultSortQuery();
                     return commonRepository().rawCustomQueryForAdapter(query);
                 }
             };
