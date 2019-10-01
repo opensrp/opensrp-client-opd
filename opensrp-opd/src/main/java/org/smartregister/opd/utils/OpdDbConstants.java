@@ -22,5 +22,6 @@ public interface OpdDbConstants {
 
         String GENDER = "gender";
         String TABLE = "ec_client";
+        String OPENSRP_ID = "opensrp_id";
     }
 }
