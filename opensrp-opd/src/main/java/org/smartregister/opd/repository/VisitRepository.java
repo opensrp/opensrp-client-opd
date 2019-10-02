@@ -31,7 +31,7 @@ public class VisitRepository extends BaseRepository implements VisitDao {
             + Visit.VISIT_DATE + " DATETIME NOT NULL,"
             + Visit.PROVIDER_ID + " VARCHAR NOT NULL,"
             + Visit.LOCATION_ID + " VARCHAR NOT NULL,"
-            + Visit.BASE_ENTITY_ID + "VARCHAR NOT NULL,"
+            + Visit.BASE_ENTITY_ID + " VARCHAR NOT NULL,"
             + Visit.CREATED_AT + " INTEGER NOT NULL)";
 
     private static final String INDEX_BASE_ENTITY_ID = "CREATE INDEX " + OpdDbConstants.Table.VISIT
