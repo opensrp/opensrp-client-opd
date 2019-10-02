@@ -88,7 +88,7 @@ public class OpdLookUpUtils {
         queryBUilder.SelectInitiateMainTable(tableName,
                 new String[]{OpdConstants.KEY.RELATIONALID, OpdConstants.KEY.OPENSRP_ID, OpdConstants.KEY.FIRST_NAME, OpdConstants.KEY.LAST_NAME,
                         AllConstants.ChildRegistrationFields.GENDER, OpdConstants.KEY.DOB,
-                        OpdConstants.KEY.BASE_ENTITY_ID}
+                        OpdConstants.KEY.BASE_ENTITY_ID, OpdConstants.KEY.NATIONAL_ID}
 
         );
         String query = queryBUilder.mainCondition(getMainConditionString(entityMap));

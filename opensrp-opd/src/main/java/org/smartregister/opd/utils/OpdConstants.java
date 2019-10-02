@@ -41,6 +41,7 @@ public class OpdConstants extends AllConstants {
         public static final String DOB = "dob";//Date Of Birth
         public static final String OPENSRP_ID = "opensrp_id";
         public static final String RELATIONALID = "relationalid";
+        public static final String NATIONAL_ID = "national_id";
     }
 
     public static class ENTITY {

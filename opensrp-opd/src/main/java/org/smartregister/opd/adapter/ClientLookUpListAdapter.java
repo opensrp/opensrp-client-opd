@@ -38,8 +38,9 @@ public class ClientLookUpListAdapter extends RecyclerView.Adapter<ClientLookUpLi
         String firstName = Utils.getValue(commonPersonObject.getColumnmaps(), "first_name", true);
         String lastName = Utils.getValue(commonPersonObject.getColumnmaps(), "last_name", true);
         String nationalId = Utils.getValue(commonPersonObject.getColumnmaps(), "national_id", true);
+        String opensrpId = Utils.getValue(commonPersonObject.getColumnmaps(), "opensrp_id", true);
         String fullname =  firstName + " " + lastName;
-        String details = context.getString(R.string.national_id)+" - "+nationalId;
+        String details = context.getString(R.string.national_id) + " - " + nationalId + ", " + context.getString(R.string.opensrp_Id_type) + " - " + opensrpId;
         holder.txtName.setText(fullname);
         holder.itemView.setTag(Utils.convert(commonPersonObject));
         holder.txtDetails.setText(details);
