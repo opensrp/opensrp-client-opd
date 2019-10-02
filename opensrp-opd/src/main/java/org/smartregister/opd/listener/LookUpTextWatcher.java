@@ -1,5 +1,6 @@
 package org.smartregister.opd.listener;
 
+import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -22,7 +23,7 @@ public class LookUpTextWatcher implements TextWatcher {
     private final View editText;
     private final JsonFormFragment jsonFormFragment;
 
-    public LookUpTextWatcher(JsonFormFragment jsonFormFragment, View editText) {
+    public LookUpTextWatcher(@NonNull JsonFormFragment jsonFormFragment, @NonNull View editText) {
         this.jsonFormFragment = jsonFormFragment;
         this.editText = editText;
         lookUpFields = new HashMap<>();
@@ -60,8 +61,8 @@ public class LookUpTextWatcher implements TextWatcher {
         lookUpFields.put(key, text);
 
         if (jsonFormFragment instanceof BaseOpdFormFragment) {
-            BaseOpdFormFragment OpdFormFragment = (BaseOpdFormFragment) jsonFormFragment;
-            Listener<List<CommonPersonObject>> listener = OpdFormFragment.lookUpListener();
+            BaseOpdFormFragment opdFormFragment = (BaseOpdFormFragment) jsonFormFragment;
+            Listener<List<CommonPersonObject>> listener = opdFormFragment.lookUpListener();
 
             OpdLookUpUtils.lookUp(OpdLibrary.getInstance().context(), lookUpFields, listener);
         }

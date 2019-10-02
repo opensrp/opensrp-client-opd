@@ -87,9 +87,10 @@ public class OpdLookUpUtils {
     private static String lookUpQuery(@NonNull Map<String, String> entityMap, @NonNull String tableName) {
         SmartRegisterQueryBuilder queryBUilder = new SmartRegisterQueryBuilder();
         queryBUilder.SelectInitiateMainTable(tableName,
-                new String[]{OpdConstants.KEY.RELATIONALID, OpdConstants.KEY.OPENSRP_ID, OpdConstants.KEY.FIRST_NAME, OpdConstants.KEY.LAST_NAME,
-                        AllConstants.ChildRegistrationFields.GENDER, OpdConstants.KEY.DOB,
-                        OpdConstants.KEY.BASE_ENTITY_ID, OpdConstants.KEY.NATIONAL_ID}
+                new String[]{OpdDbConstants.Table.Client.RELATIONALID, OpdDbConstants.Table.Client.OPENSRP_ID ,
+                        OpdDbConstants.Table.Client.FIRST_NAME, OpdDbConstants.Table.Client.LAST_NAME,
+                        OpdDbConstants.Table.Client.GENDER, OpdDbConstants.Table.Client.DOB,
+                        OpdDbConstants.Table.Client.BASE_ENTITY_ID, OpdDbConstants.Table.Client.NATIONAL_ID}
 
         );
         String query = queryBUilder.mainCondition(getMainConditionString(entityMap));

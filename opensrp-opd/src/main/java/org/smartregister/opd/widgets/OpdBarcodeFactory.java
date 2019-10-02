@@ -2,6 +2,7 @@ package org.smartregister.opd.widgets;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.google.android.gms.vision.barcode.Barcode;
@@ -22,15 +23,14 @@ import java.util.List;
 
 import timber.log.Timber;
 
-import static android.app.Activity.RESULT_OK;
-
 public class OpdBarcodeFactory extends BarcodeFactory {
 
     private JsonFormFragment jsonFormFragment;
     private boolean forLookUp;
 
     @Override
-    public List<View> getViewsFromJson(String stepName, Context context, JsonFormFragment formFragment, JSONObject jsonObject, CommonListener listener) throws Exception {
+    public List<View> getViewsFromJson(@NonNull String stepName, @NonNull Context context, @NonNull JsonFormFragment formFragment,
+                                       @NonNull JSONObject jsonObject, @NonNull CommonListener listener) throws Exception {
         List<View> viewList = super.getViewsFromJson(stepName, context, formFragment, jsonObject, listener);
         this.jsonFormFragment = formFragment;
         try {
@@ -38,13 +38,13 @@ public class OpdBarcodeFactory extends BarcodeFactory {
                     jsonObject.get(OpdConstants.KEY.LOOK_UP).toString().equalsIgnoreCase(Boolean.TRUE.toString());
         } catch (JSONException e) {
             Timber.e(e);
-            e.printStackTrace();
         }
         return viewList;
     }
 
     @Override
-    public List<View> getViewsFromJson(String stepName, Context context, JsonFormFragment formFragment, JSONObject jsonObject, CommonListener listener, boolean popup) {
+    public List<View> getViewsFromJson(@NonNull String stepName, @NonNull Context context, @NonNull JsonFormFragment formFragment, @NonNull JSONObject jsonObject,
+                                       @NonNull CommonListener listener, boolean popup) {
         List<View> viewList = super.getViewsFromJson(stepName, context, formFragment, jsonObject, listener, popup);
         this.jsonFormFragment = formFragment;
         try {
@@ -52,13 +52,12 @@ public class OpdBarcodeFactory extends BarcodeFactory {
                     jsonObject.get(OpdConstants.KEY.LOOK_UP).toString().equalsIgnoreCase(Boolean.TRUE.toString());
         } catch (JSONException e) {
             Timber.e(e);
-            e.printStackTrace();
         }
         return viewList;
     }
 
     @Override
-    protected void addOnBarCodeResultListeners(Context context, final MaterialEditText editText) {
+    protected void addOnBarCodeResultListeners(@NonNull Context context, @NonNull final MaterialEditText editText) {
         if (context instanceof JsonApi) {
             JsonApi jsonApi = (JsonApi) context;
             jsonApi.addOnActivityResultListener(JsonFormConstants.BARCODE_CONSTANTS.BARCODE_REQUEST_CODE,
@@ -66,11 +65,11 @@ public class OpdBarcodeFactory extends BarcodeFactory {
                         @Override
                         public void onActivityResult(int requestCode,
                                                      int resultCode, Intent data) {
-                            if (requestCode == JsonFormConstants.BARCODE_CONSTANTS.BARCODE_REQUEST_CODE && resultCode == RESULT_OK) {
+                            if (requestCode == JsonFormConstants.BARCODE_CONSTANTS.BARCODE_REQUEST_CODE && resultCode == android.app.Activity.RESULT_OK) {
                                 if (data != null) {
                                     Barcode barcode = data.getParcelableExtra(JsonFormConstants.BARCODE_CONSTANTS.BARCODE_KEY);
                                     Timber.d("Scanned QR Code %s ", barcode.displayValue);
-                                    if( forLookUp ) {
+                                    if (forLookUp) {
                                         editText.addTextChangedListener(new LookUpTextWatcher(jsonFormFragment, editText));
                                         editText.setTag(com.vijay.jsonwizard.R.id.after_look_up, false);
                                     }
