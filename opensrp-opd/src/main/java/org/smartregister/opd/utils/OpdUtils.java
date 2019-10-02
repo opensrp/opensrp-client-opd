@@ -3,11 +3,14 @@ package org.smartregister.opd.utils;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.support.annotation.Nullable;
 import android.util.DisplayMetrics;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jeasy.rules.api.Facts;
+import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
+import org.smartregister.opd.pojos.OpdMetadata;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +19,7 @@ import java.util.List;
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-13
  */
 
-public class OpdUtils {
+public class OpdUtils extends org.smartregister.util.Utils {
 
     private static final String OTHER_SUFFIX = ", other]";
 
@@ -77,5 +80,15 @@ public class OpdUtils {
             }//replace with extracted value
         }
         return itemLabel + (!TextUtils.isEmpty(itemLabel) ? ": " : "") + StringUtils.join(nonEmptyItems.toArray(), ",");
+    }
+
+    @NonNull
+    public static org.smartregister.Context context() {
+        return OpdLibrary.getInstance().context();
+    }
+
+    @Nullable
+    public static OpdMetadata metadata() {
+        return OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata();
     }
 }

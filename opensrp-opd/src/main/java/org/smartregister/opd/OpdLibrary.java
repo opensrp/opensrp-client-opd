@@ -12,7 +12,10 @@ import org.smartregister.opd.repository.VisitRepository;
 import org.smartregister.opd.utils.FilePath;
 import org.smartregister.repository.Repository;
 import org.smartregister.repository.UniqueIdRepository;
+import org.smartregister.sync.helper.ECSyncHelper;
 import org.smartregister.view.activity.DrishtiApplication;
+
+import id.zelory.compressor.Compressor;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
@@ -27,12 +30,14 @@ import java.io.InputStreamReader;
 public class OpdLibrary {
 
     private final Context context;
-
     private static OpdLibrary instance;
     private OpdConfiguration opdConfiguration;
     private final Repository repository;
-
+    private ECSyncHelper syncHelper;
     private UniqueIdRepository uniqueIdRepository;
+    private Compressor compressor;
+    private int applicationVersion;
+    private int databaseVersion;
     private CheckInRepository checkInRepository;
     private VisitRepository visitRepository;
 
@@ -40,18 +45,22 @@ public class OpdLibrary {
 
     private AncRulesEngineHelper ancRulesEngineHelper;
 
-    protected OpdLibrary(@NonNull Context context, @NonNull OpdConfiguration opdConfiguration, @NonNull Repository repository) {
+    protected OpdLibrary(@NonNull Context context, @NonNull OpdConfiguration opdConfiguration
+            , @NonNull Repository repository, int applicationVersion, int databaseVersion) {
         this.context = context;
         this.opdConfiguration = opdConfiguration;
         this.repository = repository;
+        this.applicationVersion = applicationVersion;
+        this.databaseVersion = databaseVersion;
 
         // Initialize configs processor
         initializeYamlConfigs();
     }
 
-    public static void init(Context context, @NonNull Repository repository, @NonNull OpdConfiguration opdConfiguration) {
+    public static void init(Context context, @NonNull Repository repository, @NonNull OpdConfiguration opdConfiguration
+            , int applicationVersion, int databaseVersion) {
         if (instance == null) {
-            instance = new OpdLibrary(context, opdConfiguration, repository);
+            instance = new OpdLibrary(context, opdConfiguration, repository, applicationVersion, databaseVersion);
         }
     }
 
@@ -101,9 +110,34 @@ public class OpdLibrary {
         return repository;
     }
 
+
+    @NonNull
+    public ECSyncHelper getEcSyncHelper() {
+        if (syncHelper == null) {
+            syncHelper = ECSyncHelper.getInstance(context().applicationContext());
+        }
+        return syncHelper;
+    }
+
     @NonNull
     public OpdConfiguration getOpdConfiguration() {
         return opdConfiguration;
+    }
+
+    public Compressor getCompressor() {
+        if (compressor == null) {
+            compressor = Compressor.getDefault(context().applicationContext());
+        }
+        return compressor;
+    }
+
+
+    public int getDatabaseVersion() {
+        return databaseVersion;
+    }
+
+    public int getApplicationVersion() {
+        return applicationVersion;
     }
 
     private void initializeYamlConfigs() {

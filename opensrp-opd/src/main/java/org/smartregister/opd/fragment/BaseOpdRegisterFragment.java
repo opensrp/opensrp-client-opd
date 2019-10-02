@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.AppCompatTextView;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -345,11 +346,13 @@ public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment imple
                 String joinedIds = "'" + StringUtils.join(ids, "','") + "'";
                 return query.replace("%s", joinedIds);
             } else {
-                sqb.addCondition(filters);
-                query = sqb.orderbyCondition(Sortqueries);
-                query = sqb.Endquery(sqb.addlimitandOffset(query
-                        , clientAdapter.getCurrentlimit()
-                        , clientAdapter.getCurrentoffset()));
+                if (!TextUtils.isEmpty(filters) && TextUtils.isEmpty(Sortqueries)) {
+                    sqb.addCondition(filters);
+                    query = sqb.orderbyCondition(Sortqueries);
+                    query = sqb.Endquery(sqb.addlimitandOffset(query
+                            , clientAdapter.getCurrentlimit()
+                            , clientAdapter.getCurrentoffset()));
+                }
 
             }
         } catch (Exception e) {

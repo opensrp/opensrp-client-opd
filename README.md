@@ -7,7 +7,8 @@ This library provides the ability to show an OPD(Outpatient Department) Register
 ## Table Of Contents
 
  1. [Getting started](#1-getting-started)
- 2. [Required Implementations](#required-implementations)
+ 2. [Required Implementations](#2-required-implementations)
+ 3. [Enable OPD Registration](#3-enable-opd-registration)
 
 ## 1. Getting started
 
@@ -152,3 +153,109 @@ where you should have implemented your own:
 
  ```
  in your implementation of `BaseOpdRegisterActivityPresenter createPresenter(@NonNull OpdRegisterActivityContract.View, @NonNull OpdRegisterActivityContract.Model)` 
+
+
+## 3. Enable OPD Registration
+
+
+Add the following `bindobject` to your `ec_client_fields` `bindobjects` array:
+
+```json
+{
+      "name": "ec_client",
+      "columns": [
+        {
+          "column_name": "base_entity_id",
+          "type": "Client",
+          "json_mapping": {
+            "field": "baseEntityId"
+          }
+        },
+        {
+          "column_name": "opensrp_id",
+          "type": "Client",
+          "json_mapping": {
+            "field": "identifiers.OPENSRP_ID"
+          }
+        },
+        {
+          "column_name": "first_name",
+          "type": "Client",
+          "json_mapping": {
+            "field": "firstName"
+          }
+        },
+        {
+          "column_name": "last_name",
+          "type": "Client",
+          "json_mapping": {
+            "field": "lastName"
+          }
+        },
+        {
+          "column_name": "dob",
+          "type": "Client",
+          "json_mapping": {
+            "field": "birthdate"
+          }
+        },
+        {
+          "column_name": "national_id",
+          "type": "Client",
+          "json_mapping": {
+            "field": "attributes.national_id"
+          }
+        },
+        {
+          "column_name": "opd_reg_number",
+          "type": "Client",
+          "json_mapping": {
+            "field": "attributes.annual_serial_number"
+          }
+        },
+        {
+          "column_name": "bht_mid",
+          "type": "Client",
+          "json_mapping": {
+            "field": "identifiers.bht_mid"
+          }
+        },
+        {
+          "column_name": "phone_number",
+          "type": "Client",
+          "json_mapping": {
+            "field": "attributes.phone_number"
+          }
+        },
+        {
+          "column_name": "reminders",
+          "type": "Client",
+          "json_mapping": {
+            "field": "attributes.reminders"
+          }
+        },
+        {
+          "column_name": "gender",
+          "type": "Client",
+          "json_mapping": {
+            "field": "gender"
+          }
+        },
+        {
+          "column_name": "date",
+          "type": "Event",
+          "json_mapping": {
+            "field": "eventDate"
+          }
+        },
+        {
+          "column_name": "date_removed",
+          "type": "Client",
+          "json_mapping": {
+            "field": "attributes.dateRemoved"
+          }
+        }
+      ]
+    }
+
+```

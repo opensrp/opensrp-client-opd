@@ -19,9 +19,17 @@ public class OpdRegisterQueryProvider extends OpdRegisterQueryProviderContract {
     @Override
     public String getObjectIdsQuery(@Nullable String filters) {
         if (TextUtils.isEmpty(filters)) {
-            return "SELECT object_id FROM (SELECT object_id, last_interacted_with FROM ec_child_search UNION ALL SELECT object_id, last_interacted_with FROM ec_mother_search ORDER BY last_interacted_with DESC) ORDER BY last_interacted_with";
+            return "SELECT object_id FROM " +
+                    "(SELECT object_id, last_interacted_with FROM ec_child_search " +
+                    "UNION ALL SELECT object_id, last_interacted_with FROM ec_mother_search " +
+                    "UNION ALL SELECT object_id, last_interacted_with FROM ec_client_search) " +
+                    "ORDER BY last_interacted_with DESC";
         } else {
-            String sql = "SELECT object_id FROM (SELECT object_id, last_interacted_with FROM ec_child_search WHERE date_removed IS NULL AND phrase MATCH '%s*' UNION ALL SELECT object_id, last_interacted_with FROM ec_mother_search WHERE date_removed IS NULL AND phrase MATCH '%s*') ORDER BY last_interacted_with";
+            String sql = "SELECT object_id FROM " +
+                    "(SELECT object_id, last_interacted_with FROM ec_child_search WHERE date_removed IS NULL AND phrase MATCH '%s*' " +
+                    "UNION ALL SELECT object_id, last_interacted_with FROM ec_mother_search WHERE date_removed IS NULL AND phrase MATCH '%s*' " +
+                    "UNION ALL SELECT object_id, last_interacted_with FROM ec_client_search WHERE date_removed IS NULL AND phrase MATCH '%s*') " +
+                    "ORDER BY last_interacted_with DESC";
             sql = sql.replace("%s", filters);
             return sql;
         }
@@ -34,7 +42,8 @@ public class OpdRegisterQueryProvider extends OpdRegisterQueryProviderContract {
 
         return new String[] {
                 sqb.countQueryFts("ec_child", null, null, filters),
-                sqb.countQueryFts("ec_mother", null, null, filters)
+                sqb.countQueryFts("ec_mother", null, null, filters),
+                sqb.countQueryFts("ec_client", null, null, filters)
         };
     }
 
@@ -70,6 +79,22 @@ public class OpdRegisterQueryProvider extends OpdRegisterQueryProviderContract {
                 "relationalid"
         });
 
+        QueryTable clientTableCol = new QueryTable();
+        clientTableCol.setTableName("ec_client");
+        clientTableCol.setColNames(new String[]{
+                "first_name",
+                "last_name",
+                "'' AS middle_name",
+                "gender",
+                "dob",
+                "'' AS home_address",
+                "'OPD' AS register_type",
+                "NULL AS mother_first_name",
+                "NULL AS mother_last_name",
+                "NULL AS mother_middle_name",
+                "relationalid"
+        });
+
         InnerJoinObject[] tablesWithInnerJoins = new InnerJoinObject[1];
         InnerJoinObject tableColsInnerJoin = new InnerJoinObject();
         tableColsInnerJoin.setFirstTable(childTableCol);
@@ -85,6 +110,6 @@ public class OpdRegisterQueryProvider extends OpdRegisterQueryProviderContract {
         tableColsInnerJoin.innerJoinTable(innerJoinMotherTable);
         tablesWithInnerJoins[0] = tableColsInnerJoin;
 
-        return mainSelectWhereIdsIn(tablesWithInnerJoins, new QueryTable[]{womanTableCol});
+        return mainSelectWhereIdsIn(tablesWithInnerJoins, new QueryTable[]{womanTableCol, clientTableCol});
     }
 }

@@ -7,7 +7,7 @@ package org.smartregister.opd.utils;
 public interface OpdDbConstants {
 
     String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    
+
     interface KEY {
 
         String MOTHER_FIRST_NAME = "mother_first_name";
@@ -23,9 +23,13 @@ public interface OpdDbConstants {
         String DOB = "dob";
 
         String GENDER = "gender";
+        String TABLE = "ec_client";
+        String OPENSRP_ID = "opensrp_id";
+        String BASE_ENTITY_ID = "base_entity_id";
+        String LAST_INTERACTED_WITH = "last_interacted_with";
+        String DATE_REMOVED = "date_removed";
 
         String REGISTER_ID = "register_id";
-        String BASE_ENTITY_ID = "base_entity_id";
     }
 
     interface Table {
