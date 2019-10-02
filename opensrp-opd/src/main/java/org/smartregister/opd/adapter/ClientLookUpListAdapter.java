@@ -36,10 +36,10 @@ public class ClientLookUpListAdapter extends RecyclerView.Adapter<ClientLookUpLi
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int i) {
         CommonPersonObject commonPersonObject = data.get(i);
-        String firstName = Utils.getValue(commonPersonObject.getColumnmaps(), OpdDbConstants.ClientTable.FIRST_NAME, true);
-        String lastName = Utils.getValue(commonPersonObject.getColumnmaps(), OpdDbConstants.ClientTable.LAST_NAME, true);
-        String nationalId = Utils.getValue(commonPersonObject.getColumnmaps(), OpdDbConstants.ClientTable.NATIONAL_ID, true);
-        String opensrpId = Utils.getValue(commonPersonObject.getColumnmaps(), OpdDbConstants.ClientTable.OPENSRP_ID, true);
+        String firstName = Utils.getValue(commonPersonObject.getColumnmaps(), OpdDbConstants.Table.Client.FIRST_NAME, true);
+        String lastName = Utils.getValue(commonPersonObject.getColumnmaps(), OpdDbConstants.Table.Client.LAST_NAME, true);
+        String nationalId = Utils.getValue(commonPersonObject.getColumnmaps(), OpdDbConstants.Table.Client.NATIONAL_ID, true);
+        String opensrpId = Utils.getValue(commonPersonObject.getColumnmaps(), OpdDbConstants.Table.Client.OPENSRP_ID, true);
         String fullname =  firstName + " " + lastName;
         String details = context.getString(R.string.national_id) + " - " + nationalId + ", " + context.getString(R.string.opd_opensrp_id_type) + " - " + opensrpId;
         holder.txtName.setText(fullname);
