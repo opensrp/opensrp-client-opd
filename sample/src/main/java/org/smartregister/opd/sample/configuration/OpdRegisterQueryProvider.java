@@ -20,12 +20,16 @@ public class OpdRegisterQueryProvider extends OpdRegisterQueryProviderContract {
     public String getObjectIdsQuery(@Nullable String filters) {
         if (TextUtils.isEmpty(filters)) {
             return "SELECT object_id FROM " +
-                    "( SELECT object_id, last_interacted_with FROM ec_client_search) " +
-                    "ORDER BY last_interacted_with";
+                    "(SELECT object_id, last_interacted_with FROM ec_child_search " +
+                    "UNION ALL SELECT object_id, last_interacted_with FROM ec_mother_search " +
+                    "UNION ALL SELECT object_id, last_interacted_with FROM ec_client_search) " +
+                    "ORDER BY last_interacted_with DESC";
         } else {
             String sql = "SELECT object_id FROM " +
-                    "(SELECT object_id, last_interacted_with FROM ec_client_search WHERE date_removed IS NULL AND phrase MATCH '%s*') " +
-                    "ORDER BY last_interacted_with";
+                    "(SELECT object_id, last_interacted_with FROM ec_child_search WHERE date_removed IS NULL AND phrase MATCH '%s*' " +
+                    "UNION ALL SELECT object_id, last_interacted_with FROM ec_mother_search WHERE date_removed IS NULL AND phrase MATCH '%s*' " +
+                    "UNION ALL SELECT object_id, last_interacted_with FROM ec_client_search WHERE date_removed IS NULL AND phrase MATCH '%s*') " +
+                    "ORDER BY last_interacted_with DESC";
             sql = sql.replace("%s", filters);
             return sql;
         }
@@ -38,7 +42,8 @@ public class OpdRegisterQueryProvider extends OpdRegisterQueryProviderContract {
 
         return new String[] {
                 sqb.countQueryFts("ec_child", null, null, filters),
-                sqb.countQueryFts("ec_mother", null, null, filters)
+                sqb.countQueryFts("ec_mother", null, null, filters),
+                sqb.countQueryFts("ec_client", null, null, filters)
         };
     }
 

@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 
 import com.vijay.jsonwizard.activities.JsonFormActivity;
 import com.vijay.jsonwizard.activities.JsonWizardFormActivity;
@@ -17,6 +16,7 @@ import org.json.JSONObject;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
 import org.smartregister.opd.fragment.BaseOpdFormFragment;
+import org.smartregister.opd.pojos.OpdMetadata;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.util.LangUtils;
@@ -28,7 +28,6 @@ import timber.log.Timber;
 public class BaseOpdFormActivity extends JsonWizardFormActivity {
 
     private BaseOpdFormFragment opdFormFragment;
-    private String TAG = BaseOpdFormActivity.class.getCanonicalName();
     private boolean enableOnCloseDialog = true;
     private JSONObject form;
 
@@ -49,7 +48,6 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
         }
 
         enableOnCloseDialog = getIntent().getBooleanExtra(OpdConstants.FormActivity.EnableOnCloseDialog, true);
-
     }
 
     @Override
@@ -89,7 +87,8 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
     public void writeValue(String stepName, String key, String value, String openMrsEntityParent, String openMrsEntity,
                            String openMrsEntityId, boolean popup) throws JSONException {
         super.writeValue(stepName, key, value, openMrsEntityParent, openMrsEntity, openMrsEntityId, popup);
-        if (OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata().isFormWizardValidateRequiredFieldsBefore()) {
+        OpdMetadata opdMetadata = OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata();
+        if (opdMetadata != null && opdMetadata.isFormWizardValidateRequiredFieldsBefore()) {
             validateActivateNext();
         }
     }
@@ -100,7 +99,8 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
             throws JSONException {
         super.writeValue(stepName, parentKey, childObjectKey, childKey, value, openMrsEntityParent, openMrsEntity,
                 openMrsEntityId, popup);
-        if (OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata().isFormWizardValidateRequiredFieldsBefore()) {
+        OpdMetadata opdMetadata = OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata();
+        if (opdMetadata != null && opdMetadata.isFormWizardValidateRequiredFieldsBefore()) {
             validateActivateNext();
         }
     }
@@ -109,7 +109,8 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
     public void writeValue(String stepName, String key, String value, String openMrsEntityParent, String openMrsEntity,
                            String openMrsEntityId) throws JSONException {
         super.writeValue(stepName, key, value, openMrsEntityParent, openMrsEntity, openMrsEntityId);
-        if (OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata().isFormWizardValidateRequiredFieldsBefore()) {
+        OpdMetadata opdMetadata = OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata();
+        if (opdMetadata != null && opdMetadata.isFormWizardValidateRequiredFieldsBefore()) {
             validateActivateNext();
         }
     }
@@ -119,7 +120,8 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
                            String openMrsEntityParent, String openMrsEntity, String openMrsEntityId) throws JSONException {
         super.writeValue(stepName, parentKey, childObjectKey, childKey, value, openMrsEntityParent, openMrsEntity,
                 openMrsEntityId);
-        if (OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata().isFormWizardValidateRequiredFieldsBefore()) {
+        OpdMetadata opdMetadata = OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata();
+        if (opdMetadata != null && opdMetadata.isFormWizardValidateRequiredFieldsBefore()) {
             validateActivateNext();
         }
     }
@@ -139,7 +141,7 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
                     }).setPositiveButton(R.string.no, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            Log.d(TAG, "No button on dialog in " + JsonFormActivity.class.getCanonicalName());
+                            Timber.d("No button on dialog in %s", JsonFormActivity.class.getCanonicalName());
                         }
                     }).create();
 
@@ -152,7 +154,7 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
 
     public void validateActivateNext() {
         Fragment fragment = getVisibleFragment();
-        if (fragment != null && fragment instanceof BaseOpdFormFragment) {
+        if (fragment instanceof BaseOpdFormFragment) {
             ((BaseOpdFormFragment) fragment).validateActivateNext();
         }
     }

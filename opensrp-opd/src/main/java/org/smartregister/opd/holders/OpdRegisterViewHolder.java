@@ -50,13 +50,13 @@ public class OpdRegisterViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void showPersonLocation() {
-        tvLocation.setVisibility(View.GONE);
-        secondDotDivider.setVisibility(View.GONE);
+        tvLocation.setVisibility(View.VISIBLE);
+        secondDotDivider.setVisibility(View.VISIBLE);
     }
 
     public void removePersonLocation() {
-        tvLocation.setVisibility(View.VISIBLE);
-        secondDotDivider.setVisibility(View.VISIBLE);
+        tvLocation.setVisibility(View.GONE);
+        secondDotDivider.setVisibility(View.GONE);
     }
 
     public void showRegisterType() {

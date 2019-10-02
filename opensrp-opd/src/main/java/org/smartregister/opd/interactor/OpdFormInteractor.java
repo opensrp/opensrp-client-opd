@@ -2,7 +2,6 @@ package org.smartregister.opd.interactor;
 
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.interactors.JsonFormInteractor;
-
 import org.smartregister.opd.widgets.OpdBarcodeFactory;
 import org.smartregister.opd.widgets.OpdEditTextFactory;
 

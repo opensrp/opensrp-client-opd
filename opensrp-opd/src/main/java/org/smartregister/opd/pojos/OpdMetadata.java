@@ -1,13 +1,15 @@
 package org.smartregister.opd.pojos;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import org.smartregister.opd.utils.OpdLocationUtils;
+import org.smartregister.opd.utils.DefaultOpdLocationUtils;
 
 import java.util.ArrayList;
 
 public class OpdMetadata {
-    private String formName;
+
+    private String opdRegistrationFormName;
 
     private String tableName;
 
@@ -27,9 +29,9 @@ public class OpdMetadata {
 
     private ArrayList<String> healthFacilityLevels;
 
-    public OpdMetadata(@NonNull String formName,@NonNull String tableName,@NonNull String registerEventType,@NonNull String updateEventType,
-                       @NonNull String config,@NonNull Class opdFormActivity, Class profileActivity, boolean formWizardValidateRequiredFieldsBefore) {
-        this.formName = formName;
+    public OpdMetadata(@NonNull String opdRegistrationFormName, @NonNull String tableName, @NonNull String registerEventType, @NonNull String updateEventType,
+                       @NonNull String config, @NonNull Class opdFormActivity, @Nullable Class profileActivity, boolean formWizardValidateRequiredFieldsBefore) {
+        this.opdRegistrationFormName = opdRegistrationFormName;
         this.tableName = tableName;
         this.registerEventType = registerEventType;
         this.updateEventType = updateEventType;
@@ -39,12 +41,12 @@ public class OpdMetadata {
         this.formWizardValidateRequiredFieldsBefore = formWizardValidateRequiredFieldsBefore;
     }
 
-    public String getFormName() {
-        return formName;
+    public String getOpdRegistrationFormName() {
+        return opdRegistrationFormName;
     }
 
-    public void setFormName(String formName) {
-        this.formName = formName;
+    public void setOpdRegistrationFormName(String opdRegistrationFormName) {
+        this.opdRegistrationFormName = opdRegistrationFormName;
     }
 
     public String getTableName() {
@@ -103,16 +105,26 @@ public class OpdMetadata {
         this.formWizardValidateRequiredFieldsBefore = formWizardValidateRequiredFieldsBefore;
     }
 
+    @NonNull
     public ArrayList<String> getLocationLevels() {
-        return OpdLocationUtils.getLocationLevels();
+        if (locationLevels == null) {
+            locationLevels = DefaultOpdLocationUtils.getLocationLevels();
+        }
+
+        return locationLevels;
     }
 
     public void setLocationLevels(ArrayList<String> locationLevels) {
         this.locationLevels = locationLevels;
     }
 
+    @NonNull
     public ArrayList<String> getHealthFacilityLevels() {
-        return OpdLocationUtils.getHealthFacilityLevels();
+        if (healthFacilityLevels == null) {
+            healthFacilityLevels = DefaultOpdLocationUtils.getHealthFacilityLevels();
+        }
+
+        return healthFacilityLevels;
     }
 
     public void setHealthFacilityLevels(ArrayList<String> healthFacilityLevels) {

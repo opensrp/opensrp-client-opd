@@ -7,6 +7,7 @@ import org.smartregister.opd.configuration.OpdConfiguration;
 import org.smartregister.repository.Repository;
 import org.smartregister.repository.UniqueIdRepository;
 import org.smartregister.sync.helper.ECSyncHelper;
+import org.smartregister.view.activity.DrishtiApplication;
 
 import id.zelory.compressor.Compressor;
 
@@ -26,7 +27,8 @@ public class OpdLibrary {
     private int applicationVersion;
     private int databaseVersion;
 
-    protected OpdLibrary(@NonNull Context context, @NonNull OpdConfiguration opdConfiguration, @NonNull Repository repository,@NonNull int applicationVersion,@NonNull int databaseVersion) {
+    protected OpdLibrary(@NonNull Context context, @NonNull OpdConfiguration opdConfiguration
+            , @NonNull Repository repository, int applicationVersion, int databaseVersion) {
         this.context = context;
         this.opdConfiguration = opdConfiguration;
         this.repository = repository;
@@ -34,11 +36,11 @@ public class OpdLibrary {
         this.databaseVersion = databaseVersion;
     }
 
-    public static void init(Context context, @NonNull Repository repository, @NonNull OpdConfiguration opdConfiguration,@NonNull int applicationVersion,@NonNull int databaseVersion) {
+    public static void init(Context context, @NonNull Repository repository, @NonNull OpdConfiguration opdConfiguration
+            , int applicationVersion, int databaseVersion) {
         if (instance == null) {
             instance = new OpdLibrary(context, opdConfiguration, repository, applicationVersion, databaseVersion);
         }
-
     }
 
     @NonNull

@@ -98,11 +98,18 @@ public class OpdSampleApplication extends org.smartregister.view.activity.Drisht
         CoreLibrary.init(context, new SampleSyncConfiguration());
 
         //Opd Initialization
-        OpdConfiguration opdConfiguration = new OpdConfiguration.Builder(OpdRegisterQueryProvider.class).build();
-        OpdMetadata opdMetadata = new OpdMetadata(OpdConstants.JSON_FORM_KEY.NAME, OpdDbConstants.KEY.TABLE,
-                OpdConstants.EventType.OPD_REGISTRATION, OpdConstants.EventType.UPDATE_OPD_REGISTRATION,
-                OpdConstants.CONFIG, OpdFormActivity.class,null,true);
-        opdConfiguration.setOpdMetadata(opdMetadata);
+        OpdMetadata opdMetadata = new OpdMetadata(OpdConstants.JSON_FORM_KEY.NAME
+                , OpdDbConstants.KEY.TABLE
+                , OpdConstants.EventType.OPD_REGISTRATION
+                , OpdConstants.EventType.UPDATE_OPD_REGISTRATION
+                , OpdConstants.CONFIG
+                , OpdFormActivity.class
+                ,null
+                ,true);
+        OpdConfiguration opdConfiguration = new OpdConfiguration
+                .Builder(OpdRegisterQueryProvider.class)
+                .setOpdMetadata(opdMetadata)
+                .build();
         OpdLibrary.init(context, getRepository(), opdConfiguration, BuildConfig.VERSION_CODE, BuildConfig.DATABASE_VERSION);
 
         //Auto login by default

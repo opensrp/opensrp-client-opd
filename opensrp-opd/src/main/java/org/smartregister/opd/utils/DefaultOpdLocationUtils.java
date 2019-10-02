@@ -1,12 +1,12 @@
 package org.smartregister.opd.utils;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 
-public class OpdLocationUtils {
+public class DefaultOpdLocationUtils {
 
-    @NotNull
+    @NonNull
     public static ArrayList<String> getLocationLevels() {
         ArrayList<String> allLevels = new ArrayList<>();
         allLevels.add("Country");
@@ -19,7 +19,7 @@ public class OpdLocationUtils {
         return allLevels;
     }
 
-    @NotNull
+    @NonNull
     public static ArrayList<String> getHealthFacilityLevels() {
         ArrayList<String> healthFacilities = new ArrayList<>();
         healthFacilities.add("Country");

@@ -4,14 +4,19 @@ package org.smartregister.opd.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
+import android.view.View;
 
+import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
 import org.smartregister.opd.model.OpdRegisterActivityModel;
 import org.smartregister.view.activity.BaseRegisterActivity;
 import org.smartregister.opd.presenter.BaseOpdRegisterActivityPresenter;
 
 import java.util.List;
+
+import timber.log.Timber;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-13
@@ -26,7 +31,19 @@ public abstract class BaseOpdRegisterActivity extends BaseRegisterActivity imple
 
     @Override
     protected void registerBottomNavigation() {
-        // Do nothing
+        try {
+            View bottomNavGeneralView = findViewById(org.smartregister.R.id.bottom_navigation);
+            if (bottomNavGeneralView instanceof BottomNavigationView) {
+                BottomNavigationView bottomNavigationView = (BottomNavigationView) bottomNavGeneralView;
+                if (!OpdLibrary.getInstance().getOpdConfiguration().isBottomNavigationEnabled()) {
+                    bottomNavigationView.setVisibility(View.GONE);
+                }
+            }
+        } catch (NoSuchFieldError e) {
+            // This error occurs because the ID cannot be found on some client applications because the layout
+            // has been overriden
+            Timber.e(e);
+        }
     }
 
     @Override

@@ -43,6 +43,7 @@ import java.util.UUID;
 import timber.log.Timber;
 
 public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
+
     public static final String METADATA = "metadata";
     public static final String ENCOUNTER_TYPE = "encounter_type";
     public static final int REQUEST_CODE_GET_JSON = 2244;
@@ -54,7 +55,7 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
         String entityId = id;
         form.getJSONObject(METADATA).put(ENCOUNTER_LOCATION, currentLocationId);
 
-        if (OpdUtils.metadata().getFormName().equals(formName)) {
+        if (OpdUtils.metadata().getOpdRegistrationFormName().equals(formName)) {
             if (StringUtils.isBlank(entityId)) {
                 UniqueIdRepository uniqueIdRepo = OpdLibrary.getInstance().getUniqueIdRepository();
                 entityId = uniqueIdRepo.getNextUniqueId() != null ? uniqueIdRepo.getNextUniqueId().getOpenmrsId() : "";

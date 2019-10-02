@@ -26,7 +26,6 @@ public class LookUpTextWatcher implements TextWatcher {
         this.jsonFormFragment = jsonFormFragment;
         this.editText = editText;
         lookUpFields = new HashMap<>();
-
     }
 
     public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -52,21 +51,20 @@ public class LookUpTextWatcher implements TextWatcher {
             return;
         }
 
-        if(lookUpFields.containsKey(key)){
-            if(text.trim().isEmpty()){
+        if (lookUpFields.containsKey(key)) {
+            if (text.trim().isEmpty()) {
                 lookUpFields.remove(key);
                 return;
             }
         }
         lookUpFields.put(key, text);
 
-        Listener<List<CommonPersonObject>> listener = null;
         if (jsonFormFragment instanceof BaseOpdFormFragment) {
             BaseOpdFormFragment OpdFormFragment = (BaseOpdFormFragment) jsonFormFragment;
-            listener = OpdFormFragment.lookUpListener();
-        }
+            Listener<List<CommonPersonObject>> listener = OpdFormFragment.lookUpListener();
 
-        OpdLookUpUtils.lookUp(OpdLibrary.getInstance().context(), lookUpFields, listener);
+            OpdLookUpUtils.lookUp(OpdLibrary.getInstance().context(), lookUpFields, listener);
+        }
 
     }
 

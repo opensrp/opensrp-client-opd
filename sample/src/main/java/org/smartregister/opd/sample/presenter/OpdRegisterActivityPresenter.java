@@ -1,6 +1,7 @@
 package org.smartregister.opd.sample.presenter;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Triple;
@@ -24,39 +25,36 @@ import timber.log.Timber;
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-20
  */
 
-public class OpdRegisterActivityPresenter extends BaseOpdRegisterActivityPresenter implements OpdRegisterActivityContract.Presenter, OpdRegisterActivityContract.InteractorCallBack {
+public class OpdRegisterActivityPresenter extends BaseOpdRegisterActivityPresenter implements OpdRegisterActivityContract.InteractorCallBack {
 
     private WeakReference<OpdRegisterActivityContract.View> viewReference;
     private OpdRegisterActivityContract.Interactor interactor;
     private OpdRegisterActivityContract.Model model;
 
     public OpdRegisterActivityPresenter(OpdRegisterActivityContract.View view, OpdRegisterActivityContract.Model model) {
-        super(view,model);
+        super(view, model);
         viewReference = new WeakReference<>(view);
         interactor = new OpdRegisterActivityInteractor();
         this.model = model;
     }
 
     @Override
-    public void saveForm(@NonNull String jsonString,@NonNull RegisterParams registerParams) {
-        try {
-            if (registerParams.getFormTag() == null) {
-                registerParams.setFormTag(OpdJsonFormUtils.formTag(OpdUtils.getAllSharedPreferences()));
-            }
-            List<OpdEventClient> opdEventClientList = model.processRegistration(jsonString, registerParams.getFormTag());
-            if (opdEventClientList == null || opdEventClientList.isEmpty()) {
-                return;
-            }
-            registerParams.setEditMode(false);
-            interactor.saveRegistration(opdEventClientList, jsonString, registerParams, this);
-
-        } catch (Exception e) {
-            Timber.e(e);
+    public void saveForm(@NonNull String jsonString, @NonNull RegisterParams registerParams) {
+        if (registerParams.getFormTag() == null) {
+            registerParams.setFormTag(OpdJsonFormUtils.formTag(OpdUtils.getAllSharedPreferences()));
         }
+
+        List<OpdEventClient> opdEventClientList = model.processRegistration(jsonString, registerParams.getFormTag());
+        if (opdEventClientList == null || opdEventClientList.isEmpty()) {
+            return;
+        }
+
+        registerParams.setEditMode(false);
+        interactor.saveRegistration(opdEventClientList, jsonString, registerParams, this);
     }
 
     @Override
-    public void startForm(@NonNull String formName,@NonNull String entityId,@NonNull String metaData,@NonNull String locationId) {
+    public void startForm(@NonNull String formName, @NonNull String entityId, @NonNull String metaData, @NonNull String locationId) {
         if (StringUtils.isBlank(entityId)) {
             Triple<String, String, String> triple = Triple.of(formName, metaData, locationId);
             interactor.getNextUniqueId(triple, this);
@@ -71,30 +69,42 @@ public class OpdRegisterActivityPresenter extends BaseOpdRegisterActivityPresent
         } catch (IllegalArgumentException e) {
             Timber.e(e);
         }
-        getView().startFormActivity(form);
+
+        if (getView() != null && form != null) {
+            getView().startFormActivity(form);
+        } else {
+            Timber.e("Could not start FormActivity");
+        }
     }
 
     @Override
     public void onNoUniqueId() {
-        getView().displayShortToast(R.string.no_unique_id);
+        if (getView() != null) {
+            getView().displayShortToast(R.string.no_unique_id);
+        }
     }
 
     @Override
-    public void onUniqueIdFetched(@NonNull Triple<String, String, String> triple,@NonNull String entityId) {
+    public void onUniqueIdFetched(@NonNull Triple<String, String, String> triple, @NonNull String entityId) {
         try {
             startForm(triple.getLeft(), entityId, triple.getMiddle(), triple.getRight());
         } catch (Exception e) {
             Timber.e(e);
-            getView().displayToast(R.string.error_unable_to_start_form);
+            if (getView() != null) {
+                getView().displayToast(R.string.error_unable_to_start_form);
+            }
         }
     }
 
     @Override
     public void onRegistrationSaved(boolean isEdit) {
-        getView().refreshList(FetchStatus.fetched);
-        getView().hideProgressDialog();
+        if (getView() != null) {
+            getView().refreshList(FetchStatus.fetched);
+            getView().hideProgressDialog();
+        }
     }
 
+    @Nullable
     private OpdRegisterActivityContract.View getView() {
         if (viewReference != null) {
             return viewReference.get();
@@ -106,9 +116,11 @@ public class OpdRegisterActivityPresenter extends BaseOpdRegisterActivityPresent
     @Override
     public void saveLanguage(String language) {
         model.saveLanguage(language);
-        getView().displayToast(language + " selected");
-    }
 
+        if (getView() != null) {
+            getView().displayToast(language + " selected");
+        }
+    }
 
     @Override
     public void registerViewConfigurations(List<String> viewIdentifiers) {

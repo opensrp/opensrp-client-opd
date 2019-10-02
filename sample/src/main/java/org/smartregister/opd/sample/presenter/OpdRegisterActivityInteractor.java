@@ -1,6 +1,7 @@
 package org.smartregister.opd.sample.presenter;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Triple;
@@ -29,8 +30,8 @@ import java.util.List;
 import timber.log.Timber;
 
 public class OpdRegisterActivityInteractor extends BaseOpdRegisterActivityInteractor {
-    private AppExecutors appExecutors;
 
+    private AppExecutors appExecutors;
 
     public OpdRegisterActivityInteractor() {
         this(new AppExecutors());
@@ -41,7 +42,7 @@ public class OpdRegisterActivityInteractor extends BaseOpdRegisterActivityIntera
     }
 
     @Override
-    public void getNextUniqueId(final Triple<String, String, String> triple, final OpdRegisterActivityContract.InteractorCallBack callBack) {
+    public void getNextUniqueId(final Triple<String, String, String> triple, @NonNull final OpdRegisterActivityContract.InteractorCallBack callBack) {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -69,7 +70,8 @@ public class OpdRegisterActivityInteractor extends BaseOpdRegisterActivityIntera
     }
 
     @Override
-    public void saveRegistration(final List<OpdEventClient> opdEventClientList, final String jsonString, final RegisterParams registerParams, final OpdRegisterActivityContract.InteractorCallBack callBack) {
+    public void saveRegistration(final List<OpdEventClient> opdEventClientList, final String jsonString
+            , final RegisterParams registerParams, @NonNull final OpdRegisterActivityContract.InteractorCallBack callBack) {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -85,7 +87,6 @@ public class OpdRegisterActivityInteractor extends BaseOpdRegisterActivityIntera
 
         appExecutors.diskIO().execute(runnable);
     }
-
 
     private void saveRegistration(@NonNull List<OpdEventClient> opdEventClients,@NonNull String jsonString,
                                   @NonNull RegisterParams params) {
@@ -129,7 +130,7 @@ public class OpdRegisterActivityInteractor extends BaseOpdRegisterActivityIntera
         }
     }
     private void addImageLocation(String jsonString, int i, Client baseClient, Event baseEvent) {
-        if (baseClient != null || baseEvent != null) {
+        if (baseClient != null && baseEvent != null) {
             String imageLocation = null;
             if (i == 0) {
                 imageLocation = OpdJsonFormUtils.getFieldValue(jsonString, OpdConstants.KEY.PHOTO);
@@ -144,7 +145,7 @@ public class OpdRegisterActivityInteractor extends BaseOpdRegisterActivityIntera
         }
     }
 
-    private void updateOpenSRPId(String jsonString, RegisterParams params, Client baseClient) {
+    private void updateOpenSRPId(@NonNull String jsonString, @NonNull RegisterParams params, @Nullable Client baseClient) {
         if (params.isEditMode()) {
             // Unassign current OPENSRP ID
             if (baseClient != null) {
@@ -170,7 +171,7 @@ public class OpdRegisterActivityInteractor extends BaseOpdRegisterActivityIntera
         }
     }
 
-    private void addEvent(RegisterParams params, List<String> currentFormSubmissionIds, Event baseEvent) throws JSONException {
+    private void addEvent(RegisterParams params, List<String> currentFormSubmissionIds, @Nullable Event baseEvent) throws JSONException {
         if (baseEvent != null) {
             JSONObject eventJson = new JSONObject(OpdJsonFormUtils.gson.toJson(baseEvent));
             getSyncHelper().addEvent(baseEvent.getBaseEntityId(), eventJson, params.getStatus());
