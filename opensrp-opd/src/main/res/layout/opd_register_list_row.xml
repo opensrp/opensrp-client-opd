@@ -22,7 +22,7 @@
         android:layout_toLeftOf="@+id/ll_opdRegisterListRow_clientActionWrapper"
         android:orientation="vertical">
 
-        <org.smartregister.view.customcontrols.CustomFontTextView
+        <android.support.v7.widget.AppCompatTextView
             android:id="@+id/tv_opdRegisterListRow_parentName"
             style="@style/CustomFontTextViewStyle.ClientList"
             android:layout_width="wrap_content"
