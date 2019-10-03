@@ -5,7 +5,9 @@ package org.smartregister.opd.utils;
  */
 
 public interface OpdDbConstants {
-    
+
+    String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
     interface KEY {
 
         String MOTHER_FIRST_NAME = "mother_first_name";
@@ -26,5 +28,42 @@ public interface OpdDbConstants {
         String BASE_ENTITY_ID = "base_entity_id";
         String LAST_INTERACTED_WITH = "last_interacted_with";
         String DATE_REMOVED = "date_removed";
+
+        String REGISTER_ID = "register_id";
+    }
+
+    interface Table {
+
+        String CHECK_IN = "check_in";
+        String VISIT = "visit";
+    }
+
+    interface Column {
+
+        interface CheckIn {
+            String ID = "_id";
+            String EVENT_ID = "event_id";
+            String VISIT_ID = "visit_id";
+            String BASE_ENTITY_ID = "base_entity_id";
+            String PREGNANCY_STATUS = "pregnancy_status";
+            String HAS_HIV_TEST_PREVIOUSLY = "has_hiv_test_previously";
+            String HIV_RESULTS_PREVIOUSLY = "hiv_results_previously";
+            String IS_TAKING_ART = "is_taking_art";
+            String CURRENT_HIV_RESULT = "current_hiv_result";
+            String VISIT_TYPE = "visit_type";
+            String APPOINTMENT_SCHEDULED_PREVIOUSLY = "appointment_scheduled_previously";
+            String APPOINTMENT_DUE_DATE = "appointment_due_date";
+            String CREATED_AT = "created_at";
+            String UPDATED_AT = "updated_at";
+        }
+
+        interface Visit {
+            String ID = "_id";
+            String VISIT_DATE = "visit_date";
+            String PROVIDER_ID = "provider_id";
+            String LOCATION_ID = "location_id";
+            String BASE_ENTITY_ID = "base_entity_id";
+            String CREATED_AT = "created_at";
+        }
     }
 }
