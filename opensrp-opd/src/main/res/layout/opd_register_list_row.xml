@@ -34,6 +34,7 @@
             android:text="CG:Parent Name, Age"
             android:textColor="@color/text_black"
             android:visibility="gone"
+            android:textStyle="bold"
             android:textSize="@dimen/child_register_title_size" />
 
         <org.smartregister.view.customcontrols.CustomFontTextView
@@ -54,7 +55,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
-            <org.smartregister.view.customcontrols.CustomFontTextView
+            <android.support.v7.widget.AppCompatTextView
                 android:id="@+id/tv_opdRegisterListRow_registerType"
                 style="@style/CustomFontTextViewStyle.ClientList.Light"
                 android:layout_width="wrap_content"
@@ -68,6 +69,7 @@
                 android:text="Child"
                 android:textColor="@color/text_blue"
                 android:textSize="@dimen/child_register_list_desc_size"
+                android:paddingRight="10dp"
                 android:textStyle="bold" />
 
             <TextView
@@ -79,7 +81,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintBaseline_toBaselineOf="@+id/tv_opdRegisterListRow_registerType"
-                android:layout_marginLeft="10dp"
+                android:paddingRight="10dp"
                 android:text="\u2022" />
 
             <org.smartregister.view.customcontrols.CustomFontTextView
@@ -91,7 +93,7 @@
                 app:layout_constraintLeft_toRightOf="@id/tv_opdRegisterListRow_firstDotDivider"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_marginLeft="10dp"
+                android:paddingRight="10dp"
                 android:paddingLeft="0dp"
                 android:paddingTop="7dp"
                 android:text="Male"
@@ -107,7 +109,7 @@
                 app:layout_constraintLeft_toRightOf="@id/tv_opdRegisterListRow_gender"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_marginLeft="10dp"
+                android:paddingRight="10dp"
                 app:layout_constraintBaseline_toBaselineOf="@+id/tv_opdRegisterListRow_registerType"
                 android:text="\u2022" />
 
@@ -119,7 +121,6 @@
                 app:layout_constraintLeft_toRightOf="@id/tv_opdRegisterListRow_secondDotDivider"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_marginLeft="10dp"
                 android:layout_gravity="left|center_horizontal"
                 android:paddingLeft="0dp"
                 android:paddingTop="7dp"
