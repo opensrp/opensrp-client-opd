@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
-import org.smartregister.AllConstants;
 import org.smartregister.Context;
 import org.smartregister.commonregistry.CommonPersonObject;
 import org.smartregister.commonregistry.CommonRepository;
@@ -84,10 +83,10 @@ public class OpdLookUpUtils {
         return results;
     }
 
-    private static String lookUpQuery(@NonNull Map<String, String> entityMap, @NonNull String tableName) {
+    protected static String lookUpQuery(@NonNull Map<String, String> entityMap, @NonNull String tableName) {
         SmartRegisterQueryBuilder queryBUilder = new SmartRegisterQueryBuilder();
         queryBUilder.SelectInitiateMainTable(tableName,
-                new String[]{OpdDbConstants.Table.Client.RELATIONALID, OpdDbConstants.Table.Client.OPENSRP_ID ,
+                new String[]{OpdDbConstants.Table.Client.RELATIONALID, OpdDbConstants.Table.Client.OPENSRP_ID,
                         OpdDbConstants.Table.Client.FIRST_NAME, OpdDbConstants.Table.Client.LAST_NAME,
                         OpdDbConstants.Table.Client.GENDER, OpdDbConstants.Table.Client.DOB,
                         OpdDbConstants.Table.Client.BASE_ENTITY_ID, OpdDbConstants.Table.Client.NATIONAL_ID}
@@ -97,7 +96,7 @@ public class OpdLookUpUtils {
         return queryBUilder.Endquery(query);
     }
 
-    private static String getMainConditionString(@NonNull Map<String, String> entityMap) {
+    protected static String getMainConditionString(@NonNull Map<String, String> entityMap) {
         String mainConditionString = "";
         for (Map.Entry<String, String> entry : entityMap.entrySet()) {
             String key = entry.getKey();

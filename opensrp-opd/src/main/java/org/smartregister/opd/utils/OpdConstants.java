@@ -14,10 +14,11 @@ public class OpdConstants extends AllConstants {
         public static final String DOB = "dob";
         public static final String DOB_UNKNOWN = "dob_unknown";
 
-        public static final String AGE_ENTERED = "age_entered" ;
+        public static final String AGE_ENTERED = "age_entered";
         public static final String DOB_ENTERED = "dob_entered";
         public static final String ADDRESS_WIDGET_KEY = "home_address";
         public static final String NAME = "opd_registration";
+        public static final String REMINDERS = "reminders";
     }
 
     public static class JSON_FORM_EXTRA {
