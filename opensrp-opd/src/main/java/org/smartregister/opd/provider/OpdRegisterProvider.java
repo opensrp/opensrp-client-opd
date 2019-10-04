@@ -138,7 +138,7 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
         View view = inflater.inflate(resId, parent, false);
 
         if (opdRegisterRowOptions != null && opdRegisterRowOptions.isCustomViewHolder()) {
-            return opdRegisterRowOptions.createCustomViewHolder(parent);
+            return opdRegisterRowOptions.createCustomViewHolder(view);
         } else {
             return new OpdRegisterViewHolder(view);
         }
