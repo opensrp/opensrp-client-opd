@@ -71,6 +71,12 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
         }
     }
 
+    public static void fillValue(@Nullable TextView v, @NonNull String value) {
+        if (v != null) {
+            v.setText(value);
+        }
+    }
+
     @Override
     public void getView(Cursor cursor, SmartRegisterClient client, OpdRegisterViewHolder viewHolder) {
         CommonPersonObjectClient pc = (CommonPersonObjectClient) client;
@@ -186,12 +192,6 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
 
         setAddressAndGender(commonPersonObjectClient, viewHolder);
         addButtonClickListeners(commonPersonObjectClient, viewHolder);
-    }
-
-    public static void fillValue(@Nullable TextView v, @NonNull String value) {
-        if (v != null) {
-            v.setText(value);
-        }
     }
 
     public void setAddressAndGender(CommonPersonObjectClient pc, OpdRegisterViewHolder viewHolder) {
