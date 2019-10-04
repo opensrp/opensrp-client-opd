@@ -12,15 +12,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.apache.commons.lang3.text.WordUtils;
+import org.smartregister.commonregistry.CommonPersonObjectClient;
+import org.smartregister.cursoradapter.RecyclerViewProvider;
 import org.smartregister.opd.OpdLibrary;
+import org.smartregister.opd.R;
 import org.smartregister.opd.configuration.OpdRegisterProviderMetadata;
 import org.smartregister.opd.configuration.OpdRegisterRowOptions;
 import org.smartregister.opd.holders.FooterViewHolder;
-import org.smartregister.opd.utils.ConfigurationInstancesHelper;
-import org.smartregister.commonregistry.CommonPersonObjectClient;
-import org.smartregister.cursoradapter.RecyclerViewProvider;
-import org.smartregister.opd.R;
 import org.smartregister.opd.holders.OpdRegisterViewHolder;
+import org.smartregister.opd.utils.ConfigurationInstancesHelper;
 import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.opd.utils.OpdViewConstants;
 import org.smartregister.util.Utils;
@@ -132,7 +132,7 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
         View view = inflater.inflate(resId, parent, false);
 
         if (opdRegisterRowOptions != null && opdRegisterRowOptions.isCustomViewHolder()) {
-            return opdRegisterRowOptions.createCustomViewHolder(parent);
+            return opdRegisterRowOptions.createCustomViewHolder(view);
         } else {
             return new OpdRegisterViewHolder(view);
         }
