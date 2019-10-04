@@ -124,7 +124,7 @@ public class OpdRegisterProviderTest extends BaseTest {
 
         opdRegisterProvider.createViewHolder(Mockito.mock(ViewGroup.class));
 
-        Mockito.verify(rowOptions, Mockito.times(1)).createCustomViewHolder(Mockito.any(ViewGroup.class));
+        Mockito.verify(rowOptions, Mockito.times(1)).createCustomViewHolder(Mockito.any(View.class));
     }
 
     @Test
