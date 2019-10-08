@@ -50,6 +50,7 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
     public static final String STEP2 = "step2";
     public static final String CURRENT_OPENSRP_ID = "current_opensrp_id";
     public static final String OPENSRP_ID = "OPENSRP_ID";
+    public static final String ZEIR_ID = "ZEIR_ID";
 
     public static JSONObject getFormAsJson(@NonNull JSONObject form, @NonNull  String formName, @NonNull  String id, @NonNull  String currentLocationId) throws JSONException {
         String entityId = id;
@@ -211,30 +212,11 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
         String providerId = allSharedPreferences.fetchRegisteredANM();
         event.setProviderId(providerId);
         event.setLocationId(locationId(allSharedPreferences));
-
-        String LocationId = getLocationId(event.getLocationId(), allSharedPreferences);
-        event.setLocationId(LocationId);
-
         event.setTeam(allSharedPreferences.fetchDefaultTeam(providerId));
         event.setTeamId(allSharedPreferences.fetchDefaultTeamId(providerId));
-
         event.setClientDatabaseVersion(OpdLibrary.getInstance().getDatabaseVersion());
         event.setClientApplicationVersion(OpdLibrary.getInstance().getApplicationVersion());
         return event;
-    }
-
-    @Nullable
-    public static String getLocationId(@NonNull String defaultLocationId, @NonNull AllSharedPreferences allSharedPreferences) {
-        String currentLocality = allSharedPreferences.fetchCurrentLocality();
-
-        if (currentLocality != null) {
-            String currentLocalityId = LocationHelper.getInstance().getOpenMrsLocationId(currentLocality);
-            if (currentLocalityId != null && !defaultLocationId.equals(currentLocalityId)) {
-                return currentLocalityId;
-            }
-        }
-
-        return null;
     }
 
     public static String locationId(@NonNull AllSharedPreferences allSharedPreferences) {
