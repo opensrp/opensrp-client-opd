@@ -212,11 +212,30 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
         String providerId = allSharedPreferences.fetchRegisteredANM();
         event.setProviderId(providerId);
         event.setLocationId(locationId(allSharedPreferences));
+
+        String childLocationId = getLocationId(event.getLocationId(), allSharedPreferences);
+        event.setChildLocationId(childLocationId);
+
         event.setTeam(allSharedPreferences.fetchDefaultTeam(providerId));
         event.setTeamId(allSharedPreferences.fetchDefaultTeamId(providerId));
+
         event.setClientDatabaseVersion(OpdLibrary.getInstance().getDatabaseVersion());
         event.setClientApplicationVersion(OpdLibrary.getInstance().getApplicationVersion());
         return event;
+    }
+
+    @Nullable
+    public static String getLocationId(@NonNull String defaultLocationId, @NonNull AllSharedPreferences allSharedPreferences) {
+        String currentLocality = allSharedPreferences.fetchCurrentLocality();
+
+        if (currentLocality != null) {
+            String currentLocalityId = LocationHelper.getInstance().getOpenMrsLocationId(currentLocality);
+            if (currentLocalityId != null && !defaultLocationId.equals(currentLocalityId)) {
+                return currentLocalityId;
+            }
+        }
+
+        return null;
     }
 
     public static String locationId(@NonNull AllSharedPreferences allSharedPreferences) {
