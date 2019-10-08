@@ -50,6 +50,7 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
     public static final String STEP2 = "step2";
     public static final String CURRENT_OPENSRP_ID = "current_opensrp_id";
     public static final String OPENSRP_ID = "OPENSRP_ID";
+    public static final String ZEIR_ID = "zeir_id";
 
     public static JSONObject getFormAsJson(@NonNull JSONObject form, @NonNull String formName, @NonNull String id, @NonNull String currentLocationId) throws JSONException {
         String entityId = id;
@@ -229,7 +230,7 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
 
         if (currentLocality != null) {
             String currentLocalityId = LocationHelper.getInstance().getOpenMrsLocationId(currentLocality);
-            if (currentLocalityId != null && !defaultLocationId.equals(currentLocalityId)) {
+            if (currentLocalityId != null && defaultLocationId.equals(currentLocalityId)) {
                 return currentLocalityId;
             }
         }
@@ -474,13 +475,9 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
             }
 
             processGender(fields);
-
             processLocationFields(fields);
-
             lastInteractedWith(fields);
-
             dobUnknownUpdateFromAge(fields);
-
             processReminder(fields);
 
             Client baseClient = org.smartregister.util.JsonFormUtils.createBaseClient(fields, formTag, entityId);
