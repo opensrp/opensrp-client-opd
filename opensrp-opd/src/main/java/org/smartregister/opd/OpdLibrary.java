@@ -13,7 +13,6 @@ import org.smartregister.opd.utils.FilePath;
 import org.smartregister.repository.Repository;
 import org.smartregister.repository.UniqueIdRepository;
 import org.smartregister.sync.helper.ECSyncHelper;
-import org.smartregister.view.activity.DrishtiApplication;
 
 import id.zelory.compressor.Compressor;
 import org.yaml.snakeyaml.TypeDescription;
