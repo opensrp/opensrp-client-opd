@@ -13,11 +13,28 @@ public class OpdConstants extends AllConstants {
         public static final String LAST_INTERACTED_WITH = "last_interacted_with";
         public static final String DOB = "dob";
         public static final String DOB_UNKNOWN = "dob_unknown";
-
         public static final String AGE_ENTERED = "age_entered" ;
         public static final String DOB_ENTERED = "dob_entered";
         public static final String ADDRESS_WIDGET_KEY = "home_address";
+        public static final String FIRST_NAME = "first_name";
+        public static final String LAST_NAME = "last_name";
+        public static final String BHT_ID = "bht_id";
+        public static final String PHONE_NUMBER = "phone_number";
+        public static final String REMINDERS = "reminders";
+        public static final String NATIONAL_ID = "national_id";
+        public static final String HOME_ADDRESS = "home_address";
+        public static final String AGE_CALCULATED = "age_calculated";
+        public static final String GENDER = "gender";
         public static final String NAME = "opd_registration";
+        public static final String ENCOUNTER_TYPE = "encounter_type";
+        public static final String ENTITY_ID = "entity_id";
+        public static final String ENCOUNTER = "encounter";
+        public static final String ENCOUNTER_LOCATION = "encounter_location";
+        public static final String UNIQUE_ID = "unique_id";
+        public static final String AGE = "age";
+        public static final String OPD_EDIT_FORM_TITLE = "Update Opd Registration";
+        public static final String FORM_TITLE = "title";
+        public static final String OPENSRP_ID = "opensrp_id";
     }
 
     public static class JSON_FORM_EXTRA {
@@ -41,6 +58,8 @@ public class OpdConstants extends AllConstants {
         public static final String DOB = "dob";//Date Of Birth
         public static final String OPENSRP_ID = "opensrp_id";
         public static final String RELATIONALID = "relationalid";
+        public static final String ZEIR_ID = "zeir_id";
+        public static final String ID = "id";
     }
 
     public static class ENTITY {
@@ -65,5 +84,11 @@ public class OpdConstants extends AllConstants {
         String CLIENT_MAP = "client_map";
         String CLIENT_OBJECT = "common_person_object_client";
         String CONTACT_NO = "contact_number";
+    }
+
+    public interface FormValue {
+        String IS_DOB_UNKNOWN = "isDobUnknown";
+        String IS_ENROLLED_IN_MESSAGES = "isEnrolledInSmsMessages";
+        String OTHER = "other";
     }
 }

@@ -12,19 +12,11 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
-import org.smartregister.CoreLibrary;
 import org.smartregister.opd.R;
 import org.smartregister.opd.contract.OpdProfileActivityContract;
-import org.smartregister.opd.tasks.FetchProfileDataTask;
-import org.smartregister.opd.utils.OpdConstants;
-import org.smartregister.repository.AllSharedPreferences;
-import org.smartregister.view.activity.DrishtiApplication;
 import org.smartregister.view.activity.SecuredActivity;
 
 /**
