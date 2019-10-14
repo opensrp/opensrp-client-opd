@@ -10,7 +10,6 @@ import net.sqlcipher.database.SQLiteDatabase;
 
 import org.apache.commons.lang3.StringUtils;
 import org.smartregister.opd.dao.CheckInDao;
-import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.repository.BaseRepository;
 import org.smartregister.repository.Repository;

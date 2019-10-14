@@ -1,6 +1,7 @@
 package org.smartregister.opd.fragment;
 
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,11 +30,13 @@ import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.event.Listener;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
+import org.smartregister.opd.activity.BaseOpdFormActivity;
 import org.smartregister.opd.adapter.ClientLookUpListAdapter;
 import org.smartregister.opd.pojos.OpdMetadata;
 import org.smartregister.opd.presenter.OpdFormFragmentPresenter;
 import org.smartregister.opd.utils.OpdConstants;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class BaseOpdFormFragment extends JsonFormFragment implements ClientLookUpListAdapter.ClickListener {
@@ -230,5 +233,29 @@ public class BaseOpdFormFragment extends JsonFormFragment implements ClientLookU
         Intent intent = new Intent(getActivity(), null);
         intent.putExtra(OpdConstants.CLIENT_TYPE, client);
         startActivity(intent);
+    }
+
+    @Override
+    public void finishWithResult(Intent returnIntent) {
+        Activity activity = getActivity();
+
+        if (activity instanceof BaseOpdFormActivity) {
+            BaseOpdFormActivity opdFormActivity = (BaseOpdFormActivity) activity;
+
+            HashMap<String, String> parcelableData = opdFormActivity.getParcelableData();
+
+            for (String key: parcelableData.keySet()) {
+                String value = parcelableData.get(key);
+
+                if (value != null) {
+                    returnIntent.putExtra(key, value);
+                }
+            }
+        }
+
+        if (activity != null) {
+            activity.setResult(Activity.RESULT_OK, returnIntent);
+            activity.finish();
+        }
     }
 }
