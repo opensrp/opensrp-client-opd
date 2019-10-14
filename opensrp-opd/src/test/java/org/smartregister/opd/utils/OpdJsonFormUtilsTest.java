@@ -11,6 +11,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -19,6 +20,7 @@ import org.smartregister.Context;
 import org.smartregister.CoreLibrary;
 import org.smartregister.SyncConfiguration;
 import org.smartregister.clientandeventmodel.Event;
+import org.smartregister.domain.tag.FormTag;
 import org.smartregister.location.helper.LocationHelper;
 import org.smartregister.opd.BuildConfig;
 import org.smartregister.opd.OpdLibrary;
@@ -376,5 +378,51 @@ public class OpdJsonFormUtilsTest {
         jsonObject.put(step, jsonObjectWithFields);
         JSONArray jsonArray = OpdJsonFormUtils.fields(jsonObject, step);
         Assert.assertNotNull(jsonArray);
+    }
+
+    @Test
+    public void testFormTagShouldReturnValidFormTagObject() {
+        OpdLibrary.init(PowerMockito.mock(Context.class), PowerMockito.mock(Repository.class), Mockito.mock(OpdConfiguration.class),
+                BuildConfig.VERSION_CODE, 1);
+        AllSharedPreferences allSharedPreferences = Mockito.mock(AllSharedPreferences.class);
+        Mockito.when(allSharedPreferences.fetchRegisteredANM()).thenReturn("1");
+        FormTag formTag = OpdJsonFormUtils.formTag(allSharedPreferences);
+        Assert.assertTrue((BuildConfig.VERSION_CODE == formTag.appVersion));
+        Assert.assertTrue((formTag.databaseVersion == 1));
+        Assert.assertEquals("1", formTag.providerId);
+    }
+
+    @Test
+    public void testGetFieldValueShouldReturnNullWithInvalidJsonString() {
+        Assert.assertNull(OpdJsonFormUtils.getFieldValue("", "", ""));
+    }
+
+    @Test
+    public void testGetFieldValueShouldReturnNullWithValidJsonStringWithoutStepKey() throws JSONException {
+        JSONObject jsonForm = new JSONObject();
+        JSONObject jsonStep = new JSONObject();
+        jsonStep.put(OpdJsonFormUtils.FIELDS, new JSONArray());
+        Assert.assertNull(OpdJsonFormUtils.getFieldValue(jsonForm.toString(), OpdJsonFormUtils.STEP1, ""));
+
+    }
+
+    @Test
+    public void testGetFieldValueShouldReturnPassedValue() throws JSONException {
+        JSONObject jsonForm = new JSONObject();
+        JSONObject jsonStep = new JSONObject();
+        JSONArray jsonArrayFields = new JSONArray();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(OpdJsonFormUtils.KEY, OpdConstants.JSON_FORM_KEY.REMINDERS);
+        jsonObject.put(OpdJsonFormUtils.VALUE, "some reminder");
+        jsonArrayFields.put(jsonObject);
+        jsonStep.put(OpdJsonFormUtils.FIELDS, jsonArrayFields);
+        jsonForm.put(OpdJsonFormUtils.STEP1, jsonStep);
+
+        Assert.assertEquals("some reminder", OpdJsonFormUtils.getFieldValue(jsonForm.toString(), OpdJsonFormUtils.STEP1, OpdConstants.JSON_FORM_KEY.REMINDERS));
+    }
+
+    @Test
+    public void testProcessOpdDetailsFormShouldReturnNullJsonFormNull() {
+        Assert.assertNull(OpdJsonFormUtils.processOpdDetailsForm("", Mockito.mock(FormTag.class)));
     }
 }

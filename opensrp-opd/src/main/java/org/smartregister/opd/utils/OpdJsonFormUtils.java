@@ -28,6 +28,7 @@ import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.repository.ImageRepository;
 import org.smartregister.repository.UniqueIdRepository;
 import org.smartregister.util.AssetHandler;
+import org.smartregister.util.JsonFormUtils;
 import org.smartregister.view.activity.DrishtiApplication;
 
 import java.io.File;
@@ -248,10 +249,11 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
     }
 
     protected static Triple<Boolean, JSONObject, JSONArray> validateParameters(@NonNull String jsonString) {
-
         JSONObject jsonForm = toJSONObject(jsonString);
-        JSONArray fields = fields(jsonForm);
-
+        JSONArray fields = null;
+        if(jsonForm != null){
+            fields = fields(jsonForm);
+        }
         return Triple.of(jsonForm != null && fields != null, jsonForm, fields);
     }
 
@@ -482,13 +484,12 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
 
             processReminder(fields);
 
-            Client baseClient = org.smartregister.util.JsonFormUtils.createBaseClient(fields, formTag, entityId);
+            Client baseClient = JsonFormUtils.createBaseClient(fields, formTag, entityId);
 
-            Event baseEvent = org.smartregister.util.JsonFormUtils
-                    .createEvent(fields, getJSONObject(jsonForm, METADATA), formTag, entityId,
-                            OpdUtils.metadata().getRegisterEventType(), OpdUtils.metadata().getTableName());
+            Event baseEvent = JsonFormUtils.createEvent(fields, getJSONObject(jsonForm, METADATA),
+                    formTag, entityId, OpdUtils.metadata().getRegisterEventType(), OpdUtils.metadata().getTableName());
 
-            OpdJsonFormUtils.tagSyncMetadata(baseEvent);// tag docs
+            tagSyncMetadata(baseEvent);
 
             return new OpdEventClient(baseClient, baseEvent);
         } catch (JSONException e) {
@@ -506,11 +507,13 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
     private static void processReminder(@NonNull JSONArray fields) {
         try {
             JSONObject reminderObject = getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.REMINDERS);
-            JSONArray options = getJSONArray(reminderObject, OpdConstants.JSON_FORM_KEY.OPTIONS);
-            JSONObject option = getJSONObject(options, 0);
-            String value = option.optString(JsonFormConstants.VALUE);
-            int result = value.equals(Boolean.toString(false)) ? 0 : 1;
-            reminderObject.put(OpdConstants.KEY.VALUE, result);
+            if(reminderObject != null) {
+                JSONArray options = getJSONArray(reminderObject, OpdConstants.JSON_FORM_KEY.OPTIONS);
+                JSONObject option = getJSONObject(options, 0);
+                String value = option.optString(JsonFormConstants.VALUE);
+                int result = value.equals(Boolean.toString(false)) ? 0 : 1;
+                reminderObject.put(OpdConstants.KEY.VALUE, result);
+            }
         } catch (JSONException e) {
             Timber.e(e, "OpdJsonFormUtils --> processReminder");
         }
