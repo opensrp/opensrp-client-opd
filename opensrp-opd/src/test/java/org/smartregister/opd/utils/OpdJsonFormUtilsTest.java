@@ -36,7 +36,7 @@ import java.util.ArrayList;
 public class OpdJsonFormUtilsTest {
 
     @Rule
-    ExpectedException expectedException = ExpectedException.none();
+    private ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void testGetFormAsJsonWithEmptyJsonObject() throws JSONException {
