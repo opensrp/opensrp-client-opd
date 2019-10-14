@@ -7,7 +7,6 @@ import org.smartregister.opd.configuration.OpdConfiguration;
 import org.smartregister.repository.Repository;
 import org.smartregister.repository.UniqueIdRepository;
 import org.smartregister.sync.helper.ECSyncHelper;
-import org.smartregister.view.activity.DrishtiApplication;
 
 import id.zelory.compressor.Compressor;
 

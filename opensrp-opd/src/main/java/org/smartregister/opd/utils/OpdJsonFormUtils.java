@@ -282,8 +282,6 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
             genderObject.put(OpdConstants.KEY.VALUE, genderValue);
         } catch (JSONException e) {
             Timber.e(e, "OpdJsonFormUtils --> processGender");
-        } catch (NullPointerException e) {
-            Timber.e(e, "OpdJsonFormUtils --> processGender");
         }
     }
 
@@ -315,8 +313,6 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
             fields.put(lastInteractedWith);
         } catch (JSONException e) {
             Timber.e(e, "OpdJsonFormUtils --> lastInteractedWith");
-        } catch (NullPointerException e) {
-            Timber.e(e, "OpdJsonFormUtils --> lastInteractedWith Fields is Null");
         }
     }
 
@@ -475,9 +471,13 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
             }
 
             processGender(fields);
+
             processLocationFields(fields);
+
             lastInteractedWith(fields);
+
             dobUnknownUpdateFromAge(fields);
+
             processReminder(fields);
 
             Client baseClient = org.smartregister.util.JsonFormUtils.createBaseClient(fields, formTag, entityId);
