@@ -7,9 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
@@ -36,29 +34,6 @@ import java.util.ArrayList;
 @PrepareForTest(OpdUtils.class)
 @RunWith(PowerMockRunner.class)
 public class OpdJsonFormUtilsTest {
-
-    @Rule
-    private ExpectedException expectedException = ExpectedException.none();
-
-    @Test
-    public void testGetFormAsJsonWithEmptyJsonObject() throws JSONException {
-        OpdMetadata opdMetadata = new OpdMetadata(OpdConstants.JSON_FORM_KEY.NAME
-                , OpdDbConstants.KEY.TABLE
-                , OpdConstants.EventType.OPD_REGISTRATION
-                , OpdConstants.EventType.UPDATE_OPD_REGISTRATION
-                , OpdConstants.CONFIG
-                , Class.class
-                , Class.class
-                , true);
-        OpdConfiguration opdConfiguration = new OpdConfiguration
-                .Builder(OpdRegisterQueryProviderTest.class)
-                .setOpdMetadata(opdMetadata)
-                .build();
-        OpdLibrary.init(PowerMockito.mock(Context.class), PowerMockito.mock(Repository.class), opdConfiguration,
-                BuildConfig.VERSION_CODE, 1);
-        expectedException.expect(JSONException.class);
-        OpdJsonFormUtils.getFormAsJson(new JSONObject(), OpdConstants.EventType.OPD_REGISTRATION, "", "");
-    }
 
     @Test
     public void testGetFormAsJsonWithNonEmptyJsonObjectAndEntityIdBlank() throws JSONException {
