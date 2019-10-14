@@ -283,12 +283,6 @@ public class OpdJsonFormUtilsTest {
     }
 
     @Test
-    public void testLastInteractedWithNullJsonArrayFields() {
-        JSONArray jsonArray = null;
-        OpdJsonFormUtils.lastInteractedWith(jsonArray);
-    }
-
-    @Test
     public void testDobUnknownUpdateFromAge() throws JSONException {
         JSONArray jsonArrayFields = new JSONArray();
 

@@ -257,10 +257,12 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
 
     protected static void processGender(@NonNull JSONArray fields) {
         try {
-
             JSONObject genderObject = getFieldJSONObject(fields, OpdConstants.SEX);
+            if (genderObject == null) {
+                Timber.e("JsonArray fields is empty or null");
+                return;
+            }
             String genderValue = "";
-
             String rawGender = genderObject.getString(JsonFormConstants.VALUE);
             char rawGenderChar = !TextUtils.isEmpty(rawGender) ? rawGender.charAt(0) : ' ';
             switch (rawGenderChar) {
