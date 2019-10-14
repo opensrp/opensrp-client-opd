@@ -19,11 +19,11 @@ import org.smartregister.Context;
 import org.smartregister.CoreLibrary;
 import org.smartregister.SyncConfiguration;
 import org.smartregister.clientandeventmodel.Event;
-import org.smartregister.domain.tag.FormTag;
 import org.smartregister.location.helper.LocationHelper;
 import org.smartregister.opd.BuildConfig;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.configuration.OpdConfiguration;
+import org.smartregister.opd.configuration.OpdRegisterQueryProviderTest;
 import org.smartregister.opd.pojos.OpdMetadata;
 import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.repository.Repository;
@@ -31,7 +31,7 @@ import org.smartregister.util.JsonFormUtils;
 
 import java.util.ArrayList;
 
-@PrepareForTest({OpdJsonFormUtils.class, OpdUtils.class})
+@PrepareForTest(OpdUtils.class)
 @RunWith(PowerMockRunner.class)
 public class OpdJsonFormUtilsTest {
 
@@ -46,10 +46,10 @@ public class OpdJsonFormUtilsTest {
                 , OpdConstants.EventType.UPDATE_OPD_REGISTRATION
                 , OpdConstants.CONFIG
                 , Class.class
-                , null
+                , Class.class
                 , true);
         OpdConfiguration opdConfiguration = new OpdConfiguration
-                .Builder(null)
+                .Builder(OpdRegisterQueryProviderTest.class)
                 .setOpdMetadata(opdMetadata)
                 .build();
         OpdLibrary.init(PowerMockito.mock(Context.class), PowerMockito.mock(Repository.class), opdConfiguration,
@@ -66,10 +66,10 @@ public class OpdJsonFormUtilsTest {
                 , OpdConstants.EventType.UPDATE_OPD_REGISTRATION
                 , OpdConstants.CONFIG
                 , Class.class
-                , null
+                , Class.class
                 , true);
         OpdConfiguration opdConfiguration = new OpdConfiguration
-                .Builder(null)
+                .Builder(OpdRegisterQueryProviderTest.class)
                 .setOpdMetadata(opdMetadata)
                 .build();
         OpdLibrary.init(PowerMockito.mock(Context.class), PowerMockito.mock(Repository.class), opdConfiguration,
@@ -88,10 +88,10 @@ public class OpdJsonFormUtilsTest {
                 , OpdConstants.EventType.UPDATE_OPD_REGISTRATION
                 , OpdConstants.CONFIG
                 , Class.class
-                , null
+                , Class.class
                 , true);
         OpdConfiguration opdConfiguration = new OpdConfiguration
-                .Builder(null)
+                .Builder(OpdRegisterQueryProviderTest.class)
                 .setOpdMetadata(opdMetadata)
                 .build();
         OpdLibrary.init(PowerMockito.mock(Context.class), PowerMockito.mock(Repository.class), opdConfiguration,
@@ -118,6 +118,7 @@ public class OpdJsonFormUtilsTest {
     public void testAddLocationTreeWithEmptyJsonObject() throws Exception {
         JSONObject jsonObject = new JSONObject();
         Whitebox.invokeMethod(OpdJsonFormUtils.class, "addLocationTree", "", jsonObject, "");
+        Assert.assertFalse(jsonObject.has("tree"));
     }
 
     @Test
@@ -126,12 +127,14 @@ public class OpdJsonFormUtilsTest {
         jsonObject.put(OpdJsonFormUtils.KEY, "");
         JSONArray jsonArray = new JSONArray();
         Whitebox.invokeMethod(OpdJsonFormUtils.class, "addLocationTree", "", jsonObject, jsonArray.toString());
+        Assert.assertTrue(jsonObject.has("tree"));
     }
 
     @Test
     public void testAddLocationDefaultWithEmptyJsonObject() throws Exception {
         JSONObject jsonObject = new JSONObject();
         Whitebox.invokeMethod(OpdJsonFormUtils.class, "addLocationDefault", "", jsonObject, "");
+        Assert.assertFalse(jsonObject.has("default"));
     }
 
     @Test
@@ -140,6 +143,7 @@ public class OpdJsonFormUtilsTest {
         jsonObject.put(OpdJsonFormUtils.KEY, "");
         JSONArray jsonArray = new JSONArray();
         Whitebox.invokeMethod(OpdJsonFormUtils.class, "addLocationDefault", "", jsonObject, jsonArray.toString());
+        Assert.assertTrue(jsonObject.has("default"));
     }
 
     @Test
@@ -150,7 +154,7 @@ public class OpdJsonFormUtilsTest {
                 , OpdConstants.EventType.UPDATE_OPD_REGISTRATION
                 , OpdConstants.CONFIG
                 , Class.class
-                , null
+                , Class.class
                 , true);
         OpdConfiguration opdConfiguration = new OpdConfiguration
                 .Builder(null)
@@ -174,11 +178,11 @@ public class OpdJsonFormUtilsTest {
                 , OpdConstants.EventType.UPDATE_OPD_REGISTRATION
                 , OpdConstants.CONFIG
                 , Class.class
-                , null
+                , Class.class
                 , true);
         opdMetadata.setHealthFacilityLevels(new ArrayList<String>());
         OpdConfiguration opdConfiguration = new OpdConfiguration
-                .Builder(null)
+                .Builder(OpdRegisterQueryProviderTest.class)
                 .setOpdMetadata(opdMetadata)
                 .build();
         OpdLibrary.init(PowerMockito.mock(Context.class), PowerMockito.mock(Repository.class), opdConfiguration,
@@ -376,17 +380,5 @@ public class OpdJsonFormUtilsTest {
         jsonObject.put(step, jsonObjectWithFields);
         JSONArray jsonArray = OpdJsonFormUtils.fields(jsonObject, step);
         Assert.assertNotNull(jsonArray);
-    }
-
-    @Test
-    public void testProcessOpdDetailsForm() throws JSONException {
-        JSONObject jsonObject = new JSONObject();
-        JSONArray jsonArrayFields = new JSONArray();
-
-        JSONObject jsonObjectWithFields = new JSONObject();
-        jsonObjectWithFields.put(OpdJsonFormUtils.FIELDS, new JSONArray());
-//        jsonObjectFields.put(OpdJsonFormUtils.FIELDS, new JSONArray());
-        jsonObject.put(JsonFormUtils.STEP1, jsonObjectWithFields);
-        OpdJsonFormUtils.processOpdDetailsForm(jsonObject.toString(), PowerMockito.mock(FormTag.class));
     }
 }

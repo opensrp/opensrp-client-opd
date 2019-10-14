@@ -230,7 +230,7 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
 
         if (currentLocality != null) {
             String currentLocalityId = LocationHelper.getInstance().getOpenMrsLocationId(currentLocality);
-            if (currentLocalityId != null && defaultLocationId.equals(currentLocalityId)) {
+            if (currentLocalityId != null && !defaultLocationId.equals(currentLocalityId)) {
                 return currentLocalityId;
             }
         }

@@ -59,7 +59,9 @@ public class OpdLookUpUtils {
 
             CommonRepository commonRepository = context.commonrepository(tableName);
             String query = lookUpQuery(entityLookUp, tableName);
-
+            if (query == null) {
+                return results;
+            }
             Cursor cursor = null;
             try {
 
@@ -92,7 +94,11 @@ public class OpdLookUpUtils {
                         OpdDbConstants.Table.Client.BASE_ENTITY_ID, OpdDbConstants.Table.Client.NATIONAL_ID}
 
         );
-        String query = queryBUilder.mainCondition(getMainConditionString(entityMap));
+        String mainConditionString = getMainConditionString(entityMap);
+        if (mainConditionString.isEmpty()) {
+            return null;
+        }
+        String query = queryBUilder.mainCondition(mainConditionString);
         return queryBUilder.Endquery(query);
     }
 
@@ -101,27 +107,9 @@ public class OpdLookUpUtils {
         for (Map.Entry<String, String> entry : entityMap.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
-            //first name, last name, bht id, national id
-            String firstName = "first_name";
-            String lastName = "last_name";
-            String bht_id = "bht_mid";
-            String national_id = "national_id";
-            if (StringUtils.containsIgnoreCase(key, firstName)) {
-                key = firstName;
+            if (value == null || value.isEmpty()) {
+                continue;
             }
-
-            if (StringUtils.containsIgnoreCase(key, lastName)) {
-                key = lastName;
-            }
-
-            if (StringUtils.containsIgnoreCase(key, bht_id)) {
-                key = bht_id;
-            }
-
-            if (StringUtils.containsIgnoreCase(key, national_id)) {
-                key = national_id;
-            }
-
             if (StringUtils.isBlank(mainConditionString)) {
                 mainConditionString += " " + key + " Like '%" + value + "%'";
             } else {
