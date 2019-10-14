@@ -243,9 +243,10 @@ public class OpdJsonFormUtilsTest {
     }
 
     @Test
-    public void testProcessGenderShouldThrowNullPointerException() {
+    public void testProcessGenderCheckNullOnGenderJsonObject() {
         JSONArray jsonArray = new JSONArray();
         OpdJsonFormUtils.processGender(jsonArray);
+        Assert.assertEquals(jsonArray.length(), 0);
     }
 
     @Test
@@ -255,6 +256,7 @@ public class OpdJsonFormUtilsTest {
         jsonObject.put(OpdConstants.KEY.KEY, OpdConstants.SEX);
         jsonArray.put(jsonObject);
         OpdJsonFormUtils.processGender(jsonArray);
+        Assert.assertEquals(jsonArray.getJSONObject(0).length(), 1);
     }
 
     @Test

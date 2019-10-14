@@ -24,7 +24,7 @@ import java.util.Map;
 public class OpdLookUpUtilsTest {
 
     @Rule
-    ExpectedException expectedException = ExpectedException.none();
+    private ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void testLookUpQueryWhenEntityMapIsNotNull() throws Exception {
