@@ -11,8 +11,8 @@ import android.view.View;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
 import org.smartregister.opd.model.OpdRegisterActivityModel;
-import org.smartregister.view.activity.BaseRegisterActivity;
 import org.smartregister.opd.presenter.BaseOpdRegisterActivityPresenter;
+import org.smartregister.view.activity.BaseRegisterActivity;
 
 import java.util.List;
 

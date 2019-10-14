@@ -4,7 +4,7 @@ import android.database.Cursor;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.view.ViewGroup;
+import android.view.View;
 
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.opd.holders.OpdRegisterViewHolder;
@@ -33,7 +33,7 @@ public interface OpdRegisterRowOptions<T extends OpdRegisterViewHolder> {
     boolean isCustomViewHolder();
 
     @Nullable
-    T createCustomViewHolder(@NonNull ViewGroup parent);
+    T createCustomViewHolder(@NonNull View itemView);
 
     boolean useCustomViewLayout();
 

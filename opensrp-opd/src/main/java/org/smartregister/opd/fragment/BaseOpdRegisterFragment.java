@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.widget.AppCompatTextView;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -91,7 +90,7 @@ public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment imple
             logo.setVisibility(View.GONE);
         }
 
-        AppCompatTextView titleView = view.findViewById(R.id.txt_title_label);
+        TextView titleView = view.findViewById(R.id.txt_title_label);
         if (titleView != null) {
             titleView.setVisibility(View.VISIBLE);
             titleView.setText(getString(getToolBarTitle()));

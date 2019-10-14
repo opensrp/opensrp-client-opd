@@ -50,6 +50,7 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
     public static final String STEP2 = "step2";
     public static final String CURRENT_OPENSRP_ID = "current_opensrp_id";
     public static final String OPENSRP_ID = "OPENSRP_ID";
+    public static final String ZEIR_ID = "ZEIR_ID";
 
     public static JSONObject getFormAsJson(@NonNull JSONObject form, @NonNull  String formName, @NonNull  String id, @NonNull  String currentLocationId) throws JSONException {
         String entityId = id;
@@ -212,8 +213,8 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
         event.setProviderId(providerId);
         event.setLocationId(locationId(allSharedPreferences));
 
-        String LocationId = getLocationId(event.getLocationId(), allSharedPreferences);
-        event.setLocationId(LocationId);
+        String childLocationId = getLocationId(event.getLocationId(), allSharedPreferences);
+        event.setChildLocationId(childLocationId);
 
         event.setTeam(allSharedPreferences.fetchDefaultTeam(providerId));
         event.setTeamId(allSharedPreferences.fetchDefaultTeamId(providerId));
