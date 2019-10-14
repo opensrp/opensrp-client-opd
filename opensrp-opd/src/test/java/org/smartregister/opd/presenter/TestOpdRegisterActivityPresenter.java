@@ -14,11 +14,6 @@ public class TestOpdRegisterActivityPresenter extends BaseOpdRegisterActivityPre
     }
 
     @Override
-    public void startForm(String formName, String entityId, String metaData, String locationId) {
-
-    }
-
-    @Override
     public void onNoUniqueId() {
 
     }
