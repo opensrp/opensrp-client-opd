@@ -31,12 +31,12 @@ public class CheckInRepository extends BaseRepository implements CheckInDao {
             + CheckIn.VISIT_ID + " VARCHAR NOT NULL, "
             + CheckIn.BASE_ENTITY_ID + " VARCHAR NOT NULL, "
             + CheckIn.PREGNANCY_STATUS + " VARCHAR, "
-            + CheckIn.HAS_HIV_TEST_PREVIOUSLY + " VARCHAR NOT NULL, "
+            + CheckIn.HAS_HIV_TEST_PREVIOUSLY + " VARCHAR, "
             + CheckIn.HIV_RESULTS_PREVIOUSLY + " VARCHAR, "
             + CheckIn.IS_TAKING_ART + " VARCHAR, "
-            + CheckIn.CURRENT_HIV_RESULT + " VARCHAR NOT NULL, "
+            + CheckIn.CURRENT_HIV_RESULT + " VARCHAR, "
             + CheckIn.VISIT_TYPE + " VARCHAR NOT NULL, "
-            + CheckIn.APPOINTMENT_SCHEDULED_PREVIOUSLY + " VARCHAR NOT NULL, "
+            + CheckIn.APPOINTMENT_SCHEDULED_PREVIOUSLY + " VARCHAR, "
             + CheckIn.APPOINTMENT_DUE_DATE + " INTEGER, "
             + CheckIn.CREATED_AT + " INTEGER NOT NULL, "
             + CheckIn.UPDATED_AT + " INTEGER NOT NULL, UNIQUE(" + CheckIn.VISIT_ID + ", " + CheckIn.BASE_ENTITY_ID + ") ON CONFLICT REPLACE)";
@@ -90,6 +90,8 @@ public class CheckInRepository extends BaseRepository implements CheckInDao {
         contentValues.put(CheckIn.VISIT_TYPE, checkIn.getVisitType());
         contentValues.put(CheckIn.APPOINTMENT_SCHEDULED_PREVIOUSLY, checkIn.getAppointmentScheduledPreviously());
         contentValues.put(CheckIn.APPOINTMENT_DUE_DATE, checkIn.getAppointmentDueDate());
+        contentValues.put(CheckIn.CREATED_AT, checkIn.getCreatedAt());
+        contentValues.put(CheckIn.UPDATED_AT, checkIn.getUpdatedAt());
 
         return contentValues;
     }

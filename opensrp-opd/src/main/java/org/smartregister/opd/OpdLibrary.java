@@ -204,6 +204,9 @@ public class OpdLibrary {
         Event opdCheckinEvent = OpdJsonFormUtils.createEvent(fieldsArray, jsonFormObject.getJSONObject(OpdJsonFormUtils.METADATA)
                 , formTag, baseEntityId, eventType, "ec_client");
 
+        // Generate the eventId and add it
+        opdCheckinEvent.setEventId(JsonFormUtils.generateRandomUUIDString());
+
         AllSharedPreferences allSharedPreferences = OpdUtils.getAllSharedPreferences();
         String providerId = allSharedPreferences.fetchRegisteredANM();
         opdCheckinEvent.setProviderId(providerId);

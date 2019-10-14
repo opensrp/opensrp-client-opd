@@ -101,7 +101,11 @@
         "keys": [
           "Yes",
           "No"
-        ]
+        ],
+        "v_required": {
+          "value": "true",
+          "err": "Please answer the question"
+        }
       },
       {
         "key": "hiv_prev_status",
@@ -174,6 +178,10 @@
               "rules-file": "opd/opd_checkin_relevance_rules.yml"
             }
           }
+        },
+        "v_required": {
+          "value": "true",
+          "err": "Please answer the question"
         }
       },
       {
@@ -192,7 +200,11 @@
           "New",
           "Referral",
           "Re-Visit"
-        ]
+        ],
+        "v_required": {
+          "value": "true",
+          "err": "Please answer the question"
+        }
       },
       {
         "key": "appointment_due",
@@ -208,7 +220,11 @@
         "keys": [
           "Yes",
           "No"
-        ]
+        ],
+        "v_required": {
+          "value": "true",
+          "err": "Please answer the question"
+        }
       },
       {
         "key": "appointment_due_date",

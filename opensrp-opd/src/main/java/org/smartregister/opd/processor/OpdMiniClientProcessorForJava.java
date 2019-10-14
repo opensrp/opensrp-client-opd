@@ -1,8 +1,10 @@
 package org.smartregister.opd.processor;
 
+import org.smartregister.CoreLibrary;
 import org.smartregister.anc.library.sync.MiniClientProcessorForJava;
 import org.smartregister.domain.db.Obs;
 import org.smartregister.opd.OpdLibrary;
+import org.smartregister.opd.exception.CheckInEventProcessException;
 import org.smartregister.opd.pojos.CheckIn;
 import org.smartregister.opd.pojos.OpdDetails;
 import org.smartregister.opd.pojos.Visit;
@@ -75,11 +77,17 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         Event event = eventClient.getEvent();
 
         if (event.getEventType().equals(OpdConstants.EventType.CHECK_IN)) {
-            processCheckIn(event, eventClient.getClient());
+
+            try {
+                processCheckIn(event, eventClient.getClient());
+                CoreLibrary.getInstance().context().getEventClientRepository().markEventAsProcessed(eventClient.getEvent().getFormSubmissionId());
+            } catch (CheckInEventProcessException ex) {
+                Timber.e(ex);
+            }
         }
     }
 
-    protected void processCheckIn(@NonNull Event event, @NonNull Client client) {
+    protected void processCheckIn(@NonNull Event event, @NonNull Client client) throws CheckInEventProcessException {
         HashMap<String, String> keyValues = new HashMap<>();
 
         List<Obs> obs = event.getObs();
@@ -125,6 +133,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
 
         if (visitDate != null) {
 
+
             // Create the visit first
             Visit visit = new Visit();
             visit.setId(visitId);
@@ -134,17 +143,22 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
             visit.setCreatedAt(new Date());
             visit.setVisitDate(visitDate);
 
+            // Start transaction
+            OpdLibrary.getInstance().getRepository().getWritableDatabase().beginTransaction();
+
             boolean saved = OpdLibrary.getInstance().getVisitRepository().addVisit(visit);
             if (!saved) {
-                Timber.e(new Exception(), "Visit with id %s could not be saved in the db. Fail operation failed", visitId);
+                abortTransaction();
+                throw new CheckInEventProcessException(String.format("Visit with id %s could not be saved in the db. Fail operation failed", visitId));
             }
 
             CheckIn checkIn = generateCheckInRecordFromCheckInEvent(event, client, keyValues, visitId, visitDate);
-            saved = OpdLibrary.getInstance().getCheckInRepository().addCheckIn(checkIn);
-            if (!saved) {
-                Timber.e("CheckIn for visit with id %s could not be saved in the db. Fail operation failed", visitId);
-            }
+            saved = OpdLibrary.getInstance().getCheckInRepository(). addCheckIn(checkIn);
 
+            if (!saved) {
+                abortTransaction();
+                throw new CheckInEventProcessException(String.format("CheckIn for visit with id %s could not be saved in the db. Fail operation failed", visitId));
+            }
 
             //TODO: Make sure this does not override opd details which are latest
 
@@ -153,10 +167,26 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
             saved = OpdLibrary.getInstance().getOpdDetailsRepository().addOrUpdateOpdDetails(opdDetails);
 
             if (!saved) {
-                Timber.e(new Exception(), "OPD Details for visit with id %s updating status of client %s could not be saved in the db. Fail operation failed", visitId, event.getBaseEntityId());
+                abortTransaction();
+                throw new CheckInEventProcessException(String.format("OPD Details for visit with id %s updating status of client %s could not be saved in the db. Fail operation failed", visitId, event.getBaseEntityId()));
             }
+
+            commitSuccessfulTransaction();
         } else {
-            Timber.e(new Exception(), "Check-in with visit id %s could not be processed because it the visitDate is null", visitId);
+            throw new CheckInEventProcessException(String.format("Check-in with visit id %s could not be processed because it the visitDate is null", visitId));
+        }
+    }
+
+    private void abortTransaction() {
+        if (OpdLibrary.getInstance().getRepository().getWritableDatabase().inTransaction()) {
+            OpdLibrary.getInstance().getRepository().getWritableDatabase().endTransaction();
+        }
+    }
+
+    private void commitSuccessfulTransaction() {
+        if (OpdLibrary.getInstance().getRepository().getWritableDatabase().inTransaction()) {
+            OpdLibrary.getInstance().getRepository().getWritableDatabase().setTransactionSuccessful();
+            OpdLibrary.getInstance().getRepository().getWritableDatabase().endTransaction();
         }
     }
 
@@ -167,10 +197,11 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         opdDetails.setCurrentVisitId(visitId);
         opdDetails.setCurrentVisitStartDate(visitDate);
         opdDetails.setCurrentVisitEndDate(null);
+        opdDetails.setCreatedAt(new Date());
 
         // Set Pending diagnose and treat if we have not lapsed the max check-in duration in minutes set in the opd library configuration
         if (visitDate != null) {
-            long timeDifferenceInMinutes = ((new Date().getTime()) - visitDate.getTime())/60;
+            long timeDifferenceInMinutes = ((new Date().getTime()) - visitDate.getTime())/(60 * 1000);
             opdDetails.setPendingDiagnoseAndTreat(timeDifferenceInMinutes <= OpdLibrary.getInstance().getOpdConfiguration().getMaxCheckInDurationInMinutes());
         }
 
