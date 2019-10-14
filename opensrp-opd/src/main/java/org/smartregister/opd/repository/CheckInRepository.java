@@ -3,6 +3,7 @@ package org.smartregister.opd.repository;
 import android.content.ContentValues;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import net.sqlcipher.Cursor;
 import net.sqlcipher.database.SQLiteDatabase;
@@ -27,7 +28,7 @@ public class CheckInRepository extends BaseRepository implements CheckInDao {
     private static final String CREATE_TABLE_SQL = "CREATE TABLE " + OpdDbConstants.Table.CHECK_IN + "("
             + CheckIn.ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"
             + CheckIn.EVENT_ID + " VARCHAR NOT NULL, "
-            + CheckIn.VISIT_ID + " INT NOT NULL, "
+            + CheckIn.VISIT_ID + " VARCHAR NOT NULL, "
             + CheckIn.BASE_ENTITY_ID + " VARCHAR NOT NULL, "
             + CheckIn.PREGNANCY_STATUS + " VARCHAR, "
             + CheckIn.HAS_HIV_TEST_PREVIOUSLY + " VARCHAR NOT NULL, "
@@ -129,14 +130,14 @@ public class CheckInRepository extends BaseRepository implements CheckInDao {
 
     @Nullable
     @Override
-    public org.smartregister.opd.pojos.CheckIn getCheckInByVisit(@NonNull int visitId) {
+    public org.smartregister.opd.pojos.CheckIn getCheckInByVisit(@NonNull String visitId) {
 
         Cursor mCursor = null;
         org.smartregister.opd.pojos.CheckIn checkIn = null;
         try {
             SQLiteDatabase db = getWritableDatabase();
 
-            if (visitId != 0) {
+            if (!TextUtils.isEmpty(visitId)) {
                 mCursor = db.query(OpdDbConstants.Table.CHECK_IN, columns, CheckIn.VISIT_ID + " = ?"
                         , new String[]{visitId + ""}
                         , null
@@ -162,13 +163,25 @@ public class CheckInRepository extends BaseRepository implements CheckInDao {
         return checkIn;
     }
 
+    @Override
+    public boolean addCheckIn(@NonNull org.smartregister.opd.pojos.CheckIn checkIn) {
+        ContentValues contentValues = createValuesFor(checkIn);
+
+        //TODO: Check for duplicates
+
+        SQLiteDatabase database = getWritableDatabase();
+        long recordId = database.insert(OpdDbConstants.Table.CHECK_IN, null, contentValues);
+
+        return recordId != -1;
+    }
+
     @NonNull
     protected org.smartregister.opd.pojos.CheckIn getCheckInResult(@NonNull Cursor cursor) {
         org.smartregister.opd.pojos.CheckIn checkIn = new org.smartregister.opd.pojos.CheckIn();
 
         checkIn.setId(cursor.getInt(cursor.getColumnIndex(CheckIn.ID)));
         checkIn.setEventId(cursor.getString(cursor.getColumnIndex(CheckIn.EVENT_ID)));
-        checkIn.setVisitId(cursor.getInt(cursor.getColumnIndex(CheckIn.VISIT_ID)));
+        checkIn.setVisitId(cursor.getString(cursor.getColumnIndex(CheckIn.VISIT_ID)));
         checkIn.setBaseEntityId(cursor.getString(cursor.getColumnIndex(CheckIn.BASE_ENTITY_ID)));
         checkIn.setPregnancyStatus(cursor.getString(cursor.getColumnIndex(CheckIn.PREGNANCY_STATUS)));
         checkIn.setHasHivTestPreviously(cursor.getString(cursor.getColumnIndex(CheckIn.HAS_HIV_TEST_PREVIOUSLY)));

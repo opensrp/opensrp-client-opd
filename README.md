@@ -82,6 +82,7 @@ where you should have implemented your own:
  
         VisitRepository.createTable(database);
         CheckInRepository.createTable(database);
+        OpdDetailsRepository.createTable(database);
     }
 
 ```

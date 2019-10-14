@@ -88,7 +88,7 @@ public class OpdRegisterActivity extends BaseOpdRegisterActivity {
     public void startFormActivity(@NonNull String formName, @Nullable String entityId, @Nullable String metaData) {
         if (mBaseFragment instanceof BaseOpdRegisterFragment) {
             String locationId = OpdUtils.context().allSharedPreferences().getPreference(AllConstants.CURRENT_LOCATION_ID);
-            presenter().startForm(formName, entityId, metaData, locationId);
+            presenter().startForm(formName, entityId, metaData, locationId, null);
         }
     }
 

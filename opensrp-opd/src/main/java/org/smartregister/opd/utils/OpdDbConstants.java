@@ -37,6 +37,7 @@ public interface OpdDbConstants {
 
         String CHECK_IN = "check_in";
         String VISIT = "visit";
+        String OPD_DETAILS = "opd_details";
     }
 
     interface Column {
@@ -64,6 +65,16 @@ public interface OpdDbConstants {
             String PROVIDER_ID = "provider_id";
             String LOCATION_ID = "location_id";
             String BASE_ENTITY_ID = "base_entity_id";
+            String CREATED_AT = "created_at";
+        }
+
+        interface OpdDetails {
+            String ID = "_id";
+            String BASE_ENTITY_ID = "base_entity_id";
+            String PENDING_DIAGNOSE_AND_TREAT = "pending_diagnose_and_treat";
+            String CURRENT_VISIT_START_DATE = "current_visit_start_date";
+            String CURRENT_VISIT_END_DATE = "current_visit_end_date";
+            String CURRENT_VISIT_ID = "visit_id";
             String CREATED_AT = "created_at";
         }
     }

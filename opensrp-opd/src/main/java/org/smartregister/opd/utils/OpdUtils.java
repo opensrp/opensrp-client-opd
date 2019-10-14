@@ -1,6 +1,7 @@
 package org.smartregister.opd.utils;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.support.annotation.Nullable;
@@ -90,5 +91,15 @@ public class OpdUtils extends org.smartregister.util.Utils {
     @Nullable
     public static OpdMetadata metadata() {
         return OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata();
+    }
+
+
+    @Nullable
+    public static String getBaseEntityId(@Nullable Intent data) {
+        if (data == null) {
+            return null;
+        }
+
+        return data.hasExtra(OpdConstants.IntentKey.BASE_ENTITY_ID) ? data.getStringExtra(OpdConstants.IntentKey.BASE_ENTITY_ID) : null;
     }
 }

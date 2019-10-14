@@ -20,6 +20,10 @@ public class OpdConstants extends AllConstants {
         public static final String NAME = "opd_registration";
     }
 
+    public static class JSON_FORM_NAME {
+        public static final String CHECK_IN = "opd_checkin";
+    }
+
     public static class JSON_FORM_EXTRA {
         public static final String NEXT = "next";
         public static final String JSON = "json";
@@ -58,14 +62,47 @@ public class OpdConstants extends AllConstants {
     public static final class EventType {
         public static final String OPD_REGISTRATION = "Opd Registration";
         public static final String UPDATE_OPD_REGISTRATION = "Update Opd Registration";
+        public static final String CHECK_IN = "OPD Check-In";
+        public static final String VISIT = "OPD Visit";
     }
 
 
-    interface IntentKey {
+    public interface IntentKey {
         String BASE_ENTITY_ID = "base-entity-id";
         String CLIENT_MAP = "client_map";
         String CLIENT_OBJECT = "common_person_object_client";
         String CONTACT_NO = "contact_number";
     }
 
+    public interface Event {
+
+        interface Visit {
+            interface Detail {
+                String VISIT_ID = "visitId";
+                String VISIT_DATE = "visitDate";
+            }
+        }
+
+        interface CheckIn {
+            interface Detail {
+                String VISIT_ID = "visitId";
+                String VISIT_DATE = "visitDate";
+            }
+        }
+    }
+
+
+    public interface JsonFormField {
+
+        String PATIENT_GENDER = "patient_gender";
+        String PREGNANCY_STATUS = "pregnancy_status";
+        String HIV_TESTED = "hiv_tested";
+        String HIV_PREVIOUS_STATUS = "hiv_prev_status";
+        String IS_PATIENT_TAKING_ART = "hiv_prev_pos_art";
+        String CURRENT_HIV_STATUS = "current_hiv_status";
+        String VISIT_TYPE = "visit_type";
+        String APPOINTMENT_DUE = "appointment_due";
+        String APPOINTMENT_DUE_DATE = "appointment_due_date";
+        String APPOINTMENT_DUE_INLESS_TIME = "appointment_done_inless_time";
+    }
 }

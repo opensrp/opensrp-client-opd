@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -52,8 +53,29 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
     public static final String OPENSRP_ID = "OPENSRP_ID";
 
     public static JSONObject getFormAsJson(@NonNull JSONObject form, @NonNull  String formName, @NonNull  String id, @NonNull  String currentLocationId) throws JSONException {
+        return getFormAsJson(form, formName, id, currentLocationId, null);
+    }
+
+    public static JSONObject getFormAsJson(@NonNull JSONObject form, @NonNull  String formName, @NonNull  String id, @NonNull  String currentLocationId, @Nullable HashMap<String, String> injectedFieldValues) throws JSONException {
         String entityId = id;
         form.getJSONObject(METADATA).put(ENCOUNTER_LOCATION, currentLocationId);
+
+        // Inject the field values
+        if (injectedFieldValues != null && injectedFieldValues.size() > 0) {
+            JSONObject stepOne = form.getJSONObject(OpdJsonFormUtils.STEP1);
+            JSONArray jsonArray = stepOne.getJSONArray(OpdJsonFormUtils.FIELDS);
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                String fieldKey = jsonObject.getString(OpdJsonFormUtils.KEY);
+
+                String fieldValue = injectedFieldValues.get(fieldKey);
+
+                if (!TextUtils.isEmpty(fieldValue)) {
+                    jsonObject.put(OpdJsonFormUtils.VALUE, fieldValue);
+                }
+            }
+        }
 
         if (OpdUtils.metadata().getOpdRegistrationFormName().equals(formName)) {
             if (StringUtils.isBlank(entityId)) {
@@ -85,6 +107,7 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
         } else {
             Timber.w("OpdJsonFormUtils --> Unsupported form requested for launch %s", formName);
         }
+
         Timber.d("OpdJsonFormUtils --> form is %s", form.toString());
         return form;
     }

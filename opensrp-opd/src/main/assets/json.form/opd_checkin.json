@@ -83,7 +83,7 @@
         "relevance": {
           "step1:patient_gender": {
             "type": "string",
-            "ex": "equalTo(., \"Female\")"
+            "ex": "equalTo(., Female)"
           }
         }
       },
@@ -169,8 +169,10 @@
           "Not Done"
         ],
         "relevance": {
-          "rules_engine": {
-            "rules-file": "opd_checkin_relevance_rules.yml"
+          "rules-engine": {
+            "ex-rules" : {
+              "rules-file": "opd/opd_checkin_relevance_rules.yml"
+            }
           }
         }
       },
@@ -227,6 +229,22 @@
           "step1:appointment_due": {
             "type": "string",
             "ex": "equalTo(., \"Yes\")"
+          }
+        }
+      },
+
+      {
+        "key": "appointment_done_inless_time",
+        "openmrs_entity_parent": "",
+        "openmrs_entity": "",
+        "openmrs_entity_id": "",
+        "type": "label",
+        "value": "Sample label",
+        "calculation": {
+          "rules-engine": {
+            "ex-rules": {
+              "rules-file": "opd/opd_checking_calculations.yml"
+            }
           }
         }
       }

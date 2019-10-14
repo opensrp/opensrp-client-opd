@@ -8,7 +8,7 @@ import java.util.Date;
 
 public class Visit {
 
-    private int id;
+    private String id;
     private Date visitDate;
     private String providerId;
     private String locationId;
@@ -16,11 +16,11 @@ public class Visit {
     private Date createdAt;
 
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

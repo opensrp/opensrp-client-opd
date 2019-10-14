@@ -15,6 +15,8 @@ public interface CheckInDao {
     CheckIn getLatestCheckIn(@NonNull String clientBaseEntityId);
 
     @Nullable
-    CheckIn getCheckInByVisit(@NonNull int visitId);
+    CheckIn getCheckInByVisit(@NonNull String visitId);
+
+    boolean addCheckIn(@NonNull CheckIn checkIn);
 
 }

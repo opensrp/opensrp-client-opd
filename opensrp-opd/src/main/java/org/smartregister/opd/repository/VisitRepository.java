@@ -27,11 +27,11 @@ import timber.log.Timber;
 public class VisitRepository extends BaseRepository implements VisitDao {
 
     private static final String CREATE_TABLE_SQL = "CREATE TABLE " + OpdDbConstants.Table.VISIT + "("
-            + Visit.ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"
+            + Visit.ID + " VARCHAR NOT NULL PRIMARY KEY,"
             + Visit.VISIT_DATE + " DATETIME NOT NULL,"
             + Visit.PROVIDER_ID + " VARCHAR NOT NULL,"
             + Visit.LOCATION_ID + " VARCHAR NOT NULL,"
-            + Visit.BASE_ENTITY_ID + "VARCHAR NOT NULL,"
+            + Visit.BASE_ENTITY_ID + " VARCHAR NOT NULL,"
             + Visit.CREATED_AT + " INTEGER NOT NULL)";
 
     private static final String INDEX_BASE_ENTITY_ID = "CREATE INDEX " + OpdDbConstants.Table.VISIT
@@ -58,7 +58,7 @@ public class VisitRepository extends BaseRepository implements VisitDao {
         database.execSQL(INDEX_VISIT_DATE);
     }
 
-
+    @NonNull
     public ContentValues createValuesFor(@NonNull org.smartregister.opd.pojos.Visit visit) {
         ContentValues contentValues = new ContentValues();
 
@@ -76,7 +76,7 @@ public class VisitRepository extends BaseRepository implements VisitDao {
     protected org.smartregister.opd.pojos.Visit getVisitResult(@NonNull Cursor cursor) {
         org.smartregister.opd.pojos.Visit visit = new org.smartregister.opd.pojos.Visit();
 
-        visit.setId(cursor.getInt(cursor.getColumnIndex(Visit.ID)));
+        visit.setId(cursor.getString(cursor.getColumnIndex(Visit.ID)));
         visit.setVisitDate(new Date(cursor.getLong(cursor.getColumnIndex(Visit.VISIT_DATE))));
         visit.setProviderId(cursor.getString(cursor.getColumnIndex(Visit.PROVIDER_ID)));
         visit.setLocationId(cursor.getString(cursor.getColumnIndex(Visit.LOCATION_ID)));
@@ -119,5 +119,16 @@ public class VisitRepository extends BaseRepository implements VisitDao {
         }
 
         return visit;
+    }
+
+    public boolean addVisit(@NonNull org.smartregister.opd.pojos.Visit visit) {
+        ContentValues contentValues = createValuesFor(visit);
+
+        //TODO: Check for duplicates
+
+        SQLiteDatabase database = getWritableDatabase();
+        long recordId = database.insert(OpdDbConstants.Table.VISIT, null, contentValues);
+
+        return recordId != -1;
     }
 }

@@ -1,17 +1,31 @@
 package org.smartregister.opd;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.smartregister.Context;
+import org.smartregister.clientandeventmodel.Event;
+import org.smartregister.domain.tag.FormTag;
 import org.smartregister.opd.configuration.OpdConfiguration;
 import org.smartregister.opd.domain.YamlConfig;
 import org.smartregister.opd.domain.YamlConfigItem;
 import org.smartregister.opd.helper.AncRulesEngineHelper;
 import org.smartregister.opd.repository.CheckInRepository;
+import org.smartregister.opd.repository.OpdDetailsRepository;
 import org.smartregister.opd.repository.VisitRepository;
 import org.smartregister.opd.utils.FilePath;
+import org.smartregister.opd.utils.OpdConstants;
+import org.smartregister.opd.utils.OpdDbConstants;
+import org.smartregister.opd.utils.OpdJsonFormUtils;
+import org.smartregister.opd.utils.OpdUtils;
+import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.repository.Repository;
 import org.smartregister.repository.UniqueIdRepository;
+import org.smartregister.util.JsonFormUtils;
 import org.smartregister.view.activity.DrishtiApplication;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
@@ -19,8 +33,10 @@ import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 import org.smartregister.sync.helper.ECSyncHelper;
-import org.yaml.snakeyaml.Yaml;
 
 import id.zelory.compressor.Compressor;
 
@@ -35,9 +51,11 @@ public class OpdLibrary {
     private OpdConfiguration opdConfiguration;
     private final Repository repository;
     private ECSyncHelper syncHelper;
+
     private UniqueIdRepository uniqueIdRepository;
     private CheckInRepository checkInRepository;
     private VisitRepository visitRepository;
+    private OpdDetailsRepository opdDetailsRepository;
 
     private Compressor compressor;
     private int applicationVersion;
@@ -45,6 +63,8 @@ public class OpdLibrary {
     private Yaml yaml;
 
     private AncRulesEngineHelper ancRulesEngineHelper;
+
+    private SimpleDateFormat dateFormat = new SimpleDateFormat(OpdDbConstants.DATE_FORMAT, Locale.US);
 
     protected OpdLibrary(@NonNull Context context, @NonNull OpdConfiguration opdConfiguration
             , @NonNull Repository repository, int applicationVersion, int databaseVersion) {
@@ -107,6 +127,15 @@ public class OpdLibrary {
     }
 
     @NonNull
+    public OpdDetailsRepository getOpdDetailsRepository() {
+        if (opdDetailsRepository == null) {
+            opdDetailsRepository = new OpdDetailsRepository(getRepository());
+        }
+
+        return opdDetailsRepository;
+    }
+
+    @NonNull
     public Repository getRepository() {
         return repository;
     }
@@ -160,5 +189,36 @@ public class OpdLibrary {
             ancRulesEngineHelper = new AncRulesEngineHelper(context.applicationContext().getApplicationContext());
         }
         return ancRulesEngineHelper;
+    }
+
+    @NonNull
+    public Event processOpdCheckInEvent(@NonNull String eventType, String jsonString, @Nullable Intent data) throws JSONException {
+        JSONObject jsonFormObject = new JSONObject(jsonString);
+
+        JSONObject stepOne = jsonFormObject.getJSONObject(OpdJsonFormUtils.STEP1);
+        JSONArray fieldsArray = stepOne.getJSONArray(OpdJsonFormUtils.FIELDS);
+
+        FormTag formTag = OpdJsonFormUtils.formTag(OpdUtils.getAllSharedPreferences());
+
+        String baseEntityId = OpdUtils.getBaseEntityId(data);
+        Event opdCheckinEvent = OpdJsonFormUtils.createEvent(fieldsArray, jsonFormObject.getJSONObject(OpdJsonFormUtils.METADATA)
+                , formTag, baseEntityId, eventType, "ec_client");
+
+        AllSharedPreferences allSharedPreferences = OpdUtils.getAllSharedPreferences();
+        String providerId = allSharedPreferences.fetchRegisteredANM();
+        opdCheckinEvent.setProviderId(providerId);
+        opdCheckinEvent.setLocationId(OpdJsonFormUtils.locationId(allSharedPreferences));
+
+        opdCheckinEvent.setTeam(allSharedPreferences.fetchDefaultTeam(providerId));
+        opdCheckinEvent.setTeamId(allSharedPreferences.fetchDefaultTeamId(providerId));
+
+        opdCheckinEvent.setClientDatabaseVersion(OpdLibrary.getInstance().getDatabaseVersion());
+        opdCheckinEvent.setClientApplicationVersion(OpdLibrary.getInstance().getApplicationVersion());
+
+        // Create the visit Id
+        opdCheckinEvent.addDetails(OpdConstants.Event.CheckIn.Detail.VISIT_ID, JsonFormUtils.generateRandomUUIDString());
+        opdCheckinEvent.addDetails(OpdConstants.Event.CheckIn.Detail.VISIT_DATE, dateFormat.format(opdCheckinEvent.getEventDate()));
+
+        return opdCheckinEvent;
     }
 }
