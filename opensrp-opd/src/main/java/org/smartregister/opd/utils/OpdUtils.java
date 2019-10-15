@@ -2,8 +2,8 @@ package org.smartregister.opd.utils;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 
 import org.apache.commons.lang3.StringUtils;
@@ -24,7 +24,7 @@ public class OpdUtils extends org.smartregister.util.Utils {
     private static final String OTHER_SUFFIX = ", other]";
 
     @NonNull
-    public static String getTranslatedDate(@NonNull String str_date, @NonNull android.content.Context context) {
+    public static String getTranslatedDate(@NonNull String str_date, @NonNull Context context) {
         return str_date
                 .replace("d", context.getString(R.string.abbrv_days))
                 .replace("w", context.getString(R.string.abbrv_weeks))
@@ -38,13 +38,15 @@ public class OpdUtils extends org.smartregister.util.Utils {
 
     @NonNull
     public static String fillTemplate(@NonNull String stringValue, @NonNull Facts facts) {
-        while (stringValue.contains("{")) {
-            String key = stringValue.substring(stringValue.indexOf("{") + 1, stringValue.indexOf("}"));
+        String stringValueResult = stringValue;
+        while (stringValueResult.contains("{")) {
+            String key = stringValueResult.substring(stringValueResult.indexOf("{") + 1, stringValueResult.indexOf("}"));
             String value = processValue(key, facts);
-            stringValue = stringValue.replace("{" + key + "}", value).replaceAll(", $", "").trim();
+            stringValueResult = stringValueResult.replace("{" + key + "}", value).replaceAll(", $", "").trim();
         }
+
         //Remove unnecessary commas by cleaning the returned string
-        return cleanValueResult(stringValue);
+        return cleanValueResult(stringValueResult);
     }
 
     @NonNull

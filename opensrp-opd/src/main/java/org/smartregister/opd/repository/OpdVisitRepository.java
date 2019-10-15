@@ -93,7 +93,7 @@ public class OpdVisitRepository extends BaseRepository implements VisitDao {
         Cursor mCursor = null;
         org.smartregister.opd.pojos.OpdVisit visit = null;
         try {
-            net.sqlcipher.database.SQLiteDatabase db = getWritableDatabase();
+            SQLiteDatabase db = getWritableDatabase();
 
             if (StringUtils.isNotBlank(clientBaseEntityId)) {
                 mCursor = db.query(OpdDbConstants.Table.OPD_VISIT, columns, OpdVisit.BASE_ENTITY_ID + " = ?"

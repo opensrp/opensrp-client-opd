@@ -22,6 +22,7 @@ public class OpdProfileFragmentPresenter implements OpdProfileFragmentContract.P
         mProfileInteractor = new ProfileFragmentInteractor(this);
     }
 
+    @Override
     public void onDestroy(boolean isChangingConfiguration) {
         mProfileView = null;//set to null on destroy
 

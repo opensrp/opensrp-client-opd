@@ -67,9 +67,9 @@ where you should have implemented your own:
  3. Add your implemented `OpdRegisterActivity` to the `Android.manifest` file
  4. Call `OpdRegisterActivity` from your navigation menu
  
- 5. Create the OPD repositories inside your application repository class.
+ 5. Create the OPD repositories inside your application repository class
  
- This can be done by adding the following lines of code to your `ApplicationRepository#onCreate(SQLiteDatabase)`:
+    This can be done by adding the following lines of code to your `ApplicationRepository#onCreate(SQLiteDatabase)`:
  
  ```java
  
@@ -83,7 +83,6 @@ where you should have implemented your own:
         VisitRepository.createTable(database);
         CheckInRepository.createTable(database);
     }
-
 ```
  
  
@@ -145,13 +144,13 @@ where you should have implemented your own:
 
  ```
  
- - You should add basically create a new instance of the Presenter implemented above  
+ -  You should add basically create a new instance of the Presenter implemented above  
  
- ```java
- 
- return new OpdRegisterActivityPresenter(view, model);
-
- ```
+    ```java
+    
+    return new OpdRegisterActivityPresenter(view, model);
+    
+    ```
  in your implementation of `BaseOpdRegisterActivityPresenter createPresenter(@NonNull OpdRegisterActivityContract.View, @NonNull OpdRegisterActivityContract.Model)` 
 
 

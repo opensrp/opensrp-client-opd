@@ -17,6 +17,7 @@ import java.util.List;
 public interface OpdRegisterActivityContract {
 
     interface View extends BaseRegisterContract.View {
+
         OpdRegisterActivityContract.Presenter presenter();
     }
 
@@ -49,6 +50,7 @@ public interface OpdRegisterActivityContract {
     }
 
     interface Interactor {
+
         void getNextUniqueId(Triple<String, String, String> triple, OpdRegisterActivityContract.InteractorCallBack callBack);
 
         void onDestroy(boolean isChangingConfiguration);

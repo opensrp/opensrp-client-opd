@@ -13,9 +13,6 @@ import org.smartregister.opd.utils.FilePath;
 import org.smartregister.repository.Repository;
 import org.smartregister.repository.UniqueIdRepository;
 import org.smartregister.sync.helper.ECSyncHelper;
-
-import id.zelory.compressor.Compressor;
-
 import org.smartregister.view.activity.DrishtiApplication;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
@@ -23,6 +20,8 @@ import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+
+import id.zelory.compressor.Compressor;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-13
@@ -161,7 +160,7 @@ public class OpdLibrary {
     @NonNull
     public OpdRulesEngineHelper getOpdRulesEngineHelper() {
         if (opdRulesEngineHelper == null) {
-            opdRulesEngineHelper = new OpdRulesEngineHelper(context.applicationContext().getApplicationContext());
+            opdRulesEngineHelper = new OpdRulesEngineHelper();
         }
 
         return opdRulesEngineHelper;

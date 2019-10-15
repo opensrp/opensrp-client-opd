@@ -15,6 +15,8 @@ public interface OpdProfileFragmentContract {
 
         @Nullable
         OpdProfileFragmentContract.View getProfileView();
+
+        void onDestroy(boolean isChangingConfiguration);
     }
 
     interface View {

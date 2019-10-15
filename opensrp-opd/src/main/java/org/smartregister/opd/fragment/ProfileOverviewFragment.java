@@ -82,40 +82,7 @@ public class ProfileOverviewFragment extends BaseProfileFragment {
                 }
             }
 
-            Iterable<Object> ruleObjects = loadFile(FilePath.FILE.PROFILE_OVERVIEW);
-
-            for (Object ruleObject : ruleObjects) {
-                List<YamlConfigWrapper> yamlConfigList = new ArrayList<>();
-                int valueCount = 0;
-
-                YamlConfig yamlConfig = (YamlConfig) ruleObject;
-                if (yamlConfig.getGroup() != null) {
-                    yamlConfigList.add(new YamlConfigWrapper(yamlConfig.getGroup(), null, null));
-                }
-
-                if (yamlConfig.getSubGroup() != null) {
-                    yamlConfigList.add(new YamlConfigWrapper(null, yamlConfig.getSubGroup(), null));
-                }
-
-                List<YamlConfigItem> configItems = yamlConfig.getFields();
-
-                if (configItems != null) {
-
-                    for (YamlConfigItem configItem : configItems) {
-                        String relevance = configItem.getRelevance();
-                        if (relevance != null && OpdLibrary.getInstance().getOpdRulesEngineHelper()
-                                .getRelevance(facts, relevance)) {
-                            yamlConfigList.add(new YamlConfigWrapper(null, null, configItem));
-                            valueCount += 1;
-                        }
-                    }
-                }
-
-                if (valueCount > 0) {
-                    yamlConfigListGlobal.addAll(yamlConfigList);
-
-                }
-            }
+            generateYamlConfigList(facts);
 
             if (getActivity() != null) {
                 ProfileOverviewAdapter adapter = new ProfileOverviewAdapter(getActivity(), yamlConfigListGlobal, facts);
@@ -128,6 +95,43 @@ public class ProfileOverviewFragment extends BaseProfileFragment {
 
         } catch (IOException e) {
             Timber.e(e);
+        }
+    }
+
+    private void generateYamlConfigList(@NonNull Facts facts) throws IOException {
+        Iterable<Object> ruleObjects = loadFile(FilePath.FILE.PROFILE_OVERVIEW);
+
+        for (Object ruleObject : ruleObjects) {
+            List<YamlConfigWrapper> yamlConfigList = new ArrayList<>();
+            int valueCount = 0;
+
+            YamlConfig yamlConfig = (YamlConfig) ruleObject;
+            if (yamlConfig.getGroup() != null) {
+                yamlConfigList.add(new YamlConfigWrapper(yamlConfig.getGroup(), null, null));
+            }
+
+            if (yamlConfig.getSubGroup() != null) {
+                yamlConfigList.add(new YamlConfigWrapper(null, yamlConfig.getSubGroup(), null));
+            }
+
+            List<YamlConfigItem> configItems = yamlConfig.getFields();
+
+            if (configItems != null) {
+
+                for (YamlConfigItem configItem : configItems) {
+                    String relevance = configItem.getRelevance();
+                    if (relevance != null && OpdLibrary.getInstance().getOpdRulesEngineHelper()
+                            .getRelevance(facts, relevance)) {
+                        yamlConfigList.add(new YamlConfigWrapper(null, null, configItem));
+                        valueCount += 1;
+                    }
+                }
+            }
+
+            if (valueCount > 0) {
+                yamlConfigListGlobal.addAll(yamlConfigList);
+
+            }
         }
     }
 

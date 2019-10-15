@@ -20,7 +20,7 @@ import org.smartregister.view.activity.BaseProfileActivity;
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-27
  */
 
-public class OpdProfileActivity extends BaseProfileActivity implements OpdProfileActivityContract.View {
+public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdProfileActivityContract.View {
 
     private TextView nameView;
     private TextView ageView;
