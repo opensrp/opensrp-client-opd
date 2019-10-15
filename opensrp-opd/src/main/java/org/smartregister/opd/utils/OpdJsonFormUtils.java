@@ -24,6 +24,7 @@ import org.smartregister.location.helper.LocationHelper;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.enums.LocationHierarchy;
 import org.smartregister.opd.pojos.OpdEventClient;
+import org.smartregister.opd.pojos.OpdMetadata;
 import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.repository.ImageRepository;
 import org.smartregister.repository.UniqueIdRepository;
@@ -94,8 +95,17 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
     private static void addRegLocHierarchyQuestions(@NonNull JSONObject form, @NonNull String widgetKey, @NonNull LocationHierarchy locationHierarchy) {
         try {
             JSONArray questions = form.getJSONObject(JsonFormConstants.STEP1).getJSONArray(JsonFormConstants.FIELDS);
-            ArrayList<String> allLevels = OpdUtils.metadata().getLocationLevels();
-            ArrayList<String> healthFacilities = OpdUtils.metadata().getHealthFacilityLevels();
+
+            ArrayList<String> allLevels;
+            ArrayList<String> healthFacilities;
+            OpdMetadata metadata = OpdUtils.metadata();
+            if (metadata != null) {
+                allLevels = metadata.getLocationLevels();
+                healthFacilities = metadata.getHealthFacilityLevels();
+            } else {
+                allLevels = DefaultOpdLocationUtils.getLocationLevels();;
+                healthFacilities = DefaultOpdLocationUtils.getLocationLevels();;
+            }
 
             List<String> defaultLocation = LocationHelper.getInstance().generateDefaultLocationHierarchy(allLevels);
             List<String> defaultFacility = LocationHelper.getInstance().generateDefaultLocationHierarchy(healthFacilities);
@@ -251,7 +261,7 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
     protected static Triple<Boolean, JSONObject, JSONArray> validateParameters(@NonNull String jsonString) {
         JSONObject jsonForm = toJSONObject(jsonString);
         JSONArray fields = null;
-        if(jsonForm != null){
+        if (jsonForm != null) {
             fields = fields(jsonForm);
         }
         return Triple.of(jsonForm != null && fields != null, jsonForm, fields);
@@ -507,7 +517,7 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
     private static void processReminder(@NonNull JSONArray fields) {
         try {
             JSONObject reminderObject = getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.REMINDERS);
-            if(reminderObject != null) {
+            if (reminderObject != null) {
                 JSONArray options = getJSONArray(reminderObject, OpdConstants.JSON_FORM_KEY.OPTIONS);
                 JSONObject option = getJSONObject(options, 0);
                 String value = option.optString(JsonFormConstants.VALUE);

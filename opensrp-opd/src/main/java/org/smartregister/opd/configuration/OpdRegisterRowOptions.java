@@ -23,10 +23,10 @@ public interface OpdRegisterRowOptions<T extends OpdRegisterViewHolder> {
      * the #opdRegisterViewHolder passed and in case you are using a custom one you can just cast it to
      * whatever you provided in {@link OpdRegisterRowOptions#createCustomViewHolder}
      *
-     * @param cursor cursor object on the current row
+     * @param cursor                   cursor object on the current row
      * @param commonPersonObjectClient Contains the column maps for the current user
      * @param smartRegisterClient
-     * @param opdRegisterViewHolder The recycler view holder which holds the required views
+     * @param opdRegisterViewHolder    The recycler view holder which holds the required views
      */
     void populateClientRow(@NonNull Cursor cursor, @NonNull CommonPersonObjectClient commonPersonObjectClient, @NonNull SmartRegisterClient smartRegisterClient, @NonNull OpdRegisterViewHolder opdRegisterViewHolder);
 
@@ -37,6 +37,7 @@ public interface OpdRegisterRowOptions<T extends OpdRegisterViewHolder> {
 
     boolean useCustomViewLayout();
 
-    @LayoutRes int getCustomViewLayoutId();
+    @LayoutRes
+    int getCustomViewLayoutId();
 
 }

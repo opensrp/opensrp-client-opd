@@ -40,7 +40,7 @@ public class ClientLookUpListAdapter extends RecyclerView.Adapter<ClientLookUpLi
         String lastName = Utils.getValue(commonPersonObject.getColumnmaps(), OpdDbConstants.Table.Client.LAST_NAME, true);
         String nationalId = Utils.getValue(commonPersonObject.getColumnmaps(), OpdDbConstants.Table.Client.NATIONAL_ID, true);
         String opensrpId = Utils.getValue(commonPersonObject.getColumnmaps(), OpdDbConstants.Table.Client.OPENSRP_ID, true);
-        String fullname =  firstName + " " + lastName;
+        String fullname = firstName + " " + lastName;
         String details = context.getString(R.string.national_id) + " - " + nationalId + ", " + context.getString(R.string.opd_opensrp_id_type) + " - " + opensrpId;
         holder.txtName.setText(fullname);
         holder.itemView.setTag(Utils.convert(commonPersonObject));
@@ -65,17 +65,17 @@ public class ClientLookUpListAdapter extends RecyclerView.Adapter<ClientLookUpLi
 
         @Override
         public void onClick(View view) {
-            if(clickListener != null) {
+            if (clickListener != null) {
                 clickListener.onItemClick(view);
             }
         }
     }
 
-    public interface  ClickListener {
+    public interface ClickListener {
         void onItemClick(View view);
     }
 
-    public void setOnClickListener(ClickListener onClickListener){
+    public void setOnClickListener(ClickListener onClickListener) {
         ClientLookUpListAdapter.clickListener = onClickListener;
     }
 }

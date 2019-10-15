@@ -5,7 +5,7 @@ package org.smartregister.opd.utils;
  */
 
 public interface OpdDbConstants {
-    
+
     interface KEY {
 
         String MOTHER_FIRST_NAME = "mother_first_name";
