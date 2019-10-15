@@ -1,9 +1,7 @@
 package org.smartregister.opd.utils;
 
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -22,9 +20,6 @@ import java.util.Map;
 
 @RunWith(PowerMockRunner.class)
 public class OpdLookUpUtilsTest {
-
-    @Rule
-    private ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void testLookUpQueryWhenEntityMapIsNotNull() throws Exception {
