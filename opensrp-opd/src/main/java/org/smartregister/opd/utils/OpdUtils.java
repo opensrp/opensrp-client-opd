@@ -23,7 +23,8 @@ public class OpdUtils extends org.smartregister.util.Utils {
 
     private static final String OTHER_SUFFIX = ", other]";
 
-    public static String getTranslatedDate(String str_date, android.content.Context context) {
+    @NonNull
+    public static String getTranslatedDate(@NonNull String str_date, @NonNull android.content.Context context) {
         return str_date
                 .replace("d", context.getString(R.string.abbrv_days))
                 .replace("w", context.getString(R.string.abbrv_weeks))
@@ -35,18 +36,19 @@ public class OpdUtils extends org.smartregister.util.Utils {
         return dp * ((float) context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
     }
 
-    public static String fillTemplate(String stringValue, Facts facts) {
-        String stringValueResult = stringValue;
-        while (stringValueResult.contains("{")) {
-            String key = stringValueResult.substring(stringValueResult.indexOf("{") + 1, stringValueResult.indexOf("}"));
+    @NonNull
+    public static String fillTemplate(@NonNull String stringValue, @NonNull Facts facts) {
+        while (stringValue.contains("{")) {
+            String key = stringValue.substring(stringValue.indexOf("{") + 1, stringValue.indexOf("}"));
             String value = processValue(key, facts);
-            stringValueResult = stringValueResult.replace("{" + key + "}", value).replaceAll(", $", "").trim();
+            stringValue = stringValue.replace("{" + key + "}", value).replaceAll(", $", "").trim();
         }
         //Remove unnecessary commas by cleaning the returned string
-        return cleanValueResult(stringValueResult);
+        return cleanValueResult(stringValue);
     }
 
-    private static String processValue(String key, Facts facts) {
+    @NonNull
+    private static String processValue(@NonNull String key, @NonNull Facts facts) {
         String value = "";
         if (facts.get(key) instanceof String) {
             value = facts.get(key);
@@ -62,7 +64,8 @@ public class OpdUtils extends org.smartregister.util.Utils {
         return ContactJsonFormUtils.keyToValueConverter(value);
     }
 
-    private static String cleanValueResult(String result) {
+    @NonNull
+    private static String cleanValueResult(@NonNull String result) {
         List<String> nonEmptyItems = new ArrayList<>();
 
         for (String item : result.split(",")) {

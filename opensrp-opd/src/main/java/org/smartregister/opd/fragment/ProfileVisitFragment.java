@@ -1,35 +1,20 @@
 package org.smartregister.opd.fragment;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.jeasy.rules.api.Facts;
-import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
 import org.smartregister.opd.contract.OpdProfileFragmentContract;
 import org.smartregister.opd.domain.YamlConfigWrapper;
-import org.smartregister.opd.presenter.ProfileFragmentPresenter;
-import org.smartregister.opd.utils.OpdConstants;
-import org.smartregister.util.JsonFormUtils;
+import org.smartregister.opd.presenter.OpdProfileFragmentPresenter;
 import org.smartregister.view.fragment.BaseProfileFragment;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-27
@@ -45,10 +30,7 @@ public class ProfileVisitFragment extends BaseProfileFragment implements OpdProf
     private LinearLayout testLayout;
     private LinearLayout testsDisplayLayout;
     private ProfileContactsActionHandler profileContactsActionHandler = new ProfileContactsActionHandler();
-    private JsonFormUtils formUtils = new JsonFormUtils();
     private OpdProfileFragmentContract.Presenter presenter;
-    private String baseEntityId;
-    private String contactNo;
 
     public static ProfileVisitFragment newInstance(Bundle bundle) {
         Bundle args = bundle;
@@ -64,7 +46,7 @@ public class ProfileVisitFragment extends BaseProfileFragment implements OpdProf
         if (getActivity() == null) {
             return;
         }
-        presenter = new ProfileFragmentPresenter(this);
+        presenter = new OpdProfileFragmentPresenter(this);
     }
 
     @Override
@@ -89,148 +71,8 @@ public class ProfileVisitFragment extends BaseProfileFragment implements OpdProf
         if (testsDisplayLayout != null) {
             testsDisplayLayout.removeAllViews();
         }
-        baseEntityId = getActivity().getIntent().getStringExtra(OpdConstants.IntentKey.BASE_ENTITY_ID);
-        HashMap<String, String> clientDetails =
-                (HashMap<String, String>) getActivity().getIntent().getSerializableExtra(OpdConstants.IntentKey.CLIENT_MAP);
-        initializeLastContactDetails(clientDetails);
+
     }
-
-    private void initializeLastContactDetails(HashMap<String, String> clientDetails) {
-        /*if (clientDetails != null) {
-            try {
-                List<LastContactDetailsWrapper> lastContactDetailsWrapperList = new ArrayList<>();
-                List<LastContactDetailsWrapper> lastContactDetailsTestsWrapperList = new ArrayList<>();
-
-                Facts facts = presenter.getImmediatePreviousContact(clientDetails, baseEntityId, contactNo);
-                addOtherRuleObjects(facts);
-                addAttentionFlagsRuleObjects(facts);
-                contactNo = (String) facts.asMap().get(Constants.CONTACT_NO);
-
-                addTestsRuleObjects(facts);
-
-                String contactDate = (String) facts.asMap().get(Constants.CONTACT_DATE);
-                String displayContactDate = "";
-                if ( !TextUtils.isEmpty(contactDate)) {
-                    Date lastContactDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(contactDate);
-                    displayContactDate = new SimpleDateFormat("dd MMM " + "yyyy", Locale.getDefault())
-                            .format(lastContactDate);
-                }
-
-
-                if (lastContactDetails.isEmpty()) {
-                    lastContactLayout.setVisibility(View.GONE);
-                } else {
-                    lastContactDetailsWrapperList
-                            .add(new LastContactDetailsWrapper(contactNo, displayContactDate, lastContactDetails, facts));
-                    setUpContactDetailsRecycler(lastContactDetailsWrapperList);
-                }
-
-                if (lastContactTests.isEmpty()) {
-                    testLayout.setVisibility(View.GONE);
-                } else {
-                    lastContactDetailsTestsWrapperList
-                            .add(new LastContactDetailsWrapper(contactNo, displayContactDate, lastContactTests, facts));
-                    testsHeader.setText(
-                            String.format(getActivity().getResources().getString(R.string.recent_test), displayContactDate));
-                    setUpContactTestsDetails(lastContactDetailsTestsWrapperList);
-                }
-
-            } catch (Exception e) {
-                Log.e(TAG, e.getMessage(), e);
-            }
-        }*/
-    }
-
-    private void addOtherRuleObjects(Facts facts) throws IOException {
-       /* Iterable<Object> ruleObjects = loadFile(FilePath.FILE.PROFILE_LAST_CONTACT);
-
-        for (Object ruleObject : ruleObjects) {
-            List<YamlConfigWrapper> yamlConfigList = new ArrayList<>();
-            int valueCount = 0;
-            YamlConfig yamlConfig = (YamlConfig) ruleObject;
-
-            List<YamlConfigItem> configItems = yamlConfig.getFields();
-
-            for (YamlConfigItem configItem : configItems) {
-                if (AncApplication.getInstance().getAncRulesEngineHelper().getRelevance(facts, configItem.getRelevance())) {
-                    yamlConfigList.add(new YamlConfigWrapper(null, null, configItem));
-                    valueCount += 1;
-                }
-            }
-
-            if (valueCount > 0) {
-                lastContactDetails.addAll(yamlConfigList);
-            }
-        }*/
-    }
-/*
-    private void addAttentionFlagsRuleObjects(Facts facts) throws IOException {
-        Iterable<Object> attentionFlagsRuleObjects = AncApplication.getInstance().readYaml(FilePath.FILE.ATTENTION_FLAGS);
-
-        for (Object ruleObject : attentionFlagsRuleObjects) {
-            YamlConfig attentionFlagConfig = (YamlConfig) ruleObject;
-            for (YamlConfigItem yamlConfigItem : attentionFlagConfig.getFields()) {
-
-                if (AncApplication.getInstance().getAncRulesEngineHelper()
-                        .getRelevance(facts, yamlConfigItem.getRelevance())) {
-                    lastContactDetails.add(new YamlConfigWrapper(null, null, yamlConfigItem));
-
-                }
-
-            }
-        }
-    }
-
-    private void addTestsRuleObjects(Facts facts) throws IOException {
-        Iterable<Object> testsRuleObjects = AncApplication.getInstance()
-                .readYaml(FilePath.FILE.PROFILE_TAB_PREVIOUS_CONTACT_TEST);
-
-        for (Object ruleObject : testsRuleObjects) {
-            YamlConfig testsConfig = (YamlConfig) ruleObject;
-            for (YamlConfigItem yamlConfigItem : testsConfig.getFields()) {
-
-                if (AncApplication.getInstance().getAncRulesEngineHelper()
-                        .getRelevance(facts, yamlConfigItem.getRelevance())) {
-                    lastContactTests.add(new YamlConfigWrapper(null, null, yamlConfigItem));
-
-                }
-
-            }
-        }
-    }*/
-/*
-    private void setUpContactDetailsRecycler(List<LastContactDetailsWrapper> lastContactDetailsWrappers) {
-        LastContactAdapter adapter = new LastContactAdapter(lastContactDetailsWrappers, getActivity());
-        adapter.notifyDataSetChanged();
-        RecyclerView recyclerView = lastContactLayout.findViewById(R.id.last_contact_information);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerView.setAdapter(adapter);
-    }
-
-    private void setUpContactTestsDetails(List<LastContactDetailsWrapper> lastContactDetailsTestsWrapperList) {
-        List<YamlConfigWrapper> data = new ArrayList<>();
-        Facts facts = new Facts();
-        if (lastContactDetailsTestsWrapperList.size() > 0) {
-            for (int i = 0; i < lastContactDetailsTestsWrapperList.size(); i++) {
-                LastContactDetailsWrapper lastContactDetailsTest = lastContactDetailsTestsWrapperList.get(i);
-                data = lastContactDetailsTest.getExtraInformation();
-                facts = lastContactDetailsTest.getFacts();
-            }
-        }
-
-        populateTestDetails(data, facts);
-    }
-
-    private void populateTestDetails(List<YamlConfigWrapper> data, Facts facts) {
-        if (data != null && data.size() > 0) {
-            for (int position = 0; position < data.size(); position++) {
-                if (data.get(position).getYamlConfigItem() != null) {
-                    ConstraintLayout constraintLayout = formUtils.createListViewItems(data, facts, position, getActivity());
-                    testsDisplayLayout.addView(constraintLayout);
-                }
-            }
-        }
-    }*/
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -248,30 +90,6 @@ public class ProfileVisitFragment extends BaseProfileFragment implements OpdProf
 
         return fragmentView;
     }
-
-    private Iterable<Object> loadFile(String filename) throws IOException {
-        return OpdLibrary.getInstance().readYaml(filename);
-    }
-
-    /*private void goToPreviousContacts() {
-        Intent intent = new Intent(getActivity(), PreviousContactsDetailsActivity.class);
-        String baseEntityId = getActivity().getIntent().getStringExtra(Constants.INTENT_KEY.BASE_ENTITY_ID);
-        intent.putExtra(Constants.INTENT_KEY.BASE_ENTITY_ID, baseEntityId);
-        intent.putExtra(Constants.INTENT_KEY.CLIENT_MAP,
-                getActivity().getIntent().getSerializableExtra(Constants.INTENT_KEY.CLIENT_MAP));
-
-        this.startActivity(intent);
-    }
-
-    private void goToPreviousContactsTests() {
-        Intent intent = new Intent(getActivity(), PreviousContactsTestsActivity.class);
-        String baseEntityId = getActivity().getIntent().getStringExtra(Constants.INTENT_KEY.BASE_ENTITY_ID);
-        intent.putExtra(Constants.INTENT_KEY.BASE_ENTITY_ID, baseEntityId);
-        intent.putExtra(Constants.INTENT_KEY.CLIENT_MAP,
-                getActivity().getIntent().getSerializableExtra(Constants.INTENT_KEY.CLIENT_MAP));
-
-        this.startActivity(intent);
-    }*/
 
     /**
      * Handles the Click actions on any of the section in the page.

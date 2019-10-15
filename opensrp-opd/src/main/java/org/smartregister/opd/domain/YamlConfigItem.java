@@ -1,6 +1,8 @@
 package org.smartregister.opd.domain;
 
 
+import android.support.annotation.Nullable;
+
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-27
  */
@@ -17,42 +19,46 @@ public class YamlConfigItem {
     public YamlConfigItem() {
     }
 
-    public YamlConfigItem(String template, String relevance, String isRedFont) {
+    public YamlConfigItem(@Nullable String template, @Nullable String relevance, @Nullable String isRedFont) {
         this.template = template;
         this.relevance = relevance;
         this.isRedFont = isRedFont;
         this.isMultiWidget = Boolean.FALSE;
     }
 
+    @Nullable
     public String getIsRedFont() {
         return isRedFont;
     }
 
-    public void setIsRedFont(String isRedFont) {
+    public void setIsRedFont(@Nullable String isRedFont) {
         this.isRedFont = isRedFont;
     }
 
+    @Nullable
     public String getTemplate() {
         return template;
     }
 
-    public void setTemplate(String template) {
+    public void setTemplate(@Nullable String template) {
         this.template = template;
     }
 
+    @Nullable
     public String getRelevance() {
         return relevance;
     }
 
-    public void setRelevance(String relevance) {
+    public void setRelevance(@Nullable String relevance) {
         this.relevance = relevance;
     }
 
+    @Nullable
     public Boolean isMultiWidget() {
         return isMultiWidget;
     }
 
-    public void setIsMultiWidget(Boolean multiWidget) {
+    public void setIsMultiWidget(@Nullable Boolean multiWidget) {
         this.isMultiWidget = multiWidget;
     }
 }

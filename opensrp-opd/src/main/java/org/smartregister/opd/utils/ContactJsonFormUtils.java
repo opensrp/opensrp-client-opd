@@ -1,5 +1,6 @@
 package org.smartregister.opd.utils;
 
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.google.common.collect.ImmutableMap;
@@ -392,6 +393,7 @@ public class ContactJsonFormUtils extends FormUtils {
         return list != null ? list.toString().substring(1, list.toString().length() - 1) : "";
     }
 
+    @NonNull
     public static String keyToValueConverter(String keys) {
         if (keys != null) {
             String cleanKey = WordUtils.capitalizeFully(cleanValue(keys), ',');

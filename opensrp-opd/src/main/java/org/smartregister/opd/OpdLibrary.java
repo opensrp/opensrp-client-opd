@@ -6,9 +6,9 @@ import org.smartregister.Context;
 import org.smartregister.opd.configuration.OpdConfiguration;
 import org.smartregister.opd.domain.YamlConfig;
 import org.smartregister.opd.domain.YamlConfigItem;
-import org.smartregister.opd.helper.AncRulesEngineHelper;
-import org.smartregister.opd.repository.CheckInRepository;
-import org.smartregister.opd.repository.VisitRepository;
+import org.smartregister.opd.helper.OpdRulesEngineHelper;
+import org.smartregister.opd.repository.OpdCheckInRepository;
+import org.smartregister.opd.repository.OpdVisitRepository;
 import org.smartregister.opd.utils.FilePath;
 import org.smartregister.repository.Repository;
 import org.smartregister.repository.UniqueIdRepository;
@@ -39,12 +39,12 @@ public class OpdLibrary {
     private Compressor compressor;
     private int applicationVersion;
     private int databaseVersion;
-    private CheckInRepository checkInRepository;
-    private VisitRepository visitRepository;
+    private OpdCheckInRepository checkInRepository;
+    private OpdVisitRepository visitRepository;
 
     private Yaml yaml;
 
-    private AncRulesEngineHelper ancRulesEngineHelper;
+    private OpdRulesEngineHelper opdRulesEngineHelper;
 
     protected OpdLibrary(@NonNull Context context, @NonNull OpdConfiguration opdConfiguration
             , @NonNull Repository repository, int applicationVersion, int databaseVersion) {
@@ -89,18 +89,18 @@ public class OpdLibrary {
     }
 
     @NonNull
-    public CheckInRepository getCheckInRepository() {
+    public OpdCheckInRepository getCheckInRepository() {
         if (checkInRepository == null) {
-            checkInRepository = new CheckInRepository(getRepository());
+            checkInRepository = new OpdCheckInRepository(getRepository());
         }
 
         return checkInRepository;
     }
 
     @NonNull
-    public VisitRepository getVisitRepository() {
+    public OpdVisitRepository getVisitRepository() {
         if (visitRepository == null) {
-            visitRepository = new VisitRepository(getRepository());
+            visitRepository = new OpdVisitRepository(getRepository());
         }
 
         return visitRepository;
@@ -125,10 +125,12 @@ public class OpdLibrary {
         return opdConfiguration;
     }
 
+    @NonNull
     public Compressor getCompressor() {
         if (compressor == null) {
             compressor = Compressor.getDefault(context().applicationContext());
         }
+
         return compressor;
     }
 
@@ -149,16 +151,19 @@ public class OpdLibrary {
         yaml = new Yaml(constructor);
     }
 
+    @NonNull
     public Iterable<Object> readYaml(String filename) throws IOException {
         InputStreamReader inputStreamReader = new InputStreamReader(
                 DrishtiApplication.getInstance().getApplicationContext().getAssets().open((FilePath.FOLDER.CONFIG_FOLDER_PATH + filename)));
         return yaml.loadAll(inputStreamReader);
     }
 
-    public AncRulesEngineHelper getAncRulesEngineHelper() {
-        if (ancRulesEngineHelper == null) {
-            ancRulesEngineHelper = new AncRulesEngineHelper(context.applicationContext().getApplicationContext());
+    @NonNull
+    public OpdRulesEngineHelper getOpdRulesEngineHelper() {
+        if (opdRulesEngineHelper == null) {
+            opdRulesEngineHelper = new OpdRulesEngineHelper(context.applicationContext().getApplicationContext());
         }
-        return ancRulesEngineHelper;
+
+        return opdRulesEngineHelper;
     }
 }

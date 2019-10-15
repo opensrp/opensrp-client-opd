@@ -3,15 +3,14 @@ package org.smartregister.opd.interactor;
 import android.support.annotation.NonNull;
 
 import org.smartregister.opd.contract.OpdProfileActivityContract;
-import org.smartregister.opd.tasks.FetchProfileDataTask;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-27
  */
-public class ProfileInteractor implements OpdProfileActivityContract.Interactor {
+public class OpdProfileInteractor implements OpdProfileActivityContract.Interactor {
     private OpdProfileActivityContract.Presenter mProfilePresenter;
 
-    public ProfileInteractor(OpdProfileActivityContract.Presenter loginPresenter) {
+    public OpdProfileInteractor(OpdProfileActivityContract.Presenter loginPresenter) {
         this.mProfilePresenter = loginPresenter;
     }
 
@@ -24,9 +23,8 @@ public class ProfileInteractor implements OpdProfileActivityContract.Interactor 
 
     @Override
     public void refreshProfileView(@NonNull String baseEntityId, boolean isForEdit) {
-        new FetchProfileDataTask(isForEdit).execute(baseEntityId);
+        // Todo: Add code for refreshing the profile view
     }
-
 
     public OpdProfileActivityContract.View getProfileView() {
         return mProfilePresenter.getProfileView();

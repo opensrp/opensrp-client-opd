@@ -4,7 +4,7 @@ package org.smartregister.opd.pojos;
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-30
  */
 
-public class CheckIn {
+public class OpdCheckIn {
 
     private int id;
     private String eventId;

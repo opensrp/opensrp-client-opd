@@ -3,7 +3,7 @@ package org.smartregister.opd.dao;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.smartregister.opd.pojos.CheckIn;
+import org.smartregister.opd.pojos.OpdCheckIn;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-30
@@ -12,9 +12,9 @@ import org.smartregister.opd.pojos.CheckIn;
 public interface CheckInDao {
 
     @Nullable
-    CheckIn getLatestCheckIn(@NonNull String clientBaseEntityId);
+    OpdCheckIn getLatestCheckIn(@NonNull String clientBaseEntityId);
 
     @Nullable
-    CheckIn getCheckInByVisit(@NonNull int visitId);
+    OpdCheckIn getCheckInByVisit(int visitId);
 
 }

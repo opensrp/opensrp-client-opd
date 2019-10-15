@@ -33,14 +33,13 @@ public interface OpdDbConstants {
     }
 
     interface Table {
-
-        String CHECK_IN = "check_in";
-        String VISIT = "visit";
+        String OPD_CHECK_IN = "opd_check_in";
+        String OPD_VISIT = "opd_visit";
     }
 
     interface Column {
 
-        interface CheckIn {
+        interface OpdCheckIn {
             String ID = "_id";
             String EVENT_ID = "event_id";
             String VISIT_ID = "visit_id";
@@ -57,7 +56,7 @@ public interface OpdDbConstants {
             String UPDATED_AT = "updated_at";
         }
 
-        interface Visit {
+        interface OpdVisit {
             String ID = "_id";
             String VISIT_DATE = "visit_date";
             String PROVIDER_ID = "provider_id";

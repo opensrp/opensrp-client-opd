@@ -6,7 +6,7 @@ import java.util.Date;
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-10-01
  */
 
-public class Visit {
+public class OpdVisit {
 
     private int id;
     private Date visitDate;
