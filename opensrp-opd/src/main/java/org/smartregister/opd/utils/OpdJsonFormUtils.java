@@ -94,8 +94,8 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
     private static void addRegLocHierarchyQuestions(@NonNull JSONObject form, @NonNull String widgetKey, @NonNull LocationHierarchy locationHierarchy) {
         try {
             JSONArray questions = form.getJSONObject(JsonFormConstants.STEP1).getJSONArray(JsonFormConstants.FIELDS);
-            ArrayList<String> allLevels = OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata().getLocationLevels();
-            ArrayList<String> healthFacilities = OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata().getHealthFacilityLevels();
+            ArrayList<String> allLevels = OpdUtils.metadata().getLocationLevels();
+            ArrayList<String> healthFacilities = OpdUtils.metadata().getHealthFacilityLevels();
 
             List<String> defaultLocation = LocationHelper.getInstance().generateDefaultLocationHierarchy(allLevels);
             List<String> defaultFacility = LocationHelper.getInstance().generateDefaultLocationHierarchy(healthFacilities);

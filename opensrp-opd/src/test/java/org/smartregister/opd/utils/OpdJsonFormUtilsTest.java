@@ -14,6 +14,7 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
+import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.Context;
 import org.smartregister.CoreLibrary;
 import org.smartregister.SyncConfiguration;
@@ -36,7 +37,7 @@ import java.util.ArrayList;
 public class OpdJsonFormUtilsTest {
 
     @Test
-    public void testGetFormAsJsonWithNonEmptyJsonObjectAndEntityIdBlank() throws JSONException {
+    public void testGetFormAsJsonWithNonEmptyJsonObjectAndEntityIdBlank() throws Exception {
         OpdMetadata opdMetadata = new OpdMetadata(OpdConstants.JSON_FORM_KEY.NAME
                 , OpdDbConstants.KEY.TABLE
                 , OpdConstants.EventType.OPD_REGISTRATION
@@ -45,12 +46,9 @@ public class OpdJsonFormUtilsTest {
                 , Class.class
                 , Class.class
                 , true);
-        OpdConfiguration opdConfiguration = new OpdConfiguration
-                .Builder(OpdRegisterQueryProviderTest.class)
-                .setOpdMetadata(opdMetadata)
-                .build();
-        OpdLibrary.init(PowerMockito.mock(Context.class), PowerMockito.mock(Repository.class), opdConfiguration,
+        OpdLibrary.init(PowerMockito.mock(Context.class), PowerMockito.mock(Repository.class), Mockito.mock(OpdConfiguration.class),
                 BuildConfig.VERSION_CODE, 1);
+        PowerMockito.when(OpdUtils.class,"metadata").thenReturn(opdMetadata);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("metadata", new JSONObject());
         JSONObject result = OpdJsonFormUtils.getFormAsJson(jsonObject, OpdConstants.JSON_FORM_KEY.NAME, "", "");
@@ -58,7 +56,7 @@ public class OpdJsonFormUtilsTest {
     }
 
     @Test
-    public void testGetFormAsJsonWithNonEmptyJsonObjectAndEntityIdNonEmpty() throws JSONException {
+    public void testGetFormAsJsonWithNonEmptyJsonObjectAndEntityIdNonEmpty() throws Exception {
         OpdMetadata opdMetadata = new OpdMetadata(OpdConstants.JSON_FORM_KEY.NAME
                 , OpdDbConstants.KEY.TABLE
                 , OpdConstants.EventType.OPD_REGISTRATION
@@ -67,12 +65,9 @@ public class OpdJsonFormUtilsTest {
                 , Class.class
                 , Class.class
                 , true);
-        OpdConfiguration opdConfiguration = new OpdConfiguration
-                .Builder(OpdRegisterQueryProviderTest.class)
-                .setOpdMetadata(opdMetadata)
-                .build();
-        OpdLibrary.init(PowerMockito.mock(Context.class), PowerMockito.mock(Repository.class), opdConfiguration,
+        OpdLibrary.init(PowerMockito.mock(Context.class), PowerMockito.mock(Repository.class), Mockito.mock(OpdConfiguration.class),
                 BuildConfig.VERSION_CODE, 1);
+        PowerMockito.when(OpdUtils.class,"metadata").thenReturn(opdMetadata);
 
         JSONObject jsonArrayFieldsJsonObject = new JSONObject();
         jsonArrayFieldsJsonObject.put(OpdJsonFormUtils.KEY, OpdJsonFormUtils.OPENSRP_ID);
@@ -87,7 +82,7 @@ public class OpdJsonFormUtilsTest {
         jsonObject.put("metadata", new JSONObject());
         jsonObject.put(OpdJsonFormUtils.STEP1, jsonObjectForFields);
 
-        JSONObject result = OpdJsonFormUtils.getFormAsJson(jsonObject, OpdConstants.JSON_FORM_KEY.NAME, "23", "");
+        JSONObject result = OpdJsonFormUtils.getFormAsJson(jsonObject, OpdConstants.JSON_FORM_KEY.NAME, "23", "currentLocation");
         Assert.assertEquals(result, jsonObject);
     }
 
