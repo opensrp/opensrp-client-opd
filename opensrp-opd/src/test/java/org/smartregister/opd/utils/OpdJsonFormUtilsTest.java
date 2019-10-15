@@ -14,7 +14,6 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
-import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.Context;
 import org.smartregister.CoreLibrary;
 import org.smartregister.SyncConfiguration;
@@ -48,7 +47,7 @@ public class OpdJsonFormUtilsTest {
                 , true);
         OpdLibrary.init(PowerMockito.mock(Context.class), PowerMockito.mock(Repository.class), Mockito.mock(OpdConfiguration.class),
                 BuildConfig.VERSION_CODE, 1);
-        PowerMockito.when(OpdUtils.class,"metadata").thenReturn(opdMetadata);
+        PowerMockito.when(OpdUtils.class, "metadata").thenReturn(opdMetadata);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("metadata", new JSONObject());
         JSONObject result = OpdJsonFormUtils.getFormAsJson(jsonObject, OpdConstants.JSON_FORM_KEY.NAME, "", "");
@@ -67,7 +66,7 @@ public class OpdJsonFormUtilsTest {
                 , true);
         OpdLibrary.init(PowerMockito.mock(Context.class), PowerMockito.mock(Repository.class), Mockito.mock(OpdConfiguration.class),
                 BuildConfig.VERSION_CODE, 1);
-        PowerMockito.when(OpdUtils.class,"metadata").thenReturn(opdMetadata);
+        PowerMockito.when(OpdUtils.class, "metadata").thenReturn(opdMetadata);
 
         JSONObject jsonArrayFieldsJsonObject = new JSONObject();
         jsonArrayFieldsJsonObject.put(OpdJsonFormUtils.KEY, OpdJsonFormUtils.OPENSRP_ID);
@@ -395,4 +394,5 @@ public class OpdJsonFormUtilsTest {
     public void testProcessOpdDetailsFormShouldReturnNullJsonFormNull() {
         Assert.assertNull(OpdJsonFormUtils.processOpdDetailsForm("", Mockito.mock(FormTag.class)));
     }
+
 }
