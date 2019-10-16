@@ -1,4 +1,6 @@
-
+[![Build Status](https://travis-ci.org/OpenSRP/opensrp-client-opd.svg?branch=master)](https://travis-ci.org/OpenSRP/opensrp-client-opd) 
+[![Coverage Status](https://coveralls.io/repos/github/OpenSRP/opensrp-client-opd/badge.svg?branch=master)](https://coveralls.io/github/OpenSRP/opensrp-client-opd?branch=master)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/62f3061728134b53a4f5fbc19f593ee8)](https://www.codacy.com/manual/bennsimon/opensrp-client-opd?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=OpenSRP/opensrp-client-opd&amp;utm_campaign=Badge_Grade)
 # OpenSRP Client OPD Library
 
 This library provides the ability to show an OPD(Outpatient Department) Register to a client application

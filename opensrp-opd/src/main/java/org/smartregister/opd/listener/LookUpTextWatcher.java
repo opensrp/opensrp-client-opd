@@ -1,5 +1,6 @@
 package org.smartregister.opd.listener;
 
+import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -19,36 +20,35 @@ import java.util.Map;
 public class LookUpTextWatcher implements TextWatcher {
 
     private static Map<String, String> lookUpFields;
+    private final View editText;
+    private final JsonFormFragment jsonFormFragment;
 
-    private final View mView;
-    private final JsonFormFragment formFragment;
-
-
-    public LookUpTextWatcher(JsonFormFragment formFragment, View view) {
-        this.formFragment = formFragment;
-        mView = view;
+    public LookUpTextWatcher(@NonNull JsonFormFragment jsonFormFragment, @NonNull View editText) {
+        this.jsonFormFragment = jsonFormFragment;
+        this.editText = editText;
         lookUpFields = new HashMap<>();
     }
 
     public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        //Do nothing
     }
 
     public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
-
+        //Do nothing
     }
 
     public void afterTextChanged(Editable editable) {
-        String text = (String) mView.getTag(com.vijay.jsonwizard.R.id.raw_value);
+        String text = (String) editText.getTag(com.vijay.jsonwizard.R.id.raw_value);
 
         if (text == null) {
             text = editable.toString();
         }
 
-        String key = (String) mView.getTag(com.vijay.jsonwizard.R.id.key);
+        String key = (String) editText.getTag(com.vijay.jsonwizard.R.id.key);
 
-        boolean afterLookUp = (Boolean) mView.getTag(com.vijay.jsonwizard.R.id.after_look_up);
+        boolean afterLookUp = (Boolean) editText.getTag(com.vijay.jsonwizard.R.id.after_look_up);
         if (afterLookUp) {
-            mView.setTag(com.vijay.jsonwizard.R.id.after_look_up, false);
+            editText.setTag(com.vijay.jsonwizard.R.id.after_look_up, false);
             return;
         }
 
@@ -60,9 +60,9 @@ public class LookUpTextWatcher implements TextWatcher {
         }
         lookUpFields.put(key, text);
 
-        if (formFragment instanceof BaseOpdFormFragment) {
-            BaseOpdFormFragment OpdFormFragment = (BaseOpdFormFragment) formFragment;
-            Listener<List<CommonPersonObject>> listener = OpdFormFragment.lookUpListener();
+        if (jsonFormFragment instanceof BaseOpdFormFragment) {
+            BaseOpdFormFragment opdFormFragment = (BaseOpdFormFragment) jsonFormFragment;
+            Listener<List<CommonPersonObject>> listener = opdFormFragment.lookUpListener();
 
             OpdLookUpUtils.lookUp(OpdLibrary.getInstance().context(), lookUpFields, listener);
         }

@@ -10,7 +10,7 @@ public class OpdEventClient {
     private Event event;
     private Client client;
 
-    public OpdEventClient(@NonNull Client client,@NonNull  Event event) {
+    public OpdEventClient(@NonNull Client client, @NonNull Event event) {
         this.client = client;
         this.event = event;
     }

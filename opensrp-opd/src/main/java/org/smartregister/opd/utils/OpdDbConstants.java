@@ -5,7 +5,7 @@ package org.smartregister.opd.utils;
  */
 
 public interface OpdDbConstants {
-    
+
     interface KEY {
 
         String MOTHER_FIRST_NAME = "mother_first_name";
@@ -26,5 +26,20 @@ public interface OpdDbConstants {
         String BASE_ENTITY_ID = "base_entity_id";
         String LAST_INTERACTED_WITH = "last_interacted_with";
         String DATE_REMOVED = "date_removed";
+    }
+
+    interface Table {
+
+        interface Client {
+            String PHOTO = "photo";
+            String FIRST_NAME = "first_name";
+            String LAST_NAME = "last_name";
+            String BASE_ENTITY_ID = "base_entity_id";
+            String DOB = "dob";//Date Of Birth
+            String OPENSRP_ID = "opensrp_id";
+            String RELATIONALID = "relationalid";
+            String NATIONAL_ID = "national_id";
+            String GENDER = "gender";
+        }
     }
 }
