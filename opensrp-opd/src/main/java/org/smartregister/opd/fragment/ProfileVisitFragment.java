@@ -9,12 +9,8 @@ import android.widget.LinearLayout;
 
 import org.smartregister.opd.R;
 import org.smartregister.opd.contract.OpdProfileFragmentContract;
-import org.smartregister.opd.domain.YamlConfigWrapper;
 import org.smartregister.opd.presenter.OpdProfileFragmentPresenter;
 import org.smartregister.view.fragment.BaseProfileFragment;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-27
@@ -22,8 +18,6 @@ import java.util.List;
 
 public class ProfileVisitFragment extends BaseProfileFragment implements OpdProfileFragmentContract.View {
 
-    private List<YamlConfigWrapper> lastContactDetails;
-    private List<YamlConfigWrapper> lastContactTests;
     private LinearLayout testsDisplayLayout;
     private OpdProfileFragmentContract.Presenter presenter;
 
@@ -52,8 +46,6 @@ public class ProfileVisitFragment extends BaseProfileFragment implements OpdProf
 
     @Override
     protected void onCreation() {
-        lastContactDetails = new ArrayList<>();
-        lastContactTests = new ArrayList<>();
         if (testsDisplayLayout != null) {
             testsDisplayLayout.removeAllViews();
         }
@@ -61,8 +53,6 @@ public class ProfileVisitFragment extends BaseProfileFragment implements OpdProf
 
     @Override
     protected void onResumption() {
-        lastContactDetails = new ArrayList<>();
-        lastContactTests = new ArrayList<>();
         if (testsDisplayLayout != null) {
             testsDisplayLayout.removeAllViews();
         }

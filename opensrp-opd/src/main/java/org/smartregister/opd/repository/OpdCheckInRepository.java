@@ -107,10 +107,8 @@ public class OpdCheckInRepository extends BaseRepository implements CheckInDao {
                         , OpdCheckIn.CREATED_AT + " DESC"
                         , "1");
 
-                if (mCursor != null) {
-                    if (mCursor.moveToNext()) {
-                        checkIn = getCheckInResult(mCursor);
-                    }
+                if (mCursor != null && mCursor.moveToNext()) {
+                    checkIn = getCheckInResult(mCursor);
                 }
             }
 

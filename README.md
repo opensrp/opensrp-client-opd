@@ -83,7 +83,8 @@ where you should have implemented your own:
         VisitRepository.createTable(database);
         CheckInRepository.createTable(database);
     }
-```
+    
+ ```
  
  
  ## 2. Required Implementations
@@ -146,12 +147,12 @@ where you should have implemented your own:
  
  -  You should add basically create a new instance of the Presenter implemented above  
  
-    ```java
+      ```java
     
-    return new OpdRegisterActivityPresenter(view, model);
+      return new OpdRegisterActivityPresenter(view, model);
     
-    ```
- in your implementation of `BaseOpdRegisterActivityPresenter createPresenter(@NonNull OpdRegisterActivityContract.View, @NonNull OpdRegisterActivityContract.Model)` 
+      ```
+    in your implementation of `BaseOpdRegisterActivityPresenter createPresenter(@NonNull OpdRegisterActivityContract.View, @NonNull OpdRegisterActivityContract.Model)` 
 
 
 ## 3. Enable OPD Registration

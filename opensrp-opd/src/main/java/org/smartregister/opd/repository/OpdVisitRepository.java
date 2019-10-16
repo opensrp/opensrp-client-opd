@@ -103,10 +103,8 @@ public class OpdVisitRepository extends BaseRepository implements VisitDao {
                         , OpdVisit.VISIT_DATE + " DESC"
                         , "1");
 
-                if (mCursor != null) {
-                    if (mCursor.moveToNext()) {
-                        visit = getVisitResult(mCursor);
-                    }
+                if (mCursor != null && mCursor.moveToNext()) {
+                    visit = getVisitResult(mCursor);
                 }
             }
 
