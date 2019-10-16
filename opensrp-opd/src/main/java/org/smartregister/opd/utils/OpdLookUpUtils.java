@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
-import org.smartregister.AllConstants;
 import org.smartregister.Context;
 import org.smartregister.commonregistry.CommonPersonObject;
 import org.smartregister.commonregistry.CommonRepository;
@@ -60,7 +59,9 @@ public class OpdLookUpUtils {
 
             CommonRepository commonRepository = context.commonrepository(tableName);
             String query = lookUpQuery(entityLookUp, tableName);
-
+            if (query == null) {
+                return results;
+            }
             Cursor cursor = null;
             try {
 
@@ -84,44 +85,31 @@ public class OpdLookUpUtils {
         return results;
     }
 
-    private static String lookUpQuery(@NonNull Map<String, String> entityMap, @NonNull String tableName) {
+    protected static String lookUpQuery(@NonNull Map<String, String> entityMap, @NonNull String tableName) {
         SmartRegisterQueryBuilder queryBUilder = new SmartRegisterQueryBuilder();
         queryBUilder.SelectInitiateMainTable(tableName,
-                new String[]{OpdConstants.KEY.RELATIONALID, OpdConstants.KEY.OPENSRP_ID, OpdConstants.KEY.FIRST_NAME, OpdConstants.KEY.LAST_NAME,
-                        AllConstants.ChildRegistrationFields.GENDER, OpdConstants.KEY.DOB,
-                        OpdConstants.KEY.BASE_ENTITY_ID}
+                new String[]{OpdDbConstants.Column.Client.RELATIONALID, OpdDbConstants.Column.Client.OPENSRP_ID,
+                        OpdDbConstants.Column.Client.FIRST_NAME, OpdDbConstants.Column.Client.LAST_NAME,
+                        OpdDbConstants.Column.Client.GENDER, OpdDbConstants.Column.Client.DOB,
+                        OpdDbConstants.Column.Client.BASE_ENTITY_ID, OpdDbConstants.Column.Client.NATIONAL_ID}
 
         );
-        String query = queryBUilder.mainCondition(getMainConditionString(entityMap));
+        String mainConditionString = getMainConditionString(entityMap);
+        if (mainConditionString.isEmpty()) {
+            return null;
+        }
+        String query = queryBUilder.mainCondition(mainConditionString);
         return queryBUilder.Endquery(query);
     }
 
-    private static String getMainConditionString(@NonNull Map<String, String> entityMap) {
+    protected static String getMainConditionString(@NonNull Map<String, String> entityMap) {
         String mainConditionString = "";
         for (Map.Entry<String, String> entry : entityMap.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
-            //first name, last name, bht id, national id
-            String firstName = "first_name";
-            String lastName = "last_name";
-            String bht_id = "bht_mid";
-            String national_id = "national_id";
-            if (StringUtils.containsIgnoreCase(key, firstName)) {
-                key = firstName;
+            if (value == null || value.isEmpty()) {
+                continue;
             }
-
-            if (StringUtils.containsIgnoreCase(key, lastName)) {
-                key = lastName;
-            }
-
-            if (StringUtils.containsIgnoreCase(key, bht_id)) {
-                key = bht_id;
-            }
-
-            if (StringUtils.containsIgnoreCase(key, national_id)) {
-                key = national_id;
-            }
-
             if (StringUtils.isBlank(mainConditionString)) {
                 mainConditionString += " " + key + " Like '%" + value + "%'";
             } else {

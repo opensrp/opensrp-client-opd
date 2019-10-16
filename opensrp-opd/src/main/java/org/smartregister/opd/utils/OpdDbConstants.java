@@ -32,11 +32,6 @@ public interface OpdDbConstants {
         String REGISTER_ID = "register_id";
     }
 
-    interface Table {
-        String OPD_CHECK_IN = "opd_check_in";
-        String OPD_VISIT = "opd_visit";
-    }
-
     interface Column {
 
         interface OpdCheckIn {
@@ -64,5 +59,24 @@ public interface OpdDbConstants {
             String BASE_ENTITY_ID = "base_entity_id";
             String CREATED_AT = "created_at";
         }
+
+        interface Client {
+            String PHOTO = "photo";
+            String FIRST_NAME = "first_name";
+            String LAST_NAME = "last_name";
+            String BASE_ENTITY_ID = "base_entity_id";
+            String DOB = "dob";
+            String OPENSRP_ID = "opensrp_id";
+            String RELATIONALID = "relationalid";
+            String NATIONAL_ID = "national_id";
+            String GENDER = "gender";
+        }
+    }
+
+    interface Table {
+
+        String OPD_CHECK_IN = "opd_check_in";
+        String OPD_VISIT = "opd_visit";
+
     }
 }

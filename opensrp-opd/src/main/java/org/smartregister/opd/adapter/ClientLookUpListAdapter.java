@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import org.smartregister.commonregistry.CommonPersonObject;
 import org.smartregister.opd.R;
+import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.util.Utils;
 
 import java.util.List;
@@ -35,11 +36,12 @@ public class ClientLookUpListAdapter extends RecyclerView.Adapter<ClientLookUpLi
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int i) {
         CommonPersonObject commonPersonObject = data.get(i);
-        String firstName = Utils.getValue(commonPersonObject.getColumnmaps(), "first_name", true);
-        String lastName = Utils.getValue(commonPersonObject.getColumnmaps(), "last_name", true);
-        String nationalId = Utils.getValue(commonPersonObject.getColumnmaps(), "national_id", true);
-        String fullname =  firstName + " " + lastName;
-        String details = context.getString(R.string.national_id) + " - " + nationalId;
+        String firstName = Utils.getValue(commonPersonObject.getColumnmaps(), OpdDbConstants.Column.Client.FIRST_NAME, true);
+        String lastName = Utils.getValue(commonPersonObject.getColumnmaps(), OpdDbConstants.Column.Client.LAST_NAME, true);
+        String nationalId = Utils.getValue(commonPersonObject.getColumnmaps(), OpdDbConstants.Column.Client.NATIONAL_ID, true);
+        String opensrpId = Utils.getValue(commonPersonObject.getColumnmaps(), OpdDbConstants.Column.Client.OPENSRP_ID, true);
+        String fullname = firstName + " " + lastName;
+        String details = context.getString(R.string.national_id) + " - " + nationalId + ", " + context.getString(R.string.opd_opensrp_id_type) + " - " + opensrpId;
         holder.txtName.setText(fullname);
         holder.itemView.setTag(Utils.convert(commonPersonObject));
         holder.txtDetails.setText(details);
@@ -63,17 +65,17 @@ public class ClientLookUpListAdapter extends RecyclerView.Adapter<ClientLookUpLi
 
         @Override
         public void onClick(View view) {
-            if(clickListener != null) {
+            if (clickListener != null) {
                 clickListener.onItemClick(view);
             }
         }
     }
 
-    public interface  ClickListener {
+    public interface ClickListener {
         void onItemClick(View view);
     }
 
-    public void setOnClickListener(ClickListener onClickListener){
+    public void setOnClickListener(ClickListener onClickListener) {
         ClientLookUpListAdapter.clickListener = onClickListener;
     }
 }
