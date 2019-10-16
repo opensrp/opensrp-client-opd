@@ -1,5 +1,7 @@
 package org.smartregister.opd.pojos;
 
+import android.support.annotation.Nullable;
+
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-30
  */
@@ -110,6 +112,7 @@ public class CheckIn {
         this.appointmentScheduledPreviously = appointmentScheduledPreviously;
     }
 
+    @Nullable
     public String getAppointmentDueDate() {
         return appointmentDueDate;
     }

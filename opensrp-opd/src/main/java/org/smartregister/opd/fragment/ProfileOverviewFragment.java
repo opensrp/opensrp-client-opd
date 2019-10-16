@@ -90,9 +90,6 @@ public class ProfileOverviewFragment extends BaseProfileFragment {
                 }
             }
 
-            /*Toast.makeText(getActivity(), "Showing test data because the user has not check-ins", Toast.LENGTH_LONG)
-                    .show();
-            setTestData(facts);*/
             Iterable<Object> ruleObjects = loadFile(FilePath.FILE.PROFILE_OVERVIEW);
 
             for (Object ruleObject : ruleObjects) {
@@ -147,7 +144,13 @@ public class ProfileOverviewFragment extends BaseProfileFragment {
         facts.put("visit_type", checkIn.getVisitType());
         facts.put("previous_appointment", checkIn.getAppointmentScheduledPreviously());
         facts.put("date_of_appointment", checkIn.getAppointmentDueDate());
-        facts.put("visit_to_appointment_date", getVisitToAppointmentDateDuration(visit.getVisitDate(), checkIn.getAppointmentDueDate()));
+
+        String visitToAppointmentDateDuration = null;
+        if (checkIn.getAppointmentDueDate() != null) {
+            visitToAppointmentDateDuration = getVisitToAppointmentDateDuration(visit.getVisitDate(), checkIn.getAppointmentDueDate());
+        }
+
+        facts.put("visit_to_appointment_date", visitToAppointmentDateDuration);
     }
 
     @NonNull

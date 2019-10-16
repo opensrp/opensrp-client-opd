@@ -2,6 +2,8 @@ package org.smartregister.opd.processor;
 
 import org.smartregister.CoreLibrary;
 import org.smartregister.anc.library.sync.MiniClientProcessorForJava;
+import org.smartregister.commonregistry.CommonFtsObject;
+import org.smartregister.commonregistry.CommonRepository;
 import org.smartregister.domain.db.Obs;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.exception.CheckInEventProcessException;
@@ -12,9 +14,12 @@ import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.sync.ClientProcessorForJava;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import net.sqlcipher.database.SQLiteException;
 
 import org.smartregister.domain.db.Client;
 import org.smartregister.domain.db.Event;
@@ -171,9 +176,62 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                 throw new CheckInEventProcessException(String.format("OPD Details for visit with id %s updating status of client %s could not be saved in the db. Fail operation failed", visitId, event.getBaseEntityId()));
             }
 
+            // Update the last interacted with of the user
+            try {
+                updateLastInteractedWith(event, visit);
+            } catch (SQLiteException ex) {
+                abortTransaction();
+                throw new CheckInEventProcessException("An error occurred saving last_interacted_with");
+            }
+
             commitSuccessfulTransaction();
         } else {
             throw new CheckInEventProcessException(String.format("Check-in with visit id %s could not be processed because it the visitDate is null", visitId));
+        }
+    }
+
+    private void updateLastInteractedWith(@NonNull Event event, Visit visit) throws CheckInEventProcessException {
+        String tableName = event.getEntityType();
+        String lastInteractedWithDate = String.valueOf(new Date().getTime());
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("last_interacted_with", lastInteractedWithDate);
+
+        int recordsUpdated = OpdLibrary.getInstance().getRepository().getWritableDatabase()
+                .update(tableName,  contentValues,"base_entity_id = ?", new String[]{event.getBaseEntityId()});
+
+        if (recordsUpdated < 1) {
+            abortTransaction();
+            throw new CheckInEventProcessException(String.format("Updating last interacted with for visit %s for base_entity_id %s in table %s failed"
+                    , visit.getId()
+                    , event.getBaseEntityId()
+                    , tableName));
+        }
+
+        // Update FTS
+        CommonRepository commonrepository = CoreLibrary.getInstance().context().commonrepository(tableName);
+
+        ContentValues contentValues1 = new ContentValues();
+        contentValues1.put("last_interacted_with", lastInteractedWithDate);
+
+        boolean isUpdated = false;
+        String fieldName = "base_entity_id";
+        if ("ec_child".equals(tableName)) {
+            fieldName = "object_id";
+        }
+
+        if (commonrepository.isFts()) {
+            recordsUpdated = OpdLibrary.getInstance().getRepository().getWritableDatabase()
+                    .update(CommonFtsObject.searchTableName(tableName),  contentValues,fieldName + " = ?", new String[]{event.getBaseEntityId()});
+            isUpdated = recordsUpdated > 0;
+        }
+
+        if (!isUpdated) {
+            abortTransaction();
+            throw new CheckInEventProcessException(String.format("Updating last interacted with for visit %s for base_entity_id %s in table %s failed"
+                    , visit.getId()
+                    , event.getBaseEntityId()
+                    , tableName));
         }
     }
 

@@ -7,6 +7,7 @@ import android.text.TextUtils;
 
 import net.sqlcipher.Cursor;
 import net.sqlcipher.database.SQLiteDatabase;
+import net.sqlcipher.database.SQLiteException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.smartregister.opd.dao.CheckInDao;
@@ -77,7 +78,10 @@ public class CheckInRepository extends BaseRepository implements CheckInDao {
     public ContentValues createValuesFor(@NonNull org.smartregister.opd.pojos.CheckIn checkIn) {
         ContentValues contentValues = new ContentValues();
 
-        contentValues.put(CheckIn.ID, checkIn.getId());
+        if (checkIn.getId() != 0) {
+            contentValues.put(CheckIn.ID, checkIn.getId());
+        }
+
         contentValues.put(CheckIn.EVENT_ID, checkIn.getEventId());
         contentValues.put(CheckIn.VISIT_ID, checkIn.getVisitId());
         contentValues.put(CheckIn.BASE_ENTITY_ID, checkIn.getBaseEntityId());
@@ -165,13 +169,13 @@ public class CheckInRepository extends BaseRepository implements CheckInDao {
     }
 
     @Override
-    public boolean addCheckIn(@NonNull org.smartregister.opd.pojos.CheckIn checkIn) {
+    public boolean addCheckIn(@NonNull org.smartregister.opd.pojos.CheckIn checkIn) throws SQLiteException {
         ContentValues contentValues = createValuesFor(checkIn);
 
         //TODO: Check for duplicates
 
         SQLiteDatabase database = getWritableDatabase();
-        long recordId = database.insert(OpdDbConstants.Table.CHECK_IN, null, contentValues);
+        long recordId = database.insertOrThrow(OpdDbConstants.Table.CHECK_IN, null, contentValues);
 
         return recordId != -1;
     }

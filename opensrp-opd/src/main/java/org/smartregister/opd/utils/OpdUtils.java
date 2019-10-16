@@ -102,4 +102,13 @@ public class OpdUtils extends org.smartregister.util.Utils {
 
         return data.hasExtra(OpdConstants.IntentKey.BASE_ENTITY_ID) ? data.getStringExtra(OpdConstants.IntentKey.BASE_ENTITY_ID) : null;
     }
+
+    @Nullable
+    public static String getEntityTable(@Nullable Intent data) {
+        if (data == null) {
+            return null;
+        }
+
+        return data.hasExtra(OpdConstants.IntentKey.ENTITY_TABLE) ? data.getStringExtra(OpdConstants.IntentKey.ENTITY_TABLE) : null;
+    }
 }

@@ -58,8 +58,7 @@
         "openmrs_entity_parent": "",
         "openmrs_entity": "",
         "openmrs_entity_id": "",
-        "type": "edit_text",
-        "hint": "What is the current pregnancy status?",
+        "type": "label",
         "read_only": true,
         "hidden": true
       },
@@ -83,7 +82,7 @@
         "relevance": {
           "step1:patient_gender": {
             "type": "string",
-            "ex": "equalTo(., Female)"
+            "ex": "equalTo(., \"Female\")"
           }
         }
       },
@@ -254,12 +253,12 @@
         "openmrs_entity_parent": "",
         "openmrs_entity": "",
         "openmrs_entity_id": "",
-        "type": "label",
-        "value": "Sample label",
+        "type": "edit_text",
+        "hidden": "true",
         "calculation": {
           "rules-engine": {
             "ex-rules": {
-              "rules-file": "opd/opd_checking_calculations.yml"
+              "rules-file": "opd/opd_checkin_calculations.yml"
             }
           }
         }

@@ -66,12 +66,12 @@ public class OpdConstants extends AllConstants {
         public static final String VISIT = "OPD Visit";
     }
 
-
     public interface IntentKey {
         String BASE_ENTITY_ID = "base-entity-id";
         String CLIENT_MAP = "client_map";
         String CLIENT_OBJECT = "common_person_object_client";
         String CONTACT_NO = "contact_number";
+        String ENTITY_TABLE = "entity_table";
     }
 
     public interface Event {

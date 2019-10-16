@@ -96,7 +96,7 @@ public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterAct
     public void saveVisitOrDiagnosisForm(@NonNull String eventType, String jsonString, @Nullable Intent data) {
         if (eventType.equals(OpdConstants.EventType.CHECK_IN)) {
             try {
-                Event opdVisitEvent = OpdLibrary.getInstance().processOpdCheckInEvent(eventType, jsonString, data);
+                Event opdVisitEvent = OpdLibrary.getInstance().processOpdCheckInForm(eventType, jsonString, data);
                 interactor.saveEvent(opdVisitEvent, this);
             } catch (JSONException e) {
                 Timber.e(e);
@@ -113,7 +113,8 @@ public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterAct
     }
 
     @Override
-    public void startForm(@NonNull String formName,@NonNull String entityId,@NonNull String metaData,@NonNull String locationId, @Nullable HashMap<String, String> injectedFieldValues) {
+    public void startForm(@NonNull String formName, @NonNull String entityId, @NonNull String metaData
+            , @NonNull String locationId, @Nullable HashMap<String, String> injectedFieldValues, @Nullable String entityTable) {
         if (StringUtils.isBlank(entityId)) {
             Triple<String, String, String> triple = Triple.of(formName, metaData, locationId);
             interactor.getNextUniqueId(triple, this);
@@ -130,6 +131,7 @@ public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterAct
         if (getView() != null && form != null) {
             HashMap<String, String> intentKeys = new HashMap<>();
             intentKeys.put(OpdConstants.IntentKey.BASE_ENTITY_ID, entityId);
+            intentKeys.put(OpdConstants.IntentKey.ENTITY_TABLE, entityTable);
 
             getView().startFormActivity(form, intentKeys);
         }

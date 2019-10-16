@@ -26,7 +26,7 @@ public interface OpdRegisterActivityContract {
 
         OpdRegisterActivityContract.Presenter presenter();
 
-        void startFormActivity(String formName, String entityId, String metaData, @Nullable HashMap<String, String> injectedFieldValues);
+        void startFormActivity(String formName, String entityId, String metaData, @Nullable HashMap<String, String> injectedFieldValues, @Nullable String clientTable);
 
         void startFormActivity(@NonNull JSONObject jsonForm, @Nullable HashMap<String, String> parcelableData);
     }
@@ -39,7 +39,7 @@ public interface OpdRegisterActivityContract {
 
         void saveVisitOrDiagnosisForm(@NonNull String eventType, String jsonString, @Nullable Intent data);
 
-        void startForm(String formName, String entityId, String metaData, String locationId, @Nullable HashMap<String, String> injectedFieldValues);
+        void startForm(String formName, String entityId, String metaData, String locationId, @Nullable HashMap<String, String> injectedFieldValues, @Nullable String entityTable);
     }
 
     interface Model {

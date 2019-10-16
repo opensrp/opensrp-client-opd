@@ -107,10 +107,10 @@ public abstract class BaseOpdRegisterActivity extends BaseRegisterActivity imple
     }
 
     @Override
-    public void startFormActivity(String formName, String entityId, String metaData, @Nullable HashMap<String, String> injectedFieldValues) {
+    public void startFormActivity(String formName, String entityId, String metaData, @Nullable HashMap<String, String> injectedFieldValues, @Nullable String entityTable) {
         if (mBaseFragment instanceof BaseOpdRegisterFragment) {
             String locationId = OpdUtils.context().allSharedPreferences().getPreference(AllConstants.CURRENT_LOCATION_ID);
-            presenter().startForm(formName, entityId, metaData, locationId, injectedFieldValues);
+            presenter().startForm(formName, entityId, metaData, locationId, injectedFieldValues, entityTable);
         } else {
 
             displayToast(getString(R.string.error_unable_to_start_form));

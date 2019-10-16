@@ -34,6 +34,7 @@ import org.yaml.snakeyaml.constructor.Constructor;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 import org.smartregister.sync.helper.ECSyncHelper;
@@ -192,7 +193,7 @@ public class OpdLibrary {
     }
 
     @NonNull
-    public Event processOpdCheckInEvent(@NonNull String eventType, String jsonString, @Nullable Intent data) throws JSONException {
+    public Event processOpdCheckInForm(@NonNull String eventType, String jsonString, @Nullable Intent data) throws JSONException {
         JSONObject jsonFormObject = new JSONObject(jsonString);
 
         JSONObject stepOne = jsonFormObject.getJSONObject(OpdJsonFormUtils.STEP1);
@@ -201,8 +202,9 @@ public class OpdLibrary {
         FormTag formTag = OpdJsonFormUtils.formTag(OpdUtils.getAllSharedPreferences());
 
         String baseEntityId = OpdUtils.getBaseEntityId(data);
+        String entityTable = OpdUtils.getEntityTable(data);
         Event opdCheckinEvent = OpdJsonFormUtils.createEvent(fieldsArray, jsonFormObject.getJSONObject(OpdJsonFormUtils.METADATA)
-                , formTag, baseEntityId, eventType, "ec_client");
+                , formTag, baseEntityId, eventType, entityTable);
 
         // Generate the eventId and add it
         opdCheckinEvent.setEventId(JsonFormUtils.generateRandomUUIDString());
@@ -220,7 +222,7 @@ public class OpdLibrary {
 
         // Create the visit Id
         opdCheckinEvent.addDetails(OpdConstants.Event.CheckIn.Detail.VISIT_ID, JsonFormUtils.generateRandomUUIDString());
-        opdCheckinEvent.addDetails(OpdConstants.Event.CheckIn.Detail.VISIT_DATE, dateFormat.format(opdCheckinEvent.getEventDate()));
+        opdCheckinEvent.addDetails(OpdConstants.Event.CheckIn.Detail.VISIT_DATE, dateFormat.format(new Date()));
 
         return opdCheckinEvent;
     }
