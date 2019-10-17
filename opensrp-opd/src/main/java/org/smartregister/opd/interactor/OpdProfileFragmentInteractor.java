@@ -8,11 +8,11 @@ import org.smartregister.opd.contract.OpdProfileFragmentContract;
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-27
  */
-public class ProfileFragmentInteractor implements OpdProfileFragmentContract.Interactor {
+public class OpdProfileFragmentInteractor implements OpdProfileFragmentContract.Interactor {
 
     private OpdProfileFragmentContract.Presenter mProfileFrgamentPresenter;
 
-    public ProfileFragmentInteractor(@NonNull OpdProfileFragmentContract.Presenter presenter) {
+    public OpdProfileFragmentInteractor(@NonNull OpdProfileFragmentContract.Presenter presenter) {
         this.mProfileFrgamentPresenter = presenter;
     }
 

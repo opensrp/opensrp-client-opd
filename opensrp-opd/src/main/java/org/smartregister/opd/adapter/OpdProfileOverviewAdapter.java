@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-30
  */
-public class ProfileOverviewAdapter extends RecyclerView.Adapter<ProfileOverviewAdapter.ViewHolder> {
+public class OpdProfileOverviewAdapter extends RecyclerView.Adapter<OpdProfileOverviewAdapter.ViewHolder> {
 
     private List<YamlConfigWrapper> mData;
     private LayoutInflater mInflater;
@@ -29,7 +29,7 @@ public class ProfileOverviewAdapter extends RecyclerView.Adapter<ProfileOverview
     private Context context;
 
     // data is passed into the constructor
-    public ProfileOverviewAdapter(@NonNull Context context, @NonNull List<YamlConfigWrapper> data, @NonNull Facts facts) {
+    public OpdProfileOverviewAdapter(@NonNull Context context, @NonNull List<YamlConfigWrapper> data, @NonNull Facts facts) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
         this.facts = facts;

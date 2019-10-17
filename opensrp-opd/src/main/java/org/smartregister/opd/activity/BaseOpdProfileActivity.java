@@ -10,8 +10,8 @@ import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.opd.R;
 import org.smartregister.opd.adapter.ViewPagerAdapter;
 import org.smartregister.opd.contract.OpdProfileActivityContract;
-import org.smartregister.opd.fragment.ProfileOverviewFragment;
-import org.smartregister.opd.fragment.ProfileVisitFragment;
+import org.smartregister.opd.fragment.OpdProfileOverviewFragment;
+import org.smartregister.opd.fragment.OpdProfileVisitFragment;
 import org.smartregister.opd.presenter.OpdProfileActivityPresenter;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.view.activity.BaseProfileActivity;
@@ -49,8 +49,8 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
     protected ViewPager setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
-        ProfileOverviewFragment profileOverviewFragment = ProfileOverviewFragment.newInstance(this.getIntent().getExtras());
-        ProfileVisitFragment profileVisitsFragment = ProfileVisitFragment.newInstance(this.getIntent().getExtras());
+        OpdProfileOverviewFragment profileOverviewFragment = OpdProfileOverviewFragment.newInstance(this.getIntent().getExtras());
+        OpdProfileVisitFragment profileVisitsFragment = OpdProfileVisitFragment.newInstance(this.getIntent().getExtras());
 
         adapter.addFragment(profileOverviewFragment, this.getString(R.string.overview));
         adapter.addFragment(profileVisitsFragment, this.getString(R.string.visits));
@@ -70,7 +70,7 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
     }
 
     @Override
-    public boolean onOptionsItemSelected(final MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
         // When user click home menu item then quit this activity.
         if (itemId == android.R.id.home) {

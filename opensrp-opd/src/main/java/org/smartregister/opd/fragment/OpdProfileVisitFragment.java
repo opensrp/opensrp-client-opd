@@ -16,14 +16,14 @@ import org.smartregister.view.fragment.BaseProfileFragment;
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-27
  */
 
-public class ProfileVisitFragment extends BaseProfileFragment implements OpdProfileFragmentContract.View {
+public class OpdProfileVisitFragment extends BaseProfileFragment implements OpdProfileFragmentContract.View {
 
     private LinearLayout testsDisplayLayout;
     private OpdProfileFragmentContract.Presenter presenter;
 
-    public static ProfileVisitFragment newInstance(Bundle bundle) {
+    public static OpdProfileVisitFragment newInstance(Bundle bundle) {
         Bundle args = bundle;
-        ProfileVisitFragment fragment = new ProfileVisitFragment();
+        OpdProfileVisitFragment fragment = new OpdProfileVisitFragment();
         if (args == null) {
             args = new Bundle();
         }

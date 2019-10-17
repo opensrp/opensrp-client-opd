@@ -13,7 +13,6 @@ import org.smartregister.opd.utils.FilePath;
 import org.smartregister.repository.Repository;
 import org.smartregister.repository.UniqueIdRepository;
 import org.smartregister.sync.helper.ECSyncHelper;
-import org.smartregister.view.activity.DrishtiApplication;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
@@ -151,9 +150,9 @@ public class OpdLibrary {
     }
 
     @NonNull
-    public Iterable<Object> readYaml(String filename) throws IOException {
+    public Iterable<Object> readYaml(@NonNull String filename) throws IOException {
         InputStreamReader inputStreamReader = new InputStreamReader(
-                DrishtiApplication.getInstance().getApplicationContext().getAssets().open((FilePath.FOLDER.CONFIG_FOLDER_PATH + filename)));
+                context.applicationContext().getAssets().open((FilePath.FOLDER.CONFIG_FOLDER_PATH + filename)));
         return yaml.loadAll(inputStreamReader);
     }
 

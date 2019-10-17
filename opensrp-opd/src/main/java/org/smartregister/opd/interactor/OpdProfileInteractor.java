@@ -10,8 +10,8 @@ import org.smartregister.opd.contract.OpdProfileActivityContract;
 public class OpdProfileInteractor implements OpdProfileActivityContract.Interactor {
     private OpdProfileActivityContract.Presenter mProfilePresenter;
 
-    public OpdProfileInteractor(OpdProfileActivityContract.Presenter loginPresenter) {
-        this.mProfilePresenter = loginPresenter;
+    public OpdProfileInteractor(OpdProfileActivityContract.Presenter presenter) {
+        this.mProfilePresenter = presenter;
     }
 
     @Override

@@ -8,7 +8,7 @@ import net.sqlcipher.Cursor;
 import net.sqlcipher.database.SQLiteDatabase;
 
 import org.apache.commons.lang3.StringUtils;
-import org.smartregister.opd.dao.VisitDao;
+import org.smartregister.opd.dao.OpdVisitDao;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.opd.utils.OpdDbConstants.Column.OpdVisit;
 import org.smartregister.repository.BaseRepository;
@@ -24,7 +24,7 @@ import timber.log.Timber;
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-10-01
  */
 
-public class OpdVisitRepository extends BaseRepository implements VisitDao {
+public class OpdVisitRepository extends BaseRepository implements OpdVisitDao {
 
     private static final String CREATE_TABLE_SQL = "CREATE TABLE " + OpdDbConstants.Table.OPD_VISIT + "("
             + OpdVisit.ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"

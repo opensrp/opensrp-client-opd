@@ -9,7 +9,7 @@ import org.smartregister.opd.pojos.OpdVisit;
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-10-01
  */
 
-public interface VisitDao {
+public interface OpdVisitDao {
 
 
     @Nullable

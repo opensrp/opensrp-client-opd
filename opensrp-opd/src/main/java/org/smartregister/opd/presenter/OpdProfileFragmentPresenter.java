@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.smartregister.opd.contract.OpdProfileFragmentContract;
-import org.smartregister.opd.interactor.ProfileFragmentInteractor;
+import org.smartregister.opd.interactor.OpdProfileFragmentInteractor;
 
 import java.lang.ref.WeakReference;
 
@@ -19,7 +19,7 @@ public class OpdProfileFragmentPresenter implements OpdProfileFragmentContract.P
 
     public OpdProfileFragmentPresenter(@NonNull OpdProfileFragmentContract.View profileView) {
         mProfileView = new WeakReference<>(profileView);
-        mProfileInteractor = new ProfileFragmentInteractor(this);
+        mProfileInteractor = new OpdProfileFragmentInteractor(this);
     }
 
     @Override

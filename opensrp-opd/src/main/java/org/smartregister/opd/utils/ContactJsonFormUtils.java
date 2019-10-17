@@ -15,13 +15,9 @@ public class ContactJsonFormUtils extends FormUtils {
 
     @NonNull
     public static String keyToValueConverter(String keys) {
-        if (keys != null) {
+        if (!TextUtils.isEmpty(keys)) {
             String cleanKey = WordUtils.capitalizeFully(cleanValue(keys), ',');
-            if (!TextUtils.isEmpty(keys)) {
-                return cleanKey.replaceAll("_", " ");
-            } else {
-                return cleanKey;
-            }
+            return cleanKey.replaceAll("_", " ");
         } else {
             return "";
         }

@@ -8,7 +8,7 @@ import net.sqlcipher.Cursor;
 import net.sqlcipher.database.SQLiteDatabase;
 
 import org.apache.commons.lang3.StringUtils;
-import org.smartregister.opd.dao.CheckInDao;
+import org.smartregister.opd.dao.OpdCheckInDao;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.opd.utils.OpdDbConstants.Column.OpdCheckIn;
 import org.smartregister.repository.BaseRepository;
@@ -20,7 +20,7 @@ import timber.log.Timber;
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-30
  */
 
-public class OpdCheckInRepository extends BaseRepository implements CheckInDao {
+public class OpdCheckInRepository extends BaseRepository implements OpdCheckInDao {
 
     private static final String CREATE_TABLE_SQL = "CREATE TABLE " + OpdDbConstants.Table.OPD_CHECK_IN + "("
             + OpdCheckIn.ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"
@@ -126,25 +126,20 @@ public class OpdCheckInRepository extends BaseRepository implements CheckInDao {
     @Nullable
     @Override
     public org.smartregister.opd.pojos.OpdCheckIn getCheckInByVisit(int visitId) {
-
         Cursor mCursor = null;
         org.smartregister.opd.pojos.OpdCheckIn checkIn = null;
         try {
             SQLiteDatabase db = getWritableDatabase();
+            mCursor = db.query(OpdDbConstants.Table.OPD_CHECK_IN, columns, OpdCheckIn.VISIT_ID + " = ?"
+                    , new String[]{String.valueOf(visitId)}
+                    , null
+                    , null
+                    , OpdCheckIn.CREATED_AT + " DESC"
+                    , "1");
 
-            if (visitId != 0) {
-                mCursor = db.query(OpdDbConstants.Table.OPD_CHECK_IN, columns, OpdCheckIn.VISIT_ID + " = ?"
-                        , new String[]{visitId + ""}
-                        , null
-                        , null
-                        , OpdCheckIn.CREATED_AT + " DESC"
-                        , "1");
-
-                if (mCursor != null && mCursor.moveToNext()) {
-                    checkIn = getCheckInResult(mCursor);
-                }
+            if (mCursor != null && mCursor.moveToNext()) {
+                checkIn = getCheckInResult(mCursor);
             }
-
         } catch (Exception e) {
             Timber.e(e);
         } finally {
