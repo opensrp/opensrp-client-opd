@@ -10,7 +10,8 @@ import org.smartregister.Context;
 import org.smartregister.opd.configuration.OpdConfiguration;
 import org.smartregister.repository.Repository;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-24

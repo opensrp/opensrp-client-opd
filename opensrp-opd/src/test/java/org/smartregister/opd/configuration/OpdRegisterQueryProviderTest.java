@@ -3,8 +3,6 @@ package org.smartregister.opd.configuration;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.smartregister.opd.configuration.OpdRegisterQueryProviderContract;
-
 public class OpdRegisterQueryProviderTest extends OpdRegisterQueryProviderContract{
 
     @NonNull

@@ -66,9 +66,9 @@ where you should have implemented your own:
  - `OpdRegisterQueryProvider` from the interface `org.smartregister.opd.configuration.OpdRegisterQueryProviderContract`
  
  
- 3. Add your implemented `OpdRegisterActivity` to the `Android.manifest` file
- 4. Call `OpdRegisterActivity` from your navigation menu
- 5. Create the OPD repositories inside your application repository class
+3. Add your implemented `OpdRegisterActivity` to the `Android.manifest` file
+4. Call `OpdRegisterActivity` from your navigation menu
+5. Create the OPD repositories inside your application repository class
  
  This can be done by adding the following lines of code to your `ApplicationRepository#onCreate(SQLiteDatabase)`:
  

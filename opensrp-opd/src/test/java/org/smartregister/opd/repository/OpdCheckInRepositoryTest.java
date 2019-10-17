@@ -5,9 +5,7 @@ import android.content.ContentValues;
 import net.sqlcipher.MatrixCursor;
 import net.sqlcipher.database.SQLiteDatabase;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,14 +30,6 @@ public class OpdCheckInRepositoryTest {
 
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
-
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
-    }
 
     @Test
     public void createTable() {
