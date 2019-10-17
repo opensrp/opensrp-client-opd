@@ -21,7 +21,6 @@ public class OpdLibraryTest extends BaseTest {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
-
     @Test
     public void initShouldCreateNewLibraryInstanceWhenInstanceIsNull() {
         assertNull(ReflectionHelpers.getStaticField(OpdLibrary.class, "instance"));
@@ -44,5 +43,12 @@ public class OpdLibraryTest extends BaseTest {
     @After
     public void tearDown() {
         ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", null);
+    }
+
+    @Test
+    public void getOpdRulesEngineHelperShouldReturnNonNull() {
+        OpdLibrary.init(Mockito.mock(Context.class), Mockito.mock(Repository.class), Mockito.mock(OpdConfiguration.class), BuildConfig.VERSION_CODE, 1);
+
+        assertNotNull(OpdLibrary.getInstance().getOpdRulesEngineHelper());
     }
 }
