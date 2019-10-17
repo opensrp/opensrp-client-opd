@@ -45,9 +45,12 @@ public class OpdJsonFormUtilsTest {
                 , Class.class
                 , Class.class
                 , true);
-        OpdLibrary.init(PowerMockito.mock(Context.class), PowerMockito.mock(Repository.class), Mockito.mock(OpdConfiguration.class),
+        OpdConfiguration opdConfiguration = new OpdConfiguration.Builder(OpdRegisterQueryProviderTest.class)
+                .setOpdMetadata(opdMetadata)
+                .build();
+
+        OpdLibrary.init(PowerMockito.mock(Context.class), PowerMockito.mock(Repository.class), opdConfiguration,
                 BuildConfig.VERSION_CODE, 1);
-        PowerMockito.when(OpdUtils.class, "metadata").thenReturn(opdMetadata);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("metadata", new JSONObject());
         JSONObject result = OpdJsonFormUtils.getFormAsJson(jsonObject, OpdConstants.JSON_FORM_KEY.NAME, "", "");
@@ -64,9 +67,13 @@ public class OpdJsonFormUtilsTest {
                 , Class.class
                 , Class.class
                 , true);
+
+        OpdConfiguration opdConfiguration = new OpdConfiguration.Builder(OpdRegisterQueryProviderTest.class)
+                .setOpdMetadata(opdMetadata)
+                .build();
+
         OpdLibrary.init(PowerMockito.mock(Context.class), PowerMockito.mock(Repository.class), Mockito.mock(OpdConfiguration.class),
                 BuildConfig.VERSION_CODE, 1);
-        PowerMockito.when(OpdUtils.class, "metadata").thenReturn(opdMetadata);
 
         JSONObject jsonArrayFieldsJsonObject = new JSONObject();
         jsonArrayFieldsJsonObject.put(OpdJsonFormUtils.KEY, OpdJsonFormUtils.OPENSRP_ID);
