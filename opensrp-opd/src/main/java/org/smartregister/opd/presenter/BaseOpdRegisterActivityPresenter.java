@@ -28,9 +28,9 @@ import timber.log.Timber;
 
 public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterActivityContract.Presenter, OpdRegisterActivityContract.InteractorCallBack {
 
-    private WeakReference<OpdRegisterActivityContract.View> viewReference;
-    private OpdRegisterActivityContract.Interactor interactor;
-    private OpdRegisterActivityContract.Model model;
+    protected WeakReference<OpdRegisterActivityContract.View> viewReference;
+    protected OpdRegisterActivityContract.Interactor interactor;
+    protected OpdRegisterActivityContract.Model model;
 
     public BaseOpdRegisterActivityPresenter(OpdRegisterActivityContract.View view, OpdRegisterActivityContract.Model model) {
         viewReference = new WeakReference<>(view);
@@ -100,7 +100,7 @@ public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterAct
 
     @Override
     public void onEventSaved() {
-        if  (getView() != null) {
+        if (getView() != null) {
             getView().refreshList(FetchStatus.fetched);
             getView().hideProgressDialog();
         }
@@ -129,5 +129,10 @@ public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterAct
 
             getView().startFormActivity(form, intentKeys);
         }
+    }
+
+    @Override
+    public void onUniqueIdFetched(@NonNull Triple<String, String, String> triple,@NonNull String entityId) {
+        startForm(triple.getLeft(), entityId, triple.getMiddle(), triple.getRight(), null, null);
     }
 }
