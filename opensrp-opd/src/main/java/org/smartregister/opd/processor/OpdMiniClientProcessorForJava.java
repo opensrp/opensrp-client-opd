@@ -1,10 +1,21 @@
 package org.smartregister.opd.processor;
 
+import android.content.ContentValues;
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import net.sqlcipher.database.SQLiteException;
+
 import org.smartregister.CoreLibrary;
 import org.smartregister.anc.library.sync.MiniClientProcessorForJava;
 import org.smartregister.commonregistry.CommonFtsObject;
 import org.smartregister.commonregistry.CommonRepository;
+import org.smartregister.domain.db.Client;
+import org.smartregister.domain.db.Event;
+import org.smartregister.domain.db.EventClient;
 import org.smartregister.domain.db.Obs;
+import org.smartregister.domain.jsonmapping.ClientClassification;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.exception.CheckInEventProcessException;
 import org.smartregister.opd.pojos.OpdCheckIn;
@@ -13,18 +24,6 @@ import org.smartregister.opd.pojos.OpdVisit;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.sync.ClientProcessorForJava;
-
-import android.content.ContentValues;
-import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
-import net.sqlcipher.database.SQLiteException;
-
-import org.smartregister.domain.db.Client;
-import org.smartregister.domain.db.Event;
-import org.smartregister.domain.db.EventClient;
-import org.smartregister.domain.jsonmapping.ClientClassification;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -95,31 +94,8 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
     protected void processCheckIn(@NonNull Event event, @NonNull Client client) throws CheckInEventProcessException {
         HashMap<String, String> keyValues = new HashMap<>();
 
-        List<Obs> obs = event.getObs();
-
-        for (Obs observation: obs) {
-            String key = observation.getFormSubmissionField();
-            List<Object> values = observation.getValues();
-
-            if (values.size() > 0) {
-                String value = (String) values.get(0);
-
-                if (value != null) {
-                    keyValues.put(key, value);
-                    continue;
-                }
-            }
-
-            List<Object> humanReadableValues = observation.getHumanReadableValues();
-            if (humanReadableValues.size() > 0) {
-                String value = (String) humanReadableValues.get(0);
-
-                if (value != null) {
-                    keyValues.put(key, value);
-                    continue;
-                }
-            }
-        }
+        // Todo: This might not work as expected when openmrs_entity_ids are added
+        generateKeyValuesFromEvent(event, keyValues);
 
         Map<String, String> eventDetailsMap = event.getDetails();
 
@@ -137,21 +113,9 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         }
 
         if (visitDate != null) {
-
-
             // Create the visit first
             OpdVisit visit = new OpdVisit();
-            visit.setId(visitId);
-            visit.setBaseEntityId(event.getBaseEntityId());
-            visit.setLocationId(event.getLocationId());
-            visit.setProviderId(event.getProviderId());
-            visit.setCreatedAt(new Date());
-            visit.setVisitDate(visitDate);
-
-            // Start transaction
-            OpdLibrary.getInstance().getRepository().getWritableDatabase().beginTransaction();
-
-            boolean saved = OpdLibrary.getInstance().getVisitRepository().addVisit(visit);
+            boolean saved = populateAndSaveVisit(event, visitId, visitDate, visit);
             if (!saved) {
                 abortTransaction();
                 throw new CheckInEventProcessException(String.format("Visit with id %s could not be saved in the db. Fail operation failed", visitId));
@@ -187,6 +151,48 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
             commitSuccessfulTransaction();
         } else {
             throw new CheckInEventProcessException(String.format("Check-in with visit id %s could not be processed because it the visitDate is null", visitId));
+        }
+    }
+
+    private boolean populateAndSaveVisit(@NonNull Event event, @NonNull String visitId, @NonNull Date visitDate, @NonNull OpdVisit visit) {
+        visit.setId(visitId);
+        visit.setBaseEntityId(event.getBaseEntityId());
+        visit.setLocationId(event.getLocationId());
+        visit.setProviderId(event.getProviderId());
+        visit.setCreatedAt(new Date());
+        visit.setVisitDate(visitDate);
+
+        // Start transaction
+        OpdLibrary.getInstance().getRepository().getWritableDatabase().beginTransaction();
+
+        return OpdLibrary.getInstance().getVisitRepository().addVisit(visit);
+    }
+
+    private void generateKeyValuesFromEvent(@NonNull Event event, HashMap<String, String> keyValues) {
+        List<Obs> obs = event.getObs();
+
+        for (Obs observation: obs) {
+            String key = observation.getFormSubmissionField();
+            List<Object> values = observation.getValues();
+
+            if (values.size() > 0) {
+                String value = (String) values.get(0);
+
+                if (value != null) {
+                    keyValues.put(key, value);
+                    continue;
+                }
+            }
+
+            List<Object> humanReadableValues = observation.getHumanReadableValues();
+            if (humanReadableValues.size() > 0) {
+                String value = (String) humanReadableValues.get(0);
+
+                if (value != null) {
+                    keyValues.put(key, value);
+                    continue;
+                }
+            }
         }
     }
 

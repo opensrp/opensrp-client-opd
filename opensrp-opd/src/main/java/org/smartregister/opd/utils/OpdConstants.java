@@ -21,7 +21,7 @@ public class OpdConstants extends AllConstants {
         public static final String REMINDERS = "reminders";
     }
 
-    public static class JSON_FORM_NAME {
+    public static class JsonFormNameUtils {
         public static final String CHECK_IN = "opd_checkin";
     }
 

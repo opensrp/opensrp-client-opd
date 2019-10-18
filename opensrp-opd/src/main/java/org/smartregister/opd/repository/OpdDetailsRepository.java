@@ -28,15 +28,6 @@ public class OpdDetailsRepository extends BaseRepository {
             + OpdDetails.CURRENT_VISIT_ID + " VARCHAR NOT NULL, "
             + OpdDetails.CREATED_AT + " DATETIME NOT NULL DEFAULT (DATETIME('now')), UNIQUE(" + OpdDetails.BASE_ENTITY_ID + ") ON CONFLICT REPLACE)";
 
-
-    private String[] columns = new String[]{
-            OpdDetails.BASE_ENTITY_ID
-            , OpdDetails.PENDING_DIAGNOSE_AND_TREAT
-            , OpdDetails.CURRENT_VISIT_START_DATE
-            , OpdDetails.CURRENT_VISIT_END_DATE
-            , OpdDetails.CURRENT_VISIT_ID
-    };
-
     private SimpleDateFormat dateFormat = new SimpleDateFormat(OpdDbConstants.DATE_FORMAT, Locale.US);
 
     public OpdDetailsRepository(Repository repository) {
