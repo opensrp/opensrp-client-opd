@@ -365,7 +365,7 @@ public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment imple
     public void countExecute() {
         try {
             int totalCount = 0;
-            for (String sql: opdRegisterQueryProvider.countExecuteQueries(filters)) {
+            for (String sql : opdRegisterQueryProvider.countExecuteQueries(filters)) {
                 Timber.i(sql);
                 totalCount += commonRepository().countSearchIds(sql);
             }

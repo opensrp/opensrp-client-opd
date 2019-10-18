@@ -13,10 +13,10 @@ import org.smartregister.domain.tag.FormTag;
 import org.smartregister.opd.configuration.OpdConfiguration;
 import org.smartregister.opd.domain.YamlConfig;
 import org.smartregister.opd.domain.YamlConfigItem;
-import org.smartregister.opd.helper.AncRulesEngineHelper;
-import org.smartregister.opd.repository.CheckInRepository;
+import org.smartregister.opd.helper.OpdRulesEngineHelper;
+import org.smartregister.opd.repository.OpdCheckInRepository;
+import org.smartregister.opd.repository.OpdVisitRepository;
 import org.smartregister.opd.repository.OpdDetailsRepository;
-import org.smartregister.opd.repository.VisitRepository;
 import org.smartregister.opd.utils.FilePath;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;
@@ -38,6 +38,12 @@ import java.util.Date;
 import java.util.Locale;
 
 import org.smartregister.sync.helper.ECSyncHelper;
+import org.yaml.snakeyaml.TypeDescription;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 import id.zelory.compressor.Compressor;
 
@@ -54,18 +60,19 @@ public class OpdLibrary {
     private ECSyncHelper syncHelper;
 
     private UniqueIdRepository uniqueIdRepository;
-    private CheckInRepository checkInRepository;
-    private VisitRepository visitRepository;
+    private OpdCheckInRepository checkInRepository;
+    private OpdVisitRepository visitRepository;
     private OpdDetailsRepository opdDetailsRepository;
 
     private Compressor compressor;
     private int applicationVersion;
     private int databaseVersion;
-    private Yaml yaml;
-
-    private AncRulesEngineHelper ancRulesEngineHelper;
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat(OpdDbConstants.DATE_FORMAT, Locale.US);
+
+    private Yaml yaml;
+
+    private OpdRulesEngineHelper opdRulesEngineHelper;
 
     protected OpdLibrary(@NonNull Context context, @NonNull OpdConfiguration opdConfiguration
             , @NonNull Repository repository, int applicationVersion, int databaseVersion) {
@@ -110,18 +117,18 @@ public class OpdLibrary {
     }
 
     @NonNull
-    public CheckInRepository getCheckInRepository() {
+    public OpdCheckInRepository getCheckInRepository() {
         if (checkInRepository == null) {
-            checkInRepository = new CheckInRepository(getRepository());
+            checkInRepository = new OpdCheckInRepository(getRepository());
         }
 
         return checkInRepository;
     }
 
     @NonNull
-    public VisitRepository getVisitRepository() {
+    public OpdVisitRepository getVisitRepository() {
         if (visitRepository == null) {
-            visitRepository = new VisitRepository(getRepository());
+            visitRepository = new OpdVisitRepository(getRepository());
         }
 
         return visitRepository;
@@ -155,10 +162,12 @@ public class OpdLibrary {
         return opdConfiguration;
     }
 
+    @NonNull
     public Compressor getCompressor() {
         if (compressor == null) {
             compressor = Compressor.getDefault(context().applicationContext());
         }
+
         return compressor;
     }
 
@@ -179,17 +188,20 @@ public class OpdLibrary {
         yaml = new Yaml(constructor);
     }
 
-    public Iterable<Object> readYaml(String filename) throws IOException {
+    @NonNull
+    public Iterable<Object> readYaml(@NonNull String filename) throws IOException {
         InputStreamReader inputStreamReader = new InputStreamReader(
-                DrishtiApplication.getInstance().getApplicationContext().getAssets().open((FilePath.FOLDER.CONFIG_FOLDER_PATH + filename)));
+                context.applicationContext().getAssets().open((FilePath.FOLDER.CONFIG_FOLDER_PATH + filename)));
         return yaml.loadAll(inputStreamReader);
     }
 
-    public AncRulesEngineHelper getAncRulesEngineHelper() {
-        if (ancRulesEngineHelper == null) {
-            ancRulesEngineHelper = new AncRulesEngineHelper(context.applicationContext().getApplicationContext());
+    @NonNull
+    public OpdRulesEngineHelper getOpdRulesEngineHelper() {
+        if (opdRulesEngineHelper == null) {
+            opdRulesEngineHelper = new OpdRulesEngineHelper();
         }
-        return ancRulesEngineHelper;
+
+        return opdRulesEngineHelper;
     }
 
     @NonNull

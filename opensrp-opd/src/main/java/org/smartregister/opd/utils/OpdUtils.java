@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 
 import org.apache.commons.lang3.StringUtils;
@@ -24,7 +25,8 @@ public class OpdUtils extends org.smartregister.util.Utils {
 
     private static final String OTHER_SUFFIX = ", other]";
 
-    public static String getTranslatedDate(String str_date, android.content.Context context) {
+    @NonNull
+    public static String getTranslatedDate(@NonNull String str_date, @NonNull Context context) {
         return str_date
                 .replace("d", context.getString(R.string.abbrv_days))
                 .replace("w", context.getString(R.string.abbrv_weeks))
@@ -36,18 +38,21 @@ public class OpdUtils extends org.smartregister.util.Utils {
         return dp * ((float) context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
     }
 
-    public static String fillTemplate(String stringValue, Facts facts) {
+    @NonNull
+    public static String fillTemplate(@NonNull String stringValue, @NonNull Facts facts) {
         String stringValueResult = stringValue;
         while (stringValueResult.contains("{")) {
             String key = stringValueResult.substring(stringValueResult.indexOf("{") + 1, stringValueResult.indexOf("}"));
             String value = processValue(key, facts);
             stringValueResult = stringValueResult.replace("{" + key + "}", value).replaceAll(", $", "").trim();
         }
+
         //Remove unnecessary commas by cleaning the returned string
         return cleanValueResult(stringValueResult);
     }
 
-    private static String processValue(String key, Facts facts) {
+    @NonNull
+    private static String processValue(@NonNull String key, @NonNull Facts facts) {
         String value = "";
         if (facts.get(key) instanceof String) {
             value = facts.get(key);
@@ -63,7 +68,8 @@ public class OpdUtils extends org.smartregister.util.Utils {
         return ContactJsonFormUtils.keyToValueConverter(value);
     }
 
-    private static String cleanValueResult(String result) {
+    @NonNull
+    private static String cleanValueResult(@NonNull String result) {
         List<String> nonEmptyItems = new ArrayList<>();
 
         for (String item : result.split(",")) {

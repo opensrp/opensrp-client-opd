@@ -21,6 +21,7 @@
     <string name="dismiss">Dismiss</string>
     <string name="undo_lookup">Undo LookUp</string>
     <string name="national_id">National Id</string>
+    <string name="opd_opensrp_id_type">Opensrp Id</string>
 
     <string name="contact_number_due">Contact %1$d &#183; due %2$s</string>
 

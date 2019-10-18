@@ -24,10 +24,12 @@ import org.smartregister.location.helper.LocationHelper;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.enums.LocationHierarchy;
 import org.smartregister.opd.pojos.OpdEventClient;
+import org.smartregister.opd.pojos.OpdMetadata;
 import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.repository.ImageRepository;
 import org.smartregister.repository.UniqueIdRepository;
 import org.smartregister.util.AssetHandler;
+import org.smartregister.util.JsonFormUtils;
 import org.smartregister.view.activity.DrishtiApplication;
 
 import java.io.File;
@@ -51,12 +53,13 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
     public static final String STEP2 = "step2";
     public static final String CURRENT_OPENSRP_ID = "current_opensrp_id";
     public static final String OPENSRP_ID = "OPENSRP_ID";
+    public static final String ZEIR_ID = "zeir_id";
 
-    public static JSONObject getFormAsJson(@NonNull JSONObject form, @NonNull  String formName, @NonNull  String id, @NonNull  String currentLocationId) throws JSONException {
+    public static JSONObject getFormAsJson(@NonNull JSONObject form, @NonNull String formName, @NonNull String id, @NonNull String currentLocationId) throws JSONException {
         return getFormAsJson(form, formName, id, currentLocationId, null);
     }
 
-    public static JSONObject getFormAsJson(@NonNull JSONObject form, @NonNull  String formName, @NonNull  String id, @NonNull  String currentLocationId, @Nullable HashMap<String, String> injectedFieldValues) throws JSONException {
+    public static JSONObject getFormAsJson(@NonNull JSONObject form, @NonNull String formName, @NonNull String id, @NonNull String currentLocationId, @Nullable HashMap<String, String> injectedFieldValues) throws JSONException {
         String entityId = id;
         form.getJSONObject(METADATA).put(ENCOUNTER_LOCATION, currentLocationId);
 
@@ -91,7 +94,7 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
                 entityId = entityId.replace("-", "");
             }
 
-            OpdJsonFormUtils.addRegLocHierarchyQuestions(form, OpdConstants.JSON_FORM_KEY.ADDRESS_WIDGET_KEY , LocationHierarchy.ENTIRE_TREE);
+            OpdJsonFormUtils.addRegLocHierarchyQuestions(form, OpdConstants.JSON_FORM_KEY.ADDRESS_WIDGET_KEY, LocationHierarchy.ENTIRE_TREE);
 
             // Inject OPenSrp id into the form
             JSONObject stepOne = form.getJSONObject(OpdJsonFormUtils.STEP1);
@@ -112,11 +115,20 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
         return form;
     }
 
-    private static void addRegLocHierarchyQuestions(@NonNull JSONObject form,@NonNull String widgetKey,@NonNull LocationHierarchy locationHierarchy) {
+    private static void addRegLocHierarchyQuestions(@NonNull JSONObject form, @NonNull String widgetKey, @NonNull LocationHierarchy locationHierarchy) {
         try {
             JSONArray questions = form.getJSONObject(JsonFormConstants.STEP1).getJSONArray(JsonFormConstants.FIELDS);
-            ArrayList<String> allLevels = OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata().getLocationLevels();
-            ArrayList<String> healthFacilities = OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata().getHealthFacilityLevels();
+
+            ArrayList<String> allLevels;
+            ArrayList<String> healthFacilities;
+            OpdMetadata metadata = OpdUtils.metadata();
+            if (metadata != null) {
+                allLevels = metadata.getLocationLevels();
+                healthFacilities = metadata.getHealthFacilityLevels();
+            } else {
+                allLevels = DefaultOpdLocationUtils.getLocationLevels();;
+                healthFacilities = DefaultOpdLocationUtils.getLocationLevels();;
+            }
 
             List<String> defaultLocation = LocationHelper.getInstance().generateDefaultLocationHierarchy(allLevels);
             List<String> defaultFacility = LocationHelper.getInstance().generateDefaultLocationHierarchy(healthFacilities);
@@ -172,9 +184,9 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
         }
     }
 
-    private static void updateLocationTree(@NonNull String widgetKey,@NonNull LocationHierarchy locationHierarchy,@NonNull JSONArray questions,
-                                           @NonNull String defaultLocationString,@NonNull String defaultFacilityString,
-                                           @NonNull String upToFacilitiesString,@NonNull String upToFacilitiesWithOtherString,
+    private static void updateLocationTree(@NonNull String widgetKey, @NonNull LocationHierarchy locationHierarchy, @NonNull JSONArray questions,
+                                           @NonNull String defaultLocationString, @NonNull String defaultFacilityString,
+                                           @NonNull String upToFacilitiesString, @NonNull String upToFacilitiesWithOtherString,
                                            @NonNull String entireTreeString) throws JSONException {
         for (int i = 0; i < questions.length(); i++) {
             JSONObject widgets = questions.getJSONObject(i);
@@ -209,9 +221,9 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
         }
     }
 
-    private static void addLocationTree(@NonNull String widgetKey,@NonNull JSONObject widget,@NonNull String updateString) {
+    private static void addLocationTree(@NonNull String widgetKey, @NonNull JSONObject widget, @NonNull String updateString) {
         try {
-            if (widget.getString("key").equals(widgetKey)) {
+            if (widget.getString(OpdJsonFormUtils.KEY).equals(widgetKey)) {
                 widget.put("tree", new JSONArray(updateString));
             }
         } catch (JSONException e) {
@@ -219,9 +231,9 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
         }
     }
 
-    private static void addLocationDefault(@NonNull String widgetKey,@NonNull JSONObject widget,@NonNull String updateString) {
+    private static void addLocationDefault(@NonNull String widgetKey, @NonNull JSONObject widget, @NonNull String updateString) {
         try {
-            if (widget.getString("key").equals(widgetKey)) {
+            if (widget.getString(OpdJsonFormUtils.KEY).equals(widgetKey)) {
                 widget.put("default", new JSONArray(updateString));
             }
         } catch (JSONException e) {
@@ -235,8 +247,8 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
         event.setProviderId(providerId);
         event.setLocationId(locationId(allSharedPreferences));
 
-        String LocationId = getLocationId(event.getLocationId(), allSharedPreferences);
-        event.setLocationId(LocationId);
+        String childLocationId = getLocationId(event.getLocationId(), allSharedPreferences);
+        event.setChildLocationId(childLocationId);
 
         event.setTeam(allSharedPreferences.fetchDefaultTeam(providerId));
         event.setTeamId(allSharedPreferences.fetchDefaultTeamId(providerId));
@@ -270,20 +282,22 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
     }
 
     protected static Triple<Boolean, JSONObject, JSONArray> validateParameters(@NonNull String jsonString) {
-
         JSONObject jsonForm = toJSONObject(jsonString);
-        JSONArray fields = fields(jsonForm);
-
+        JSONArray fields = null;
+        if (jsonForm != null) {
+            fields = fields(jsonForm);
+        }
         return Triple.of(jsonForm != null && fields != null, jsonForm, fields);
     }
 
     protected static void processGender(@NonNull JSONArray fields) {
         try {
-            //TO DO Will need re-architecting later to support more languages, perhaps update the selector widget
-
             JSONObject genderObject = getFieldJSONObject(fields, OpdConstants.SEX);
+            if (genderObject == null) {
+                Timber.e("JsonArray fields is empty or null");
+                return;
+            }
             String genderValue = "";
-
             String rawGender = genderObject.getString(JsonFormConstants.VALUE);
             char rawGenderChar = !TextUtils.isEmpty(rawGender) ? rawGender.charAt(0) : ' ';
             switch (rawGenderChar) {
@@ -374,11 +388,10 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
         JSONObject originalClientJsonObject =
                 OpdLibrary.getInstance().getEcSyncHelper().getClient(baseClient.getBaseEntityId());
         JSONObject mergedJson = org.smartregister.util.JsonFormUtils.merge(originalClientJsonObject, updatedClientJson);
-        //TODO Save edit log ?
         OpdLibrary.getInstance().getEcSyncHelper().addClient(baseClient.getBaseEntityId(), mergedJson);
     }
 
-    public static void saveImage(@NonNull String providerId,@NonNull String entityId,@NonNull String imageLocation) {
+    public static void saveImage(@NonNull String providerId, @NonNull String entityId, @NonNull String imageLocation) {
         if (StringUtils.isBlank(imageLocation)) {
             return;
         }
@@ -439,7 +452,7 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
 
     }
 
-    public static JSONArray fields(@NonNull JSONObject jsonForm,@NonNull String step) {
+    public static JSONArray fields(@NonNull JSONObject jsonForm, @NonNull String step) {
         try {
 
             JSONObject step1 = jsonForm.has(step) ? jsonForm.getJSONObject(step) : null;
@@ -463,7 +476,7 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
         return formTag;
     }
 
-    public static String getFieldValue(@NonNull String jsonString,@NonNull String step,@NonNull String key) {
+    public static String getFieldValue(@NonNull String jsonString, @NonNull String step, @NonNull String key) {
         JSONObject jsonForm = toJSONObject(jsonString);
         if (jsonForm == null) {
             return null;
@@ -478,7 +491,7 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
 
     }
 
-    public static OpdEventClient processOpdDetailsForm(@NonNull String jsonString,@NonNull FormTag formTag) {
+    public static OpdEventClient processOpdDetailsForm(@NonNull String jsonString, @NonNull FormTag formTag) {
         try {
             Triple<Boolean, JSONObject, JSONArray> registrationFormParams = validateParameters(jsonString);
 
@@ -494,7 +507,7 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
                 entityId = generateRandomUUIDString();
             }
 
-            processGender(fields);//multi language to re visit
+            processGender(fields);
 
             processLocationFields(fields);
 
@@ -504,13 +517,12 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
 
             processReminder(fields);
 
-            Client baseClient = org.smartregister.util.JsonFormUtils.createBaseClient(fields, formTag, entityId);
+            Client baseClient = JsonFormUtils.createBaseClient(fields, formTag, entityId);
 
-            Event baseEvent = org.smartregister.util.JsonFormUtils
-                    .createEvent(fields, getJSONObject(jsonForm, METADATA), formTag, entityId,
-                            OpdUtils.metadata().getRegisterEventType(), OpdUtils.metadata().getTableName());
+            Event baseEvent = JsonFormUtils.createEvent(fields, getJSONObject(jsonForm, METADATA),
+                    formTag, entityId, OpdUtils.metadata().getRegisterEventType(), OpdUtils.metadata().getTableName());
 
-            OpdJsonFormUtils.tagSyncMetadata(baseEvent);// tag docs
+            tagSyncMetadata(baseEvent);
 
             return new OpdEventClient(baseClient, baseEvent);
         } catch (JSONException e) {
@@ -527,12 +539,14 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
 
     private static void processReminder(@NonNull JSONArray fields) {
         try {
-            JSONObject reminderObject = getFieldJSONObject(fields, "reminders");
-            JSONArray options = getJSONArray(reminderObject, OpdConstants.JSON_FORM_KEY.OPTIONS);
-            JSONObject option = getJSONObject(options, 0);
-            String value = option.optString(JsonFormConstants.VALUE);
-            int result = value.equals(Boolean.toString(false)) ? 0 : 1;
-            reminderObject.put(OpdConstants.KEY.VALUE, result);
+            JSONObject reminderObject = getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.REMINDERS);
+            if (reminderObject != null) {
+                JSONArray options = getJSONArray(reminderObject, OpdConstants.JSON_FORM_KEY.OPTIONS);
+                JSONObject option = getJSONObject(options, 0);
+                String value = option.optString(JsonFormConstants.VALUE);
+                int result = value.equals(Boolean.toString(false)) ? 0 : 1;
+                reminderObject.put(OpdConstants.KEY.VALUE, result);
+            }
         } catch (JSONException e) {
             Timber.e(e, "OpdJsonFormUtils --> processReminder");
         }

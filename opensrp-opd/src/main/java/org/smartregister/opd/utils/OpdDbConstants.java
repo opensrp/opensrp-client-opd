@@ -7,7 +7,7 @@ package org.smartregister.opd.utils;
 public interface OpdDbConstants {
 
     String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    
+
     interface KEY {
 
         String MOTHER_FIRST_NAME = "mother_first_name";
@@ -33,16 +33,9 @@ public interface OpdDbConstants {
         String DATE_REMOVED = "date_removed";
     }
 
-    interface Table {
-
-        String CHECK_IN = "check_in";
-        String VISIT = "visit";
-        String OPD_DETAILS = "opd_details";
-    }
-
     interface Column {
 
-        interface CheckIn {
+        interface OpdCheckIn {
             String ID = "_id";
             String EVENT_ID = "event_id";
             String VISIT_ID = "visit_id";
@@ -59,13 +52,25 @@ public interface OpdDbConstants {
             String UPDATED_AT = "updated_at";
         }
 
-        interface Visit {
+        interface OpdVisit {
             String ID = "_id";
             String VISIT_DATE = "visit_date";
             String PROVIDER_ID = "provider_id";
             String LOCATION_ID = "location_id";
             String BASE_ENTITY_ID = "base_entity_id";
             String CREATED_AT = "created_at";
+        }
+
+        interface Client {
+            String PHOTO = "photo";
+            String FIRST_NAME = "first_name";
+            String LAST_NAME = "last_name";
+            String BASE_ENTITY_ID = "base_entity_id";
+            String DOB = "dob";
+            String OPENSRP_ID = "opensrp_id";
+            String RELATIONALID = "relationalid";
+            String NATIONAL_ID = "national_id";
+            String GENDER = "gender";
         }
 
         interface OpdDetails {
@@ -77,5 +82,13 @@ public interface OpdDbConstants {
             String CURRENT_VISIT_ID = "visit_id";
             String CREATED_AT = "created_at";
         }
+    }
+
+    interface Table {
+
+        String OPD_CHECK_IN = "opd_check_in";
+        String OPD_VISIT = "opd_visit";
+        String OPD_DETAILS = "opd_details";
+
     }
 }

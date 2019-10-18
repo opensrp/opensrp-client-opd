@@ -7,9 +7,9 @@ import org.smartregister.commonregistry.CommonRepository;
 import org.smartregister.domain.db.Obs;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.exception.CheckInEventProcessException;
-import org.smartregister.opd.pojos.CheckIn;
+import org.smartregister.opd.pojos.OpdCheckIn;
 import org.smartregister.opd.pojos.OpdDetails;
-import org.smartregister.opd.pojos.Visit;
+import org.smartregister.opd.pojos.OpdVisit;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.sync.ClientProcessorForJava;
@@ -140,7 +140,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
 
 
             // Create the visit first
-            Visit visit = new Visit();
+            OpdVisit visit = new OpdVisit();
             visit.setId(visitId);
             visit.setBaseEntityId(event.getBaseEntityId());
             visit.setLocationId(event.getLocationId());
@@ -157,7 +157,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                 throw new CheckInEventProcessException(String.format("Visit with id %s could not be saved in the db. Fail operation failed", visitId));
             }
 
-            CheckIn checkIn = generateCheckInRecordFromCheckInEvent(event, client, keyValues, visitId, visitDate);
+            OpdCheckIn checkIn = generateCheckInRecordFromCheckInEvent(event, client, keyValues, visitId, visitDate);
             saved = OpdLibrary.getInstance().getCheckInRepository(). addCheckIn(checkIn);
 
             if (!saved) {
@@ -190,7 +190,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         }
     }
 
-    private void updateLastInteractedWith(@NonNull Event event, Visit visit) throws CheckInEventProcessException {
+    private void updateLastInteractedWith(@NonNull Event event, OpdVisit visit) throws CheckInEventProcessException {
         String tableName = event.getEntityType();
         String lastInteractedWithDate = String.valueOf(new Date().getTime());
 
@@ -257,6 +257,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         opdDetails.setCurrentVisitEndDate(null);
         opdDetails.setCreatedAt(new Date());
 
+        // This code and flag is useless now - Todo: Work on disabling the flag in the query by deleting the current_visit_date & change this flag to diagnose_and_treat_ongoing
         // Set Pending diagnose and treat if we have not lapsed the max check-in duration in minutes set in the opd library configuration
         if (visitDate != null) {
             long timeDifferenceInMinutes = ((new Date().getTime()) - visitDate.getTime())/(60 * 1000);
@@ -267,8 +268,8 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
     }
 
     @NonNull
-    private CheckIn generateCheckInRecordFromCheckInEvent(@NonNull Event event, @NonNull Client client, HashMap<String, String> keyValues, String visitId, Date visitDate) {
-        CheckIn checkIn = new CheckIn();
+    private OpdCheckIn generateCheckInRecordFromCheckInEvent(@NonNull Event event, @NonNull Client client, HashMap<String, String> keyValues, String visitId, Date visitDate) {
+        OpdCheckIn checkIn = new OpdCheckIn();
         checkIn.setVisitId(visitId);
         checkIn.setPregnancyStatus(keyValues.get(OpdConstants.JsonFormField.PREGNANCY_STATUS));
         checkIn.setHasHivTestPreviously(keyValues.get(OpdConstants.JsonFormField.HIV_TESTED));

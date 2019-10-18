@@ -26,7 +26,7 @@ public class OpdRegisterQueryBuilder extends SmartRegisterQueryBuilder {
 
         String[] columns = tableColsInnerJoin.getFirstTable().getColNames();
         String tableName = tableColsInnerJoin.getFirstTable().getTableName();
-        for (String column: columns) {
+        for (String column : columns) {
             if (!column.contains("'")) {
                 selectQuery += String.format(", %s.%s", tableName, column);
             } else {
@@ -36,7 +36,7 @@ public class OpdRegisterQueryBuilder extends SmartRegisterQueryBuilder {
 
         columns = tableColsInnerJoin.getSecondTable().getColNames();
         tableName = tableColsInnerJoin.getSecondTable().getTableName();
-        for (String column: columns) {
+        for (String column : columns) {
             if (!column.contains("'")) {
                 selectQuery += String.format(", %s.%s", tableName, column);
             } else {

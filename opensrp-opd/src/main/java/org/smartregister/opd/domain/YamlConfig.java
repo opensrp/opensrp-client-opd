@@ -1,5 +1,7 @@
 package org.smartregister.opd.domain;
 
+import android.support.annotation.Nullable;
+
 import java.util.List;
 
 /**
@@ -15,48 +17,47 @@ public class YamlConfig {
     public YamlConfig() {
     }
 
-    public YamlConfig(String group, String sub_group, List<YamlConfigItem> fields, String test_results) {
+    public YamlConfig(@Nullable String group, @Nullable String sub_group, @Nullable List<YamlConfigItem> fields, @Nullable String test_results) {
         this.group = group;
         this.sub_group = sub_group;
         this.fields = fields;
         this.test_results = test_results;
     }
 
+    @Nullable
     public String getSubGroup() {
         return sub_group;
     }
 
-    public void setSubGroup(String sub_group) {
+    public void setSubGroup(@Nullable String sub_group) {
         this.sub_group = sub_group;
     }
 
+    @Nullable
     public String getGroup() {
         return group;
     }
 
-    public void setGroup(String group) {
+    public void setGroup(@Nullable String group) {
         this.group = group;
     }
 
+    @Nullable
     public List<YamlConfigItem> getFields() {
         return fields;
     }
 
-    public void setFields(List<YamlConfigItem> fields) {
+    public void setFields(@Nullable List<YamlConfigItem> fields) {
         this.fields = fields;
     }
 
+    @Nullable
     public String getTestResults() {
         return test_results;
     }
 
-    public void setTestResults(String test_results) {
+    public void setTestResults(@Nullable String test_results) {
         this.test_results = test_results;
-    }
-
-    public static final class KEY {
-        public static final String GROUP = "group";
-        public static final String FIELDS = "fields";
     }
 
 }
