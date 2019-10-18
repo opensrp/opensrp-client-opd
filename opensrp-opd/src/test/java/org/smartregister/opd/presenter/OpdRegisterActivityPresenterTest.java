@@ -4,7 +4,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.opd.BaseTest;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
 

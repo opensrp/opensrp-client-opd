@@ -17,60 +17,78 @@ This library provides the ability to show an OPD(Outpatient Department) Register
 Add the module to your project as follows
 
  1. Add the repository to your project-root `build.gradle`
-```groovy
-allprojects {
-    repositories {
-        ...
-
-        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-    }
-}
-```
-
-
-```groovy
-
-dependencies {
-
-    ...
-
-    implementation 'org.smartregister:opensrp-client-opd:0.0.1-SNAPSHOT'
-}
-```
+ ```groovy
+ allprojects {
+     repositories {
+         ...
+ 
+         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+     }
+ }
+ ```
 
 
-2. Initialise the library in the `onCreate` method of your `Application` class
+ ```groovy
 
-```java
+ dependencies {
+ 
+     ...
+ 
+     implementation 'org.smartregister:opensrp-client-opd:0.0.1-SNAPSHOT'
+ }
+ ```
 
-public class HealthApplication extends DrishtiApplication {
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        ...
+ 2. Initialise the library in the `onCreate` method of your `Application` class
 
-        OpdLibrary.init(context, getRepository(), 
-            new OpdConfiguration.Builder(OpdRegisterQueryProvider.class)
-                .build()
-        );
-    }
-}
+ ```java
 
-```
+ public class HealthApplication extends DrishtiApplication {
+ 
+     @Override
+     public void onCreate() {
+         super.onCreate();
+         ...
+ 
+         OpdLibrary.init(context, getRepository(), 
+             new OpdConfiguration.Builder(OpdRegisterQueryProvider.class)
+                 .build()
+         );
+     }
+ }
 
-where you should have implemented your own:
- - `OpdRegisterActivity` from the abstract Activity `org.smartregister.opd.activity.BaseOpdRegisterActivity`
- - `OpdRegisterActivityPresenter` from the abstract Presenter `org.smartregister.opd.presenter.BaseOpdRegisterActivityPresenter`
- - `OpdRegisterFragment` from the abstract Fragment `org.smartregister.opd.fragment.BaseOpdRegisterFragment`
- - `OpdRegisterQueryProvider` from the interface `org.smartregister.opd.configuration.OpdRegisterQueryProviderContract`
+ ```
+
+ where you should have implemented your own:
+  - `OpdRegisterActivity` from the abstract Activity `org.smartregister.opd.activity.BaseOpdRegisterActivity`
+  - `OpdRegisterActivityPresenter` from the abstract Presenter `org.smartregister.opd.presenter.BaseOpdRegisterActivityPresenter`
+  - `OpdRegisterFragment` from the abstract Fragment `org.smartregister.opd.fragment.BaseOpdRegisterFragment`
+  - `OpdRegisterQueryProvider` from the interface `org.smartregister.opd.configuration.OpdRegisterQueryProviderContract`
  
  
  3. Add your implemented `OpdRegisterActivity` to the `Android.manifest` file
  4. Call `OpdRegisterActivity` from your navigation menu
+ 5. Create the OPD repositories inside your application repository class
+ 
+ This can be done by adding the following lines of code to your `ApplicationRepository#onCreate(SQLiteDatabase)`:
+ 
+ ```java
+ 
+    ...
+ 
+    public void onCreate(SQLiteDatabase database) {
+    
+        
+        ...
+ 
+        VisitRepository.createTable(database);
+        CheckInRepository.createTable(database);
+    }
+    
+ ```
  
  
- ## 2. Required Implementations
+## 2. Required Implementations
  
  ### OpdRegisterFragment
  
@@ -128,14 +146,14 @@ where you should have implemented your own:
 
  ```
  
- - You should add basically create a new instance of the Presenter implemented above  
+ -  You should add basically create a new instance of the Presenter implemented above  
  
- ```java
- 
- return new OpdRegisterActivityPresenter(view, model);
-
- ```
- in your implementation of `BaseOpdRegisterActivityPresenter createPresenter(@NonNull OpdRegisterActivityContract.View, @NonNull OpdRegisterActivityContract.Model)` 
+      ```java
+    
+      return new OpdRegisterActivityPresenter(view, model);
+    
+      ```
+    in your implementation of `BaseOpdRegisterActivityPresenter createPresenter(@NonNull OpdRegisterActivityContract.View, @NonNull OpdRegisterActivityContract.Model)` 
 
 
 ## 3. Enable OPD Registration

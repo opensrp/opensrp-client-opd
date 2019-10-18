@@ -4,9 +4,21 @@ import android.support.annotation.NonNull;
 
 import org.smartregister.Context;
 import org.smartregister.opd.configuration.OpdConfiguration;
+import org.smartregister.opd.domain.YamlConfig;
+import org.smartregister.opd.domain.YamlConfigItem;
+import org.smartregister.opd.helper.OpdRulesEngineHelper;
+import org.smartregister.opd.repository.OpdCheckInRepository;
+import org.smartregister.opd.repository.OpdVisitRepository;
+import org.smartregister.opd.utils.FilePath;
 import org.smartregister.repository.Repository;
 import org.smartregister.repository.UniqueIdRepository;
 import org.smartregister.sync.helper.ECSyncHelper;
+import org.yaml.snakeyaml.TypeDescription;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 import id.zelory.compressor.Compressor;
 
@@ -25,6 +37,12 @@ public class OpdLibrary {
     private Compressor compressor;
     private int applicationVersion;
     private int databaseVersion;
+    private OpdCheckInRepository checkInRepository;
+    private OpdVisitRepository visitRepository;
+
+    private Yaml yaml;
+
+    private OpdRulesEngineHelper opdRulesEngineHelper;
 
     protected OpdLibrary(@NonNull Context context, @NonNull OpdConfiguration opdConfiguration
             , @NonNull Repository repository, int applicationVersion, int databaseVersion) {
@@ -33,6 +51,9 @@ public class OpdLibrary {
         this.repository = repository;
         this.applicationVersion = applicationVersion;
         this.databaseVersion = databaseVersion;
+
+        // Initialize configs processor
+        initializeYamlConfigs();
     }
 
     public static void init(Context context, @NonNull Repository repository, @NonNull OpdConfiguration opdConfiguration
@@ -57,11 +78,30 @@ public class OpdLibrary {
         return instance;
     }
 
+    @NonNull
     public UniqueIdRepository getUniqueIdRepository() {
         if (uniqueIdRepository == null) {
             uniqueIdRepository = new UniqueIdRepository(getRepository());
         }
         return uniqueIdRepository;
+    }
+
+    @NonNull
+    public OpdCheckInRepository getCheckInRepository() {
+        if (checkInRepository == null) {
+            checkInRepository = new OpdCheckInRepository(getRepository());
+        }
+
+        return checkInRepository;
+    }
+
+    @NonNull
+    public OpdVisitRepository getVisitRepository() {
+        if (visitRepository == null) {
+            visitRepository = new OpdVisitRepository(getRepository());
+        }
+
+        return visitRepository;
     }
 
     @NonNull
@@ -83,10 +123,12 @@ public class OpdLibrary {
         return opdConfiguration;
     }
 
+    @NonNull
     public Compressor getCompressor() {
         if (compressor == null) {
             compressor = Compressor.getDefault(context().applicationContext());
         }
+
         return compressor;
     }
 
@@ -97,5 +139,29 @@ public class OpdLibrary {
 
     public int getApplicationVersion() {
         return applicationVersion;
+    }
+
+    private void initializeYamlConfigs() {
+        Constructor constructor = new Constructor(YamlConfig.class);
+        TypeDescription customTypeDescription = new TypeDescription(YamlConfig.class);
+        customTypeDescription.addPropertyParameters(YamlConfigItem.FIELD_CONTACT_SUMMARY_ITEMS, YamlConfigItem.class);
+        constructor.addTypeDescription(customTypeDescription);
+        yaml = new Yaml(constructor);
+    }
+
+    @NonNull
+    public Iterable<Object> readYaml(@NonNull String filename) throws IOException {
+        InputStreamReader inputStreamReader = new InputStreamReader(
+                context.applicationContext().getAssets().open((FilePath.FOLDER.CONFIG_FOLDER_PATH + filename)));
+        return yaml.loadAll(inputStreamReader);
+    }
+
+    @NonNull
+    public OpdRulesEngineHelper getOpdRulesEngineHelper() {
+        if (opdRulesEngineHelper == null) {
+            opdRulesEngineHelper = new OpdRulesEngineHelper();
+        }
+
+        return opdRulesEngineHelper;
     }
 }

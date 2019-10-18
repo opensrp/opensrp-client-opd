@@ -6,7 +6,9 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.smartregister.configurableviews.model.RegisterConfiguration;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-19

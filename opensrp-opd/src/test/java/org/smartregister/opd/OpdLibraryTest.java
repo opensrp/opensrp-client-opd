@@ -10,7 +10,8 @@ import org.smartregister.Context;
 import org.smartregister.opd.configuration.OpdConfiguration;
 import org.smartregister.repository.Repository;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-24
@@ -20,7 +21,6 @@ public class OpdLibraryTest extends BaseTest {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
-
 
     @Test
     public void initShouldCreateNewLibraryInstanceWhenInstanceIsNull() {
@@ -44,5 +44,12 @@ public class OpdLibraryTest extends BaseTest {
     @After
     public void tearDown() {
         ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", null);
+    }
+
+    @Test
+    public void getOpdRulesEngineHelperShouldReturnNonNull() {
+        OpdLibrary.init(Mockito.mock(Context.class), Mockito.mock(Repository.class), Mockito.mock(OpdConfiguration.class), BuildConfig.VERSION_CODE, 1);
+
+        assertNotNull(OpdLibrary.getInstance().getOpdRulesEngineHelper());
     }
 }

@@ -2,4 +2,16 @@
 <resources>
 
     <color name="chw_primary">#218CC5</color>
+    <color name="black_text_color">#000000</color>
+
+    <color name="overview_header_bg">#3B404D</color>
+    <color name="overview_sub_header_bg">#EEEEEE</color>
+    <color name="overview_font_red">#D44D4C</color>
+    <color name="overview_font_right">#212121</color>
+    <color name="overview_font_left">#757575</color>
+
+    <color name="profile_contact_section_bg">#3F3F4F</color>
+
+    <color name="vaccine_blue_bg_stk">#267ea5</color>
+    <color name="vaccine_blue_bg_end">#3495bf</color>
 </resources>
