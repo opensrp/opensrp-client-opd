@@ -53,7 +53,11 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
     public static final String STEP2 = "step2";
     public static final String CURRENT_OPENSRP_ID = "current_opensrp_id";
     public static final String OPENSRP_ID = "OPENSRP_ID";
+    public static final String CURRENT_ZEIR_ID = "current_zeir_id";
+    public static final String READ_ONLY = "read_only";
+    public static final String HOME_ADDRESS = "home_address";
     public static final String ZEIR_ID = "zeir_id";
+    public static final String PERSON_IDENTIFIER = "person_identifier";
 
     public static JSONObject getFormAsJson(@NonNull JSONObject form, @NonNull String formName, @NonNull String id, @NonNull String currentLocationId) throws JSONException {
         return getFormAsJson(form, formName, id, currentLocationId, null);
@@ -101,7 +105,7 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
             JSONArray jsonArray = stepOne.getJSONArray(OpdJsonFormUtils.FIELDS);
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                if (jsonObject.getString(OpdJsonFormUtils.KEY).equalsIgnoreCase(OpdJsonFormUtils.OPENSRP_ID)) {
+                if (jsonObject.getString(OpdJsonFormUtils.KEY).equalsIgnoreCase(OpdConstants.KEY.ZEIR_ID)) {
                     jsonObject.remove(OpdJsonFormUtils.VALUE);
                     jsonObject.put(OpdJsonFormUtils.VALUE, entityId);
                 }
@@ -115,7 +119,7 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
         return form;
     }
 
-    private static void addRegLocHierarchyQuestions(@NonNull JSONObject form, @NonNull String widgetKey, @NonNull LocationHierarchy locationHierarchy) {
+    public static void addRegLocHierarchyQuestions(@NonNull JSONObject form, @NonNull String widgetKey, @NonNull LocationHierarchy locationHierarchy) {
         try {
             JSONArray questions = form.getJSONObject(JsonFormConstants.STEP1).getJSONArray(JsonFormConstants.FIELDS);
 
@@ -246,13 +250,10 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
         String providerId = allSharedPreferences.fetchRegisteredANM();
         event.setProviderId(providerId);
         event.setLocationId(locationId(allSharedPreferences));
-
         String childLocationId = getLocationId(event.getLocationId(), allSharedPreferences);
         event.setChildLocationId(childLocationId);
-
         event.setTeam(allSharedPreferences.fetchDefaultTeam(providerId));
         event.setTeamId(allSharedPreferences.fetchDefaultTeamId(providerId));
-
         event.setClientDatabaseVersion(OpdLibrary.getInstance().getDatabaseVersion());
         event.setClientApplicationVersion(OpdLibrary.getInstance().getApplicationVersion());
         return event;
@@ -305,15 +306,12 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
                 case 'M':
                     genderValue = "Male";
                     break;
-
                 case 'f':
                 case 'F':
                     genderValue = "Female";
                     break;
-
                 default:
                     break;
-
             }
 
             genderObject.put(OpdConstants.KEY.VALUE, genderValue);
@@ -356,26 +354,26 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
     protected static void dobUnknownUpdateFromAge(@NonNull JSONArray fields) {
         try {
             JSONObject dobUnknownObject = getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.DOB_UNKNOWN);
-            JSONArray options = getJSONArray(dobUnknownObject, OpdConstants.JSON_FORM_KEY.OPTIONS);
-            JSONObject option = getJSONObject(options, 0);
-            String dobUnKnownString = option != null ? option.getString(VALUE) : null;
-            if (StringUtils.isNotBlank(dobUnKnownString) && Boolean.valueOf(dobUnKnownString)) {
-
-                String ageString = getFieldValue(fields, OpdConstants.JSON_FORM_KEY.AGE_ENTERED);
-                if (StringUtils.isNotBlank(ageString) && NumberUtils.isNumber(ageString)) {
-                    int age = Integer.valueOf(ageString);
-                    JSONObject dobJSONObject = getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.DOB_ENTERED);
-                    dobJSONObject.put(VALUE, OpdUtils.getDob(age));
-
-                    //Mark the birth date as an approximation
-                    JSONObject isBirthdateApproximate = new JSONObject();
-                    isBirthdateApproximate.put(OpdConstants.KEY.KEY, FormEntityConstants.Person.birthdate_estimated);
-                    isBirthdateApproximate.put(OpdConstants.KEY.VALUE, OpdConstants.BOOLEAN_INT.TRUE);
-                    isBirthdateApproximate
-                            .put(OpdConstants.OPENMRS.ENTITY, OpdConstants.ENTITY.PERSON);//Required for value to be processed
-                    isBirthdateApproximate.put(OpdConstants.OPENMRS.ENTITY_ID, FormEntityConstants.Person.birthdate_estimated);
-                    fields.put(isBirthdateApproximate);
-
+            JSONArray jsonValueArray = dobUnknownObject.getJSONArray(OpdJsonFormUtils.VALUE);
+            if(jsonValueArray.length() == 0 ){
+                dobUnknownObject.put(OpdJsonFormUtils.VALUE, false);
+            }
+            else{
+                dobUnknownObject.put(OpdJsonFormUtils.VALUE, true);
+                if(jsonValueArray.getString(0).contains(OpdConstants.FormValue.IS_DOB_UNKNOWN)){
+                    String ageString = getFieldValue(fields, OpdConstants.JSON_FORM_KEY.AGE_ENTERED);
+                    if (StringUtils.isNotBlank(ageString) && NumberUtils.isNumber(ageString)) {
+                        int age = Integer.valueOf(ageString);
+                        JSONObject dobJSONObject = getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.DOB_ENTERED);
+                        dobJSONObject.put(VALUE, OpdUtils.getDob(age));
+                        //Mark the birth date as an approximation
+                        JSONObject isBirthdateApproximate = new JSONObject();
+                        isBirthdateApproximate.put(OpdConstants.KEY.KEY, FormEntityConstants.Person.birthdate_estimated);
+                        isBirthdateApproximate.put(OpdConstants.KEY.VALUE, OpdConstants.BOOLEAN_INT.TRUE);
+                        isBirthdateApproximate.put(OpdConstants.OPENMRS.ENTITY, OpdConstants.ENTITY.PERSON);//Required for value to be processed
+                        isBirthdateApproximate.put(OpdConstants.OPENMRS.ENTITY_ID, FormEntityConstants.Person.birthdate_estimated);
+                        fields.put(isBirthdateApproximate);
+                    }
                 }
             }
         } catch (JSONException e) {
