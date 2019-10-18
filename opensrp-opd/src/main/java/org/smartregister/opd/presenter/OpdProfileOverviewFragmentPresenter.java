@@ -39,17 +39,17 @@ public class OpdProfileOverviewFragmentPresenter implements OpdProfileOverviewFr
     }
 
     @Override
-    public void loadOverviewFacts(@NonNull String baseEntityId, @NonNull OnFinishedCallback onFinishedCallback) {
+    public void loadOverviewFacts(@NonNull String baseEntityId, @NonNull final OnFinishedCallback onFinishedCallback) {
         model.fetchLastCheckAndVisit(baseEntityId, new OpdProfileOverviewFragmentContract.Model.OnFetchedCallback() {
             @Override
             public void onFetched(@Nullable OpdCheckIn opdCheckIn, @Nullable OpdVisit opdVisit) {
-                loadOverviewDataAndDisplay(opdCheckIn, opdVisit);
+                loadOverviewDataAndDisplay(opdCheckIn, opdVisit, onFinishedCallback);
             }
         });
     }
 
     @Override
-    public void loadOverviewDataAndDisplay(@Nullable OpdCheckIn opdCheckIn, @Nullable OpdVisit opdVisit) {
+    public void loadOverviewDataAndDisplay(@Nullable OpdCheckIn opdCheckIn, @Nullable OpdVisit opdVisit, @NonNull final OnFinishedCallback onFinishedCallback) {
         List<YamlConfigWrapper> yamlConfigListGlobal = new ArrayList<>(); //This makes sure no data duplication happens
         Facts facts = new Facts();
 
@@ -62,6 +62,8 @@ public class OpdProfileOverviewFragmentPresenter implements OpdProfileOverviewFr
         } catch (IOException ioException) {
             Timber.e(ioException);
         }
+
+        onFinishedCallback.onFinished(facts, yamlConfigListGlobal);
     }
 
     private void generateYamlConfigList(@NonNull Facts facts, @NonNull List<YamlConfigWrapper> yamlConfigListGlobal) throws IOException {
@@ -108,7 +110,10 @@ public class OpdProfileOverviewFragmentPresenter implements OpdProfileOverviewFr
         facts.put("visit_type", checkIn.getVisitType());
         facts.put("previous_appointment", checkIn.getAppointmentScheduledPreviously());
         facts.put("date_of_appointment", checkIn.getAppointmentDueDate());
-        facts.put("visit_to_appointment_date", getVisitToAppointmentDateDuration(visit.getVisitDate(), checkIn.getAppointmentDueDate()));
+
+        if (visit.getVisitDate() != null && checkIn.getAppointmentDueDate() != null) {
+            facts.put("visit_to_appointment_date", getVisitToAppointmentDateDuration(visit.getVisitDate(), checkIn.getAppointmentDueDate()));
+        }
     }
 
     private Iterable<Object> loadFile(@NonNull String filename) throws IOException {

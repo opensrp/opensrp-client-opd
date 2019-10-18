@@ -24,11 +24,11 @@ public interface OpdProfileOverviewFragmentContract {
 
         void loadOverviewFacts(@NonNull String baseEntityId, @NonNull OnFinishedCallback onFinishedCallback);
 
-        void loadOverviewDataAndDisplay(@Nullable OpdCheckIn opdCheckIn, @Nullable OpdVisit opdVisit);
+        void loadOverviewDataAndDisplay(@Nullable OpdCheckIn opdCheckIn, @Nullable OpdVisit opdVisit, @NonNull final OnFinishedCallback onFinishedCallback);
 
         interface OnFinishedCallback {
 
-            void onFinished(@Nullable OpdCheckIn checkIn, @Nullable Facts facts, @Nullable List<YamlConfigWrapper> yamlConfigListGlobal);
+            void onFinished(@Nullable Facts facts, @Nullable List<YamlConfigWrapper> yamlConfigListGlobal);
         }
     }
 
