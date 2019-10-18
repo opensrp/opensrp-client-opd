@@ -33,6 +33,6 @@ public class TestOpdRegisterActivityPresenter extends BaseOpdRegisterActivityPre
 
     @Override
     public void saveForm(String jsonString, @NonNull RegisterParams registerParams) {
-        
+        // Do nothing
     }
 }
