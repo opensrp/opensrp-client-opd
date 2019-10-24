@@ -112,10 +112,11 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
             visitDate = event.getEventDate().toDate();
         }
 
-        if (visitDate != null) {
-            // Create the visit first
-            OpdVisit visit = new OpdVisit();
-            boolean saved = populateAndSaveVisit(event, visitId, visitDate, visit);
+        if (visitDate != null && visitId != null) {
+            // Start transaction
+            OpdLibrary.getInstance().getRepository().getWritableDatabase().beginTransaction();
+
+            boolean saved = saveVisit(event.getBaseEntityId(), event.getLocationId(), event.getProviderId(), visitId, visitDate);
             if (!saved) {
                 abortTransaction();
                 throw new CheckInEventProcessException(String.format("Visit with id %s could not be saved in the db. Fail operation failed", visitId));
@@ -142,7 +143,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
 
             // Update the last interacted with of the user
             try {
-                updateLastInteractedWith(event, visit);
+                updateLastInteractedWith(event, visitId);
             } catch (SQLiteException ex) {
                 abortTransaction();
                 throw new CheckInEventProcessException("An error occurred saving last_interacted_with");
@@ -150,20 +151,19 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
 
             commitSuccessfulTransaction();
         } else {
-            throw new CheckInEventProcessException(String.format("Check-in with visit id %s could not be processed because it the visitDate is null", visitId));
+            throw new CheckInEventProcessException(String.format("Check-in with visit id %s could not be processed because it the visitDate OR visitId is null", visitId));
         }
     }
 
-    private boolean populateAndSaveVisit(@NonNull Event event, @NonNull String visitId, @NonNull Date visitDate, @NonNull OpdVisit visit) {
+    private boolean saveVisit(@NonNull String baseEntityId, @NonNull String locationId, @NonNull String providerId, @NonNull String visitId, @NonNull Date visitDate) {
+        OpdVisit visit = new OpdVisit();
+
         visit.setId(visitId);
-        visit.setBaseEntityId(event.getBaseEntityId());
-        visit.setLocationId(event.getLocationId());
-        visit.setProviderId(event.getProviderId());
+        visit.setBaseEntityId(baseEntityId);
+        visit.setLocationId(locationId);
+        visit.setProviderId(providerId);
         visit.setCreatedAt(new Date());
         visit.setVisitDate(visitDate);
-
-        // Start transaction
-        OpdLibrary.getInstance().getRepository().getWritableDatabase().beginTransaction();
 
         return OpdLibrary.getInstance().getVisitRepository().addVisit(visit);
     }
@@ -196,7 +196,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         }
     }
 
-    private void updateLastInteractedWith(@NonNull Event event, OpdVisit visit) throws CheckInEventProcessException {
+    private void updateLastInteractedWith(@NonNull Event event, @NonNull String visitId) throws CheckInEventProcessException {
         String tableName = event.getEntityType();
         String lastInteractedWithDate = String.valueOf(new Date().getTime());
 
@@ -209,7 +209,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         if (recordsUpdated < 1) {
             abortTransaction();
             throw new CheckInEventProcessException(String.format("Updating last interacted with for visit %s for base_entity_id %s in table %s failed"
-                    , visit.getId()
+                    , visitId
                     , event.getBaseEntityId()
                     , tableName));
         }
@@ -235,7 +235,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         if (!isUpdated) {
             abortTransaction();
             throw new CheckInEventProcessException(String.format("Updating last interacted with for visit %s for base_entity_id %s in table %s failed"
-                    , visit.getId()
+                    , visitId
                     , event.getBaseEntityId()
                     , tableName));
         }

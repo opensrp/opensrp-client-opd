@@ -12,7 +12,6 @@ import org.smartregister.opd.pojos.OpdMetadata;
 public class OpdConfiguration {
 
     private Builder builder;
-    private int maxCheckInDurationInMinutes = 24 * 60;
 
     private OpdConfiguration(@NonNull Builder builder) {
         this.builder = builder;
@@ -47,7 +46,7 @@ public class OpdConfiguration {
     }
 
     public int getMaxCheckInDurationInMinutes() {
-        return maxCheckInDurationInMinutes;
+        return builder.maxCheckInDurationInMinutes;
     }
 
     public boolean isBottomNavigationEnabled() {
@@ -68,6 +67,7 @@ public class OpdConfiguration {
         private boolean isBottomNavigationEnabled;
 
         private OpdMetadata opdMetadata;
+        private int maxCheckInDurationInMinutes = 24 * 60;
 
         public Builder(@NonNull Class<? extends OpdRegisterQueryProviderContract> opdRegisterQueryProvider) {
             this.opdRegisterQueryProvider = opdRegisterQueryProvider;
@@ -90,6 +90,11 @@ public class OpdConfiguration {
 
         public Builder setOpdMetadata(@NonNull OpdMetadata opdMetadata) {
             this.opdMetadata = opdMetadata;
+            return this;
+        }
+
+        public Builder setMaxCheckInDurationInMinutes(int durationInMinutes) {
+            this.maxCheckInDurationInMinutes = durationInMinutes;
             return this;
         }
 

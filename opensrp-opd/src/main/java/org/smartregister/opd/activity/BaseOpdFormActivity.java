@@ -54,8 +54,8 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
 
         enableOnCloseDialog = getIntent().getBooleanExtra(OpdConstants.FormActivity.EnableOnCloseDialog, true);
 
-        Bundle extras = getIntent().getExtras();
-        if (getIntent() != null && extras != null) {
+        if (getIntent() != null && getIntent().getExtras() != null) {
+            Bundle extras = getIntent().getExtras();
             Set<String> keySet = extras.keySet();
 
             for (String key: keySet) {
