@@ -1,6 +1,7 @@
 package org.smartregister.opd.provider;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -179,7 +180,8 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
         String childName = org.smartregister.util.Utils.getName(firstName, middleName + " " + lastName);
 
         String dobString = Utils.getDuration(opdRegisterProviderMetadata.getDob(patientColumnMaps));
-        //dobString = dobString.contains("y") ? dobString.substring(0, dobString.indexOf("y")) : dobString;
+        int year = dobString.contains("y") ? Integer.parseInt(dobString.substring(0, dobString.indexOf("y"))) : 0;
+        dobString = year >= 5 ? dobString.substring(0, dobString.indexOf("y")) : dobString;
         fillValue(viewHolder.textViewChildName, WordUtils.capitalize(childName) + ", " + WordUtils.capitalize(OpdUtils.getTranslatedDate(dobString, context)));
         String registerType = opdRegisterProviderMetadata.getRegisterType(patientColumnMaps);
 
