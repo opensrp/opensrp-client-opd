@@ -65,7 +65,7 @@ public class BaseOpdRegisterActivityInteractor implements OpdRegisterActivityCon
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                saveEventInDb(event);
+                saveEventInDbAndProcess(event);
                 appExecutors.mainThread().execute(new Runnable() {
                     @Override
                     public void run() {
@@ -79,25 +79,32 @@ public class BaseOpdRegisterActivityInteractor implements OpdRegisterActivityCon
     }
 
 
-    private void saveEventInDb(@NonNull Event event) {
+    private void saveEventInDbAndProcess(@NonNull Event event) {
         try {
-            CoreLibrary.getInstance().context().getEventClientRepository().addEvent(event.getBaseEntityId()
+            CoreLibrary.getInstance()
+                    .context()
+                    .getEventClientRepository()
+                    .addEvent(event.getBaseEntityId()
                     , new JSONObject(JsonFormUtils.gson.toJson(event)));
         } catch (JSONException e) {
             Timber.e(e);
         }
 
+        processLatestUnprocessedEvents();
+    }
+
+    private void processLatestUnprocessedEvents() {
+        // Process this event
         long lastSyncTimeStamp = getAllSharedPreferences().fetchLastUpdatedAtDate(0);
         Date lastSyncDate = new Date(lastSyncTimeStamp);
 
         try {
             getClientProcessorForJava().processClient(getSyncHelper().getEvents(lastSyncDate, BaseRepository.TYPE_Unprocessed));
-            getAllSharedPreferences().saveLastUpdatedAtDate(lastSyncDate.getTime());
+            getAllSharedPreferences().saveLastUpdatedAtDate(new Date().getTime());
         } catch (Exception e) {
             Timber.e(e);
         }
     }
-
 
     @NonNull
     public ECSyncHelper getSyncHelper() {

@@ -33,9 +33,7 @@ import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 import id.zelory.compressor.Compressor;
 
@@ -59,8 +57,6 @@ public class OpdLibrary {
     private Compressor compressor;
     private int applicationVersion;
     private int databaseVersion;
-
-    private SimpleDateFormat dateFormat = new SimpleDateFormat(OpdDbConstants.DATE_FORMAT, Locale.US);
 
     private Yaml yaml;
 
@@ -226,7 +222,7 @@ public class OpdLibrary {
 
         // Create the visit Id
         opdCheckinEvent.addDetails(OpdConstants.Event.CheckIn.Detail.VISIT_ID, JsonFormUtils.generateRandomUUIDString());
-        opdCheckinEvent.addDetails(OpdConstants.Event.CheckIn.Detail.VISIT_DATE, dateFormat.format(new Date()));
+        opdCheckinEvent.addDetails(OpdConstants.Event.CheckIn.Detail.VISIT_DATE, OpdUtils.convertDate(new Date(), OpdDbConstants.DATE_FORMAT));
 
         return opdCheckinEvent;
     }

@@ -7,11 +7,9 @@ import net.sqlcipher.database.SQLiteDatabase;
 
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.opd.utils.OpdDbConstants.Column.OpdDetails;
+import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.repository.BaseRepository;
 import org.smartregister.repository.Repository;
-
-import java.text.SimpleDateFormat;
-import java.util.Locale;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-30
@@ -27,8 +25,6 @@ public class OpdDetailsRepository extends BaseRepository {
             + OpdDetails.CURRENT_VISIT_END_DATE + " DATETIME, "
             + OpdDetails.CURRENT_VISIT_ID + " VARCHAR NOT NULL, "
             + OpdDetails.CREATED_AT + " DATETIME NOT NULL DEFAULT (DATETIME('now')), UNIQUE(" + OpdDetails.BASE_ENTITY_ID + ") ON CONFLICT REPLACE)";
-
-    private SimpleDateFormat dateFormat = new SimpleDateFormat(OpdDbConstants.DATE_FORMAT, Locale.US);
 
     public OpdDetailsRepository(Repository repository) {
         super(repository);
@@ -48,14 +44,16 @@ public class OpdDetailsRepository extends BaseRepository {
 
         contentValues.put(OpdDetails.BASE_ENTITY_ID, opdDetails.getBaseEntityId());
         contentValues.put(OpdDetails.PENDING_DIAGNOSE_AND_TREAT, opdDetails.isPendingDiagnoseAndTreat());
-        contentValues.put(OpdDetails.CURRENT_VISIT_START_DATE, dateFormat.format(opdDetails.getCurrentVisitStartDate()));
+
+        if (opdDetails.getCurrentVisitStartDate() != null) {
+            contentValues.put(OpdDetails.CURRENT_VISIT_START_DATE, OpdUtils.convertDate(opdDetails.getCurrentVisitStartDate(), OpdDbConstants.DATE_FORMAT));
+        }
 
         if (opdDetails.getCurrentVisitEndDate() != null) {
-            contentValues.put(OpdDetails.CURRENT_VISIT_START_DATE, dateFormat.format(opdDetails.getCurrentVisitEndDate()));
+            contentValues.put(OpdDetails.CURRENT_VISIT_END_DATE, OpdUtils.convertDate(opdDetails.getCurrentVisitEndDate(), OpdDbConstants.DATE_FORMAT));
         }
 
         contentValues.put(OpdDetails.CURRENT_VISIT_ID, opdDetails.getCurrentVisitId());
-
         return contentValues;
     }
 

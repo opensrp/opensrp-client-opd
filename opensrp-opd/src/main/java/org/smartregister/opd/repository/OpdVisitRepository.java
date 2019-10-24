@@ -14,9 +14,7 @@ import org.smartregister.opd.utils.OpdDbConstants.Column.OpdVisit;
 import org.smartregister.repository.BaseRepository;
 import org.smartregister.repository.Repository;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 import timber.log.Timber;
 
@@ -45,8 +43,6 @@ public class OpdVisitRepository extends BaseRepository implements OpdVisitDao {
             , OpdVisit.LOCATION_ID
             , OpdVisit.BASE_ENTITY_ID
             , OpdVisit.CREATED_AT};
-
-    private SimpleDateFormat dateFormat = new SimpleDateFormat(OpdDbConstants.DATE_FORMAT, Locale.US);
 
     public OpdVisitRepository(Repository repository) {
         super(repository);

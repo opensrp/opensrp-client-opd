@@ -13,8 +13,11 @@ import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
 import org.smartregister.opd.pojos.OpdMetadata;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-13
@@ -115,5 +118,11 @@ public class OpdUtils extends org.smartregister.util.Utils {
         }
 
         return data.hasExtra(OpdConstants.IntentKey.ENTITY_TABLE) ? data.getStringExtra(OpdConstants.IntentKey.ENTITY_TABLE) : null;
+    }
+
+    @NonNull
+    public static String convertDate(@NonNull Date date, @NonNull String dateFormat) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat, Locale.US);
+        return simpleDateFormat.format(date);
     }
 }
