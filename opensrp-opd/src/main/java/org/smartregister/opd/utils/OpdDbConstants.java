@@ -23,13 +23,14 @@ public interface OpdDbConstants {
         String DOB = "dob";
 
         String GENDER = "gender";
-        String TABLE = "ec_client";
-        String OPENSRP_ID = "opensrp_id";
-        String BASE_ENTITY_ID = "base_entity_id";
-        String LAST_INTERACTED_WITH = "last_interacted_with";
-        String DATE_REMOVED = "date_removed";
 
         String REGISTER_ID = "register_id";
+        String BASE_ENTITY_ID = "base_entity_id";
+
+        String TABLE = "ec_client";
+        String OPENSRP_ID = "opensrp_id";
+        String LAST_INTERACTED_WITH = "last_interacted_with";
+        String DATE_REMOVED = "date_removed";
     }
 
     interface Column {
@@ -71,12 +72,23 @@ public interface OpdDbConstants {
             String NATIONAL_ID = "national_id";
             String GENDER = "gender";
         }
+
+        interface OpdDetails {
+            String ID = "_id";
+            String BASE_ENTITY_ID = "base_entity_id";
+            String PENDING_DIAGNOSE_AND_TREAT = "pending_diagnose_and_treat";
+            String CURRENT_VISIT_START_DATE = "current_visit_start_date";
+            String CURRENT_VISIT_END_DATE = "current_visit_end_date";
+            String CURRENT_VISIT_ID = "visit_id";
+            String CREATED_AT = "created_at";
+        }
     }
 
     interface Table {
 
         String OPD_CHECK_IN = "opd_check_in";
         String OPD_VISIT = "opd_visit";
+        String OPD_DETAILS = "opd_details";
 
     }
 }

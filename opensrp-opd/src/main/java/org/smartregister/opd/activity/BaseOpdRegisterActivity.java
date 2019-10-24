@@ -4,16 +4,28 @@ package org.smartregister.opd.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.view.View;
 
+import com.vijay.jsonwizard.constants.JsonFormConstants;
+import com.vijay.jsonwizard.domain.Form;
+
+import org.json.JSONObject;
+import org.smartregister.AllConstants;
 import org.smartregister.opd.OpdLibrary;
+import org.smartregister.opd.R;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
+import org.smartregister.opd.fragment.BaseOpdRegisterFragment;
 import org.smartregister.opd.model.OpdRegisterActivityModel;
 import org.smartregister.opd.presenter.BaseOpdRegisterActivityPresenter;
+import org.smartregister.opd.utils.OpdConstants;
+import org.smartregister.opd.utils.OpdJsonFormUtils;
+import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.view.activity.BaseRegisterActivity;
 
+import java.util.HashMap;
 import java.util.List;
 
 import timber.log.Timber;
@@ -92,5 +104,39 @@ public abstract class BaseOpdRegisterActivity extends BaseRegisterActivity imple
     @Override
     public void startFormActivity(String formName, String entityId, String metaData) {
         //do nothing
+    }
+
+    @Override
+    public void startFormActivity(String formName, String entityId, String metaData, @Nullable HashMap<String, String> injectedFieldValues, @Nullable String entityTable) {
+        if (mBaseFragment instanceof BaseOpdRegisterFragment) {
+            String locationId = OpdUtils.context().allSharedPreferences().getPreference(AllConstants.CURRENT_LOCATION_ID);
+            presenter().startForm(formName, entityId, metaData, locationId, injectedFieldValues, entityTable);
+        } else {
+
+            displayToast(getString(R.string.error_unable_to_start_form));
+        }
+    }
+
+    @Override
+    public void startFormActivity(@NonNull JSONObject jsonForm, @Nullable HashMap<String, String> parcelableData) {
+
+        Intent intent = new Intent(this, OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata().getOpdFormActivity());
+
+        intent.putExtra(OpdConstants.JSON_FORM_EXTRA.JSON, jsonForm.toString());
+
+        Form form = new Form();
+        form.setWizard(false);
+        form.setHideSaveLabel(true);
+        form.setNextLabel("");
+
+        intent.putExtra(JsonFormConstants.JSON_FORM_KEY.FORM, form);
+
+        if (parcelableData != null) {
+            for (String intentKey : parcelableData.keySet()) {
+                intent.putExtra(intentKey, parcelableData.get(intentKey));
+            }
+        }
+
+        startActivityForResult(intent, OpdJsonFormUtils.REQUEST_CODE_GET_JSON);
     }
 }

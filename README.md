@@ -83,6 +83,7 @@ Add the module to your project as follows
  
         VisitRepository.createTable(database);
         CheckInRepository.createTable(database);
+        OpdDetailsRepository.createTable(database);
     }
     
  ```

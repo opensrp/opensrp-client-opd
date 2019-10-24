@@ -45,6 +45,10 @@ public class OpdConfiguration {
         return builder.opdRegisterQueryProvider;
     }
 
+    public int getMaxCheckInDurationInMinutes() {
+        return builder.maxCheckInDurationInMinutes;
+    }
+
     public boolean isBottomNavigationEnabled() {
         return builder.isBottomNavigationEnabled;
     }
@@ -63,6 +67,7 @@ public class OpdConfiguration {
         private boolean isBottomNavigationEnabled;
 
         private OpdMetadata opdMetadata;
+        private int maxCheckInDurationInMinutes = 24 * 60;
 
         public Builder(@NonNull Class<? extends OpdRegisterQueryProviderContract> opdRegisterQueryProvider) {
             this.opdRegisterQueryProvider = opdRegisterQueryProvider;
@@ -85,6 +90,11 @@ public class OpdConfiguration {
 
         public Builder setOpdMetadata(@NonNull OpdMetadata opdMetadata) {
             this.opdMetadata = opdMetadata;
+            return this;
+        }
+
+        public Builder setMaxCheckInDurationInMinutes(int durationInMinutes) {
+            this.maxCheckInDurationInMinutes = durationInMinutes;
             return this;
         }
 

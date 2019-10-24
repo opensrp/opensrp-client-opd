@@ -3,6 +3,7 @@ package org.smartregister.opd.activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
@@ -21,7 +22,9 @@ import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.util.LangUtils;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import timber.log.Timber;
 
@@ -30,6 +33,8 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
     private BaseOpdFormFragment opdFormFragment;
     private boolean enableOnCloseDialog = true;
     private JSONObject form;
+
+    private HashMap<String, String> parcelableData = new HashMap<>();
 
     @Override
     protected void attachBaseContext(android.content.Context base) {
@@ -48,6 +53,22 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
         }
 
         enableOnCloseDialog = getIntent().getBooleanExtra(OpdConstants.FormActivity.EnableOnCloseDialog, true);
+
+        if (getIntent() != null && getIntent().getExtras() != null) {
+            Bundle extras = getIntent().getExtras();
+            Set<String> keySet = extras.keySet();
+
+            for (String key: keySet) {
+                if (!key.equals(OpdConstants.JSON_FORM_EXTRA.JSON)) {
+                    Object objectValue = extras.get(key);
+
+                    if (objectValue instanceof String) {
+                        String value = (String) objectValue;
+                        parcelableData.put(key, value);
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -167,5 +188,10 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
             }
         }
         return null;
+    }
+
+    @NonNull
+    public HashMap<String, String> getParcelableData() {
+        return parcelableData;
     }
 }

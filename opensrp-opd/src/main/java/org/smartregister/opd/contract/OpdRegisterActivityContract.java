@@ -1,13 +1,19 @@
 package org.smartregister.opd.contract;
 
+import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import org.apache.commons.lang3.tuple.Triple;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.domain.tag.FormTag;
 import org.smartregister.opd.pojos.OpdEventClient;
 import org.smartregister.opd.pojos.RegisterParams;
 import org.smartregister.view.contract.BaseRegisterContract;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -19,15 +25,21 @@ public interface OpdRegisterActivityContract {
     interface View extends BaseRegisterContract.View {
 
         OpdRegisterActivityContract.Presenter presenter();
+
+        void startFormActivity(String formName, String entityId, String metaData, @Nullable HashMap<String, String> injectedFieldValues, @Nullable String clientTable);
+
+        void startFormActivity(@NonNull JSONObject jsonForm, @Nullable HashMap<String, String> parcelableData);
     }
 
     interface Presenter extends BaseRegisterContract.Presenter {
 
         void saveLanguage(String language);
 
-        void saveForm(String jsonString, RegisterParams registerParams);
+        void saveForm(String jsonString, @NonNull RegisterParams registerParams);
 
-        void startForm(String formName, String entityId, String metaData, String locationId);
+        void saveVisitOrDiagnosisForm(@NonNull String eventType, String jsonString, @Nullable Intent data);
+
+        void startForm(String formName, String entityId, String metaData, String locationId, @Nullable HashMap<String, String> injectedFieldValues, @Nullable String entityTable);
     }
 
     interface Model {
@@ -42,8 +54,14 @@ public interface OpdRegisterActivityContract {
 
         List<OpdEventClient> processRegistration(String jsonString, FormTag formTag);
 
+        @Nullable
         JSONObject getFormAsJson(String formName, String entityId,
                                  String currentLocationId) throws JSONException;
+
+
+        @Nullable
+        JSONObject getFormAsJson(String formName, String entityId,
+                                 String currentLocationId, @Nullable HashMap<String, String> injectedValues) throws JSONException;
 
         String getInitials();
 
@@ -56,6 +74,8 @@ public interface OpdRegisterActivityContract {
         void onDestroy(boolean isChangingConfiguration);
 
         void saveRegistration(List<OpdEventClient> opdEventClientList, String jsonString, RegisterParams registerParams, OpdRegisterActivityContract.InteractorCallBack callBack);
+
+        void saveEvent(@NonNull Event event, @NonNull OpdRegisterActivityContract.InteractorCallBack callBack);
     }
 
     interface InteractorCallBack {
@@ -65,6 +85,8 @@ public interface OpdRegisterActivityContract {
         void onUniqueIdFetched(Triple<String, String, String> triple, String entityId);
 
         void onRegistrationSaved(boolean isEdit);
+
+        void onEventSaved();
 
     }
 }

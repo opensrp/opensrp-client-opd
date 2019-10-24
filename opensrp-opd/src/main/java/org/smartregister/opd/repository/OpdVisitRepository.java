@@ -14,9 +14,7 @@ import org.smartregister.opd.utils.OpdDbConstants.Column.OpdVisit;
 import org.smartregister.repository.BaseRepository;
 import org.smartregister.repository.Repository;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 import timber.log.Timber;
 
@@ -27,7 +25,7 @@ import timber.log.Timber;
 public class OpdVisitRepository extends BaseRepository implements OpdVisitDao {
 
     private static final String CREATE_TABLE_SQL = "CREATE TABLE " + OpdDbConstants.Table.OPD_VISIT + "("
-            + OpdVisit.ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"
+            + OpdVisit.ID + " VARCHAR NOT NULL PRIMARY KEY,"
             + OpdVisit.VISIT_DATE + " DATETIME NOT NULL,"
             + OpdVisit.PROVIDER_ID + " VARCHAR NOT NULL,"
             + OpdVisit.LOCATION_ID + " VARCHAR NOT NULL,"
@@ -45,8 +43,6 @@ public class OpdVisitRepository extends BaseRepository implements OpdVisitDao {
             , OpdVisit.LOCATION_ID
             , OpdVisit.BASE_ENTITY_ID
             , OpdVisit.CREATED_AT};
-
-    private SimpleDateFormat dateFormat = new SimpleDateFormat(OpdDbConstants.DATE_FORMAT, Locale.US);
 
     public OpdVisitRepository(Repository repository) {
         super(repository);
@@ -76,7 +72,7 @@ public class OpdVisitRepository extends BaseRepository implements OpdVisitDao {
     protected org.smartregister.opd.pojos.OpdVisit getVisitResult(@NonNull Cursor cursor) {
         org.smartregister.opd.pojos.OpdVisit visit = new org.smartregister.opd.pojos.OpdVisit();
 
-        visit.setId(cursor.getInt(cursor.getColumnIndex(OpdVisit.ID)));
+        visit.setId(cursor.getString(cursor.getColumnIndex(OpdVisit.ID)));
         visit.setVisitDate(new Date(cursor.getLong(cursor.getColumnIndex(OpdVisit.VISIT_DATE))));
         visit.setProviderId(cursor.getString(cursor.getColumnIndex(OpdVisit.PROVIDER_ID)));
         visit.setLocationId(cursor.getString(cursor.getColumnIndex(OpdVisit.LOCATION_ID)));
@@ -117,5 +113,16 @@ public class OpdVisitRepository extends BaseRepository implements OpdVisitDao {
         }
 
         return visit;
+    }
+
+    public boolean addVisit(@NonNull org.smartregister.opd.pojos.OpdVisit visit) {
+        ContentValues contentValues = createValuesFor(visit);
+
+        //TODO: Check for duplicates
+
+        SQLiteDatabase database = getWritableDatabase();
+        long recordId = database.insert(OpdDbConstants.Table.OPD_VISIT, null, contentValues);
+
+        return recordId != -1;
     }
 }

@@ -15,6 +15,7 @@ import org.smartregister.util.FormUtils;
 import org.smartregister.util.Utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import timber.log.Timber;
@@ -68,6 +69,13 @@ public class OpdRegisterActivityModel implements OpdRegisterActivityContract.Mod
     @Nullable
     @Override
     public JSONObject getFormAsJson(String formName, String entityId, String currentLocationId) throws JSONException {
+        return getFormAsJson(formName, entityId, currentLocationId, null);
+    }
+
+    @Nullable
+    @Override
+    public JSONObject getFormAsJson(String formName, String entityId,
+                             String currentLocationId, @Nullable HashMap<String, String> injectedValues) throws JSONException {
         if (getFormUtils() == null) {
             return null;
         }
@@ -77,7 +85,7 @@ public class OpdRegisterActivityModel implements OpdRegisterActivityContract.Mod
             return null;
         }
 
-        return OpdJsonFormUtils.getFormAsJson(form, formName, entityId, currentLocationId);
+        return OpdJsonFormUtils.getFormAsJson(form, formName, entityId, currentLocationId, injectedValues);
     }
 
     @Override

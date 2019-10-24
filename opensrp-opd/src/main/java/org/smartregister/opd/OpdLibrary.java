@@ -1,24 +1,39 @@
 package org.smartregister.opd;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.smartregister.Context;
+import org.smartregister.clientandeventmodel.Event;
+import org.smartregister.domain.tag.FormTag;
 import org.smartregister.opd.configuration.OpdConfiguration;
 import org.smartregister.opd.domain.YamlConfig;
 import org.smartregister.opd.domain.YamlConfigItem;
 import org.smartregister.opd.helper.OpdRulesEngineHelper;
 import org.smartregister.opd.repository.OpdCheckInRepository;
+import org.smartregister.opd.repository.OpdDetailsRepository;
 import org.smartregister.opd.repository.OpdVisitRepository;
 import org.smartregister.opd.utils.FilePath;
+import org.smartregister.opd.utils.OpdConstants;
+import org.smartregister.opd.utils.OpdDbConstants;
+import org.smartregister.opd.utils.OpdJsonFormUtils;
+import org.smartregister.opd.utils.OpdUtils;
+import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.repository.Repository;
 import org.smartregister.repository.UniqueIdRepository;
 import org.smartregister.sync.helper.ECSyncHelper;
+import org.smartregister.util.JsonFormUtils;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Date;
 
 import id.zelory.compressor.Compressor;
 
@@ -33,12 +48,15 @@ public class OpdLibrary {
     private OpdConfiguration opdConfiguration;
     private final Repository repository;
     private ECSyncHelper syncHelper;
+
     private UniqueIdRepository uniqueIdRepository;
+    private OpdCheckInRepository checkInRepository;
+    private OpdVisitRepository visitRepository;
+    private OpdDetailsRepository opdDetailsRepository;
+
     private Compressor compressor;
     private int applicationVersion;
     private int databaseVersion;
-    private OpdCheckInRepository checkInRepository;
-    private OpdVisitRepository visitRepository;
 
     private Yaml yaml;
 
@@ -105,6 +123,15 @@ public class OpdLibrary {
     }
 
     @NonNull
+    public OpdDetailsRepository getOpdDetailsRepository() {
+        if (opdDetailsRepository == null) {
+            opdDetailsRepository = new OpdDetailsRepository(getRepository());
+        }
+
+        return opdDetailsRepository;
+    }
+
+    @NonNull
     public Repository getRepository() {
         return repository;
     }
@@ -163,5 +190,40 @@ public class OpdLibrary {
         }
 
         return opdRulesEngineHelper;
+    }
+
+    @NonNull
+    public Event processOpdCheckInForm(@NonNull String eventType, String jsonString, @Nullable Intent data) throws JSONException {
+        JSONObject jsonFormObject = new JSONObject(jsonString);
+
+        JSONObject stepOne = jsonFormObject.getJSONObject(OpdJsonFormUtils.STEP1);
+        JSONArray fieldsArray = stepOne.getJSONArray(OpdJsonFormUtils.FIELDS);
+
+        FormTag formTag = OpdJsonFormUtils.formTag(OpdUtils.getAllSharedPreferences());
+
+        String baseEntityId = OpdUtils.getBaseEntityId(data);
+        String entityTable = OpdUtils.getEntityTable(data);
+        Event opdCheckinEvent = OpdJsonFormUtils.createEvent(fieldsArray, jsonFormObject.getJSONObject(OpdJsonFormUtils.METADATA)
+                , formTag, baseEntityId, eventType, entityTable);
+
+        // Generate the eventId and add it
+        opdCheckinEvent.setEventId(JsonFormUtils.generateRandomUUIDString());
+
+        AllSharedPreferences allSharedPreferences = OpdUtils.getAllSharedPreferences();
+        String providerId = allSharedPreferences.fetchRegisteredANM();
+        opdCheckinEvent.setProviderId(providerId);
+        opdCheckinEvent.setLocationId(OpdJsonFormUtils.locationId(allSharedPreferences));
+
+        opdCheckinEvent.setTeam(allSharedPreferences.fetchDefaultTeam(providerId));
+        opdCheckinEvent.setTeamId(allSharedPreferences.fetchDefaultTeamId(providerId));
+
+        opdCheckinEvent.setClientDatabaseVersion(OpdLibrary.getInstance().getDatabaseVersion());
+        opdCheckinEvent.setClientApplicationVersion(OpdLibrary.getInstance().getApplicationVersion());
+
+        // Create the visit Id
+        opdCheckinEvent.addDetails(OpdConstants.Event.CheckIn.Detail.VISIT_ID, JsonFormUtils.generateRandomUUIDString());
+        opdCheckinEvent.addDetails(OpdConstants.Event.CheckIn.Detail.VISIT_DATE, OpdUtils.convertDate(new Date(), OpdDbConstants.DATE_FORMAT));
+
+        return opdCheckinEvent;
     }
 }

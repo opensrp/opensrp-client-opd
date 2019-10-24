@@ -182,7 +182,7 @@ public class OpdCheckInRepositoryTest {
                         , Mockito.eq("1"));
 
         OpdCheckInRepository opdCheckInRepository = new OpdCheckInRepository(repository);
-        OpdCheckIn checkIn = opdCheckInRepository.getCheckInByVisit(3);
+        OpdCheckIn checkIn = opdCheckInRepository.getCheckInByVisit("dsldk");
 
         Mockito.verify(database, Mockito.times(1))
                 .query(Mockito.eq("opd_check_in")
@@ -221,7 +221,7 @@ public class OpdCheckInRepositoryTest {
         matrixCursor.addRow(new Object[]{
                 1
                 , eventId
-                , 100
+                , "visit-id"
                 , baseEntityId
                 , "positive"
                 , "no"
@@ -241,7 +241,7 @@ public class OpdCheckInRepositoryTest {
         OpdCheckIn checkIn = opdCheckInRepository.getCheckInResult(matrixCursor);
 
         assertEquals(1, checkIn.getId());
-        assertEquals(100, checkIn.getVisitId());
+        assertEquals("visit-id", checkIn.getVisitId());
         assertEquals(eventId, checkIn.getEventId());
         assertEquals(checkInDate, checkIn.getUpdatedAt());
         assertNull(checkIn.getAppointmentDueDate());

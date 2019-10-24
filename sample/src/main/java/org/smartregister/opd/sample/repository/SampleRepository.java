@@ -7,6 +7,7 @@ import net.sqlcipher.database.SQLiteDatabase;
 import org.smartregister.AllConstants;
 import org.smartregister.configurableviews.repository.ConfigurableViewsRepository;
 import org.smartregister.opd.repository.OpdCheckInRepository;
+import org.smartregister.opd.repository.OpdDetailsRepository;
 import org.smartregister.opd.repository.OpdVisitRepository;
 import org.smartregister.opd.sample.BuildConfig;
 import org.smartregister.opd.sample.application.OpdSampleApplication;
@@ -52,6 +53,7 @@ public class SampleRepository extends Repository {
 
         OpdVisitRepository.createTable(database);
         OpdCheckInRepository.createTable(database);
+        OpdDetailsRepository.createTable(database);
     }
 
 

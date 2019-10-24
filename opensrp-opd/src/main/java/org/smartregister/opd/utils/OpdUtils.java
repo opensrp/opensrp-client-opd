@@ -1,6 +1,7 @@
 package org.smartregister.opd.utils;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -12,8 +13,11 @@ import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
 import org.smartregister.opd.pojos.OpdMetadata;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-13
@@ -95,5 +99,30 @@ public class OpdUtils extends org.smartregister.util.Utils {
     @Nullable
     public static OpdMetadata metadata() {
         return OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata();
+    }
+
+
+    @Nullable
+    public static String getBaseEntityId(@Nullable Intent data) {
+        if (data == null) {
+            return null;
+        }
+
+        return data.hasExtra(OpdConstants.IntentKey.BASE_ENTITY_ID) ? data.getStringExtra(OpdConstants.IntentKey.BASE_ENTITY_ID) : null;
+    }
+
+    @Nullable
+    public static String getEntityTable(@Nullable Intent data) {
+        if (data == null) {
+            return null;
+        }
+
+        return data.hasExtra(OpdConstants.IntentKey.ENTITY_TABLE) ? data.getStringExtra(OpdConstants.IntentKey.ENTITY_TABLE) : null;
+    }
+
+    @NonNull
+    public static String convertDate(@NonNull Date date, @NonNull String dateFormat) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat, Locale.US);
+        return simpleDateFormat.format(date);
     }
 }
