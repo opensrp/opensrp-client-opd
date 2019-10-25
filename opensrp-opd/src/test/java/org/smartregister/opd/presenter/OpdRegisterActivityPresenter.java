@@ -18,16 +18,16 @@ public class OpdRegisterActivityPresenter extends BaseOpdRegisterActivityPresent
 
     @Override
     public void saveForm(String jsonString, @NonNull RegisterParams registerParams) {
-
+        // Do nothing
     }
 
     @Override
     public void onNoUniqueId() {
-
+        // Do nothing
     }
 
     @Override
     public void onRegistrationSaved(boolean isEdit) {
-
+        // Do nothing
     }
 }

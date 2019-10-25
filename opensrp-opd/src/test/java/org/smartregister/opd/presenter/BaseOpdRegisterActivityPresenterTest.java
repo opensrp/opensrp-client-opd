@@ -2,7 +2,6 @@ package org.smartregister.opd.presenter;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -12,8 +11,6 @@ import org.smartregister.opd.contract.OpdRegisterActivityContract;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-10-24
