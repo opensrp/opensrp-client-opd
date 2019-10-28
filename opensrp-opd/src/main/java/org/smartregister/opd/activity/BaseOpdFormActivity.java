@@ -98,7 +98,7 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
     }
 
     protected void initializeFormFragmentCore() {
-        opdFormFragment = BaseOpdFormFragment.getFormFragment(JsonFormConstants.FIRST_STEP_NAME);
+        opdFormFragment = (BaseOpdFormFragment) BaseOpdFormFragment.getFormFragment(JsonFormConstants.FIRST_STEP_NAME);
         getSupportFragmentManager().beginTransaction().add(com.vijay.jsonwizard.R.id.container, opdFormFragment).commit();
     }
 
@@ -114,10 +114,6 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
     public void writeValue(String stepName, String key, String value, String openMrsEntityParent, String openMrsEntity,
                            String openMrsEntityId, boolean popup) throws JSONException {
         super.writeValue(stepName, key, value, openMrsEntityParent, openMrsEntity, openMrsEntityId, popup);
-        OpdMetadata opdMetadata = OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata();
-        if (opdMetadata != null && opdMetadata.isFormWizardValidateRequiredFieldsBefore()) {
-            validateActivateNext();
-        }
     }
 
     @Override
@@ -126,20 +122,12 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
             throws JSONException {
         super.writeValue(stepName, parentKey, childObjectKey, childKey, value, openMrsEntityParent, openMrsEntity,
                 openMrsEntityId, popup);
-        OpdMetadata opdMetadata = OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata();
-        if (opdMetadata != null && opdMetadata.isFormWizardValidateRequiredFieldsBefore()) {
-            validateActivateNext();
-        }
     }
 
     @Override
     public void writeValue(String stepName, String key, String value, String openMrsEntityParent, String openMrsEntity,
                            String openMrsEntityId) throws JSONException {
         super.writeValue(stepName, key, value, openMrsEntityParent, openMrsEntity, openMrsEntityId);
-        OpdMetadata opdMetadata = OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata();
-        if (opdMetadata != null && opdMetadata.isFormWizardValidateRequiredFieldsBefore()) {
-            validateActivateNext();
-        }
     }
 
     @Override
@@ -147,10 +135,6 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
                            String openMrsEntityParent, String openMrsEntity, String openMrsEntityId) throws JSONException {
         super.writeValue(stepName, parentKey, childObjectKey, childKey, value, openMrsEntityParent, openMrsEntity,
                 openMrsEntityId);
-        OpdMetadata opdMetadata = OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata();
-        if (opdMetadata != null && opdMetadata.isFormWizardValidateRequiredFieldsBefore()) {
-            validateActivateNext();
-        }
     }
 
     /**
@@ -197,23 +181,6 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
                 opdDiagnosisAndTreatmentFormDao.saveOrUpdate(opdDiagnosisAndTreatmentForm);
             }
         });
-    }
-
-    public void validateActivateNext() {
-        Fragment fragment = getVisibleFragment();
-        if (fragment instanceof BaseOpdFormFragment) {
-            ((BaseOpdFormFragment) fragment).validateActivateNext();
-        }
-    }
-
-    public Fragment getVisibleFragment() {
-        List<Fragment> fragments = this.getSupportFragmentManager().getFragments();
-        if (fragments != null) {
-            for (Fragment fragment : fragments) {
-                if (fragment != null && fragment.isVisible()) return fragment;
-            }
-        }
-        return null;
     }
 
     @NonNull

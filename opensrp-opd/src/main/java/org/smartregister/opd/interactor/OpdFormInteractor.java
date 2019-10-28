@@ -10,16 +10,13 @@ import org.smartregister.opd.widgets.OpdMultiSelectDrugPicker;
 
 public class OpdFormInteractor extends JsonFormInteractor {
 
+    private static final OpdFormInteractor INSTANCE = new OpdFormInteractor();
 
-    private OpdFormInteractor() {
+    public OpdFormInteractor() {
         super();
     }
 
     public static JsonFormInteractor getInstance() {
-
-        if (INSTANCE != null && !(INSTANCE instanceof OpdFormInteractor)) {
-            INSTANCE = new OpdFormInteractor();
-        }
         return INSTANCE;
     }
 

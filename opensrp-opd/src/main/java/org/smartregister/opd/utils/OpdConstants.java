@@ -50,11 +50,11 @@ public class OpdConstants extends AllConstants {
         String MULTI_SELECT_DRUG_PICKER = "multi_select_drug_picker";
     }
 
-    public interface OpdDiagnosisAndTreatmentEcTables {
-        String DIAGNOSIS = "ec_opd_diagnosis";
-        String TREATMENT = "ec_opd_treatment";
-        String TEST_CONDUCTED = "ec_opd_test_conducted";
-        String SERVICE_DETAIL = "ec_opd_service_detail";
+    public interface OpdDiagnosisAndTreatmentTables {
+        String DIAGNOSIS = "opd_diagnosis";
+        String TREATMENT = "opd_treatment";
+        String TEST_CONDUCTED = "opd_test_conducted";
+        String SERVICE_DETAIL = "opd_service_detail";
     }
 
     public static class JSON_FORM_KEY {

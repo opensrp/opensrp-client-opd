@@ -22,7 +22,8 @@ import android.widget.TextView;
 import com.vijay.jsonwizard.activities.JsonFormActivity;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.domain.Form;
-import com.vijay.jsonwizard.fragments.JsonFormFragment;
+import com.vijay.jsonwizard.fragments.JsonWizardFormFragment;
+import com.vijay.jsonwizard.presenters.JsonWizardFormFragmentPresenter;
 import com.vijay.jsonwizard.utils.ValidationStatus;
 
 import org.smartregister.commonregistry.CommonPersonObject;
@@ -40,11 +41,10 @@ import org.smartregister.opd.utils.OpdConstants;
 import java.util.HashMap;
 import java.util.List;
 
-public class BaseOpdFormFragment extends JsonFormFragment implements ClientLookUpListAdapter.ClickListener {
+public class BaseOpdFormFragment extends JsonWizardFormFragment implements ClientLookUpListAdapter.ClickListener {
 
     private Snackbar snackbar = null;
     private AlertDialog alertDialog = null;
-
     private final Listener<List<CommonPersonObject>> lookUpListener =
             new Listener<List<CommonPersonObject>>() {
                 @Override
@@ -52,42 +52,14 @@ public class BaseOpdFormFragment extends JsonFormFragment implements ClientLookU
                     showClientLookUp(data);
                 }
             };
+    private OpdFormFragmentPresenter presenter;
 
-    public static BaseOpdFormFragment getFormFragment(String stepName) {
+    public static JsonWizardFormFragment getFormFragment(String stepName) {
         BaseOpdFormFragment jsonFormFragment = new BaseOpdFormFragment();
         Bundle bundle = new Bundle();
         bundle.putString(JsonFormConstants.JSON_FORM_KEY.STEPNAME, stepName);
         jsonFormFragment.setArguments(bundle);
         return jsonFormFragment;
-    }
-
-    public void validateActivateNext() {
-        if (!isVisible()) { //form fragment is initializing or not the last page
-            return;
-        }
-
-        Form form = getForm();
-        if (form == null || !form.isWizard()) {
-            return;
-        }
-
-        ValidationStatus validationStatus = null;
-        for (View dataView : getJsonApi().getFormDataViews()) {
-            validationStatus = getPresenter().validate(this, dataView, false);
-            if (!validationStatus.isValid()) {
-                break;
-            }
-        }
-
-        if (validationStatus != null && validationStatus.isValid()) {
-            if (!getPresenter().isIntermediatePage()) {
-                getMenu().findItem(com.vijay.jsonwizard.R.id.action_save).setVisible(true);
-            }
-        } else {
-            if (!getPresenter().isIntermediatePage()) {
-                getMenu().findItem(com.vijay.jsonwizard.R.id.action_save).setVisible(false);
-            }
-        }
     }
 
     @Nullable
@@ -97,7 +69,7 @@ public class BaseOpdFormFragment extends JsonFormFragment implements ClientLookU
     }
 
     public OpdFormFragmentPresenter getPresenter() {
-        return (OpdFormFragmentPresenter) presenter;
+        return presenter;
     }
 
     @Override
@@ -260,9 +232,9 @@ public class BaseOpdFormFragment extends JsonFormFragment implements ClientLookU
         }
     }
 
-
     @Override
-    protected OpdFormFragmentPresenter createPresenter() {
-        return new OpdFormFragmentPresenter(this, OpdFormInteractor.getInstance());
+    protected JsonWizardFormFragmentPresenter createPresenter() {
+        presenter = new OpdFormFragmentPresenter(this, OpdFormInteractor.getInstance());
+        return presenter;
     }
 }

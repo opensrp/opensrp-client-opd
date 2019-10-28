@@ -14,6 +14,8 @@ import org.smartregister.opd.configuration.OpdConfiguration;
 import org.smartregister.opd.domain.YamlConfig;
 import org.smartregister.opd.domain.YamlConfigItem;
 import org.smartregister.opd.helper.OpdRulesEngineHelper;
+import org.smartregister.opd.pojos.OpdCheckIn;
+import org.smartregister.opd.pojos.OpdDiagnosisAndTreatmentForm;
 import org.smartregister.opd.repository.OpdCheckInRepository;
 import org.smartregister.opd.repository.OpdDetailsRepository;
 import org.smartregister.opd.repository.OpdDiagnosisAndTreatmentFormRepository;
@@ -290,9 +292,9 @@ public class OpdLibrary {
 
         String entityId = OpdUtils.getIntentValue(data, OpdConstants.IntentKey.BASE_ENTITY_ID);
 
-//        OpdCheckIn opdCheckIn = OpdLibrary.getInstance().getCheckInRepository().getLatestCheckIn(entityId);
+        OpdCheckIn opdCheckIn = OpdLibrary.getInstance().getCheckInRepository().getLatestCheckIn(entityId);
 
-        String visitId = "visitId";
+        String visitId = opdCheckIn.getVisitId();
 
         List<JSONObject> steps = Arrays.asList(step1JsonObject, step2JsonObject, step3JsonObject, step4JsonObject);
 
@@ -309,6 +311,12 @@ public class OpdLibrary {
             baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_ID, visitId);
             eventList.add(baseEvent);
         }
+
+        //remove any saved sessions
+        OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm = new OpdDiagnosisAndTreatmentForm();
+        opdDiagnosisAndTreatmentForm.setBaseEntityId(entityId);
+        OpdLibrary.getInstance().opdDiagnosisAndTreatmentFormRepository.delete(opdDiagnosisAndTreatmentForm);
+
         return eventList;
     }
 
@@ -318,7 +326,7 @@ public class OpdLibrary {
     }
 
     protected String[] getDiagnosisAndTreatmentEcTableArray() {
-        return new String[]{OpdConstants.OpdDiagnosisAndTreatmentEcTables.TEST_CONDUCTED, OpdConstants.OpdDiagnosisAndTreatmentEcTables.DIAGNOSIS,
-                OpdConstants.OpdDiagnosisAndTreatmentEcTables.TREATMENT, OpdConstants.OpdDiagnosisAndTreatmentEcTables.SERVICE_DETAIL};
+        return new String[]{OpdConstants.OpdDiagnosisAndTreatmentTables.TEST_CONDUCTED, OpdConstants.OpdDiagnosisAndTreatmentTables.DIAGNOSIS,
+                OpdConstants.OpdDiagnosisAndTreatmentTables.TREATMENT, OpdConstants.OpdDiagnosisAndTreatmentTables.SERVICE_DETAIL};
     }
 }
