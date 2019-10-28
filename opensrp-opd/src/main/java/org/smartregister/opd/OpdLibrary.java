@@ -16,6 +16,11 @@ import org.smartregister.opd.domain.YamlConfigItem;
 import org.smartregister.opd.helper.OpdRulesEngineHelper;
 import org.smartregister.opd.repository.OpdCheckInRepository;
 import org.smartregister.opd.repository.OpdDetailsRepository;
+import org.smartregister.opd.repository.OpdDiagnosisAndTreatmentFormRepository;
+import org.smartregister.opd.repository.OpdDiagnosisRepository;
+import org.smartregister.opd.repository.OpdServiceDetailRepository;
+import org.smartregister.opd.repository.OpdTestConductedRepository;
+import org.smartregister.opd.repository.OpdTreatmentRepository;
 import org.smartregister.opd.repository.OpdVisitRepository;
 import org.smartregister.opd.utils.FilePath;
 import org.smartregister.opd.utils.OpdConstants;
@@ -33,9 +38,15 @@ import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import id.zelory.compressor.Compressor;
+
+import static org.smartregister.opd.utils.OpdJsonFormUtils.METADATA;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-13
@@ -43,17 +54,21 @@ import id.zelory.compressor.Compressor;
 
 public class OpdLibrary {
 
-    private final Context context;
     private static OpdLibrary instance;
-    private OpdConfiguration opdConfiguration;
+    private final Context context;
     private final Repository repository;
+    private OpdConfiguration opdConfiguration;
     private ECSyncHelper syncHelper;
 
     private UniqueIdRepository uniqueIdRepository;
     private OpdCheckInRepository checkInRepository;
     private OpdVisitRepository visitRepository;
     private OpdDetailsRepository opdDetailsRepository;
-
+    private OpdDiagnosisAndTreatmentFormRepository opdDiagnosisAndTreatmentFormRepository;
+    private OpdServiceDetailRepository opdServiceDetailRepository;
+    private OpdDiagnosisRepository opdDiagnosisRepository;
+    private OpdTreatmentRepository opdTreatmentRepository;
+    private OpdTestConductedRepository opdTestConductedRepository;
     private Compressor compressor;
     private int applicationVersion;
     private int databaseVersion;
@@ -81,11 +96,6 @@ public class OpdLibrary {
         }
     }
 
-    @NonNull
-    public Context context() {
-        return context;
-    }
-
     public static OpdLibrary getInstance() {
         if (instance == null) {
             throw new IllegalStateException("Instance does not exist!!! Call "
@@ -94,6 +104,11 @@ public class OpdLibrary {
                     + "your Application class");
         }
         return instance;
+    }
+
+    @NonNull
+    public Context context() {
+        return context;
     }
 
     @NonNull
@@ -127,8 +142,47 @@ public class OpdLibrary {
         if (opdDetailsRepository == null) {
             opdDetailsRepository = new OpdDetailsRepository(getRepository());
         }
-
         return opdDetailsRepository;
+    }
+
+    @NonNull
+    public OpdDiagnosisAndTreatmentFormRepository getOpdDiagnosisAndTreatmentFormRepository() {
+        if (opdDiagnosisAndTreatmentFormRepository == null) {
+            opdDiagnosisAndTreatmentFormRepository = new OpdDiagnosisAndTreatmentFormRepository(getRepository());
+        }
+        return opdDiagnosisAndTreatmentFormRepository;
+    }
+
+    @NonNull
+    public OpdDiagnosisRepository getOpdDiagnosisRepository() {
+        if (opdDiagnosisRepository == null) {
+            opdDiagnosisRepository = new OpdDiagnosisRepository(getRepository());
+        }
+        return opdDiagnosisRepository;
+    }
+
+    @NonNull
+    public OpdTestConductedRepository getOpdTestConductedRepository() {
+        if (opdTestConductedRepository == null) {
+            opdTestConductedRepository = new OpdTestConductedRepository(getRepository());
+        }
+        return opdTestConductedRepository;
+    }
+
+    @NonNull
+    public OpdTreatmentRepository getOpdTreatmentRepository() {
+        if (opdTreatmentRepository == null) {
+            opdTreatmentRepository = new OpdTreatmentRepository(getRepository());
+        }
+        return opdTreatmentRepository;
+    }
+
+    @NonNull
+    public OpdServiceDetailRepository getOpdServiceDetailRepository() {
+        if (opdServiceDetailRepository == null) {
+            opdServiceDetailRepository = new OpdServiceDetailRepository(getRepository());
+        }
+        return opdServiceDetailRepository;
     }
 
     @NonNull
@@ -193,7 +247,7 @@ public class OpdLibrary {
     }
 
     @NonNull
-    public Event processOpdCheckInForm(@NonNull String eventType, String jsonString, @Nullable Intent data) throws JSONException {
+    public List<Event> processOpdCheckInForm(@NonNull String eventType, String jsonString, @Nullable Intent data) throws JSONException {
         JSONObject jsonFormObject = new JSONObject(jsonString);
 
         JSONObject stepOne = jsonFormObject.getJSONObject(OpdJsonFormUtils.STEP1);
@@ -203,7 +257,7 @@ public class OpdLibrary {
 
         String baseEntityId = OpdUtils.getBaseEntityId(data);
         String entityTable = OpdUtils.getEntityTable(data);
-        Event opdCheckinEvent = OpdJsonFormUtils.createEvent(fieldsArray, jsonFormObject.getJSONObject(OpdJsonFormUtils.METADATA)
+        Event opdCheckinEvent = OpdJsonFormUtils.createEvent(fieldsArray, jsonFormObject.getJSONObject(METADATA)
                 , formTag, baseEntityId, eventType, entityTable);
 
         // Generate the eventId and add it
@@ -224,6 +278,47 @@ public class OpdLibrary {
         opdCheckinEvent.addDetails(OpdConstants.Event.CheckIn.Detail.VISIT_ID, JsonFormUtils.generateRandomUUIDString());
         opdCheckinEvent.addDetails(OpdConstants.Event.CheckIn.Detail.VISIT_DATE, OpdUtils.convertDate(new Date(), OpdDbConstants.DATE_FORMAT));
 
-        return opdCheckinEvent;
+        return Collections.singletonList(opdCheckinEvent);
+    }
+
+    public List<Event> processOpdDiagnosisAndTreatmentForm(@NonNull String jsonString, @NonNull Intent data) throws JSONException {
+        JSONObject jsonFormObject = new JSONObject(jsonString);
+        JSONObject step1JsonObject = jsonFormObject.optJSONObject(OpdConstants.JSON_FORM_EXTRA.STEP1);
+        JSONObject step2JsonObject = jsonFormObject.optJSONObject(OpdConstants.JSON_FORM_EXTRA.STEP2);
+        JSONObject step3JsonObject = jsonFormObject.optJSONObject(OpdConstants.JSON_FORM_EXTRA.STEP3);
+        JSONObject step4JsonObject = jsonFormObject.optJSONObject(OpdConstants.JSON_FORM_EXTRA.STEP4);
+
+        String entityId = OpdUtils.getIntentValue(data, OpdConstants.IntentKey.BASE_ENTITY_ID);
+
+//        OpdCheckIn opdCheckIn = OpdLibrary.getInstance().getCheckInRepository().getLatestCheckIn(entityId);
+
+        String visitId = "visitId";
+
+        List<JSONObject> steps = Arrays.asList(step1JsonObject, step2JsonObject, step3JsonObject, step4JsonObject);
+
+        FormTag formTag = OpdJsonFormUtils.formTag(OpdUtils.getAllSharedPreferences());
+
+        List<Event> eventList = new ArrayList<>();
+
+        for (int i = 0; i < steps.size(); i++) {
+            JSONObject step = steps.get(i);
+            JSONArray fields = step.getJSONArray(OpdJsonFormUtils.FIELDS);
+            Event baseEvent = JsonFormUtils.createEvent(fields, jsonFormObject.getJSONObject(METADATA),
+                    formTag, entityId, getDiagnosisAndTreatmentEventArray()[i], getDiagnosisAndTreatmentEcTableArray()[i]);
+            OpdJsonFormUtils.tagSyncMetadata(baseEvent);
+            baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_ID, visitId);
+            eventList.add(baseEvent);
+        }
+        return eventList;
+    }
+
+    protected String[] getDiagnosisAndTreatmentEventArray() {
+        return new String[]{OpdConstants.EventType.TEST_CONDUCTED, OpdConstants.EventType.DIAGNOSIS,
+                OpdConstants.EventType.TREATMENT, OpdConstants.EventType.SERVICE_DETAIL};
+    }
+
+    protected String[] getDiagnosisAndTreatmentEcTableArray() {
+        return new String[]{OpdConstants.OpdDiagnosisAndTreatmentEcTables.TEST_CONDUCTED, OpdConstants.OpdDiagnosisAndTreatmentEcTables.DIAGNOSIS,
+                OpdConstants.OpdDiagnosisAndTreatmentEcTables.TREATMENT, OpdConstants.OpdDiagnosisAndTreatmentEcTables.SERVICE_DETAIL};
     }
 }

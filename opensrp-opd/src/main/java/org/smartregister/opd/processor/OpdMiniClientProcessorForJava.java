@@ -4,9 +4,16 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
+
+import com.vijay.jsonwizard.constants.JsonFormConstants;
 
 import net.sqlcipher.database.SQLiteException;
 
+import org.joda.time.DateTime;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.smartregister.CoreLibrary;
 import org.smartregister.anc.library.sync.MiniClientProcessorForJava;
 import org.smartregister.commonregistry.CommonFtsObject;
@@ -20,10 +27,17 @@ import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.exception.CheckInEventProcessException;
 import org.smartregister.opd.pojos.OpdCheckIn;
 import org.smartregister.opd.pojos.OpdDetails;
+import org.smartregister.opd.pojos.OpdDiagnosis;
+import org.smartregister.opd.pojos.OpdServiceDetail;
+import org.smartregister.opd.pojos.OpdTestConducted;
+import org.smartregister.opd.pojos.OpdTreatment;
 import org.smartregister.opd.pojos.OpdVisit;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;
+import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.sync.ClientProcessorForJava;
+import org.smartregister.util.JsonFormUtils;
+import org.smartregister.util.Utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -65,6 +79,10 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         if (eventTypes == null) {
             eventTypes = new HashSet<>();
             eventTypes.add(OpdConstants.EventType.CHECK_IN);
+            eventTypes.add(OpdConstants.EventType.TEST_CONDUCTED);
+            eventTypes.add(OpdConstants.EventType.DIAGNOSIS);
+            eventTypes.add(OpdConstants.EventType.SERVICE_DETAIL);
+            eventTypes.add(OpdConstants.EventType.TREATMENT);
         }
 
         return eventTypes;
@@ -81,13 +99,166 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         Event event = eventClient.getEvent();
 
         if (event.getEventType().equals(OpdConstants.EventType.CHECK_IN)) {
-
             try {
                 processCheckIn(event, eventClient.getClient());
                 CoreLibrary.getInstance().context().getEventClientRepository().markEventAsProcessed(eventClient.getEvent().getFormSubmissionId());
             } catch (CheckInEventProcessException ex) {
                 Timber.e(ex);
             }
+        } else if (event.getEventType().equals(OpdConstants.EventType.TEST_CONDUCTED)) {
+            try {
+                processTestConducted(eventClient);
+                CoreLibrary.getInstance().context().getEventClientRepository().markEventAsProcessed(eventClient.getEvent().getFormSubmissionId());
+            } catch (Exception ex) {
+                Timber.e(ex);
+            }
+        } else if (event.getEventType().equals(OpdConstants.EventType.DIAGNOSIS)) {
+            try {
+                processDiagnosis(eventClient);
+                CoreLibrary.getInstance().context().getEventClientRepository().markEventAsProcessed(eventClient.getEvent().getFormSubmissionId());
+            } catch (Exception ex) {
+                Timber.e(ex);
+            }
+        } else if (event.getEventType().equals(OpdConstants.EventType.TREATMENT)) {
+            try {
+                processTreatment(eventClient);
+                CoreLibrary.getInstance().context().getEventClientRepository().markEventAsProcessed(eventClient.getEvent().getFormSubmissionId());
+            } catch (Exception ex) {
+                Timber.e(ex);
+            }
+        } else if (event.getEventType().equals(OpdConstants.EventType.SERVICE_DETAIL)) {
+            try {
+                processServiceDetail(eventClient);
+                CoreLibrary.getInstance().context().getEventClientRepository().markEventAsProcessed(eventClient.getEvent().getFormSubmissionId());
+            } catch (Exception ex) {
+                Timber.e(ex);
+            }
+        }
+    }
+
+    private void processServiceDetail(@NonNull EventClient eventClient) {
+        Event event = eventClient.getEvent();
+        Map<String, String> mapDetails = event.getDetails();
+
+        HashMap<String, String> keyValues = new HashMap<>();
+        generateKeyValuesFromEvent(eventClient.getEvent(), keyValues);
+
+        String serviceFee = keyValues.get(OpdConstants.JSON_FORM_KEY.SERVICE_FEE);
+
+        if (!TextUtils.isEmpty(serviceFee)) {
+            OpdServiceDetail opdServiceDetail = new OpdServiceDetail();
+            opdServiceDetail.setId(JsonFormUtils.generateRandomUUIDString());
+            opdServiceDetail.setBaseEntityId(event.getBaseEntityId());
+            opdServiceDetail.setFee(serviceFee);
+            opdServiceDetail.setCreatedAt(Utils.convertDateFormat(new DateTime()));
+            opdServiceDetail.setUpdatedAt(Utils.convertDateFormat(new DateTime()));
+            opdServiceDetail.setVisitId(mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID));
+            opdServiceDetail.setDetails(mapDetails.toString());
+            OpdLibrary.getInstance().getOpdServiceDetailRepository().saveOrUpdate(opdServiceDetail);
+        }
+    }
+
+    private void processTreatment(@NonNull EventClient eventClient) throws JSONException {
+        Event event = eventClient.getEvent();
+        Map<String, String> mapDetails = event.getDetails();
+
+        HashMap<String, String> keyValues = new HashMap<>();
+        generateKeyValuesFromEvent(eventClient.getEvent(), keyValues);
+        String medicine = keyValues.get(OpdConstants.JSON_FORM_KEY.MEDICINE);
+        if (!TextUtils.isEmpty(medicine)) {
+            JSONArray medicineJsonArray = new JSONArray(medicine);
+            for (int i = 0; i < medicineJsonArray.length(); i++) {
+                JSONObject jsonObject = medicineJsonArray.getJSONObject(i);
+                String key = jsonObject.optString(OpdConstants.KEY.KEY);
+                JSONObject property = jsonObject.optJSONObject(JsonFormConstants.MultiSelectUtils.PROPERTY);
+                JSONObject meta = property.optJSONObject(OpdConstants.JSON_FORM_KEY.META);
+
+                OpdTreatment opdTreatment = new OpdTreatment();
+                opdTreatment.setId(JsonFormUtils.generateRandomUUIDString());
+                opdTreatment.setBaseEntityId(event.getBaseEntityId());
+                opdTreatment.setVisitId(mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID));
+                opdTreatment.setDosage(meta.optString(OpdConstants.JSON_FORM_KEY.DOSAGE));
+                opdTreatment.setDuration(property.optString(OpdConstants.JSON_FORM_KEY.DURATION));
+                opdTreatment.setMedicine(key);
+                opdTreatment.setCreatedAt(Utils.convertDateFormat(new DateTime()));
+                opdTreatment.setUpdatedAt(Utils.convertDateFormat(new DateTime()));
+                opdTreatment.setNote(meta.optString(OpdConstants.JSON_FORM_KEY.INFO));
+                OpdLibrary.getInstance().getOpdTreatmentRepository().saveOrUpdate(opdTreatment);
+            }
+        }
+    }
+
+    private void processDiagnosis(@NonNull EventClient eventClient) throws JSONException {
+        Event event = eventClient.getEvent();
+        Map<String, String> mapDetails = event.getDetails();
+
+        HashMap<String, String> keyValues = new HashMap<>();
+        generateKeyValuesFromEvent(eventClient.getEvent(), keyValues);
+
+        String diagnosis = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSIS);
+        String diagnosisType = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSIS_TYPE);
+        String diseaseCode = keyValues.get(OpdConstants.JSON_FORM_KEY.DISEASE_CODE);
+
+        if (!TextUtils.isEmpty(diseaseCode) && !TextUtils.isEmpty(diagnosis)) {
+            JSONArray diseaseCodesJsonArray = new JSONArray(diseaseCode);
+            for (int i = 0; i < diseaseCodesJsonArray.length(); i++) {
+                JSONObject jsonObject = diseaseCodesJsonArray.getJSONObject(i);
+                String key = jsonObject.optString(OpdJsonFormUtils.KEY);
+                JSONObject property = jsonObject.optJSONObject(JsonFormConstants.MultiSelectUtils.PROPERTY);
+                OpdDiagnosis opdDiagnosis = new OpdDiagnosis();
+                opdDiagnosis.setId(JsonFormUtils.generateRandomUUIDString());
+                opdDiagnosis.setBaseEntityId(event.getBaseEntityId());
+                opdDiagnosis.setVisitId(mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID));
+                opdDiagnosis.setIcd10Code(property.optString(OpdConstants.JSON_FORM_KEY.ICD10));
+                opdDiagnosis.setCode(property.optString(OpdConstants.JSON_FORM_KEY.CODE));
+                opdDiagnosis.setDetails(property.optString(OpdConstants.JSON_FORM_KEY.META));
+                opdDiagnosis.setType(diagnosisType);
+                opdDiagnosis.setCreatedAt(Utils.convertDateFormat(new DateTime()));
+                opdDiagnosis.setUpdatedAt(Utils.convertDateFormat(new DateTime()));
+                opdDiagnosis.setDisease(key);
+                opdDiagnosis.setDiagnosis(diagnosis);
+                OpdLibrary.getInstance().getOpdDiagnosisRepository().saveOrUpdate(opdDiagnosis);
+            }
+        }
+
+    }
+
+    private void processTestConducted(@NonNull EventClient eventClient) {
+        Event event = eventClient.getEvent();
+        Map<String, String> mapDetails = event.getDetails();
+
+        HashMap<String, String> keyValues = new HashMap<>();
+        generateKeyValuesFromEvent(eventClient.getEvent(), keyValues);
+        String diagnosticResult = null;
+        String diagnosticTest = null;
+
+        if (keyValues.containsKey(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER)) {
+            diagnosticResult = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER);
+        }
+
+        if (keyValues.containsKey(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_OTHER)) {
+            diagnosticTest = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_OTHER);
+        }
+        if (keyValues.containsKey(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST)) {
+            diagnosticTest = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST);
+        }
+
+        if (keyValues.containsKey(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPECIFY)) {
+            diagnosticResult = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPECIFY);
+        }
+
+        if (!TextUtils.isEmpty(diagnosticResult) && !TextUtils.isEmpty(diagnosticTest)) {
+
+            OpdTestConducted opdTestConducted = new OpdTestConducted();
+            opdTestConducted.setResult(diagnosticResult);
+            opdTestConducted.setTest(diagnosticTest);
+            opdTestConducted.setVisitId(mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID));
+            opdTestConducted.setBaseEntityId(event.getBaseEntityId());
+            opdTestConducted.setId(JsonFormUtils.generateRandomUUIDString());
+            opdTestConducted.setCreatedAt(Utils.convertDateFormat(new DateTime()));
+            opdTestConducted.setUpdatedAt(Utils.convertDateFormat(new DateTime()));
+
+            OpdLibrary.getInstance().getOpdTestConductedRepository().saveOrUpdate(opdTestConducted);
         }
     }
 
@@ -123,7 +294,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
             }
 
             OpdCheckIn checkIn = generateCheckInRecordFromCheckInEvent(event, client, keyValues, visitId, visitDate);
-            saved = OpdLibrary.getInstance().getCheckInRepository(). addCheckIn(checkIn);
+            saved = OpdLibrary.getInstance().getCheckInRepository().addCheckIn(checkIn);
 
             if (!saved) {
                 abortTransaction();
@@ -171,7 +342,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
     private void generateKeyValuesFromEvent(@NonNull Event event, HashMap<String, String> keyValues) {
         List<Obs> obs = event.getObs();
 
-        for (Obs observation: obs) {
+        for (Obs observation : obs) {
             String key = observation.getFormSubmissionField();
             List<Object> values = observation.getValues();
 
@@ -204,7 +375,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         contentValues.put("last_interacted_with", lastInteractedWithDate);
 
         int recordsUpdated = OpdLibrary.getInstance().getRepository().getWritableDatabase()
-                .update(tableName,  contentValues,"base_entity_id = ?", new String[]{event.getBaseEntityId()});
+                .update(tableName, contentValues, "base_entity_id = ?", new String[]{event.getBaseEntityId()});
 
         if (recordsUpdated < 1) {
             abortTransaction();
@@ -228,7 +399,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
 
         if (commonrepository.isFts()) {
             recordsUpdated = OpdLibrary.getInstance().getRepository().getWritableDatabase()
-                    .update(CommonFtsObject.searchTableName(tableName),  contentValues,fieldName + " = ?", new String[]{event.getBaseEntityId()});
+                    .update(CommonFtsObject.searchTableName(tableName), contentValues, fieldName + " = ?", new String[]{event.getBaseEntityId()});
             isUpdated = recordsUpdated > 0;
         }
 
@@ -266,7 +437,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         // This code and flag is useless now - Todo: Work on disabling the flag in the query by deleting the current_visit_date & change this flag to diagnose_and_treat_ongoing
         // Set Pending diagnose and treat if we have not lapsed the max check-in duration in minutes set in the opd library configuration
         if (visitDate != null) {
-            long timeDifferenceInMinutes = ((new Date().getTime()) - visitDate.getTime())/(60 * 1000);
+            long timeDifferenceInMinutes = ((new Date().getTime()) - visitDate.getTime()) / (60 * 1000);
             opdDetails.setPendingDiagnoseAndTreat(timeDifferenceInMinutes <= OpdLibrary.getInstance().getOpdConfiguration().getMaxCheckInDurationInMinutes());
         }
 

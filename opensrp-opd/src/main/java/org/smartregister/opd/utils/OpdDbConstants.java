@@ -82,6 +82,60 @@ public interface OpdDbConstants {
             String CURRENT_VISIT_ID = "visit_id";
             String CREATED_AT = "created_at";
         }
+
+        interface OpdDiagnosisAndTreatmentForm {
+            String ID = "id";
+            String BASE_ENTITY_ID = "base_entity_id";
+            String FORM = "form";
+            String CREATED_AT = "created_at";
+        }
+
+        interface OpdDiagnosis {
+            String ID = "id";
+            String BASE_ENTITY_ID = "base_entity_id";
+            String DIAGNOSIS = "diagnosis";
+            String TYPE = "type";
+            String DISEASE = "disease";
+            String ICD10_CODE = "icd10_code";
+            String CODE = "code";
+            String DETAILS = "details";
+            String CREATED_AT = "created_at";
+            String UPDATED_AT = "updated_at";
+            String VISIT_ID = "visit_id";
+        }
+
+        interface OpdTreatment {
+            String ID = "id";
+            String BASE_ENTITY_ID = "base_entity_id";
+            String MEDICINE = "medicine";
+            String TYPE = "type";
+            String DOSAGE = "dosage";
+            String DURATION = "duration";
+            String NOTE = "note";
+            String CREATED_AT = "created_at";
+            String UPDATED_AT = "updated_at";
+            String VISIT_ID = "visit_id";
+        }
+
+        interface OpdServiceDetail {
+            String ID = "id";
+            String BASE_ENTITY_ID = "base_entity_id";
+            String FEE = "fee";
+            String VISIT_ID = "visit_id";
+            String DETAILS = "details";
+            String CREATED_AT = "created_at";
+            String UPDATED_AT = "updated_at";
+        }
+
+        interface OpdTestConducted {
+            String ID = "id";
+            String BASE_ENTITY_ID = "base_entity_id";
+            String TEST = "test";
+            String RESULT = "result";
+            String CREATED_AT = "created_at";
+            String UPDATED_AT = "updated_at";
+            String VISIT_ID = "visit_id";
+        }
     }
 
     interface Table {
@@ -89,6 +143,11 @@ public interface OpdDbConstants {
         String OPD_CHECK_IN = "opd_check_in";
         String OPD_VISIT = "opd_visit";
         String OPD_DETAILS = "opd_details";
+        String OPD_DIAGNOSIS_AND_TREATMENT_FORM = "opd_diagnosis_and_treatment_form";
+        String OPD_DIAGNOSIS = "opd_diagnosis";
+        String OPD_TREATMENT = "opd_treatment";
+        String OPD_SERVICE_DETAIL = "opd_service_detail";
+        String OPD_TEST_CONDUCTED = "opd_test_conducted";
 
     }
 }

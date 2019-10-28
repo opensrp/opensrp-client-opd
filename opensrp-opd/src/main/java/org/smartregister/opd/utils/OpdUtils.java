@@ -101,6 +101,14 @@ public class OpdUtils extends org.smartregister.util.Utils {
         return OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata();
     }
 
+    @Nullable
+    public static String getIntentValue(@Nullable Intent data, @NonNull String key) {
+        if (data == null) {
+            return null;
+        }
+
+        return data.hasExtra(key) ? data.getStringExtra(key) : null;
+    }
 
     @Nullable
     public static String getBaseEntityId(@Nullable Intent data) {

@@ -61,11 +61,16 @@ public class BaseOpdRegisterActivityInteractor implements OpdRegisterActivityCon
     }
 
     @Override
-    public void saveEvent(@NonNull final Event event, @NonNull final OpdRegisterActivityContract.InteractorCallBack callBack) {
+    public void saveEvent(@NonNull final List<Event> events, @NonNull final OpdRegisterActivityContract.InteractorCallBack callBack) {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                saveEventInDbAndProcess(event);
+                for (Event event : events) {
+                    saveEventInDbAndProcess(event);
+                }
+
+                processLatestUnprocessedEvents();
+
                 appExecutors.mainThread().execute(new Runnable() {
                     @Override
                     public void run() {
@@ -85,12 +90,10 @@ public class BaseOpdRegisterActivityInteractor implements OpdRegisterActivityCon
                     .context()
                     .getEventClientRepository()
                     .addEvent(event.getBaseEntityId()
-                    , new JSONObject(JsonFormUtils.gson.toJson(event)));
+                            , new JSONObject(JsonFormUtils.gson.toJson(event)));
         } catch (JSONException e) {
             Timber.e(e);
         }
-
-        processLatestUnprocessedEvents();
     }
 
     private void processLatestUnprocessedEvents() {

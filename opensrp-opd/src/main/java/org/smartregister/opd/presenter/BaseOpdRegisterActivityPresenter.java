@@ -14,6 +14,7 @@ import org.smartregister.domain.FetchStatus;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
 import org.smartregister.opd.interactor.BaseOpdRegisterActivityInteractor;
+import org.smartregister.opd.pojos.OpdDiagnosisAndTreatmentForm;
 import org.smartregister.opd.utils.OpdConstants;
 
 import java.lang.ref.WeakReference;
@@ -87,11 +88,27 @@ public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterAct
     }
 
     @Override
-    public void saveVisitOrDiagnosisForm(@NonNull String eventType, String jsonString, @Nullable Intent data) {
+    public void saveVisitOrDiagnosisForm(@NonNull String eventType, @Nullable Intent data) {
+        String jsonString = null;
+        if (data != null) {
+            jsonString = data.getStringExtra(OpdConstants.JSON_FORM_EXTRA.JSON);
+        }
+
+        if (jsonString == null) {
+            return;
+        }
+
         if (eventType.equals(OpdConstants.EventType.CHECK_IN)) {
             try {
-                Event opdVisitEvent = OpdLibrary.getInstance().processOpdCheckInForm(eventType, jsonString, data);
+                List<Event> opdVisitEvent = OpdLibrary.getInstance().processOpdCheckInForm(eventType, jsonString, data);
                 interactor.saveEvent(opdVisitEvent, this);
+            } catch (JSONException e) {
+                Timber.e(e);
+            }
+        } else if (eventType.equals(OpdConstants.EventType.DIAGNOSIS_AND_TREAT)) {
+            try {
+                List<Event> opdDiagnosisAndTreatment = OpdLibrary.getInstance().processOpdDiagnosisAndTreatmentForm(jsonString, data);
+                interactor.saveEvent(opdDiagnosisAndTreatment, this);
             } catch (JSONException e) {
                 Timber.e(e);
             }
@@ -117,9 +134,17 @@ public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterAct
 
         JSONObject form = null;
         try {
+            OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm = new OpdDiagnosisAndTreatmentForm();
+            opdDiagnosisAndTreatmentForm.setBaseEntityId(entityId);
+            if (OpdLibrary.getInstance().getOpdDiagnosisAndTreatmentFormRepository().findOne(opdDiagnosisAndTreatmentForm) != null) {
+                form = new JSONObject(OpdLibrary.getInstance().getOpdDiagnosisAndTreatmentFormRepository().findOne(opdDiagnosisAndTreatmentForm).getForm());
+            }
             form = model.getFormAsJson(formName, entityId, locationId, injectedFieldValues);
+
         } catch (JSONException e) {
             Timber.e(e);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         if (getView() != null && form != null) {
@@ -132,7 +157,7 @@ public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterAct
     }
 
     @Override
-    public void onUniqueIdFetched(@NonNull Triple<String, String, String> triple,@NonNull String entityId) {
+    public void onUniqueIdFetched(@NonNull Triple<String, String, String> triple, @NonNull String entityId) {
         startForm(triple.getLeft(), entityId, triple.getMiddle(), triple.getRight(), null, null);
     }
 }

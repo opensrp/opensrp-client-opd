@@ -19,9 +19,11 @@ public class OpdFormFragment extends BaseOpdFormFragment implements ClientLookUp
         return new JsonFormFragmentViewState();
     }
 
+
+
     @Override
     protected OpdFormFragmentPresenter createPresenter() {
-        return new OpdFormFragmentPresenter(this, OpdFormInteractor.getOpdInteractorInstance());
+        return new OpdFormFragmentPresenter(this, OpdFormInteractor.getInstance());
     }
 
 

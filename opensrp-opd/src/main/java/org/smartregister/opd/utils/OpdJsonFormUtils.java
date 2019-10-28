@@ -126,8 +126,10 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
                 allLevels = metadata.getLocationLevels();
                 healthFacilities = metadata.getHealthFacilityLevels();
             } else {
-                allLevels = DefaultOpdLocationUtils.getLocationLevels();;
-                healthFacilities = DefaultOpdLocationUtils.getLocationLevels();;
+                allLevels = DefaultOpdLocationUtils.getLocationLevels();
+                ;
+                healthFacilities = DefaultOpdLocationUtils.getLocationLevels();
+                ;
             }
 
             List<String> defaultLocation = LocationHelper.getInstance().generateDefaultLocationHierarchy(allLevels);
@@ -241,7 +243,7 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
         }
     }
 
-    protected static Event tagSyncMetadata(@NonNull Event event) {
+    public static Event tagSyncMetadata(@NonNull Event event) {
         AllSharedPreferences allSharedPreferences = OpdUtils.getAllSharedPreferences();
         String providerId = allSharedPreferences.fetchRegisteredANM();
         event.setProviderId(providerId);
@@ -339,6 +341,17 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
                 } catch (IllegalArgumentException e) {
                     Timber.e(e);
                 }
+        }
+    }
+
+    public static void addKeyPairToJsonForm(@NonNull JSONArray fields, String key, String value) {
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put(OpdConstants.KEY.KEY, key);
+            jsonObject.put(OpdConstants.KEY.VALUE, value);
+            fields.put(jsonObject);
+        } catch (JSONException e) {
+            Timber.e(e, "OpdJsonFormUtils --> add %s:%s to Json Form", key, value);
         }
     }
 

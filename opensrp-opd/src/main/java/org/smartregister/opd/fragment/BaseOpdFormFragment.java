@@ -32,6 +32,7 @@ import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
 import org.smartregister.opd.activity.BaseOpdFormActivity;
 import org.smartregister.opd.adapter.ClientLookUpListAdapter;
+import org.smartregister.opd.interactor.OpdFormInteractor;
 import org.smartregister.opd.pojos.OpdMetadata;
 import org.smartregister.opd.presenter.OpdFormFragmentPresenter;
 import org.smartregister.opd.utils.OpdConstants;
@@ -244,7 +245,7 @@ public class BaseOpdFormFragment extends JsonFormFragment implements ClientLookU
 
             HashMap<String, String> parcelableData = opdFormActivity.getParcelableData();
 
-            for (String key: parcelableData.keySet()) {
+            for (String key : parcelableData.keySet()) {
                 String value = parcelableData.get(key);
 
                 if (value != null) {
@@ -257,5 +258,11 @@ public class BaseOpdFormFragment extends JsonFormFragment implements ClientLookU
             activity.setResult(Activity.RESULT_OK, returnIntent);
             activity.finish();
         }
+    }
+
+
+    @Override
+    protected OpdFormFragmentPresenter createPresenter() {
+        return new OpdFormFragmentPresenter(this, OpdFormInteractor.getInstance());
     }
 }

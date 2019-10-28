@@ -41,5 +41,7 @@
 
 
     <string name="no_openmrs_id">No unique ids found. Click on the sync button to get more and if this error persists contact the system admin.</string>
+    <string name="save_form_fill_session">Save session to continue Later</string>
+    <string name="end_session">End Session</string>
 
 </resources>
