@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.support.annotation.NonNull;
 
 import net.sqlcipher.Cursor;
-import net.sqlcipher.SQLException;
 import net.sqlcipher.database.SQLiteDatabase;
 
 import org.smartregister.opd.dao.OpdDiagnosisAndTreatmentFormDao;
@@ -14,8 +13,6 @@ import org.smartregister.repository.BaseRepository;
 import org.smartregister.repository.Repository;
 
 import java.util.List;
-
-import timber.log.Timber;
 
 public class OpdDiagnosisAndTreatmentFormRepository extends BaseRepository implements OpdDiagnosisAndTreatmentFormDao {
 
@@ -59,19 +56,15 @@ public class OpdDiagnosisAndTreatmentFormRepository extends BaseRepository imple
     @Override
     public OpdDiagnosisAndTreatmentForm findOne(OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm) {
         SQLiteDatabase sqLiteDatabase = getReadableDatabase();
-        try {
-            Cursor cursor = sqLiteDatabase.query(OpdDbConstants.Table.OPD_DIAGNOSIS_AND_TREATMENT_FORM, columns, OpdDbConstants.Column.OpdDiagnosisAndTreatmentForm.BASE_ENTITY_ID + " = ? ",
-                    new String[]{opdDiagnosisAndTreatmentForm.getBaseEntityId()}, null, null, null);
-            if (cursor.getCount() == 0) {
-                return null;
-            }
-            if (cursor.moveToNext()) {
-                opdDiagnosisAndTreatmentForm = new OpdDiagnosisAndTreatmentForm(cursor.getInt(0), cursor.getString(1),
-                        cursor.getString(2), cursor.getString(3));
-                cursor.close();
-            }
-        } catch (SQLException | IllegalArgumentException e) {
-            Timber.e(e);
+        Cursor cursor = sqLiteDatabase.query(OpdDbConstants.Table.OPD_DIAGNOSIS_AND_TREATMENT_FORM, columns, OpdDbConstants.Column.OpdDiagnosisAndTreatmentForm.BASE_ENTITY_ID + " = ? ",
+                new String[]{opdDiagnosisAndTreatmentForm.getBaseEntityId()}, null, null, null);
+        if (cursor.getCount() == 0) {
+            return null;
+        }
+        if (cursor.moveToNext()) {
+            opdDiagnosisAndTreatmentForm = new OpdDiagnosisAndTreatmentForm(cursor.getInt(0), cursor.getString(1),
+                    cursor.getString(2), cursor.getString(3));
+            cursor.close();
         }
         return opdDiagnosisAndTreatmentForm;
     }

@@ -143,4 +143,8 @@ public class OpdConstants extends AllConstants {
         public static final String SERVICE_DETAIL = "OPD Service Detail";
         public static final String VISIT = "OPD Visit";
     }
+
+    public interface DateFormat {
+        String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
+    }
 }

@@ -178,7 +178,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                 opdTreatment.setBaseEntityId(event.getBaseEntityId());
                 opdTreatment.setVisitId(mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID));
                 opdTreatment.setDosage(meta.optString(OpdConstants.JSON_FORM_KEY.DOSAGE));
-                opdTreatment.setDuration(property.optString(OpdConstants.JSON_FORM_KEY.DURATION));
+                opdTreatment.setDuration(meta.optString(OpdConstants.JSON_FORM_KEY.DURATION));
                 opdTreatment.setMedicine(key);
                 opdTreatment.setCreatedAt(Utils.convertDateFormat(new DateTime()));
                 opdTreatment.setUpdatedAt(Utils.convertDateFormat(new DateTime()));
@@ -305,7 +305,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
 
             // Update the detail
             OpdDetails opdDetails = generateOpdDetailsFromCheckInEvent(event, visitId, visitDate);
-            saved = OpdLibrary.getInstance().getOpdDetailsRepository().addOrUpdateOpdDetails(opdDetails);
+            saved = OpdLibrary.getInstance().getOpdDetailsRepository().saveOrUpdate(opdDetails);
 
             if (!saved) {
                 abortTransaction();

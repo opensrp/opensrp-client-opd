@@ -13,11 +13,15 @@ import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
 import org.smartregister.opd.pojos.OpdMetadata;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import timber.log.Timber;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-13
@@ -132,5 +136,19 @@ public class OpdUtils extends org.smartregister.util.Utils {
     public static String convertDate(@NonNull Date date, @NonNull String dateFormat) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat, Locale.US);
         return simpleDateFormat.format(date);
+    }
+
+    public static Date convertStringToDate(String pattern, String dateString) {
+        Date date = null;
+        DateFormat dateFormat = new SimpleDateFormat(pattern, Locale.ENGLISH);
+
+        if (!TextUtils.isEmpty(dateString) && !TextUtils.isEmpty(pattern)) {
+            try {
+                date = dateFormat.parse(dateString);
+            } catch (ParseException e) {
+                Timber.e(e);
+            }
+        }
+        return date;
     }
 }

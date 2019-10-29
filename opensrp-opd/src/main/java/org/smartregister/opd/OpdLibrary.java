@@ -15,6 +15,7 @@ import org.smartregister.opd.domain.YamlConfig;
 import org.smartregister.opd.domain.YamlConfigItem;
 import org.smartregister.opd.helper.OpdRulesEngineHelper;
 import org.smartregister.opd.pojos.OpdCheckIn;
+import org.smartregister.opd.pojos.OpdDetails;
 import org.smartregister.opd.pojos.OpdDiagnosisAndTreatmentForm;
 import org.smartregister.opd.repository.OpdCheckInRepository;
 import org.smartregister.opd.repository.OpdDetailsRepository;
@@ -306,7 +307,7 @@ public class OpdLibrary {
             JSONObject step = steps.get(i);
             JSONArray fields = step.getJSONArray(OpdJsonFormUtils.FIELDS);
             Event baseEvent = JsonFormUtils.createEvent(fields, jsonFormObject.getJSONObject(METADATA),
-                    formTag, entityId, getDiagnosisAndTreatmentEventArray()[i], getDiagnosisAndTreatmentEcTableArray()[i]);
+                    formTag, entityId, getDiagnosisAndTreatmentEventArray()[i], getDiagnosisAndTreatmentTableArray()[i]);
             OpdJsonFormUtils.tagSyncMetadata(baseEvent);
             baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_ID, visitId);
             eventList.add(baseEvent);
@@ -317,6 +318,14 @@ public class OpdLibrary {
         opdDiagnosisAndTreatmentForm.setBaseEntityId(entityId);
         OpdLibrary.getInstance().opdDiagnosisAndTreatmentFormRepository.delete(opdDiagnosisAndTreatmentForm);
 
+        //update visit end date
+        OpdDetails opdDetails = new OpdDetails();
+        opdDetails.setCurrentVisitId(visitId);
+        opdDetails.setBaseEntityId(entityId);
+        opdDetails = OpdLibrary.getInstance().getOpdDetailsRepository().findOne(opdDetails);
+        opdDetails.setCurrentVisitEndDate(new Date());
+        OpdLibrary.getInstance().getOpdDetailsRepository().saveOrUpdate(opdDetails);
+
         return eventList;
     }
 
@@ -325,7 +334,7 @@ public class OpdLibrary {
                 OpdConstants.EventType.TREATMENT, OpdConstants.EventType.SERVICE_DETAIL};
     }
 
-    protected String[] getDiagnosisAndTreatmentEcTableArray() {
+    protected String[] getDiagnosisAndTreatmentTableArray() {
         return new String[]{OpdConstants.OpdDiagnosisAndTreatmentTables.TEST_CONDUCTED, OpdConstants.OpdDiagnosisAndTreatmentTables.DIAGNOSIS,
                 OpdConstants.OpdDiagnosisAndTreatmentTables.TREATMENT, OpdConstants.OpdDiagnosisAndTreatmentTables.SERVICE_DETAIL};
     }
