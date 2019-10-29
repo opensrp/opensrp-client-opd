@@ -124,10 +124,12 @@ public abstract class BaseOpdRegisterActivity extends BaseRegisterActivity imple
         intent.putExtra(OpdConstants.JSON_FORM_EXTRA.JSON, jsonForm.toString());
         Form form = new Form();
         form.setWizard(true);
+        form.setName(OpdConstants.EventType.DIAGNOSIS_AND_TREAT);
 
         String encounterType = jsonForm.optString(OpdJsonFormUtils.ENCOUNTER_TYPE);
         if (encounterType.equals(OpdConstants.EventType.CHECK_IN)) {
             form.setWizard(false);
+            form.setName("");
         }
 
         form.setHideSaveLabel(true);
