@@ -2,6 +2,7 @@ package org.smartregister.opd.widgets;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -26,12 +27,12 @@ public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements 
     private Button opd_btn_save_drug;
 
     @Override
-    protected void handleClickEventOnListData(MultiSelectItem multiSelectItem, Context context) {
+    protected void handleClickEventOnListData(@NonNull MultiSelectItem multiSelectItem, @NonNull Context context) {
         this.context = context;
         createAdditionalDetailsDialog(multiSelectItem);
     }
 
-    private void createAdditionalDetailsDialog(final MultiSelectItem multiSelectItem) {
+    private void createAdditionalDetailsDialog(@NonNull final MultiSelectItem multiSelectItem) {
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.dosage_and_duration_layout, null);
         ImageView imgClose = view.findViewById(R.id.multiSelectListCloseDialog);
@@ -73,7 +74,7 @@ public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements 
         });
     }
 
-    private void writeAdditionalDetails(String duration, String dosage, MultiSelectItem multiSelectItem) {
+    private void writeAdditionalDetails(@NonNull String duration, @NonNull String dosage, @NonNull MultiSelectItem multiSelectItem) {
         String multiSelectValue = multiSelectItem.getValue();
         String msg = "Dose: " + dosage + ", Duration: " + duration;
         JSONObject jsonObject = new JSONObject();

@@ -4,7 +4,10 @@ import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.Context;
 import org.smartregister.opd.configuration.OpdConfiguration;
@@ -16,7 +19,8 @@ import static org.junit.Assert.assertNull;
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-24
  */
-
+@PrepareForTest(OpdLibrary.class)
+@RunWith(PowerMockRunner.class)
 public class OpdLibraryTest extends BaseTest {
 
     @Rule

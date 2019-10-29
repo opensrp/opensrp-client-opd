@@ -84,6 +84,7 @@ public class OpdConstants extends AllConstants {
         public static final String DIAGNOSTIC_TEST_OTHER = "diagnostic_test_other";
         public static final String DIAGNOSTIC_TEST = "diagnostic_test";
         public static final String DIAGNOSTIC_TEST_RESULT_SPECIFY = "diagnostic_test_result_specify";
+        public static final String ID = "ID";
     }
 
     public static class JsonFormNameUtils {

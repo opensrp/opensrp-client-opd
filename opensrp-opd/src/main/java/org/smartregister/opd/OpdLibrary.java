@@ -310,13 +310,14 @@ public class OpdLibrary {
                     formTag, entityId, getDiagnosisAndTreatmentEventArray()[i], getDiagnosisAndTreatmentTableArray()[i]);
             OpdJsonFormUtils.tagSyncMetadata(baseEvent);
             baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_ID, visitId);
+            baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.ID, JsonFormUtils.generateRandomUUIDString());
             eventList.add(baseEvent);
         }
 
         //remove any saved sessions
         OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm = new OpdDiagnosisAndTreatmentForm();
         opdDiagnosisAndTreatmentForm.setBaseEntityId(entityId);
-        OpdLibrary.getInstance().opdDiagnosisAndTreatmentFormRepository.delete(opdDiagnosisAndTreatmentForm);
+        OpdLibrary.getInstance().getOpdDiagnosisAndTreatmentFormRepository().delete(opdDiagnosisAndTreatmentForm);
 
         //update visit end date
         OpdDetails opdDetails = new OpdDetails();
