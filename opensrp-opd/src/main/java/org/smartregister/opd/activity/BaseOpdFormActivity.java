@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
 
 import com.vijay.jsonwizard.activities.JsonFormActivity;
@@ -20,7 +19,6 @@ import org.smartregister.opd.R;
 import org.smartregister.opd.dao.OpdDiagnosisAndTreatmentFormDao;
 import org.smartregister.opd.fragment.BaseOpdFormFragment;
 import org.smartregister.opd.pojos.OpdDiagnosisAndTreatmentForm;
-import org.smartregister.opd.pojos.OpdMetadata;
 import org.smartregister.opd.utils.AppExecutors;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
@@ -29,7 +27,6 @@ import org.smartregister.util.LangUtils;
 import org.smartregister.util.Utils;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 
 import timber.log.Timber;

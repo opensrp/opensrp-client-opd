@@ -32,15 +32,15 @@ public class OpdTestConductedRepository extends BaseRepository implements OpdTes
             + "_" + OpdDbConstants.Column.OpdServiceDetail.VISIT_ID + "_index ON " + OpdDbConstants.Table.OPD_TEST_CONDUCTED +
             "(" + OpdDbConstants.Column.OpdServiceDetail.VISIT_ID + " COLLATE NOCASE);";
 
-    private String[] columns = new String[]{
-            OpdDbConstants.Column.OpdTestConducted.ID,
-            OpdDbConstants.Column.OpdTestConducted.BASE_ENTITY_ID,
-            OpdDbConstants.Column.OpdTestConducted.TEST,
-            OpdDbConstants.Column.OpdTestConducted.RESULT,
-            OpdDbConstants.Column.OpdTestConducted.VISIT_ID,
-            OpdDbConstants.Column.OpdTestConducted.UPDATED_AT,
-            OpdDbConstants.Column.OpdTestConducted.CREATED_AT
-    };
+//    private String[] columns = new String[]{
+//            OpdDbConstants.Column.OpdTestConducted.ID,
+//            OpdDbConstants.Column.OpdTestConducted.BASE_ENTITY_ID,
+//            OpdDbConstants.Column.OpdTestConducted.TEST,
+//            OpdDbConstants.Column.OpdTestConducted.RESULT,
+//            OpdDbConstants.Column.OpdTestConducted.VISIT_ID,
+//            OpdDbConstants.Column.OpdTestConducted.UPDATED_AT,
+//            OpdDbConstants.Column.OpdTestConducted.CREATED_AT
+//    };
 
 
     public OpdTestConductedRepository(Repository repository) {

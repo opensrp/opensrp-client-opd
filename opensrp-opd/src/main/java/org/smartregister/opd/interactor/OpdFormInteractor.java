@@ -12,10 +12,6 @@ public class OpdFormInteractor extends JsonFormInteractor {
 
     private static final OpdFormInteractor INSTANCE = new OpdFormInteractor();
 
-    public OpdFormInteractor() {
-        super();
-    }
-
     public static JsonFormInteractor getInstance() {
         return INSTANCE;
     }

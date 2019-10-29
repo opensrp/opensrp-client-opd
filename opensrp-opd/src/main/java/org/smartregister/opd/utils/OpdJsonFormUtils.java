@@ -127,9 +127,7 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
                 healthFacilities = metadata.getHealthFacilityLevels();
             } else {
                 allLevels = DefaultOpdLocationUtils.getLocationLevels();
-                ;
                 healthFacilities = DefaultOpdLocationUtils.getLocationLevels();
-                ;
             }
 
             List<String> defaultLocation = LocationHelper.getInstance().generateDefaultLocationHierarchy(allLevels);

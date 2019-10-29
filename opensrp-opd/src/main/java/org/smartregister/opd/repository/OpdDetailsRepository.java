@@ -22,6 +22,16 @@ import java.util.List;
 
 public class OpdDetailsRepository extends BaseRepository implements OpdDetailsDao {
 
+    private String[] columns = new String[]{
+            OpdDetails.ID,
+            OpdDetails.BASE_ENTITY_ID,
+            OpdDetails.PENDING_DIAGNOSE_AND_TREAT,
+            OpdDetails.CURRENT_VISIT_START_DATE,
+            OpdDetails.CURRENT_VISIT_END_DATE,
+            OpdDetails.CURRENT_VISIT_ID,
+            OpdDetails.CREATED_AT
+    };
+
     private static final String CREATE_TABLE_SQL = "CREATE TABLE " + OpdDbConstants.Table.OPD_DETAILS + "("
             + OpdDetails.ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
             + OpdDetails.BASE_ENTITY_ID + " VARCHAR NOT NULL, "
@@ -34,16 +44,6 @@ public class OpdDetailsRepository extends BaseRepository implements OpdDetailsDa
     public OpdDetailsRepository(Repository repository) {
         super(repository);
     }
-
-    private String[] columns = new String[]{
-            OpdDetails.ID,
-            OpdDetails.BASE_ENTITY_ID,
-            OpdDetails.PENDING_DIAGNOSE_AND_TREAT,
-            OpdDetails.CURRENT_VISIT_START_DATE,
-            OpdDetails.CURRENT_VISIT_END_DATE,
-            OpdDetails.CURRENT_VISIT_ID,
-            OpdDetails.CREATED_AT
-    };
 
     public static void createTable(@NonNull SQLiteDatabase database) {
         database.execSQL(CREATE_TABLE_SQL);
@@ -84,6 +84,7 @@ public class OpdDetailsRepository extends BaseRepository implements OpdDetailsDa
 
     @Override
     public org.smartregister.opd.pojos.OpdDetails findOne(@NonNull org.smartregister.opd.pojos.OpdDetails opdDetails) {
+        org.smartregister.opd.pojos.OpdDetails details = null;
         if (opdDetails.getCurrentVisitId() != null && opdDetails.getBaseEntityId() != null) {
             SQLiteDatabase sqLiteDatabase = getReadableDatabase();
             Cursor cursor = sqLiteDatabase.query(OpdDbConstants.Table.OPD_DETAILS, columns, OpdDetails.BASE_ENTITY_ID + "=? and " + OpdDetails.CURRENT_VISIT_ID + "=?",
@@ -93,26 +94,26 @@ public class OpdDetailsRepository extends BaseRepository implements OpdDetailsDa
             }
 
             if (cursor.moveToNext()) {
-                opdDetails = new org.smartregister.opd.pojos.OpdDetails();
-                opdDetails.setId(cursor.getInt(0));
-                opdDetails.setBaseEntityId(cursor.getString(1));
-                opdDetails.setPendingDiagnoseAndTreat((cursor.getInt(2) == 1));
+                details = new org.smartregister.opd.pojos.OpdDetails();
+                details.setId(cursor.getInt(0));
+                details.setBaseEntityId(cursor.getString(1));
+                details.setPendingDiagnoseAndTreat((cursor.getInt(2) == 1));
 
-                opdDetails.setCurrentVisitStartDate(OpdUtils
+                details.setCurrentVisitStartDate(OpdUtils
                         .convertStringToDate(OpdConstants.DateFormat.YYYY_MM_DD_HH_MM_SS,
                                 cursor.getString(3)));
-                opdDetails.setCurrentVisitEndDate(OpdUtils
+                details.setCurrentVisitEndDate(OpdUtils
                         .convertStringToDate(OpdConstants.DateFormat.YYYY_MM_DD_HH_MM_SS,
                                 cursor.getString(4)));
-                opdDetails.setCurrentVisitId(cursor.getString(5));
-                opdDetails.setCreatedAt(OpdUtils
+                details.setCurrentVisitId(cursor.getString(5));
+                details.setCreatedAt(OpdUtils
                         .convertStringToDate(OpdConstants.DateFormat.YYYY_MM_DD_HH_MM_SS,
                                 cursor.getString(6)));
                 cursor.close();
             }
 
         }
-        return opdDetails;
+        return details;
     }
 
     @Override

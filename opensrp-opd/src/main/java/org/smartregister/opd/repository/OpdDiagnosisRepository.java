@@ -37,19 +37,19 @@ public class OpdDiagnosisRepository extends BaseRepository implements OpdDiagnos
             + "_" + OpdDbConstants.Column.OpdDiagnosis.VISIT_ID + "_index ON " + OpdDbConstants.Table.OPD_DIAGNOSIS +
             "(" + OpdDbConstants.Column.OpdDiagnosis.VISIT_ID + " COLLATE NOCASE);";
 
-    private String[] columns = new String[]{
-            OpdDbConstants.Column.OpdDiagnosis.ID,
-            OpdDbConstants.Column.OpdDiagnosis.BASE_ENTITY_ID,
-            OpdDbConstants.Column.OpdDiagnosis.DIAGNOSIS,
-            OpdDbConstants.Column.OpdDiagnosis.TYPE,
-            OpdDbConstants.Column.OpdDiagnosis.DISEASE,
-            OpdDbConstants.Column.OpdDiagnosis.ICD10_CODE,
-            OpdDbConstants.Column.OpdDiagnosis.CODE,
-            OpdDbConstants.Column.OpdDiagnosis.DETAILS,
-            OpdDbConstants.Column.OpdDiagnosis.VISIT_ID,
-            OpdDbConstants.Column.OpdDiagnosis.CREATED_AT,
-            OpdDbConstants.Column.OpdDiagnosis.UPDATED_AT
-    };
+//    private String[] columns = new String[]{
+//            OpdDbConstants.Column.OpdDiagnosis.ID,
+//            OpdDbConstants.Column.OpdDiagnosis.BASE_ENTITY_ID,
+//            OpdDbConstants.Column.OpdDiagnosis.DIAGNOSIS,
+//            OpdDbConstants.Column.OpdDiagnosis.TYPE,
+//            OpdDbConstants.Column.OpdDiagnosis.DISEASE,
+//            OpdDbConstants.Column.OpdDiagnosis.ICD10_CODE,
+//            OpdDbConstants.Column.OpdDiagnosis.CODE,
+//            OpdDbConstants.Column.OpdDiagnosis.DETAILS,
+//            OpdDbConstants.Column.OpdDiagnosis.VISIT_ID,
+//            OpdDbConstants.Column.OpdDiagnosis.CREATED_AT,
+//            OpdDbConstants.Column.OpdDiagnosis.UPDATED_AT
+//    };
 
     public OpdDiagnosisRepository(Repository repository) {
         super(repository);

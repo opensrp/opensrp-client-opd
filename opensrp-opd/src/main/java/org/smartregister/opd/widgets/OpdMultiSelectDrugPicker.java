@@ -38,7 +38,6 @@ public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements 
         ImageView imgClose = view.findViewById(R.id.multiSelectListCloseDialog);
         opd_btn_save_drug = view.findViewById(R.id.opd_btn_save_drug);
 
-        TextView txtMultiSelectListDialogTitle = view.findViewById(R.id.multiSelectListDialogTitle);
         TextView txtSelectedItemInMultiSelectList = view.findViewById(R.id.txtSelectedItemInMultiSelectList);
         txtSelectedItemInMultiSelectList.setText(multiSelectItem.getKey());
         final EditText edtTreatmentDuration = view.findViewById(R.id.edtTreatmentDosage);

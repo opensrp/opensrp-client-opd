@@ -61,12 +61,13 @@ public class OpdDiagnosisAndTreatmentFormRepository extends BaseRepository imple
         if (cursor.getCount() == 0) {
             return null;
         }
+        OpdDiagnosisAndTreatmentForm diagnosisAndTreatmentForm = null;
         if (cursor.moveToNext()) {
-            opdDiagnosisAndTreatmentForm = new OpdDiagnosisAndTreatmentForm(cursor.getInt(0), cursor.getString(1),
+            diagnosisAndTreatmentForm = new OpdDiagnosisAndTreatmentForm(cursor.getInt(0), cursor.getString(1),
                     cursor.getString(2), cursor.getString(3));
             cursor.close();
         }
-        return opdDiagnosisAndTreatmentForm;
+        return diagnosisAndTreatmentForm;
     }
 
     @Override
