@@ -35,6 +35,7 @@ import org.smartregister.opd.pojos.OpdVisit;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
+import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.sync.ClientProcessorForJava;
 import org.smartregister.util.JsonFormUtils;
 import org.smartregister.util.Utils;
@@ -83,6 +84,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
             eventTypes.add(OpdConstants.EventType.DIAGNOSIS);
             eventTypes.add(OpdConstants.EventType.SERVICE_DETAIL);
             eventTypes.add(OpdConstants.EventType.TREATMENT);
+            eventTypes.add(OpdConstants.EventType.CLOSE_OPD_VISIT);
         }
 
         return eventTypes;
@@ -133,6 +135,23 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
             } catch (Exception ex) {
                 Timber.e(ex);
             }
+        } else if (event.getEventType().equals(OpdConstants.EventType.CLOSE_OPD_VISIT)) {
+            try {
+                processOpdCloseEvent(event);
+            } catch (Exception e) {
+                Timber.e(e);
+            }
+        }
+    }
+
+    private void processOpdCloseEvent(Event event) {
+        Map<String, String> mapDetails = event.getDetails();
+        //update visit end date
+        OpdDetails opdDetails = new OpdDetails(event.getBaseEntityId(), mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID));
+        opdDetails = OpdLibrary.getInstance().getOpdDetailsRepository().findOne(opdDetails);
+        if (opdDetails != null) {
+            opdDetails.setCurrentVisitEndDate(OpdUtils.convertStringToDate(OpdConstants.DateFormat.YYYY_MM_DD_HH_MM_SS, mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_END_DATE)));
+            OpdLibrary.getInstance().getOpdDetailsRepository().saveOrUpdate(opdDetails);
         }
     }
 

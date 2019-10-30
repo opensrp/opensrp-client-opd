@@ -85,6 +85,7 @@ public class OpdConstants extends AllConstants {
         public static final String DIAGNOSTIC_TEST = "diagnostic_test";
         public static final String DIAGNOSTIC_TEST_RESULT_SPECIFY = "diagnostic_test_result_specify";
         public static final String ID = "ID";
+        public static final String VISIT_END_DATE = "visit_end_date";
     }
 
     public static class JsonFormNameUtils {
@@ -143,6 +144,7 @@ public class OpdConstants extends AllConstants {
         public static final String TEST_CONDUCTED = "OPD Test Conducted";
         public static final String SERVICE_DETAIL = "OPD Service Detail";
         public static final String VISIT = "OPD Visit";
+        public static final String CLOSE_OPD_VISIT = "OPD Close Visit";
     }
 
     public interface DateFormat {

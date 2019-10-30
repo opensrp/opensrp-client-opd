@@ -15,7 +15,6 @@ import org.smartregister.opd.domain.YamlConfig;
 import org.smartregister.opd.domain.YamlConfigItem;
 import org.smartregister.opd.helper.OpdRulesEngineHelper;
 import org.smartregister.opd.pojos.OpdCheckIn;
-import org.smartregister.opd.pojos.OpdDetails;
 import org.smartregister.opd.pojos.OpdDiagnosisAndTreatmentForm;
 import org.smartregister.opd.repository.OpdCheckInRepository;
 import org.smartregister.opd.repository.OpdDetailsRepository;
@@ -319,13 +318,12 @@ public class OpdLibrary {
         opdDiagnosisAndTreatmentForm.setBaseEntityId(entityId);
         OpdLibrary.getInstance().getOpdDiagnosisAndTreatmentFormRepository().delete(opdDiagnosisAndTreatmentForm);
 
-        //update visit end date
-        OpdDetails opdDetails = new OpdDetails();
-        opdDetails.setCurrentVisitId(visitId);
-        opdDetails.setBaseEntityId(entityId);
-        opdDetails = OpdLibrary.getInstance().getOpdDetailsRepository().findOne(opdDetails);
-        opdDetails.setCurrentVisitEndDate(new Date());
-        OpdLibrary.getInstance().getOpdDetailsRepository().saveOrUpdate(opdDetails);
+        Event closeOpdVisit = JsonFormUtils.createEvent(new JSONArray(), new JSONObject(),
+                formTag, entityId, OpdConstants.EventType.CLOSE_OPD_VISIT, "");
+        OpdJsonFormUtils.tagSyncMetadata(closeOpdVisit);
+        closeOpdVisit.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_ID, visitId);
+        closeOpdVisit.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_END_DATE, OpdUtils.convertDate(new Date(), OpdConstants.DateFormat.YYYY_MM_DD_HH_MM_SS));
+        eventList.add(closeOpdVisit);
 
         return eventList;
     }
