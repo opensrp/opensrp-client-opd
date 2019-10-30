@@ -75,7 +75,7 @@ public interface OpdRegisterActivityContract {
 
         void saveRegistration(List<OpdEventClient> opdEventClientList, String jsonString, RegisterParams registerParams, OpdRegisterActivityContract.InteractorCallBack callBack);
 
-        void saveEvent(@NonNull List<Event> events, @NonNull InteractorCallBack callBack);
+        void saveEvents(@NonNull List<Event> events, @NonNull InteractorCallBack callBack);
     }
 
     interface InteractorCallBack {

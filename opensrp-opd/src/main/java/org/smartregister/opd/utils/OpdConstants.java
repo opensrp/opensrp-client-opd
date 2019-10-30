@@ -50,13 +50,6 @@ public class OpdConstants extends AllConstants {
         String MULTI_SELECT_DRUG_PICKER = "multi_select_drug_picker";
     }
 
-    public interface OpdDiagnosisAndTreatmentTables {
-        String DIAGNOSIS = "opd_diagnosis";
-        String TREATMENT = "opd_treatment";
-        String TEST_CONDUCTED = "opd_test_conducted";
-        String SERVICE_DETAIL = "opd_service_detail";
-    }
-
     public static class JSON_FORM_KEY {
         public static final String OPTIONS = "options";
         public static final String LAST_INTERACTED_WITH = "last_interacted_with";
@@ -149,5 +142,9 @@ public class OpdConstants extends AllConstants {
 
     public interface DateFormat {
         String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
+    }
+
+    public interface Form {
+        String OPD_DIAGNOSIS_AND_TREAT = "opd_diagnose_and_treat";
     }
 }

@@ -43,5 +43,9 @@
     <string name="no_openmrs_id">No unique ids found. Click on the sync button to get more and if this error persists contact the system admin.</string>
     <string name="save_form_fill_session">Save session to continue Later</string>
     <string name="end_session">End Session</string>
+    <string name="dosage">Dosage</string>
+    <string name="duration">Duration</string>
+    <string name="add_treatment_medicine">Add treatment/medicine</string>
+    <string name="dug_picker_dialog_save">SAVE</string>
 
 </resources>

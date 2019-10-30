@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 
 import net.sqlcipher.database.SQLiteDatabase;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.smartregister.opd.dao.OpdServiceDetailDao;
 import org.smartregister.opd.pojos.OpdServiceDetail;
 import org.smartregister.opd.utils.OpdDbConstants;
@@ -44,7 +45,7 @@ public class OpdServiceDetailRepository extends BaseRepository implements OpdSer
 //    };
 
 
-    public OpdServiceDetailRepository(Repository repository) {
+    public OpdServiceDetailRepository(@NonNull Repository repository) {
         super(repository);
     }
 
@@ -55,7 +56,7 @@ public class OpdServiceDetailRepository extends BaseRepository implements OpdSer
     }
 
     @Override
-    public boolean saveOrUpdate(OpdServiceDetail opdServiceDetail) {
+    public boolean saveOrUpdate(@NonNull OpdServiceDetail opdServiceDetail) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(OpdDbConstants.Column.OpdServiceDetail.ID, opdServiceDetail.getId());
         contentValues.put(OpdDbConstants.Column.OpdServiceDetail.BASE_ENTITY_ID, opdServiceDetail.getBaseEntityId());
@@ -71,16 +72,16 @@ public class OpdServiceDetailRepository extends BaseRepository implements OpdSer
 
     @Override
     public OpdServiceDetail findOne(OpdServiceDetail opdServiceDetail) {
-        return null;
+        throw new NotImplementedException("Not Implemented");
     }
 
     @Override
     public boolean delete(OpdServiceDetail opdServiceDetail) {
-        return false;
+        throw new NotImplementedException("Not Implemented");
     }
 
     @Override
     public List<OpdServiceDetail> findAll() {
-        return null;
+        throw new NotImplementedException("Not Implemented");
     }
 }

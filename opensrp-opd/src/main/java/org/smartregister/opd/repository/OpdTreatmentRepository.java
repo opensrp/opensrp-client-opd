@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 
 import net.sqlcipher.database.SQLiteDatabase;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.smartregister.opd.dao.OpdTreatmentDao;
 import org.smartregister.opd.pojos.OpdTreatment;
 import org.smartregister.opd.utils.OpdDbConstants;
@@ -47,7 +48,7 @@ public class OpdTreatmentRepository extends BaseRepository implements OpdTreatme
 //            OpdDbConstants.Column.OpdTreatment.CREATED_AT
 //    };
 
-    public OpdTreatmentRepository(Repository repository) {
+    public OpdTreatmentRepository(@NonNull Repository repository) {
         super(repository);
     }
 
@@ -59,7 +60,7 @@ public class OpdTreatmentRepository extends BaseRepository implements OpdTreatme
     }
 
     @Override
-    public boolean saveOrUpdate(OpdTreatment opdTreatment) {
+    public boolean saveOrUpdate(@NonNull OpdTreatment opdTreatment) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(OpdDbConstants.Column.OpdTreatment.ID, opdTreatment.getId());
         contentValues.put(OpdDbConstants.Column.OpdTreatment.BASE_ENTITY_ID, opdTreatment.getBaseEntityId());
@@ -77,16 +78,16 @@ public class OpdTreatmentRepository extends BaseRepository implements OpdTreatme
 
     @Override
     public OpdTreatment findOne(OpdTreatment opdTreatmentDao) {
-        return null;
+        throw new NotImplementedException("Not Implemented");
     }
 
     @Override
     public boolean delete(OpdTreatment opdTreatmentDao) {
-        return false;
+        throw new NotImplementedException("Not Implemented");
     }
 
     @Override
     public List<OpdTreatment> findAll() {
-        return null;
+        throw new NotImplementedException("Not Implemented");
     }
 }

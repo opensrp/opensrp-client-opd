@@ -61,12 +61,12 @@ public class BaseOpdRegisterActivityInteractor implements OpdRegisterActivityCon
     }
 
     @Override
-    public void saveEvent(@NonNull final List<Event> events, @NonNull final OpdRegisterActivityContract.InteractorCallBack callBack) {
+    public void saveEvents(@NonNull final List<Event> events, @NonNull final OpdRegisterActivityContract.InteractorCallBack callBack) {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 for (Event event : events) {
-                    saveEventInDbAndProcess(event);
+                    saveEventInDb(event);
                 }
 
                 processLatestUnprocessedEvents();
@@ -84,7 +84,7 @@ public class BaseOpdRegisterActivityInteractor implements OpdRegisterActivityCon
     }
 
 
-    private void saveEventInDbAndProcess(@NonNull Event event) {
+    private void saveEventInDb(@NonNull Event event) {
         try {
             CoreLibrary.getInstance()
                     .context()

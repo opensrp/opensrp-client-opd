@@ -8,7 +8,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -35,7 +34,7 @@ public class BaseOpdRegisterActivityPresenterTest {
     private OpdDiagnosisAndTreatmentFormRepository opdDiagnosisAndTreatmentFormRepository;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
     }
 
@@ -55,7 +54,7 @@ public class BaseOpdRegisterActivityPresenterTest {
         ReflectionHelpers.setField(baseOpdRegisterActivityPresenter, "viewReference", new WeakReference<OpdRegisterActivityContract.View>(view));
         baseOpdRegisterActivityPresenter.setModel(model);
 
-        baseOpdRegisterActivityPresenter.startForm("check_in.json", "90923-dsfds",  "meta", "location-id", null, "ec_child");
+        baseOpdRegisterActivityPresenter.startForm("check_in.json", "90923-dsfds", "meta", "location-id", null, "ec_child");
 
         Mockito.verify(view, Mockito.times(1))
                 .startFormActivity(Mockito.any(JSONObject.class), Mockito.any(HashMap.class));

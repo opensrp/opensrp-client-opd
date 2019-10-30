@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 
 import net.sqlcipher.database.SQLiteDatabase;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.smartregister.opd.dao.OpdTestConductedDao;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.repository.BaseRepository;
@@ -29,8 +30,8 @@ public class OpdTestConductedRepository extends BaseRepository implements OpdTes
             "(" + OpdDbConstants.Column.OpdTestConducted.BASE_ENTITY_ID + " COLLATE NOCASE);";
 
     private static final String INDEX_VISIT_ID = "CREATE INDEX " + OpdDbConstants.Table.OPD_TEST_CONDUCTED
-            + "_" + OpdDbConstants.Column.OpdServiceDetail.VISIT_ID + "_index ON " + OpdDbConstants.Table.OPD_TEST_CONDUCTED +
-            "(" + OpdDbConstants.Column.OpdServiceDetail.VISIT_ID + " COLLATE NOCASE);";
+            + "_" + OpdDbConstants.Column.OpdTestConducted.VISIT_ID + "_index ON " + OpdDbConstants.Table.OPD_TEST_CONDUCTED +
+            "(" + OpdDbConstants.Column.OpdTestConducted.VISIT_ID + " COLLATE NOCASE);";
 
 //    private String[] columns = new String[]{
 //            OpdDbConstants.Column.OpdTestConducted.ID,
@@ -43,7 +44,7 @@ public class OpdTestConductedRepository extends BaseRepository implements OpdTes
 //    };
 
 
-    public OpdTestConductedRepository(Repository repository) {
+    public OpdTestConductedRepository(@NonNull Repository repository) {
         super(repository);
     }
 
@@ -56,7 +57,7 @@ public class OpdTestConductedRepository extends BaseRepository implements OpdTes
 
 
     @Override
-    public boolean saveOrUpdate(org.smartregister.opd.pojos.OpdTestConducted opdTestConducted) {
+    public boolean saveOrUpdate(@NonNull org.smartregister.opd.pojos.OpdTestConducted opdTestConducted) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(OpdDbConstants.Column.OpdTestConducted.ID, opdTestConducted.getId());
         contentValues.put(OpdDbConstants.Column.OpdTestConducted.BASE_ENTITY_ID, opdTestConducted.getBaseEntityId());
@@ -72,16 +73,16 @@ public class OpdTestConductedRepository extends BaseRepository implements OpdTes
 
     @Override
     public org.smartregister.opd.pojos.OpdTestConducted findOne(org.smartregister.opd.pojos.OpdTestConducted opdTestConducted) {
-        return null;
+        throw new NotImplementedException("Not Implemented");
     }
 
     @Override
     public boolean delete(org.smartregister.opd.pojos.OpdTestConducted opdTestConducted) {
-        return false;
+        throw new NotImplementedException("Not Implemented");
     }
 
     @Override
     public List<org.smartregister.opd.pojos.OpdTestConducted> findAll() {
-        return null;
+        throw new NotImplementedException("Not Implemented");
     }
 }

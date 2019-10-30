@@ -18,6 +18,7 @@ import org.smartregister.opd.pojos.OpdDiagnosisAndTreatmentForm;
 import org.smartregister.opd.utils.OpdConstants;
 
 import java.lang.ref.WeakReference;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -100,15 +101,15 @@ public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterAct
 
         if (eventType.equals(OpdConstants.EventType.CHECK_IN)) {
             try {
-                List<Event> opdVisitEvent = OpdLibrary.getInstance().processOpdCheckInForm(eventType, jsonString, data);
-                interactor.saveEvent(opdVisitEvent, this);
+                Event opdVisitEvent = OpdLibrary.getInstance().processOpdCheckInForm(eventType, jsonString, data);
+                interactor.saveEvents(Collections.singletonList(opdVisitEvent), this);
             } catch (JSONException e) {
                 Timber.e(e);
             }
         } else if (eventType.equals(OpdConstants.EventType.DIAGNOSIS_AND_TREAT)) {
             try {
                 List<Event> opdDiagnosisAndTreatment = OpdLibrary.getInstance().processOpdDiagnosisAndTreatmentForm(jsonString, data);
-                interactor.saveEvent(opdDiagnosisAndTreatment, this);
+                interactor.saveEvents(opdDiagnosisAndTreatment, this);
             } catch (JSONException e) {
                 Timber.e(e);
             }
@@ -134,17 +135,16 @@ public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterAct
 
         JSONObject form = null;
         try {
-            OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm = new OpdDiagnosisAndTreatmentForm();
-            opdDiagnosisAndTreatmentForm.setBaseEntityId(entityId);
-            if (OpdLibrary.getInstance().getOpdDiagnosisAndTreatmentFormRepository().findOne(opdDiagnosisAndTreatmentForm) != null) {
-                form = new JSONObject(OpdLibrary.getInstance().getOpdDiagnosisAndTreatmentFormRepository().findOne(opdDiagnosisAndTreatmentForm).getForm());
+            if (formName.equals(OpdConstants.Form.OPD_DIAGNOSIS_AND_TREAT)) {
+                OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm = new OpdDiagnosisAndTreatmentForm(entityId);
+                if (OpdLibrary.getInstance().getOpdDiagnosisAndTreatmentFormRepository().findOne(opdDiagnosisAndTreatmentForm) != null) {
+                    form = new JSONObject(OpdLibrary.getInstance().getOpdDiagnosisAndTreatmentFormRepository().findOne(opdDiagnosisAndTreatmentForm).getForm());
+                }
             }
             form = model.getFormAsJson(formName, entityId, locationId, injectedFieldValues);
 
         } catch (JSONException e) {
             Timber.e(e);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
         if (getView() != null && form != null) {

@@ -16,7 +16,6 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
-import org.smartregister.domain.db.Client;
 import org.smartregister.domain.db.Event;
 import org.smartregister.domain.db.Obs;
 import org.smartregister.opd.BaseTest;
@@ -65,8 +64,6 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
     private ArgumentCaptor<OpdTestConducted> opdTestConductedArgumentCaptor;
 
     private Event event;
-
-    private Client client;
 
     @Before
     public void setUp() {

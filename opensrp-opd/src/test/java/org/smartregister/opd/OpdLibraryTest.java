@@ -1,8 +1,5 @@
 package org.smartregister.opd;
 
-import android.content.Intent;
-
-import org.json.JSONException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -14,12 +11,10 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.reflect.Whitebox;
 import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.Context;
 import org.smartregister.opd.configuration.OpdConfiguration;
 import org.smartregister.opd.repository.OpdCheckInRepository;
-import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.repository.Repository;
 

@@ -3,6 +3,7 @@ package org.smartregister.opd;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,7 +43,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -249,7 +249,7 @@ public class OpdLibrary {
     }
 
     @NonNull
-    public List<Event> processOpdCheckInForm(@NonNull String eventType, String jsonString, @Nullable Intent data) throws JSONException {
+    public Event processOpdCheckInForm(@NonNull String eventType, String jsonString, @Nullable Intent data) throws JSONException {
         JSONObject jsonFormObject = new JSONObject(jsonString);
 
         JSONObject stepOne = jsonFormObject.getJSONObject(OpdJsonFormUtils.STEP1);
@@ -280,13 +280,15 @@ public class OpdLibrary {
         opdCheckinEvent.addDetails(OpdConstants.Event.CheckIn.Detail.VISIT_ID, JsonFormUtils.generateRandomUUIDString());
         opdCheckinEvent.addDetails(OpdConstants.Event.CheckIn.Detail.VISIT_DATE, OpdUtils.convertDate(new Date(), OpdDbConstants.DATE_FORMAT));
 
-        return Collections.singletonList(opdCheckinEvent);
+        return opdCheckinEvent;
     }
 
     public List<Event> processOpdDiagnosisAndTreatmentForm(@NonNull String jsonString, @NonNull Intent data) throws JSONException {
         JSONObject jsonFormObject = new JSONObject(jsonString);
         JSONObject step1JsonObject = jsonFormObject.optJSONObject(OpdConstants.JSON_FORM_EXTRA.STEP1);
+
         JSONObject step2JsonObject = jsonFormObject.optJSONObject(OpdConstants.JSON_FORM_EXTRA.STEP2);
+
         JSONObject step3JsonObject = jsonFormObject.optJSONObject(OpdConstants.JSON_FORM_EXTRA.STEP3);
         JSONObject step4JsonObject = jsonFormObject.optJSONObject(OpdConstants.JSON_FORM_EXTRA.STEP4);
 
@@ -305,17 +307,35 @@ public class OpdLibrary {
         for (int i = 0; i < steps.size(); i++) {
             JSONObject step = steps.get(i);
             JSONArray fields = step.getJSONArray(OpdJsonFormUtils.FIELDS);
+            JSONArray jsonArrayIds = null;
+            JSONObject jsonObject;
+            if (i == 0 || i == 3) {
+                jsonArrayIds = OpdUtils.generateNIds(1);
+            } else if (i == 1) {
+                jsonObject = JsonFormUtils.getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.DISEASE_CODE);
+                String value = jsonObject.optString(OpdConstants.KEY.VALUE);
+                if (TextUtils.isEmpty(value)) {
+                    continue;
+                }
+                jsonArrayIds = OpdUtils.generateNIds(new JSONArray(value).length());
+            } else if (i == 2) {
+                jsonObject = JsonFormUtils.getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.MEDICINE);
+                String value = jsonObject.optString(OpdConstants.KEY.VALUE);
+                if (TextUtils.isEmpty(value)) {
+                    continue;
+                }
+                jsonArrayIds = OpdUtils.generateNIds(new JSONArray(value).length());
+            }
             Event baseEvent = JsonFormUtils.createEvent(fields, jsonFormObject.getJSONObject(METADATA),
                     formTag, entityId, getDiagnosisAndTreatmentEventArray()[i], getDiagnosisAndTreatmentTableArray()[i]);
             OpdJsonFormUtils.tagSyncMetadata(baseEvent);
             baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_ID, visitId);
-            baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.ID, JsonFormUtils.generateRandomUUIDString());
+            baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.ID, jsonArrayIds.toString());
             eventList.add(baseEvent);
         }
 
         //remove any saved sessions
-        OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm = new OpdDiagnosisAndTreatmentForm();
-        opdDiagnosisAndTreatmentForm.setBaseEntityId(entityId);
+        OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm = new OpdDiagnosisAndTreatmentForm(entityId);
         OpdLibrary.getInstance().getOpdDiagnosisAndTreatmentFormRepository().delete(opdDiagnosisAndTreatmentForm);
 
         Event closeOpdVisit = JsonFormUtils.createEvent(new JSONArray(), new JSONObject(),
@@ -334,7 +354,7 @@ public class OpdLibrary {
     }
 
     protected String[] getDiagnosisAndTreatmentTableArray() {
-        return new String[]{OpdConstants.OpdDiagnosisAndTreatmentTables.TEST_CONDUCTED, OpdConstants.OpdDiagnosisAndTreatmentTables.DIAGNOSIS,
-                OpdConstants.OpdDiagnosisAndTreatmentTables.TREATMENT, OpdConstants.OpdDiagnosisAndTreatmentTables.SERVICE_DETAIL};
+        return new String[]{OpdDbConstants.Table.OPD_TEST_CONDUCTED, OpdDbConstants.Table.OPD_DIAGNOSIS,
+                OpdDbConstants.Table.OPD_TREATMENT, OpdDbConstants.Table.OPD_SERVICE_DETAIL};
     }
 }

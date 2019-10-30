@@ -11,6 +11,10 @@ public class OpdDiagnosisAndTreatmentForm {
     public OpdDiagnosisAndTreatmentForm() {
     }
 
+    public OpdDiagnosisAndTreatmentForm(String baseEntityId) {
+        this.baseEntityId = baseEntityId;
+    }
+
     public OpdDiagnosisAndTreatmentForm(int id, @NonNull String baseEntityId, @NonNull String form, @NonNull String createdAt) {
         this.id = id;
         this.baseEntityId = baseEntityId;

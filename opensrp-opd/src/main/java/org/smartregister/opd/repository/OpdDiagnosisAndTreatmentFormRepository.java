@@ -2,10 +2,12 @@ package org.smartregister.opd.repository;
 
 import android.content.ContentValues;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import net.sqlcipher.Cursor;
 import net.sqlcipher.database.SQLiteDatabase;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.smartregister.opd.dao.OpdDiagnosisAndTreatmentFormDao;
 import org.smartregister.opd.pojos.OpdDiagnosisAndTreatmentForm;
 import org.smartregister.opd.utils.OpdDbConstants;
@@ -33,7 +35,7 @@ public class OpdDiagnosisAndTreatmentFormRepository extends BaseRepository imple
             OpdDbConstants.Column.OpdDiagnosisAndTreatmentForm.FORM,
             OpdDbConstants.Column.OpdDiagnosisAndTreatmentForm.CREATED_AT};
 
-    public OpdDiagnosisAndTreatmentFormRepository(Repository repository) {
+    public OpdDiagnosisAndTreatmentFormRepository(@NonNull Repository repository) {
         super(repository);
     }
 
@@ -53,8 +55,9 @@ public class OpdDiagnosisAndTreatmentFormRepository extends BaseRepository imple
         return rows != -1;
     }
 
+    @Nullable
     @Override
-    public OpdDiagnosisAndTreatmentForm findOne(OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm) {
+    public OpdDiagnosisAndTreatmentForm findOne(@NonNull OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm) {
         SQLiteDatabase sqLiteDatabase = getReadableDatabase();
         Cursor cursor = sqLiteDatabase.query(OpdDbConstants.Table.OPD_DIAGNOSIS_AND_TREATMENT_FORM, columns, OpdDbConstants.Column.OpdDiagnosisAndTreatmentForm.BASE_ENTITY_ID + " = ? ",
                 new String[]{opdDiagnosisAndTreatmentForm.getBaseEntityId()}, null, null, null);
@@ -71,7 +74,7 @@ public class OpdDiagnosisAndTreatmentFormRepository extends BaseRepository imple
     }
 
     @Override
-    public boolean delete(OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm) {
+    public boolean delete(@NonNull OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm) {
         SQLiteDatabase sqLiteDatabase = getReadableDatabase();
         int rows = sqLiteDatabase.delete(OpdDbConstants.Table.OPD_DIAGNOSIS_AND_TREATMENT_FORM, OpdDbConstants.Column.OpdDiagnosisAndTreatmentForm.BASE_ENTITY_ID + " = ? ",
                 new String[]{opdDiagnosisAndTreatmentForm.getBaseEntityId()});
@@ -80,6 +83,6 @@ public class OpdDiagnosisAndTreatmentFormRepository extends BaseRepository imple
 
     @Override
     public List<OpdDiagnosisAndTreatmentForm> findAll() {
-        return null;
+        throw new NotImplementedException("Not Implemented");
     }
 }

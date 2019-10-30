@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 
 import net.sqlcipher.database.SQLiteDatabase;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.smartregister.opd.dao.OpdDiagnosisDao;
 import org.smartregister.opd.pojos.OpdDiagnosis;
 import org.smartregister.opd.utils.OpdDbConstants;
@@ -51,7 +52,7 @@ public class OpdDiagnosisRepository extends BaseRepository implements OpdDiagnos
 //            OpdDbConstants.Column.OpdDiagnosis.UPDATED_AT
 //    };
 
-    public OpdDiagnosisRepository(Repository repository) {
+    public OpdDiagnosisRepository(@NonNull Repository repository) {
         super(repository);
     }
 
@@ -62,7 +63,7 @@ public class OpdDiagnosisRepository extends BaseRepository implements OpdDiagnos
     }
 
     @Override
-    public boolean saveOrUpdate(OpdDiagnosis opdDiagnosis) {
+    public boolean saveOrUpdate(@NonNull OpdDiagnosis opdDiagnosis) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(OpdDbConstants.Column.OpdDiagnosis.ID, opdDiagnosis.getId());
         contentValues.put(OpdDbConstants.Column.OpdDiagnosis.BASE_ENTITY_ID, opdDiagnosis.getBaseEntityId());
@@ -82,16 +83,16 @@ public class OpdDiagnosisRepository extends BaseRepository implements OpdDiagnos
 
     @Override
     public OpdDiagnosis findOne(OpdDiagnosis opdDiagnosis) {
-        return null;
+        throw new NotImplementedException("Not Implemented");
     }
 
     @Override
     public boolean delete(OpdDiagnosis opdDiagnosis) {
-        return false;
+        throw new NotImplementedException("Not Implemented");
     }
 
     @Override
     public List<OpdDiagnosis> findAll() {
-        return null;
+        throw new NotImplementedException("Not Implemented");
     }
 }

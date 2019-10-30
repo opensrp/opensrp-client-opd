@@ -2,10 +2,12 @@ package org.smartregister.opd.repository;
 
 import android.content.ContentValues;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import net.sqlcipher.Cursor;
 import net.sqlcipher.database.SQLiteDatabase;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.smartregister.opd.dao.OpdDetailsDao;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;
@@ -41,7 +43,7 @@ public class OpdDetailsRepository extends BaseRepository implements OpdDetailsDa
             + OpdDetails.CURRENT_VISIT_ID + " VARCHAR NOT NULL, "
             + OpdDetails.CREATED_AT + " DATETIME NOT NULL DEFAULT (DATETIME('now')), UNIQUE(" + OpdDetails.BASE_ENTITY_ID + ") ON CONFLICT REPLACE)";
 
-    public OpdDetailsRepository(Repository repository) {
+    public OpdDetailsRepository(@NonNull Repository repository) {
         super(repository);
     }
 
@@ -82,6 +84,7 @@ public class OpdDetailsRepository extends BaseRepository implements OpdDetailsDa
         return recordId != -1;
     }
 
+    @Nullable
     @Override
     public org.smartregister.opd.pojos.OpdDetails findOne(@NonNull org.smartregister.opd.pojos.OpdDetails opdDetails) {
         org.smartregister.opd.pojos.OpdDetails details = null;
@@ -118,11 +121,11 @@ public class OpdDetailsRepository extends BaseRepository implements OpdDetailsDa
 
     @Override
     public boolean delete(org.smartregister.opd.pojos.OpdDetails opdDetails) {
-        return false;
+        throw new NotImplementedException("Not Implemented");
     }
 
     @Override
     public List<org.smartregister.opd.pojos.OpdDetails> findAll() {
-        return null;
+        throw new NotImplementedException("Not Implemented");
     }
 }

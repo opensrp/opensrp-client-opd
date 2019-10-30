@@ -29,7 +29,7 @@ public class OpdUtilsTest {
     @Test
     public void convertStringToDate() {
         Date date = OpdUtils.convertStringToDate(OpdConstants.DateFormat.YYYY_MM_DD_HH_MM_SS, "2019-10-28 18:09:49");
-        Assert.assertNotNull(date);
+        Assert.assertEquals("2019-10-28 18:09:49", OpdUtils.convertDate(date, OpdConstants.DateFormat.YYYY_MM_DD_HH_MM_SS));
     }
 
 }

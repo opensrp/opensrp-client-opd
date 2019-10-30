@@ -37,7 +37,6 @@ import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.sync.ClientProcessorForJava;
-import org.smartregister.util.JsonFormUtils;
 import org.smartregister.util.Utils;
 
 import java.text.ParseException;
@@ -137,26 +136,38 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
             }
         } else if (event.getEventType().equals(OpdConstants.EventType.CLOSE_OPD_VISIT)) {
             try {
-                processOpdCloseEvent(event);
+                processOpdCloseVisitEvent(event);
             } catch (Exception e) {
                 Timber.e(e);
             }
         }
     }
 
-    private void processOpdCloseEvent(Event event) {
+    private void processOpdCloseVisitEvent(@NonNull Event event) {
         Map<String, String> mapDetails = event.getDetails();
         //update visit end date
-        OpdDetails opdDetails = new OpdDetails(event.getBaseEntityId(), mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID));
-        opdDetails = OpdLibrary.getInstance().getOpdDetailsRepository().findOne(opdDetails);
-        if (opdDetails != null) {
-            opdDetails.setCurrentVisitEndDate(OpdUtils.convertStringToDate(OpdConstants.DateFormat.YYYY_MM_DD_HH_MM_SS, mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_END_DATE)));
-            OpdLibrary.getInstance().getOpdDetailsRepository().saveOrUpdate(opdDetails);
+        if (mapDetails != null) {
+            OpdDetails opdDetails = new OpdDetails(event.getBaseEntityId(), mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID));
+            opdDetails = OpdLibrary.getInstance().getOpdDetailsRepository().findOne(opdDetails);
+            if (opdDetails != null) {
+                opdDetails.setCurrentVisitEndDate(OpdUtils.convertStringToDate(OpdConstants.DateFormat.YYYY_MM_DD_HH_MM_SS, mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_END_DATE)));
+                boolean result = OpdLibrary.getInstance().getOpdDetailsRepository().saveOrUpdate(opdDetails);
+                if (result) {
+                    Timber.d("Opd processOpdCloseVisitEvent for %s saved", event.getBaseEntityId());
+                    return;
+                }
+                Timber.e("Opd processOpdCloseVisitEvent for %s not saved", event.getBaseEntityId());
+            } else {
+                Timber.e("Opd Details for %s not found", mapDetails.toString());
+            }
+        } else {
+            Timber.e("Opd Details for %s not found, event details is null", event.getBaseEntityId());
         }
     }
 
-    private void processServiceDetail(@NonNull Event event) {
+    private void processServiceDetail(@NonNull Event event) throws JSONException {
         Map<String, String> mapDetails = event.getDetails();
+        JSONArray jsonArrayId = new JSONArray(mapDetails.get(OpdConstants.JSON_FORM_KEY.ID));
 
         HashMap<String, String> keyValues = new HashMap<>();
         generateKeyValuesFromEvent(event, keyValues);
@@ -165,19 +176,25 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
 
         if (!TextUtils.isEmpty(serviceFee)) {
             OpdServiceDetail opdServiceDetail = new OpdServiceDetail();
-            opdServiceDetail.setId(JsonFormUtils.generateRandomUUIDString());
+            opdServiceDetail.setId(jsonArrayId.getString(0));
             opdServiceDetail.setBaseEntityId(event.getBaseEntityId());
             opdServiceDetail.setFee(serviceFee);
             opdServiceDetail.setCreatedAt(Utils.convertDateFormat(new DateTime()));
             opdServiceDetail.setUpdatedAt(Utils.convertDateFormat(new DateTime()));
             opdServiceDetail.setVisitId(mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID));
             opdServiceDetail.setDetails(mapDetails.toString());
-            OpdLibrary.getInstance().getOpdServiceDetailRepository().saveOrUpdate(opdServiceDetail);
+            boolean result = OpdLibrary.getInstance().getOpdServiceDetailRepository().saveOrUpdate(opdServiceDetail);
+            if (result) {
+                Timber.d("Opd processServiceDetail for %s saved", event.getBaseEntityId());
+                return;
+            }
+            Timber.e("Opd processServiceDetail for %s not saved", event.getBaseEntityId());
         }
     }
 
     private void processTreatment(@NonNull Event event) throws JSONException {
         Map<String, String> mapDetails = event.getDetails();
+        JSONArray jsonArrayIds = new JSONArray(mapDetails.get(OpdConstants.JSON_FORM_KEY.ID));
 
         HashMap<String, String> keyValues = new HashMap<>();
         generateKeyValuesFromEvent(event, keyValues);
@@ -190,7 +207,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                 JSONObject property = jsonObject.optJSONObject(JsonFormConstants.MultiSelectUtils.PROPERTY);
                 JSONObject meta = property.optJSONObject(OpdConstants.JSON_FORM_KEY.META);
                 OpdTreatment opdTreatment = new OpdTreatment();
-                opdTreatment.setId(JsonFormUtils.generateRandomUUIDString());
+                opdTreatment.setId(jsonArrayIds.getString(i));
                 opdTreatment.setBaseEntityId(event.getBaseEntityId());
                 opdTreatment.setVisitId(mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID));
                 if (meta != null) {
@@ -201,13 +218,19 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                 opdTreatment.setMedicine(key);
                 opdTreatment.setCreatedAt(Utils.convertDateFormat(new DateTime()));
                 opdTreatment.setUpdatedAt(Utils.convertDateFormat(new DateTime()));
-                OpdLibrary.getInstance().getOpdTreatmentRepository().saveOrUpdate(opdTreatment);
+                boolean result = OpdLibrary.getInstance().getOpdTreatmentRepository().saveOrUpdate(opdTreatment);
+                if (result) {
+                    Timber.i("Opd processTreatment for %s saved", event.getBaseEntityId());
+                    return;
+                }
+                Timber.e("Opd processTreatment for %s not saved", event.getBaseEntityId());
             }
         }
     }
 
     private void processDiagnosis(@NonNull Event event) throws JSONException {
         Map<String, String> mapDetails = event.getDetails();
+        JSONArray jsonArrayIds = new JSONArray(mapDetails.get(OpdConstants.JSON_FORM_KEY.ID));
 
         HashMap<String, String> keyValues = new HashMap<>();
         generateKeyValuesFromEvent(event, keyValues);
@@ -223,7 +246,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                 String key = jsonObject.optString(OpdJsonFormUtils.KEY);
                 JSONObject property = jsonObject.optJSONObject(JsonFormConstants.MultiSelectUtils.PROPERTY);
                 OpdDiagnosis opdDiagnosis = new OpdDiagnosis();
-                opdDiagnosis.setId(JsonFormUtils.generateRandomUUIDString());
+                opdDiagnosis.setId(jsonArrayIds.getString(i));
                 opdDiagnosis.setBaseEntityId(event.getBaseEntityId());
                 opdDiagnosis.setVisitId(mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID));
                 opdDiagnosis.setIcd10Code(property.optString(OpdConstants.JSON_FORM_KEY.ICD10));
@@ -234,16 +257,22 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                 opdDiagnosis.setUpdatedAt(Utils.convertDateFormat(new DateTime()));
                 opdDiagnosis.setDisease(key);
                 opdDiagnosis.setDiagnosis(diagnosis);
-                OpdLibrary.getInstance().getOpdDiagnosisRepository().saveOrUpdate(opdDiagnosis);
+                boolean result = OpdLibrary.getInstance().getOpdDiagnosisRepository().saveOrUpdate(opdDiagnosis);
+                if (result) {
+                    Timber.i("Opd processDiagnosis for %s saved", event.getBaseEntityId());
+                    return;
+                }
+                Timber.e("Opd processDiagnosis for %s not saved", event.getBaseEntityId());
             }
         }
 
     }
 
-    private void processTestConducted(@NonNull Event event) {
+    private void processTestConducted(@NonNull Event event) throws JSONException {
 
         Map<String, String> mapDetails = event.getDetails();
 
+        JSONArray jsonArrayId = new JSONArray(mapDetails.get(OpdConstants.JSON_FORM_KEY.ID));
         HashMap<String, String> keyValues = new HashMap<>();
         generateKeyValuesFromEvent(event, keyValues);
         String diagnosticResult = null;
@@ -271,11 +300,17 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
             opdTestConducted.setTest(diagnosticTest);
             opdTestConducted.setVisitId(mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID));
             opdTestConducted.setBaseEntityId(event.getBaseEntityId());
-            opdTestConducted.setId(JsonFormUtils.generateRandomUUIDString());
+            opdTestConducted.setId(jsonArrayId.getString(0));
             opdTestConducted.setCreatedAt(Utils.convertDateFormat(new DateTime()));
             opdTestConducted.setUpdatedAt(Utils.convertDateFormat(new DateTime()));
 
-            OpdLibrary.getInstance().getOpdTestConductedRepository().saveOrUpdate(opdTestConducted);
+            boolean result = OpdLibrary.getInstance().getOpdTestConductedRepository().saveOrUpdate(opdTestConducted);
+
+            if (result) {
+                Timber.i("Opd processTestConducted for %s saved", event.getBaseEntityId());
+                return;
+            }
+            Timber.e("Opd processTestConducted for %s not saved", event.getBaseEntityId());
         }
     }
 
