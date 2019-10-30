@@ -36,6 +36,7 @@ import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.sync.ClientProcessorForJava;
+import org.smartregister.util.JsonFormUtils;
 import org.smartregister.util.Utils;
 
 import java.text.ParseException;
@@ -106,28 +107,28 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
             }
         } else if (event.getEventType().equals(OpdConstants.EventType.TEST_CONDUCTED)) {
             try {
-                processTestConducted(eventClient);
+                processTestConducted(event);
                 CoreLibrary.getInstance().context().getEventClientRepository().markEventAsProcessed(eventClient.getEvent().getFormSubmissionId());
             } catch (Exception ex) {
                 Timber.e(ex);
             }
         } else if (event.getEventType().equals(OpdConstants.EventType.DIAGNOSIS)) {
             try {
-                processDiagnosis(eventClient);
+                processDiagnosis(event);
                 CoreLibrary.getInstance().context().getEventClientRepository().markEventAsProcessed(eventClient.getEvent().getFormSubmissionId());
             } catch (Exception ex) {
                 Timber.e(ex);
             }
         } else if (event.getEventType().equals(OpdConstants.EventType.TREATMENT)) {
             try {
-                processTreatment(eventClient);
+                processTreatment(event);
                 CoreLibrary.getInstance().context().getEventClientRepository().markEventAsProcessed(eventClient.getEvent().getFormSubmissionId());
             } catch (Exception ex) {
                 Timber.e(ex);
             }
         } else if (event.getEventType().equals(OpdConstants.EventType.SERVICE_DETAIL)) {
             try {
-                processServiceDetail(eventClient);
+                processServiceDetail(event);
                 CoreLibrary.getInstance().context().getEventClientRepository().markEventAsProcessed(eventClient.getEvent().getFormSubmissionId());
             } catch (Exception ex) {
                 Timber.e(ex);
@@ -135,11 +136,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         }
     }
 
-    private void processServiceDetail(@NonNull EventClient eventClient) {
-        Event event = eventClient.getEvent();
-        if (event == null) {
-            return;
-        }
+    private void processServiceDetail(@NonNull Event event) {
         Map<String, String> mapDetails = event.getDetails();
 
         HashMap<String, String> keyValues = new HashMap<>();
@@ -149,7 +146,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
 
         if (!TextUtils.isEmpty(serviceFee)) {
             OpdServiceDetail opdServiceDetail = new OpdServiceDetail();
-            opdServiceDetail.setId(mapDetails.get(OpdConstants.JSON_FORM_KEY.ID));
+            opdServiceDetail.setId(JsonFormUtils.generateRandomUUIDString());
             opdServiceDetail.setBaseEntityId(event.getBaseEntityId());
             opdServiceDetail.setFee(serviceFee);
             opdServiceDetail.setCreatedAt(Utils.convertDateFormat(new DateTime()));
@@ -160,11 +157,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         }
     }
 
-    private void processTreatment(@NonNull EventClient eventClient) throws JSONException {
-        Event event = eventClient.getEvent();
-        if (event == null) {
-            return;
-        }
+    private void processTreatment(@NonNull Event event) throws JSONException {
         Map<String, String> mapDetails = event.getDetails();
 
         HashMap<String, String> keyValues = new HashMap<>();
@@ -178,7 +171,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                 JSONObject property = jsonObject.optJSONObject(JsonFormConstants.MultiSelectUtils.PROPERTY);
                 JSONObject meta = property.optJSONObject(OpdConstants.JSON_FORM_KEY.META);
                 OpdTreatment opdTreatment = new OpdTreatment();
-                opdTreatment.setId(mapDetails.get(OpdConstants.JSON_FORM_KEY.ID));
+                opdTreatment.setId(JsonFormUtils.generateRandomUUIDString());
                 opdTreatment.setBaseEntityId(event.getBaseEntityId());
                 opdTreatment.setVisitId(mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID));
                 if (meta != null) {
@@ -194,11 +187,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         }
     }
 
-    private void processDiagnosis(@NonNull EventClient eventClient) throws JSONException {
-        Event event = eventClient.getEvent();
-        if (event == null) {
-            return;
-        }
+    private void processDiagnosis(@NonNull Event event) throws JSONException {
         Map<String, String> mapDetails = event.getDetails();
 
         HashMap<String, String> keyValues = new HashMap<>();
@@ -215,7 +204,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                 String key = jsonObject.optString(OpdJsonFormUtils.KEY);
                 JSONObject property = jsonObject.optJSONObject(JsonFormConstants.MultiSelectUtils.PROPERTY);
                 OpdDiagnosis opdDiagnosis = new OpdDiagnosis();
-                opdDiagnosis.setId(mapDetails.get(OpdConstants.JSON_FORM_KEY.ID));
+                opdDiagnosis.setId(JsonFormUtils.generateRandomUUIDString());
                 opdDiagnosis.setBaseEntityId(event.getBaseEntityId());
                 opdDiagnosis.setVisitId(mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID));
                 opdDiagnosis.setIcd10Code(property.optString(OpdConstants.JSON_FORM_KEY.ICD10));
@@ -232,15 +221,12 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
 
     }
 
-    private void processTestConducted(@NonNull EventClient eventClient) {
-        Event event = eventClient.getEvent();
-        if (event == null) {
-            return;
-        }
+    private void processTestConducted(@NonNull Event event) {
+
         Map<String, String> mapDetails = event.getDetails();
 
         HashMap<String, String> keyValues = new HashMap<>();
-        generateKeyValuesFromEvent(eventClient.getEvent(), keyValues);
+        generateKeyValuesFromEvent(event, keyValues);
         String diagnosticResult = null;
         String diagnosticTest = null;
 
@@ -266,7 +252,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
             opdTestConducted.setTest(diagnosticTest);
             opdTestConducted.setVisitId(mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID));
             opdTestConducted.setBaseEntityId(event.getBaseEntityId());
-            opdTestConducted.setId(mapDetails.get(OpdConstants.JSON_FORM_KEY.ID));
+            opdTestConducted.setId(JsonFormUtils.generateRandomUUIDString());
             opdTestConducted.setCreatedAt(Utils.convertDateFormat(new DateTime()));
             opdTestConducted.setUpdatedAt(Utils.convertDateFormat(new DateTime()));
 
