@@ -307,30 +307,30 @@ public class OpdLibrary {
         for (int i = 0; i < steps.size(); i++) {
             JSONObject step = steps.get(i);
             JSONArray fields = step.getJSONArray(OpdJsonFormUtils.FIELDS);
-            JSONArray jsonArrayIds = null;
+            String valueIds = null;
             JSONObject jsonObject;
             if (i == 0 || i == 3) {
-                jsonArrayIds = OpdUtils.generateNIds(1);
+                valueIds = OpdUtils.generateNIds(1);
             } else if (i == 1) {
                 jsonObject = JsonFormUtils.getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.DISEASE_CODE);
                 String value = jsonObject.optString(OpdConstants.KEY.VALUE);
                 if (TextUtils.isEmpty(value)) {
                     continue;
                 }
-                jsonArrayIds = OpdUtils.generateNIds(new JSONArray(value).length());
+                valueIds = OpdUtils.generateNIds(new JSONArray(value).length());
             } else if (i == 2) {
                 jsonObject = JsonFormUtils.getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.MEDICINE);
                 String value = jsonObject.optString(OpdConstants.KEY.VALUE);
                 if (TextUtils.isEmpty(value)) {
                     continue;
                 }
-                jsonArrayIds = OpdUtils.generateNIds(new JSONArray(value).length());
+                valueIds = OpdUtils.generateNIds(new JSONArray(value).length());
             }
             Event baseEvent = JsonFormUtils.createEvent(fields, jsonFormObject.getJSONObject(METADATA),
                     formTag, entityId, getDiagnosisAndTreatmentEventArray()[i], getDiagnosisAndTreatmentTableArray()[i]);
             OpdJsonFormUtils.tagSyncMetadata(baseEvent);
             baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_ID, visitId);
-            baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.ID, jsonArrayIds.toString());
+            baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.ID, valueIds);
             eventList.add(baseEvent);
         }
 

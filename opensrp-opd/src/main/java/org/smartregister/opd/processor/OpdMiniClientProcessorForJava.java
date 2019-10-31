@@ -165,10 +165,13 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         }
     }
 
-    private void processServiceDetail(@NonNull Event event) throws JSONException {
+    private void processServiceDetail(@NonNull Event event) {
         Map<String, String> mapDetails = event.getDetails();
-        JSONArray jsonArrayId = new JSONArray(mapDetails.get(OpdConstants.JSON_FORM_KEY.ID));
-
+        String id = mapDetails.get(OpdConstants.JSON_FORM_KEY.ID);
+        if (id == null) {
+            return;
+        }
+        String[] valueIds = id.split(",");
         HashMap<String, String> keyValues = new HashMap<>();
         generateKeyValuesFromEvent(event, keyValues);
 
@@ -176,7 +179,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
 
         if (!TextUtils.isEmpty(serviceFee)) {
             OpdServiceDetail opdServiceDetail = new OpdServiceDetail();
-            opdServiceDetail.setId(jsonArrayId.getString(0));
+            opdServiceDetail.setId(valueIds[0]);
             opdServiceDetail.setBaseEntityId(event.getBaseEntityId());
             opdServiceDetail.setFee(serviceFee);
             opdServiceDetail.setCreatedAt(Utils.convertDateFormat(new DateTime()));
@@ -194,8 +197,11 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
 
     private void processTreatment(@NonNull Event event) throws JSONException {
         Map<String, String> mapDetails = event.getDetails();
-        JSONArray jsonArrayIds = new JSONArray(mapDetails.get(OpdConstants.JSON_FORM_KEY.ID));
-
+        String id = mapDetails.get(OpdConstants.JSON_FORM_KEY.ID);
+        if (id == null) {
+            return;
+        }
+        String[] valueIds = id.split(",");
         HashMap<String, String> keyValues = new HashMap<>();
         generateKeyValuesFromEvent(event, keyValues);
         String medicine = keyValues.get(OpdConstants.JSON_FORM_KEY.MEDICINE);
@@ -207,7 +213,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                 JSONObject property = jsonObject.optJSONObject(JsonFormConstants.MultiSelectUtils.PROPERTY);
                 JSONObject meta = property.optJSONObject(OpdConstants.JSON_FORM_KEY.META);
                 OpdTreatment opdTreatment = new OpdTreatment();
-                opdTreatment.setId(jsonArrayIds.getString(i));
+                opdTreatment.setId(valueIds[i]);
                 opdTreatment.setBaseEntityId(event.getBaseEntityId());
                 opdTreatment.setVisitId(mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID));
                 if (meta != null) {
@@ -230,7 +236,11 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
 
     private void processDiagnosis(@NonNull Event event) throws JSONException {
         Map<String, String> mapDetails = event.getDetails();
-        JSONArray jsonArrayIds = new JSONArray(mapDetails.get(OpdConstants.JSON_FORM_KEY.ID));
+        String id = mapDetails.get(OpdConstants.JSON_FORM_KEY.ID);
+        if (id == null) {
+            return;
+        }
+        String[] valueIds = id.split(",");
 
         HashMap<String, String> keyValues = new HashMap<>();
         generateKeyValuesFromEvent(event, keyValues);
@@ -246,7 +256,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                 String key = jsonObject.optString(OpdJsonFormUtils.KEY);
                 JSONObject property = jsonObject.optJSONObject(JsonFormConstants.MultiSelectUtils.PROPERTY);
                 OpdDiagnosis opdDiagnosis = new OpdDiagnosis();
-                opdDiagnosis.setId(jsonArrayIds.getString(i));
+                opdDiagnosis.setId(valueIds[i]);
                 opdDiagnosis.setBaseEntityId(event.getBaseEntityId());
                 opdDiagnosis.setVisitId(mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID));
                 opdDiagnosis.setIcd10Code(property.optString(OpdConstants.JSON_FORM_KEY.ICD10));
@@ -272,7 +282,11 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
 
         Map<String, String> mapDetails = event.getDetails();
 
-        JSONArray jsonArrayId = new JSONArray(mapDetails.get(OpdConstants.JSON_FORM_KEY.ID));
+        String id = mapDetails.get(OpdConstants.JSON_FORM_KEY.ID);
+        if (id == null) {
+            return;
+        }
+        String[] valueIds = id.split(",");
         HashMap<String, String> keyValues = new HashMap<>();
         generateKeyValuesFromEvent(event, keyValues);
         String diagnosticResult = null;
@@ -300,7 +314,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
             opdTestConducted.setTest(diagnosticTest);
             opdTestConducted.setVisitId(mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID));
             opdTestConducted.setBaseEntityId(event.getBaseEntityId());
-            opdTestConducted.setId(jsonArrayId.getString(0));
+            opdTestConducted.setId(valueIds[0]);
             opdTestConducted.setCreatedAt(Utils.convertDateFormat(new DateTime()));
             opdTestConducted.setUpdatedAt(Utils.convertDateFormat(new DateTime()));
 

@@ -9,7 +9,6 @@ import android.util.DisplayMetrics;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jeasy.rules.api.Facts;
-import org.json.JSONArray;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
 import org.smartregister.opd.pojos.OpdMetadata;
@@ -154,11 +153,11 @@ public class OpdUtils extends org.smartregister.util.Utils {
         return date;
     }
 
-    public static JSONArray generateNIds(int n) {
-        JSONArray jsonArray = new JSONArray();
+    public static String generateNIds(int n) {
+        StringBuilder strIds = new StringBuilder();
         for (int i = 0; i < n; i++) {
-            jsonArray.put(JsonFormUtils.generateRandomUUIDString());
+            strIds.append(JsonFormUtils.generateRandomUUIDString()).append(",");
         }
-        return jsonArray;
+        return strIds.toString();
     }
 }
