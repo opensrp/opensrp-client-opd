@@ -4,13 +4,14 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.smartregister.Context;
 import org.smartregister.commonregistry.CommonPersonObject;
 import org.smartregister.commonregistry.CommonRepository;
-import org.smartregister.cursoradapter.SmartRegisterQueryBuilder;
 import org.smartregister.event.Listener;
+import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.pojos.OpdMetadata;
 
 import java.util.ArrayList;
@@ -58,7 +59,7 @@ public class OpdLookUpUtils {
             String tableName = opdMetadata.getTableName();
 
             CommonRepository commonRepository = context.commonrepository(tableName);
-            String query = lookUpQuery(entityLookUp, tableName);
+            String query = lookUpQuery(entityLookUp);
             if (query == null) {
                 return results;
             }
@@ -85,21 +86,12 @@ public class OpdLookUpUtils {
         return results;
     }
 
-    protected static String lookUpQuery(@NonNull Map<String, String> entityMap, @NonNull String tableName) {
-        SmartRegisterQueryBuilder queryBUilder = new SmartRegisterQueryBuilder();
-        queryBUilder.SelectInitiateMainTable(tableName,
-                new String[]{OpdDbConstants.Column.Client.RELATIONALID, OpdDbConstants.Column.Client.OPENSRP_ID,
-                        OpdDbConstants.Column.Client.FIRST_NAME, OpdDbConstants.Column.Client.LAST_NAME,
-                        OpdDbConstants.Column.Client.GENDER, OpdDbConstants.Column.Client.DOB,
-                        OpdDbConstants.Column.Client.BASE_ENTITY_ID, OpdDbConstants.Column.Client.NATIONAL_ID}
-
-        );
-        String mainConditionString = getMainConditionString(entityMap);
-        if (mainConditionString.isEmpty()) {
-            return null;
+    protected static String lookUpQuery(@NonNull Map<String, String> entityMap) {
+        String mainCondition = getMainConditionString(entityMap);
+        if (!TextUtils.isEmpty(mainCondition)) {
+            return OpdLibrary.getInstance().opdLookUpQuery().replace("[condition]", mainCondition) + ";";
         }
-        String query = queryBUilder.mainCondition(mainConditionString);
-        return queryBUilder.Endquery(query);
+        return null;
     }
 
     protected static String getMainConditionString(@NonNull Map<String, String> entityMap) {

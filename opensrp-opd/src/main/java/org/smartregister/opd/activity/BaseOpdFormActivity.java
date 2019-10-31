@@ -169,7 +169,7 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
 
     private void saveFormFillSession() {
         JSONObject jsonObject = getmJSONObject();
-        final OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm = new OpdDiagnosisAndTreatmentForm(0, OpdUtils.getBaseEntityId(getIntent()),
+        final OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm = new OpdDiagnosisAndTreatmentForm(0, OpdUtils.getIntentValue(getIntent(), OpdConstants.IntentKey.BASE_ENTITY_ID),
                 jsonObject.toString(), Utils.convertDateFormat(new DateTime()));
         final OpdDiagnosisAndTreatmentFormDao opdDiagnosisAndTreatmentFormDao = OpdLibrary.getInstance().getOpdDiagnosisAndTreatmentFormRepository();
         new AppExecutors().diskIO().execute(new Runnable() {

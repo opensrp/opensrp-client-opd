@@ -257,8 +257,8 @@ public class OpdLibrary {
 
         FormTag formTag = OpdJsonFormUtils.formTag(OpdUtils.getAllSharedPreferences());
 
-        String baseEntityId = OpdUtils.getBaseEntityId(data);
-        String entityTable = OpdUtils.getEntityTable(data);
+        String baseEntityId = OpdUtils.getIntentValue(data, OpdConstants.IntentKey.BASE_ENTITY_ID);
+        String entityTable = OpdUtils.getIntentValue(data, OpdConstants.IntentKey.ENTITY_TABLE);
         Event opdCheckinEvent = OpdJsonFormUtils.createEvent(fieldsArray, jsonFormObject.getJSONObject(METADATA)
                 , formTag, baseEntityId, eventType, entityTable);
 
@@ -356,5 +356,12 @@ public class OpdLibrary {
     protected String[] getDiagnosisAndTreatmentTableArray() {
         return new String[]{OpdDbConstants.Table.OPD_TEST_CONDUCTED, OpdDbConstants.Table.OPD_DIAGNOSIS,
                 OpdDbConstants.Table.OPD_TREATMENT, OpdDbConstants.Table.OPD_SERVICE_DETAIL};
+    }
+
+    public String opdLookUpQuery() {
+        String lookUpQueryForChild = "select id as _id, relationalid, first_name, last_name, gender, dob, base_entity_id, null as national_id from ec_child where [condition] ";
+        String lookUpQueryForMother = "select id as _id, relationalid, first_name, last_name, gender, dob, base_entity_id, nrc_number as national_id from ec_mother where [condition] ";
+        String lookUpQueryForOpdClient = "select id as _id, relationalid, first_name, last_name, gender, dob, base_entity_id, null as national_id from ec_client where [condition] ";
+        return lookUpQueryForChild + " union all " + lookUpQueryForMother + " union all " + lookUpQueryForOpdClient;
     }
 }

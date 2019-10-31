@@ -115,24 +115,6 @@ public class OpdUtils extends org.smartregister.util.Utils {
         return data.hasExtra(key) ? data.getStringExtra(key) : null;
     }
 
-    @Nullable
-    public static String getBaseEntityId(@Nullable Intent data) {
-        if (data == null) {
-            return null;
-        }
-
-        return data.hasExtra(OpdConstants.IntentKey.BASE_ENTITY_ID) ? data.getStringExtra(OpdConstants.IntentKey.BASE_ENTITY_ID) : null;
-    }
-
-    @Nullable
-    public static String getEntityTable(@Nullable Intent data) {
-        if (data == null) {
-            return null;
-        }
-
-        return data.hasExtra(OpdConstants.IntentKey.ENTITY_TABLE) ? data.getStringExtra(OpdConstants.IntentKey.ENTITY_TABLE) : null;
-    }
-
     @NonNull
     public static String convertDate(@NonNull Date date, @NonNull String dateFormat) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat, Locale.US);
@@ -156,7 +138,11 @@ public class OpdUtils extends org.smartregister.util.Utils {
     public static String generateNIds(int n) {
         StringBuilder strIds = new StringBuilder();
         for (int i = 0; i < n; i++) {
-            strIds.append(JsonFormUtils.generateRandomUUIDString()).append(",");
+            if ((i + 1) == n) {
+                strIds.append(JsonFormUtils.generateRandomUUIDString());
+            } else {
+                strIds.append(JsonFormUtils.generateRandomUUIDString()).append(",");
+            }
         }
         return strIds.toString();
     }

@@ -1,9 +1,13 @@
 package org.smartregister.opd.utils;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 import org.smartregister.Context;
@@ -19,13 +23,27 @@ import java.util.List;
 import java.util.Map;
 
 @RunWith(PowerMockRunner.class)
+@PrepareForTest(OpdLibrary.class)
 public class OpdLookUpUtilsTest {
 
+    @Mock
+    private OpdLibrary opdLibrary;
+
+
+    @Before
+    public void setUp(){
+        MockitoAnnotations.initMocks(this);
+    }
+
     @Test
-    public void testLookUpQueryWhenEntityMapIsNotNull() throws Exception {
+    public void testLookUpQuery() throws Exception {
+        PowerMockito.mockStatic(OpdLibrary.class);
+        PowerMockito.when(OpdLibrary.getInstance()).thenReturn(opdLibrary);
+        PowerMockito.when(opdLibrary.opdLookUpQuery()).thenReturn("");
+
         Map<String, String> entityMap = new HashMap<>();
-        String result = Whitebox.invokeMethod(OpdLookUpUtils.class, "lookUpQuery", entityMap, "");
-        Assert.assertNull(result);
+        String result = Whitebox.invokeMethod(OpdLookUpUtils.class, "lookUpQuery", entityMap);
+        Assert.assertEquals(";", result);
     }
 
     @Test
