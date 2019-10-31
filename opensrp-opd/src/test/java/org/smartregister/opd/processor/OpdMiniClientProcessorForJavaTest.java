@@ -20,10 +20,12 @@ import org.smartregister.domain.db.Event;
 import org.smartregister.domain.db.Obs;
 import org.smartregister.opd.BaseTest;
 import org.smartregister.opd.OpdLibrary;
+import org.smartregister.opd.pojos.OpdDetails;
 import org.smartregister.opd.pojos.OpdDiagnosis;
 import org.smartregister.opd.pojos.OpdServiceDetail;
 import org.smartregister.opd.pojos.OpdTestConducted;
 import org.smartregister.opd.pojos.OpdTreatment;
+import org.smartregister.opd.repository.OpdDetailsRepository;
 import org.smartregister.opd.repository.OpdDiagnosisRepository;
 import org.smartregister.opd.repository.OpdServiceDetailRepository;
 import org.smartregister.opd.repository.OpdTestConductedRepository;
@@ -51,6 +53,9 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
     @Mock
     private OpdDiagnosisRepository opdDiagnosisRepository;
 
+    @Mock
+    private OpdDetailsRepository opdDetailsRepository;
+
     @Captor
     private ArgumentCaptor<OpdServiceDetail> opdServiceDetailArgumentCaptor;
 
@@ -59,6 +64,9 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
 
     @Captor
     private ArgumentCaptor<OpdDiagnosis> opdDiagnosisArgumentCaptor;
+
+    @Captor
+    private ArgumentCaptor<OpdDetails> opdDetailsArgumentCaptor;
 
     @Captor
     private ArgumentCaptor<OpdTestConducted> opdTestConductedArgumentCaptor;
@@ -188,5 +196,30 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
         Assert.assertNotNull(opdTestConductedArgumentCaptor.getValue().getCreatedAt());
         Assert.assertNotNull(opdTestConductedArgumentCaptor.getValue().getUpdatedAt());
         Assert.assertNotNull(opdTestConductedArgumentCaptor.getValue().getId());
+    }
+
+    @Test
+    public void processOpdCloseVisitEvent() throws Exception {
+        PowerMockito.mockStatic(OpdLibrary.class);
+        OpdDetails opdDetails = new OpdDetails("id", "id");
+        PowerMockito.when(opdDetailsRepository.findOne(Mockito.any(OpdDetails.class))).thenReturn(opdDetails);
+        PowerMockito.when(opdLibrary.getOpdDetailsRepository()).thenReturn(opdDetailsRepository);
+        PowerMockito.when(OpdLibrary.getInstance()).thenReturn(opdLibrary);
+
+
+        event.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_ID, "id");
+        event.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_END_DATE, "id");
+
+        Whitebox.invokeMethod(opdMiniClientProcessorForJava, "processOpdCloseVisitEvent", event);
+
+        Mockito.verify(opdDetailsRepository, Mockito.times(1))
+                .saveOrUpdate(opdDetailsArgumentCaptor.capture());
+        Assert.assertEquals("id", opdDetailsArgumentCaptor.getValue().getBaseEntityId());
+        Assert.assertEquals("id", opdDetailsArgumentCaptor.getValue().getCurrentVisitId());
+    }
+
+    @Test
+    public void getEventTypes(){
+        Assert.assertNotNull(opdMiniClientProcessorForJava.getEventTypes());
     }
 }

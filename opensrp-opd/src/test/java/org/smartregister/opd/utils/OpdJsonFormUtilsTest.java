@@ -8,9 +8,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -19,6 +24,7 @@ import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.Context;
 import org.smartregister.CoreLibrary;
 import org.smartregister.SyncConfiguration;
+import org.smartregister.clientandeventmodel.Client;
 import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.domain.tag.FormTag;
 import org.smartregister.location.helper.LocationHelper;
@@ -29,17 +35,52 @@ import org.smartregister.opd.configuration.OpdRegisterQueryProviderTest;
 import org.smartregister.opd.pojos.OpdMetadata;
 import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.repository.Repository;
+import org.smartregister.sync.helper.ECSyncHelper;
 import org.smartregister.util.JsonFormUtils;
 
 import java.util.ArrayList;
 
-@PrepareForTest(OpdUtils.class)
+@PrepareForTest({OpdUtils.class, OpdLibrary.class})
 @RunWith(PowerMockRunner.class)
 public class OpdJsonFormUtilsTest {
 
+    @Mock
+    private OpdLibrary opdLibrary;
+
+    @Captor
+    private ArgumentCaptor addClientCaptor;
+
+    @Before
+    public void setUp() {
+        MockitoAnnotations.initMocks(this);
+    }
+
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", null);
+    }
+
+    @Test
+    public void mergeAndSaveClient() throws Exception {
+        PowerMockito.mockStatic(OpdLibrary.class);
+        PowerMockito.when(OpdLibrary.getInstance()).thenReturn(opdLibrary);
+        ECSyncHelper ecSyncHelper = Mockito.mock(ECSyncHelper.class);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("first_name", "first_name");
+        PowerMockito.when(ecSyncHelper.getClient("baseEntity")).thenReturn(jsonObject);
+        PowerMockito.when(opdLibrary.getEcSyncHelper()).thenReturn(ecSyncHelper);
+
+        Client client = new Client("baseEntity");
+        OpdJsonFormUtils.mergeAndSaveClient(client);
+        Mockito.verify(ecSyncHelper, Mockito.times(1))
+                .addClient((String) addClientCaptor.capture(), (JSONObject) addClientCaptor.capture());
+
+        JSONObject expected = new JSONObject();
+        expected.put("baseEntityId", "baseEntity");
+        expected.put("type", "Client");
+        expected.put("first_name", "first_name");
+        Assert.assertEquals("baseEntity", addClientCaptor.getAllValues().get(0));
+        Assert.assertEquals(expected.toString(), addClientCaptor.getAllValues().get(1).toString());
     }
 
     @Test
