@@ -26,11 +26,11 @@ import java.util.Collections;
 import timber.log.Timber;
 
 public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements TextWatcher {
+
     private Button opd_btn_save_drug;
 
     @Override
     protected void handleClickEventOnListData(@NonNull MultiSelectItem multiSelectItem, @NonNull Context context) {
-        this.context = context;
         createAdditionalDetailsDialog(multiSelectItem);
     }
 
@@ -100,8 +100,8 @@ public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements 
         } catch (JSONException e) {
             Timber.e(e);
         }
-        multiSelectItem.setValue(jsonObject.toString());
 
+        multiSelectItem.setValue(jsonObject.toString());
         updateSelectedData(Collections.singletonList(multiSelectItem), false);
     }
 
