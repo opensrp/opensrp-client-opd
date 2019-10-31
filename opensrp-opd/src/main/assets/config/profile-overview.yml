@@ -2,36 +2,30 @@
 group: person_overview
 sub_group: pregnancy_status
 fields:
-  - template: "Pregnancy Status: {pregnancy_status}"
+  - template: "Status: {pregnancy_status}"
     relevance: "pregnancy_status != ''"
 
 ---
-sub_group: hiv_status
+sub_group: hiv_details
 fields:
-  - template: "Previously tested for HIV: {is_previously_tested_hiv}"
+  - template: "Testing done before?: {is_previously_tested_hiv}"
     relevance: "is_previously_tested_hiv != ''"
 
-  - template: "Previous HIV Status: {previous_hiv_status}"
+  - template: "Prev. test results: {previous_hiv_status}"
     relevance: "previous_hiv_status != ''"
 
-  - template: "Patient on ART: {patient_on_art}"
-    relevance: "patient_on_art != ''"
-
-  - template: "Current HIV Status: {hiv_status}"
+  - template: "Current results: {hiv_status}"
     relevance: "hiv_status != ''"
     isRedFont: "hiv_status == 'positive' || hiv_status == 'Positive'"
 
 ---
-sub_group: latest_visit
+sub_group: current_visit
 fields:
   - template: "Visit Type: {visit_type}"
     relevance: "visit_type != ''"
 
-  - template: "Previous Appointment: {previous_appointment}"
+  - template: "Scheduled?: {previous_appointment}"
     relevance: "previous_appointment != ''"
 
-  - template: "Date of Appointment: {date_of_appointment}"
+  - template: "Appt. due date: {date_of_appointment}"
     relevance: "date_of_appointment != ''"
-
-  - template: "Appointment to Visit Duration: {visit_to_appointment_date}"
-    relevance: "visit_to_appointment_date != ''"
