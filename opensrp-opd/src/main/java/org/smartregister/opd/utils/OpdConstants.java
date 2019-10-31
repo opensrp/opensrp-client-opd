@@ -95,6 +95,7 @@ public class OpdConstants extends AllConstants {
         public static final String ADDRESS_WIDGET_KEY = "home_address";
         public static final String NAME = "opd_registration";
         public static final String REMINDERS = "reminders";
+
         public static final String SERVICE_FEE = "service_fee";
         public static final String VISIT_ID = "visitId";
         public static final String MEDICINE = "medicine";
@@ -113,6 +114,24 @@ public class OpdConstants extends AllConstants {
         public static final String DIAGNOSTIC_TEST_RESULT_SPECIFY = "diagnostic_test_result_specify";
         public static final String ID = "ID";
         public static final String VISIT_END_DATE = "visit_end_date";
+
+        public static final String FIRST_NAME = "first_name";
+        public static final String LAST_NAME = "last_name";
+        public static final String BHT_ID = "bht_mid";
+        public static final String PHONE_NUMBER = "phone_number";
+        public static final String NATIONAL_ID = "national_id";
+        public static final String HOME_ADDRESS = "home_address";
+        public static final String AGE_CALCULATED = "age_calculated";
+        public static final String GENDER = "gender";
+        public static final String ENCOUNTER_TYPE = "encounter_type";
+        public static final String ENTITY_ID = "entity_id";
+        public static final String ENCOUNTER = "encounter";
+        public static final String ENCOUNTER_LOCATION = "encounter_location";
+        public static final String UNIQUE_ID = "unique_id";
+        public static final String AGE = "age";
+        public static final String OPD_EDIT_FORM_TITLE = "Update Opd Registration";
+        public static final String FORM_TITLE = "title";
+        public static final String OPENSRP_ID = "opensrp_id";
     }
 
     public static class JsonFormNameUtils {
@@ -128,6 +147,8 @@ public class OpdConstants extends AllConstants {
         public static final String STEP3 = "step3";
         public static final String STEP4 = "step4";
 
+        public static final String ZEIR_ID = "zeir_id";
+        public static final String ID = "id";
     }
 
     public static class OPENMRS {
@@ -178,7 +199,7 @@ public class OpdConstants extends AllConstants {
     public interface ColumnMapKey {
         String REGISTER_ID = "register_id";
     }
-  
+
     public interface DateFormat {
         String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
         String d_MMM_yyyy = "d MMM yyyy";
@@ -187,5 +208,11 @@ public class OpdConstants extends AllConstants {
     public interface Form {
         String OPD_DIAGNOSIS_AND_TREAT = "opd_diagnose_and_treat";
         String OPD_CHECK_IN = "opd_checkin";
+    }
+
+    public interface FormValue {
+        String IS_DOB_UNKNOWN = "isDobUnknown";
+        String IS_ENROLLED_IN_MESSAGES = "isEnrolledInSmsMessages";
+        String OTHER = "other";
     }
 }

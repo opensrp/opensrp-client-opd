@@ -1,6 +1,8 @@
 package org.smartregister.opd.contract;
 
 import android.content.Intent;
+import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -9,6 +11,8 @@ import org.json.JSONObject;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.opd.listener.OnSendActionToFragment;
 import org.smartregister.opd.pojos.OpdDiagnosisAndTreatmentForm;
+import org.apache.commons.lang3.tuple.Triple;
+import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.view.contract.BaseProfileContract;
 
 import java.util.HashMap;
@@ -33,6 +37,10 @@ public interface OpdProfileActivityContract {
         void startFormActivity(@Nullable JSONObject form, @NonNull String caseId, @NonNull String entityTable);
 
         void saveVisitOrDiagnosisForm(String eventType, Intent data);
+
+        HashMap<String, String> saveFinishForm(@NonNull Map<String, String> client);
+
+        void onUpdateRegistrationBtnCLicked(@NonNull String baseEntityId);
     }
 
     interface View extends BaseProfileContract.View {
@@ -59,6 +67,13 @@ public interface OpdProfileActivityContract {
 
         @Nullable
         String getString(@StringRes int resId);
+
+
+        @NonNull
+        Context getContext();
+
+        void startActivityForResult(@NonNull Intent intent, int requestCode);
+
     }
 
     interface Interactor {
