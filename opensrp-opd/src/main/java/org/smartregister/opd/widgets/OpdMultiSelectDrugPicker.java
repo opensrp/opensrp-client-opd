@@ -1,7 +1,6 @@
 package org.smartregister.opd.widgets;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
@@ -13,17 +12,20 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.domain.MultiSelectItem;
 import com.vijay.jsonwizard.widgets.MultiSelectListFactory;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.opd.R;
+import org.smartregister.opd.utils.OpdConstants;
 
-import java.util.Arrays;
+import java.util.Collections;
+
+import timber.log.Timber;
 
 public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements TextWatcher {
-    private Context context;
     private Button opd_btn_save_drug;
 
     @Override
@@ -59,8 +61,18 @@ public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements 
         opd_btn_save_drug.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String duration = edtTreatmentDuration.getText().toString();
-                String dosage = edtTreatmentDosage.getText().toString();
+                Editable editableTreatmentDuration = edtTreatmentDuration.getText();
+                Editable editableTreatmentDosage = edtTreatmentDosage.getText();
+
+                String duration = "";
+                if (editableTreatmentDuration != null) {
+                    duration = editableTreatmentDuration.toString();
+                }
+
+                String dosage = "";
+                if (editableTreatmentDuration != null) {
+                    dosage = editableTreatmentDosage.toString();
+                }
 
                 writeAdditionalDetails(duration, dosage, multiSelectItem);
 
@@ -75,22 +87,22 @@ public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements 
 
     private void writeAdditionalDetails(@NonNull String duration, @NonNull String dosage, @NonNull MultiSelectItem multiSelectItem) {
         String multiSelectValue = multiSelectItem.getValue();
-        String msg = "Dose: " + dosage + ", Duration: " + duration;
+        String msg = String.format(context.getString(R.string.opd_dosage_duration_text), dosage, duration);
         JSONObject jsonObject = new JSONObject();
 
         try {
             jsonObject = new JSONObject(multiSelectValue);
             JSONObject jsonAdditionalObject = new JSONObject();
-            jsonAdditionalObject.put("duration", duration);
-            jsonAdditionalObject.put("dosage", dosage);
-            jsonAdditionalObject.put("info", msg);
-            jsonObject.put("meta", jsonAdditionalObject);
+            jsonAdditionalObject.put(OpdConstants.JSON_FORM_KEY.DURATION, duration);
+            jsonAdditionalObject.put(OpdConstants.JSON_FORM_KEY.DOSAGE, dosage);
+            jsonAdditionalObject.put(JsonFormConstants.MultiSelectUtils.INFO, msg);
+            jsonObject.put(JsonFormConstants.MultiSelectUtils.META, jsonAdditionalObject);
         } catch (JSONException e) {
-            e.printStackTrace();
+            Timber.e(e);
         }
         multiSelectItem.setValue(jsonObject.toString());
 
-        updateSelectedData(Arrays.asList(multiSelectItem), false);
+        updateSelectedData(Collections.singletonList(multiSelectItem), false);
     }
 
     @Override
@@ -107,11 +119,11 @@ public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements 
     public void afterTextChanged(Editable s) {
         if (!s.toString().isEmpty()) {
             if (opd_btn_save_drug != null) {
-                opd_btn_save_drug.setTextColor(Color.parseColor("#212121"));
+                opd_btn_save_drug.setTextColor(context.getResources().getColor(R.color.primary_text));
             }
         } else {
             if (opd_btn_save_drug != null) {
-                opd_btn_save_drug.setTextColor(Color.parseColor("#cccccc"));
+                opd_btn_save_drug.setTextColor(context.getResources().getColor(R.color.light_grey));
             }
         }
     }

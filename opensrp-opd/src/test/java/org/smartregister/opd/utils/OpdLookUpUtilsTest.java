@@ -1,5 +1,6 @@
 package org.smartregister.opd.utils;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,6 +11,7 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
+import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.Context;
 import org.smartregister.commonregistry.CommonPersonObject;
 import org.smartregister.opd.BuildConfig;
@@ -93,6 +95,11 @@ public class OpdLookUpUtilsTest {
         List<CommonPersonObject> result = Whitebox.invokeMethod(OpdLookUpUtils.class, "clientLookUp", PowerMockito.mock(Context.class), entityLookUp);
         List<CommonPersonObject> expectedResult = new ArrayList<>();
         Assert.assertEquals(expectedResult, result);
+    }
+
+    @After
+    public void tearDown(){
+        ReflectionHelpers.setStaticField(OpdLibrary.class,"instance", null);
     }
 
 }

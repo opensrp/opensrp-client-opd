@@ -34,7 +34,7 @@
             android:layout_gravity="center"
             android:background="@color/transparent"
             android:gravity="center"
-            android:text="@string/dug_picker_dialog_save"
+            android:text="@string/drug_picker_dialog_save"
             android:textColor="@color/light_grey"
             android:textSize="20sp"
             android:textStyle="normal" />

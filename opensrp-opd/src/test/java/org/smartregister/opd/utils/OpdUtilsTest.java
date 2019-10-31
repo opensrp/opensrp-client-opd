@@ -20,6 +20,7 @@ import org.smartregister.opd.pojos.OpdMetadata;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-10-17
@@ -55,32 +56,32 @@ public class OpdUtilsTest {
     @Test
     public void convertStringToDate() {
         Date date = OpdUtils.convertStringToDate(OpdConstants.DateFormat.YYYY_MM_DD_HH_MM_SS, "2019-10-28 18:09:49");
-        Assert.assertEquals("2019-10-28 18:09:49", OpdUtils.convertDate(date, OpdConstants.DateFormat.YYYY_MM_DD_HH_MM_SS));
+        assertEquals("2019-10-28 18:09:49", OpdUtils.convertDate(date, OpdConstants.DateFormat.YYYY_MM_DD_HH_MM_SS));
     }
 
     @Test
     public void generateNIds() {
         String result = OpdUtils.generateNIds(0);
-        Assert.assertEquals(result, "");
+        assertEquals(result, "");
 
         String result1 = OpdUtils.generateNIds(1);
-        Assert.assertEquals(result1.split(",").length, 1);
+        assertEquals(result1.split(",").length, 1);
     }
 
     @Test
     public void getIntentValue() {
         Intent intent = Mockito.mock(Intent.class);
         Mockito.when(intent.hasExtra("test")).thenReturn(false);
-        Assert.assertNull(OpdUtils.getIntentValue(intent, "test"));
+        assertNull(OpdUtils.getIntentValue(intent, "test"));
 
         Mockito.when(intent.hasExtra("test")).thenReturn(true);
         Mockito.when(intent.getStringExtra("test")).thenReturn("test");
-        Assert.assertEquals("test", OpdUtils.getIntentValue(intent, "test"));
+        assertEquals("test", OpdUtils.getIntentValue(intent, "test"));
     }
 
     @Test
     public void getIntentValueReturnNull() {
-        Assert.assertNull(OpdUtils.getIntentValue(null, "test"));
+        assertNull(OpdUtils.getIntentValue(null, "test"));
     }
 
     @Test
@@ -89,7 +90,7 @@ public class OpdUtilsTest {
         PowerMockito.when(OpdLibrary.getInstance()).thenReturn(opdLibrary);
         PowerMockito.when(opdLibrary.getOpdConfiguration()).thenReturn(opdConfiguration);
         PowerMockito.when(opdConfiguration.getOpdMetadata()).thenReturn(opdMetadata);
-        Assert.assertEquals(opdMetadata, OpdUtils.metadata());
+        assertEquals(opdMetadata, OpdUtils.metadata());
     }
 
 }

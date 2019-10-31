@@ -121,7 +121,8 @@ public class OpdUtils extends org.smartregister.util.Utils {
         return simpleDateFormat.format(date);
     }
 
-    public static Date convertStringToDate(String pattern, String dateString) {
+    @Nullable
+    public static Date convertStringToDate(@NonNull String pattern, @NonNull String dateString) {
         Date date = null;
         DateFormat dateFormat = new SimpleDateFormat(pattern, Locale.ENGLISH);
 
