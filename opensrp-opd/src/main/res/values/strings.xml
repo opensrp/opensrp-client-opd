@@ -52,5 +52,6 @@
 
     <string name="diagnose_and_treat"><![CDATA[DIAGNOSE & TREAT]]></string>
     <string name="check_in">CHECK IN</string>
+    <string name="diagnosis">Diagnosis</string>
 
 </resources>

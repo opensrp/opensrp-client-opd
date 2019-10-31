@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.jeasy.rules.api.Facts;
+import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.opd.domain.YamlConfigWrapper;
 import org.smartregister.opd.pojos.OpdCheckIn;
 import org.smartregister.opd.pojos.OpdDetails;
@@ -26,6 +27,8 @@ public interface OpdProfileOverviewFragmentContract {
         void loadOverviewFacts(@NonNull String baseEntityId, @NonNull OnFinishedCallback onFinishedCallback);
 
         void loadOverviewDataAndDisplay(@Nullable OpdCheckIn opdCheckIn, @Nullable OpdVisit opdVisit, @Nullable OpdDetails opdDetails, @NonNull final OnFinishedCallback onFinishedCallback);
+
+        void setClient(@NonNull CommonPersonObjectClient client);
 
         interface OnFinishedCallback {
 

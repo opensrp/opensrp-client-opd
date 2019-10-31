@@ -3,6 +3,10 @@ package org.smartregister.opd.contract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.smartregister.opd.pojos.OpdVisitSummary;
+
+import java.util.List;
+
 
 /**
  *
@@ -17,6 +21,13 @@ public interface OpdProfileFragmentContract {
         OpdProfileFragmentContract.View getProfileView();
 
         void onDestroy(boolean isChangingConfiguration);
+
+        void loadVisits(@NonNull String baseEntityId, @NonNull OnFinishedCallback onFinishedCallback);
+
+        interface OnFinishedCallback {
+
+            void onFinished(@NonNull List<OpdVisitSummary> opdVisitSummaries);
+        }
     }
 
     interface View {
@@ -29,5 +40,7 @@ public interface OpdProfileFragmentContract {
         void onDestroy(boolean isChangingConfiguration);
 
         void refreshProfileView(@NonNull String baseEntityId, boolean isForEdit);
+
+        void fetchVisits(@NonNull String baseEntityId, @NonNull Presenter.OnFinishedCallback onFinishedCallback);
     }
 }

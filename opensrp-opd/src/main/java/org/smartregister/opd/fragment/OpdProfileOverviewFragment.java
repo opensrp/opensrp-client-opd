@@ -49,17 +49,17 @@ public class OpdProfileOverviewFragment extends BaseProfileFragment implements O
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        presenter = new OpdProfileOverviewFragmentPresenter();
-    }
-
-    @Override
     protected void onCreation() {
+        presenter = new OpdProfileOverviewFragmentPresenter();
+
         if (getArguments() != null) {
             CommonPersonObjectClient commonPersonObjectClient = (CommonPersonObjectClient) getArguments()
                     .getSerializable(OpdConstants.IntentKey.CLIENT_OBJECT);
-            baseEntityId = commonPersonObjectClient.getCaseId();
+
+            if (commonPersonObjectClient != null) {
+                presenter.setClient(commonPersonObjectClient);
+                baseEntityId = commonPersonObjectClient.getCaseId();
+            }
         }
     }
 

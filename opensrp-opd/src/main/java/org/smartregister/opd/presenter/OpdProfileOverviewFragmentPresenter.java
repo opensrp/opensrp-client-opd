@@ -112,15 +112,17 @@ public class OpdProfileOverviewFragmentPresenter implements OpdProfileOverviewFr
             facts.put("previous_appointment", checkIn.getAppointmentScheduledPreviously());
             facts.put("date_of_appointment", checkIn.getAppointmentDueDate());
         } else {
-            if ("female".equals(client.getColumnmaps().get("gender"))) {
-                facts.put("pregnancy_status", "Unknown");
-            } else {
-                facts.put("hiv_status", "Unknown");
+            if (client != null) {
+                if ("female".equalsIgnoreCase(client.getColumnmaps().get("gender"))) {
+                    facts.put("pregnancy_status", "Unknown");
+                } else {
+                    facts.put("hiv_status", "Unknown");
+                }
             }
         }
 
         Date latestValidCheckInDate = OpdLibrary.getInstance().getLatestValidCheckInDate();
-        boolean shouldCheckIn = visit == null || latestValidCheckInDate.after(visit.getVisitDate()) || (opdDetails != null && opdDetails.getCurrentVisitEndDate() != null);
+        boolean shouldCheckIn = visit == null || latestValidCheckInDate.before(visit.getVisitDate()) || (opdDetails != null && opdDetails.getCurrentVisitEndDate() != null);
 
         facts.put(OpdDbConstants.Column.OpdDetails.PENDING_DIAGNOSE_AND_TREAT,  !shouldCheckIn);
 
@@ -144,5 +146,9 @@ public class OpdProfileOverviewFragmentPresenter implements OpdProfileOverviewFr
             Timber.e(e);
             return "";
         }
+    }
+
+    public void setClient(@NonNull CommonPersonObjectClient client) {
+        this.client = client;
     }
 }

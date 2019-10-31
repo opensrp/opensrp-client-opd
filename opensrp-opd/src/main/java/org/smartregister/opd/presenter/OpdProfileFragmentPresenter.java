@@ -37,6 +37,13 @@ public class OpdProfileFragmentPresenter implements OpdProfileFragmentContract.P
         }
     }
 
+    @Override
+    public void loadVisits(@NonNull String baseEntityId, @NonNull OnFinishedCallback onFinishedCallback) {
+        if (mProfileInteractor != null) {
+            mProfileInteractor.fetchVisits(baseEntityId, onFinishedCallback);
+        }
+    }
+
     @Nullable
     @Override
     public OpdProfileFragmentContract.View getProfileView() {

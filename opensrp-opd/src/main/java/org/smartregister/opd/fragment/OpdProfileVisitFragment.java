@@ -2,15 +2,22 @@ package org.smartregister.opd.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
+import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.opd.R;
+import org.smartregister.opd.adapter.OpdProfileVisitsAdapter;
 import org.smartregister.opd.contract.OpdProfileFragmentContract;
+import org.smartregister.opd.pojos.OpdVisitSummary;
 import org.smartregister.opd.presenter.OpdProfileFragmentPresenter;
+import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.view.fragment.BaseProfileFragment;
+
+import java.util.List;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-27
@@ -18,8 +25,9 @@ import org.smartregister.view.fragment.BaseProfileFragment;
 
 public class OpdProfileVisitFragment extends BaseProfileFragment implements OpdProfileFragmentContract.View {
 
-    private LinearLayout testsDisplayLayout;
+    private RecyclerView recyclerView;
     private OpdProfileFragmentContract.Presenter presenter;
+    private String baseEntityId;
 
     public static OpdProfileVisitFragment newInstance(Bundle bundle) {
         Bundle args = bundle;
@@ -39,23 +47,32 @@ public class OpdProfileVisitFragment extends BaseProfileFragment implements OpdP
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        initializePresenter();
-    }
-
-    @Override
     protected void onCreation() {
-        if (testsDisplayLayout != null) {
-            testsDisplayLayout.removeAllViews();
+        initializePresenter();
+        if (getArguments() != null) {
+            CommonPersonObjectClient commonPersonObjectClient = (CommonPersonObjectClient) getArguments()
+                    .getSerializable(OpdConstants.IntentKey.CLIENT_OBJECT);
+
+            if (commonPersonObjectClient != null) {
+                baseEntityId = commonPersonObjectClient.getCaseId();
+            }
         }
     }
 
     @Override
     protected void onResumption() {
-        if (testsDisplayLayout != null) {
-            testsDisplayLayout.removeAllViews();
-        }
+        presenter.loadVisits(baseEntityId, new OpdProfileFragmentContract.Presenter.OnFinishedCallback() {
+            @Override
+            public void onFinished(@NonNull List<OpdVisitSummary> opdVisitSummaries) {
+
+                OpdProfileVisitsAdapter adapter = new OpdProfileVisitsAdapter(getActivity(), opdVisitSummaries);
+                adapter.notifyDataSetChanged();
+
+                // set up the RecyclerView
+                recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                recyclerView.setAdapter(adapter);
+            }
+        });
     }
 
     @Override
@@ -66,10 +83,9 @@ public class OpdProfileVisitFragment extends BaseProfileFragment implements OpdP
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View fragmentView = inflater.inflate(R.layout.fragment_profile_contacts, container, false);
-        LinearLayout testLayout = fragmentView.findViewById(R.id.test_layout);
+        View fragmentView = inflater.inflate(R.layout.opd_fragment_profile_visits, container, false);
 
-        testsDisplayLayout = testLayout.findViewById(R.id.test_display_layout);
+        recyclerView = fragmentView.findViewById(R.id.rv_opdFragmentProfileVisit_recyclerView);
         return fragmentView;
     }
 }

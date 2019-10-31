@@ -16,7 +16,7 @@ import org.smartregister.opd.utils.AppExecutors;
 public class OpdProfileOverviewFragmentModel implements OpdProfileOverviewFragmentContract.Model {
 
     private AppExecutors appExecutors;
-    OpdDetails opdDetails = null;
+    private OpdDetails opdDetails = null;
 
     public OpdProfileOverviewFragmentModel() {
         this.appExecutors = new AppExecutors();
