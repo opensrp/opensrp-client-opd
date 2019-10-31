@@ -84,6 +84,8 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
         obs.setFieldDataType("text");
         obs.setFieldCode(OpdConstants.JSON_FORM_KEY.SERVICE_FEE);
         event.addObs(obs);
+        event.addDetails(OpdConstants.JSON_FORM_KEY.ID, "id");
+
         Whitebox.invokeMethod(opdMiniClientProcessorForJava, "processServiceDetail", event);
         Mockito.verify(opdServiceDetailRepository, Mockito.times(1)).saveOrUpdate(opdServiceDetailArgumentCaptor.capture());
         Assert.assertEquals("fee", opdServiceDetailArgumentCaptor.getValue().getFee());
@@ -106,6 +108,7 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
         obs.setFieldDataType("text");
         obs.setFieldCode(OpdConstants.JSON_FORM_KEY.MEDICINE);
         event.addObs(obs);
+        event.addDetails(OpdConstants.JSON_FORM_KEY.ID, "id");
 
         Whitebox.invokeMethod(opdMiniClientProcessorForJava, "processTreatment", event);
         Mockito.verify(opdTreatmentRepository, Mockito.times(1)).saveOrUpdate(opdTreatmentArgumentCaptor.capture());
@@ -129,6 +132,7 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
         obs.setFieldDataType("text");
         obs.setFieldCode(OpdConstants.JSON_FORM_KEY.DISEASE_CODE);
         event.addObs(obs);
+        event.addDetails(OpdConstants.JSON_FORM_KEY.ID, "id");
 
         Obs obs1 = new Obs();
         obs1.setFormSubmissionField(OpdConstants.JSON_FORM_KEY.DIAGNOSIS);
@@ -173,6 +177,7 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
         obs1.setFieldDataType("text");
         obs1.setFieldCode(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST);
         event.addObs(obs1);
+        event.addDetails(OpdConstants.JSON_FORM_KEY.ID, "id");
 
         Whitebox.invokeMethod(opdMiniClientProcessorForJava, "processTestConducted", event);
 
