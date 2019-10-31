@@ -32,7 +32,6 @@ public class OpdLibraryTest extends BaseTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        OpdLibrary opdLibrary = new OpdLibrary(Mockito.mock(Context.class), Mockito.mock(OpdConfiguration.class), Mockito.mock(Repository.class), BuildConfig.VERSION_CODE, 1);
     }
 
     @Test
