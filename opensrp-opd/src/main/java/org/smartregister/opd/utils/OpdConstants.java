@@ -140,6 +140,10 @@ public class OpdConstants extends AllConstants {
         public static final String CLOSE_OPD_VISIT = "OPD Close Visit";
     }
 
+    public interface ColumnMapKey {
+        String REGISTER_ID = "register_id";
+    }
+  
     public interface DateFormat {
         String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
     }
