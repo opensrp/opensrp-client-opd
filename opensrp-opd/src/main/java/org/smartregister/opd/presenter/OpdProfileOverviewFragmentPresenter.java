@@ -111,6 +111,9 @@ public class OpdProfileOverviewFragmentPresenter implements OpdProfileOverviewFr
         facts.put("previous_appointment", checkIn.getAppointmentScheduledPreviously());
         facts.put("date_of_appointment", checkIn.getAppointmentDueDate());
 
+        Date latestValidCheckInDate = OpdLibrary.getInstance().getLatestValidCheckInDate();
+        facts.put(OpdDbConstants.Column.OpdDetails.PENDING_DIAGNOSE_AND_TREAT, latestValidCheckInDate.after(visit.getVisitDate()));
+
         if (visit.getVisitDate() != null && checkIn.getAppointmentDueDate() != null) {
             facts.put("visit_to_appointment_date", getVisitToAppointmentDateDuration(visit.getVisitDate(), checkIn.getAppointmentDueDate()));
         }

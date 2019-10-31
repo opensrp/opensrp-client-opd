@@ -3,19 +3,25 @@ package org.smartregister.opd.fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
 
 import org.jeasy.rules.api.Facts;
+import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.opd.R;
+import org.smartregister.opd.activity.BaseOpdProfileActivity;
 import org.smartregister.opd.adapter.OpdProfileOverviewAdapter;
 import org.smartregister.opd.contract.OpdProfileOverviewFragmentContract;
 import org.smartregister.opd.domain.YamlConfigWrapper;
 import org.smartregister.opd.presenter.OpdProfileOverviewFragmentPresenter;
 import org.smartregister.opd.utils.OpdConstants;
+import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.view.fragment.BaseProfileFragment;
 
 import java.util.List;
@@ -28,6 +34,8 @@ public class OpdProfileOverviewFragment extends BaseProfileFragment implements O
 
     private String baseEntityId;
     private OpdProfileOverviewFragmentContract.Presenter presenter;
+
+    private LinearLayout opdCheckinSectionLayout;
 
     public static OpdProfileOverviewFragment newInstance(Bundle bundle) {
         Bundle args = bundle;
@@ -47,8 +55,10 @@ public class OpdProfileOverviewFragment extends BaseProfileFragment implements O
 
     @Override
     protected void onCreation() {
-        if (getActivity() != null) {
-            baseEntityId = getActivity().getIntent().getStringExtra(OpdConstants.IntentKey.BASE_ENTITY_ID);
+        if (getArguments() != null) {
+            CommonPersonObjectClient commonPersonObjectClient = (CommonPersonObjectClient) getArguments()
+                    .getSerializable(OpdConstants.IntentKey.CLIENT_OBJECT);
+            baseEntityId = commonPersonObjectClient.getCaseId();
         }
     }
 
@@ -59,7 +69,13 @@ public class OpdProfileOverviewFragment extends BaseProfileFragment implements O
 
                 @Override
                 public void onFinished(@Nullable Facts facts, @Nullable List<YamlConfigWrapper> yamlConfigListGlobal) {
-                    if (getActivity() != null && facts != null) {
+                    if (getActivity() != null && facts != null && yamlConfigListGlobal != null) {
+                        Boolean isPendingDiagnoseAndTreat = facts.get(OpdDbConstants.Column.OpdDetails.PENDING_DIAGNOSE_AND_TREAT);
+
+                        if (isPendingDiagnoseAndTreat) {
+                            opdCheckinSectionLayout.setVisibility(View.VISIBLE);
+                        }
+
                         OpdProfileOverviewAdapter adapter = new OpdProfileOverviewAdapter(getActivity(), yamlConfigListGlobal, facts);
                         adapter.notifyDataSetChanged();
                         // set up the RecyclerView
@@ -75,6 +91,23 @@ public class OpdProfileOverviewFragment extends BaseProfileFragment implements O
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_profile_overview, container, false);
+        View view =  inflater.inflate(R.layout.opd_fragment_profile_overview, container, false);
+
+        opdCheckinSectionLayout = view.findViewById(R.id.ll_opdFragmentProfileOverview_checkinLayout);
+
+        Button diagnoseAndTreat = view.findViewById(R.id.btn_opdFragmentProfileOverview_diagnoseAndTreat);
+        diagnoseAndTreat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentActivity activity = getActivity();
+
+                if (activity instanceof BaseOpdProfileActivity) {
+                    ((BaseOpdProfileActivity) activity).openDiagnoseAndTreatForm();
+                }
+            }
+        });
+
+        return view;
     }
+
 }

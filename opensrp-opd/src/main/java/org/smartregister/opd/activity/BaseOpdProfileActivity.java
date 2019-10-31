@@ -28,6 +28,8 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
     private TextView ancIdView;
     private ImageView imageView;
 
+    private CommonPersonObjectClient commonPersonObjectClient;
+
     @Override
     protected void initializePresenter() {
         presenter = new OpdProfileActivityPresenter(this);
@@ -84,7 +86,7 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
     @Override
     protected void onResumption() {
         super.onResumption();
-        CommonPersonObjectClient commonPersonObjectClient = (CommonPersonObjectClient) getIntent()
+        commonPersonObjectClient = (CommonPersonObjectClient) getIntent()
                 .getSerializableExtra(OpdConstants.IntentKey.CLIENT_OBJECT);
         String baseEntityId = commonPersonObjectClient.getCaseId();
 
@@ -124,5 +126,10 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
     @Override
     public void setProfileImage(@NonNull String baseEntityId) {
         imageRenderHelper.refreshProfileImage(baseEntityId, imageView, R.drawable.avatar_woman);
+    }
+
+    @Override
+    public void openDiagnoseAndTreatForm() {
+        //startFormActivity(OpdConstants.Form.OPD_DIAGNOSIS_AND_TREAT, commonPersonObjectClient.getCaseId(), null, injectedValues, entityTable);
     }
 }

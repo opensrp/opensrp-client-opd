@@ -1,5 +1,5 @@
 ---
-group: person_overview
+group:
 sub_group: pregnancy_status
 fields:
   - template: "Status: {pregnancy_status}"

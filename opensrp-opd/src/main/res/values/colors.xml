@@ -14,4 +14,9 @@
 
     <color name="vaccine_blue_bg_stk">#267ea5</color>
     <color name="vaccine_blue_bg_end">#3495bf</color>
+
+    <color name="diagnose_treat_btn_clicked">#EDBA00</color>
+    <color name="diagnose_treat_btn_normal">@color/translucent_yellow</color>
+
+    <color name="diagnose_treat_txt_color">#756020</color>
 </resources>

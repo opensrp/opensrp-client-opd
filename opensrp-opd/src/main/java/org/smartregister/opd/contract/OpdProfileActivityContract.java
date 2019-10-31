@@ -42,6 +42,8 @@ public interface OpdProfileActivityContract {
 
         void setProfileImage(@NonNull String baseEntityId);
 
+        void openDiagnoseAndTreatForm();
+
     }
 
     interface Interactor {

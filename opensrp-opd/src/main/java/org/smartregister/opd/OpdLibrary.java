@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -363,5 +364,20 @@ public class OpdLibrary {
         String lookUpQueryForMother = "select id as _id, relationalid, first_name, last_name, gender, dob, base_entity_id, nrc_number as national_id from ec_mother where [condition] ";
         String lookUpQueryForOpdClient = "select id as _id, relationalid, first_name, last_name, gender, dob, base_entity_id, null as national_id from ec_client where [condition] ";
         return lookUpQueryForChild + " union all " + lookUpQueryForMother + " union all " + lookUpQueryForOpdClient;
+    }
+
+    /**
+     * This method enables us to configure how-long ago we should consider a valid check-in so that
+     * we enable the next step which is DIAGNOSE & TREAT. This method returns the latest date that a check-in
+     * should be so that it can be considered for moving to DIAGNOSE & TREAT
+     *
+     * @return Date
+     */
+    @NonNull
+    public Date getLatestValidCheckInDate() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_MONTH, -1);
+
+        return calendar.getTime();
     }
 }
