@@ -37,7 +37,7 @@ public class OpdVisitRepository extends BaseRepository implements OpdVisitDao {
     private static final String INDEX_VISIT_DATE = "CREATE INDEX " + OpdDbConstants.Table.OPD_VISIT
             + "_" + OpdVisit.VISIT_DATE + "_index ON " + OpdDbConstants.Table.OPD_VISIT + "(" + OpdVisit.VISIT_DATE + " COLLATE NOCASE);";
 
-    private String[] columns = new String[] {OpdVisit.ID
+    private String[] columns = new String[]{OpdVisit.ID
             , OpdVisit.VISIT_DATE
             , OpdVisit.PROVIDER_ID
             , OpdVisit.LOCATION_ID

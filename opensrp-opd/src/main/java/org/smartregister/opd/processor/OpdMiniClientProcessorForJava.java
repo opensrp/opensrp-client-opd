@@ -4,9 +4,16 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
+
+import com.vijay.jsonwizard.constants.JsonFormConstants;
 
 import net.sqlcipher.database.SQLiteException;
 
+import org.joda.time.DateTime;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.smartregister.CoreLibrary;
 import org.smartregister.anc.library.sync.MiniClientProcessorForJava;
 import org.smartregister.commonregistry.CommonFtsObject;
@@ -20,10 +27,17 @@ import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.exception.CheckInEventProcessException;
 import org.smartregister.opd.pojos.OpdCheckIn;
 import org.smartregister.opd.pojos.OpdDetails;
+import org.smartregister.opd.pojos.OpdDiagnosis;
+import org.smartregister.opd.pojos.OpdServiceDetail;
+import org.smartregister.opd.pojos.OpdTestConducted;
+import org.smartregister.opd.pojos.OpdTreatment;
 import org.smartregister.opd.pojos.OpdVisit;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;
+import org.smartregister.opd.utils.OpdJsonFormUtils;
+import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.sync.ClientProcessorForJava;
+import org.smartregister.util.Utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -65,6 +79,11 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         if (eventTypes == null) {
             eventTypes = new HashSet<>();
             eventTypes.add(OpdConstants.EventType.CHECK_IN);
+            eventTypes.add(OpdConstants.EventType.TEST_CONDUCTED);
+            eventTypes.add(OpdConstants.EventType.DIAGNOSIS);
+            eventTypes.add(OpdConstants.EventType.SERVICE_DETAIL);
+            eventTypes.add(OpdConstants.EventType.TREATMENT);
+            eventTypes.add(OpdConstants.EventType.CLOSE_OPD_VISIT);
         }
 
         return eventTypes;
@@ -77,17 +96,235 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
     }
 
     @Override
-    public void processEventClient(@NonNull EventClient eventClient, @NonNull List<Event> unsyncEvents, @Nullable ClientClassification clientClassification) throws Exception {
+    public void processEventClient(@NonNull EventClient eventClient, @NonNull List<Event> unsyncEvents, @Nullable ClientClassification clientClassification) {
         Event event = eventClient.getEvent();
 
         if (event.getEventType().equals(OpdConstants.EventType.CHECK_IN)) {
-
             try {
                 processCheckIn(event, eventClient.getClient());
                 CoreLibrary.getInstance().context().getEventClientRepository().markEventAsProcessed(eventClient.getEvent().getFormSubmissionId());
             } catch (CheckInEventProcessException ex) {
                 Timber.e(ex);
             }
+        } else if (event.getEventType().equals(OpdConstants.EventType.TEST_CONDUCTED)) {
+            try {
+                processTestConducted(event);
+                CoreLibrary.getInstance().context().getEventClientRepository().markEventAsProcessed(eventClient.getEvent().getFormSubmissionId());
+            } catch (Exception ex) {
+                Timber.e(ex);
+            }
+        } else if (event.getEventType().equals(OpdConstants.EventType.DIAGNOSIS)) {
+            try {
+                processDiagnosis(event);
+                CoreLibrary.getInstance().context().getEventClientRepository().markEventAsProcessed(eventClient.getEvent().getFormSubmissionId());
+            } catch (Exception ex) {
+                Timber.e(ex);
+            }
+        } else if (event.getEventType().equals(OpdConstants.EventType.TREATMENT)) {
+            try {
+                processTreatment(event);
+                CoreLibrary.getInstance().context().getEventClientRepository().markEventAsProcessed(eventClient.getEvent().getFormSubmissionId());
+            } catch (Exception ex) {
+                Timber.e(ex);
+            }
+        } else if (event.getEventType().equals(OpdConstants.EventType.SERVICE_DETAIL)) {
+            try {
+                processServiceDetail(event);
+                CoreLibrary.getInstance().context().getEventClientRepository().markEventAsProcessed(eventClient.getEvent().getFormSubmissionId());
+            } catch (Exception ex) {
+                Timber.e(ex);
+            }
+        } else if (event.getEventType().equals(OpdConstants.EventType.CLOSE_OPD_VISIT)) {
+            try {
+                processOpdCloseVisitEvent(event);
+            } catch (Exception e) {
+                Timber.e(e);
+            }
+        }
+    }
+
+    private void processOpdCloseVisitEvent(@NonNull Event event) {
+        Map<String, String> mapDetails = event.getDetails();
+        //update visit end date
+        if (mapDetails != null) {
+            OpdDetails opdDetails = new OpdDetails(event.getBaseEntityId(), mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID));
+            opdDetails = OpdLibrary.getInstance().getOpdDetailsRepository().findOne(opdDetails);
+            if (opdDetails != null) {
+                opdDetails.setCurrentVisitEndDate(OpdUtils.convertStringToDate(OpdConstants.DateFormat.YYYY_MM_DD_HH_MM_SS, mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_END_DATE)));
+                boolean result = OpdLibrary.getInstance().getOpdDetailsRepository().saveOrUpdate(opdDetails);
+                if (result) {
+                    Timber.d("Opd processOpdCloseVisitEvent for %s saved", event.getBaseEntityId());
+                    return;
+                }
+                Timber.e("Opd processOpdCloseVisitEvent for %s not saved", event.getBaseEntityId());
+            } else {
+                Timber.e("Opd Details for %s not found", mapDetails.toString());
+            }
+        } else {
+            Timber.e("Opd Details for %s not found, event details is null", event.getBaseEntityId());
+        }
+    }
+
+    private void processServiceDetail(@NonNull Event event) {
+        Map<String, String> mapDetails = event.getDetails();
+        String id = mapDetails.get(OpdConstants.JSON_FORM_KEY.ID);
+        if (id == null) {
+            return;
+        }
+        String[] valueIds = id.split(",");
+        HashMap<String, String> keyValues = new HashMap<>();
+        generateKeyValuesFromEvent(event, keyValues);
+
+        String serviceFee = keyValues.get(OpdConstants.JSON_FORM_KEY.SERVICE_FEE);
+
+        if (!TextUtils.isEmpty(serviceFee)) {
+            OpdServiceDetail opdServiceDetail = new OpdServiceDetail();
+            opdServiceDetail.setId(valueIds[0]);
+            opdServiceDetail.setBaseEntityId(event.getBaseEntityId());
+            opdServiceDetail.setFee(serviceFee);
+            opdServiceDetail.setCreatedAt(Utils.convertDateFormat(new DateTime()));
+            opdServiceDetail.setUpdatedAt(Utils.convertDateFormat(new DateTime()));
+            opdServiceDetail.setVisitId(mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID));
+            opdServiceDetail.setDetails(mapDetails.toString());
+            boolean result = OpdLibrary.getInstance().getOpdServiceDetailRepository().saveOrUpdate(opdServiceDetail);
+            if (result) {
+                Timber.d("Opd processServiceDetail for %s saved", event.getBaseEntityId());
+                return;
+            }
+            Timber.e("Opd processServiceDetail for %s not saved", event.getBaseEntityId());
+        }
+    }
+
+    private void processTreatment(@NonNull Event event) throws JSONException {
+        Map<String, String> mapDetails = event.getDetails();
+        String id = mapDetails.get(OpdConstants.JSON_FORM_KEY.ID);
+        if (id == null) {
+            return;
+        }
+        String[] valueIds = id.split(",");
+        HashMap<String, String> keyValues = new HashMap<>();
+        generateKeyValuesFromEvent(event, keyValues);
+        String medicine = keyValues.get(OpdConstants.JSON_FORM_KEY.MEDICINE);
+        if (!TextUtils.isEmpty(medicine)) {
+            JSONArray medicineJsonArray = new JSONArray(medicine);
+            for (int i = 0; i < medicineJsonArray.length(); i++) {
+                JSONObject jsonObject = medicineJsonArray.getJSONObject(i);
+                String key = jsonObject.optString(OpdConstants.KEY.KEY);
+                JSONObject property = jsonObject.optJSONObject(JsonFormConstants.MultiSelectUtils.PROPERTY);
+                JSONObject meta = property.optJSONObject(OpdConstants.JSON_FORM_KEY.META);
+                OpdTreatment opdTreatment = new OpdTreatment();
+                opdTreatment.setId(valueIds[i]);
+                opdTreatment.setBaseEntityId(event.getBaseEntityId());
+                opdTreatment.setVisitId(mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID));
+                if (meta != null) {
+                    opdTreatment.setDosage(meta.optString(OpdConstants.JSON_FORM_KEY.DOSAGE));
+                    opdTreatment.setDuration(meta.optString(OpdConstants.JSON_FORM_KEY.DURATION));
+                    opdTreatment.setNote(meta.optString(OpdConstants.JSON_FORM_KEY.INFO));
+                }
+                opdTreatment.setMedicine(key);
+                opdTreatment.setCreatedAt(Utils.convertDateFormat(new DateTime()));
+                opdTreatment.setUpdatedAt(Utils.convertDateFormat(new DateTime()));
+                boolean result = OpdLibrary.getInstance().getOpdTreatmentRepository().saveOrUpdate(opdTreatment);
+                if (result) {
+                    Timber.i("Opd processTreatment for %s saved", event.getBaseEntityId());
+                    return;
+                }
+                Timber.e("Opd processTreatment for %s not saved", event.getBaseEntityId());
+            }
+        }
+    }
+
+    private void processDiagnosis(@NonNull Event event) throws JSONException {
+        Map<String, String> mapDetails = event.getDetails();
+        String id = mapDetails.get(OpdConstants.JSON_FORM_KEY.ID);
+        if (id == null) {
+            return;
+        }
+        String[] valueIds = id.split(",");
+
+        HashMap<String, String> keyValues = new HashMap<>();
+        generateKeyValuesFromEvent(event, keyValues);
+
+        String diagnosis = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSIS);
+        String diagnosisType = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSIS_TYPE);
+        String diseaseCode = keyValues.get(OpdConstants.JSON_FORM_KEY.DISEASE_CODE);
+
+        if (!TextUtils.isEmpty(diseaseCode) && !TextUtils.isEmpty(diagnosis)) {
+            JSONArray diseaseCodesJsonArray = new JSONArray(diseaseCode);
+            for (int i = 0; i < diseaseCodesJsonArray.length(); i++) {
+                JSONObject jsonObject = diseaseCodesJsonArray.getJSONObject(i);
+                String key = jsonObject.optString(OpdJsonFormUtils.KEY);
+                JSONObject property = jsonObject.optJSONObject(JsonFormConstants.MultiSelectUtils.PROPERTY);
+                OpdDiagnosis opdDiagnosis = new OpdDiagnosis();
+                opdDiagnosis.setId(valueIds[i]);
+                opdDiagnosis.setBaseEntityId(event.getBaseEntityId());
+                opdDiagnosis.setVisitId(mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID));
+                opdDiagnosis.setIcd10Code(property.optString(OpdConstants.JSON_FORM_KEY.ICD10));
+                opdDiagnosis.setCode(property.optString(OpdConstants.JSON_FORM_KEY.CODE));
+                opdDiagnosis.setDetails(property.optString(OpdConstants.JSON_FORM_KEY.META));
+                opdDiagnosis.setType(diagnosisType);
+                opdDiagnosis.setCreatedAt(Utils.convertDateFormat(new DateTime()));
+                opdDiagnosis.setUpdatedAt(Utils.convertDateFormat(new DateTime()));
+                opdDiagnosis.setDisease(key);
+                opdDiagnosis.setDiagnosis(diagnosis);
+                boolean result = OpdLibrary.getInstance().getOpdDiagnosisRepository().saveOrUpdate(opdDiagnosis);
+                if (result) {
+                    Timber.i("Opd processDiagnosis for %s saved", event.getBaseEntityId());
+                    return;
+                }
+                Timber.e("Opd processDiagnosis for %s not saved", event.getBaseEntityId());
+            }
+        }
+
+    }
+
+    private void processTestConducted(@NonNull Event event) throws JSONException {
+
+        Map<String, String> mapDetails = event.getDetails();
+
+        String id = mapDetails.get(OpdConstants.JSON_FORM_KEY.ID);
+        if (id == null) {
+            return;
+        }
+        String[] valueIds = id.split(",");
+        HashMap<String, String> keyValues = new HashMap<>();
+        generateKeyValuesFromEvent(event, keyValues);
+        String diagnosticResult = null;
+        String diagnosticTest = null;
+
+        if (keyValues.containsKey(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER)) {
+            diagnosticResult = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER);
+        }
+
+        if (keyValues.containsKey(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_OTHER)) {
+            diagnosticTest = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_OTHER);
+        }
+        if (keyValues.containsKey(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST)) {
+            diagnosticTest = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST);
+        }
+
+        if (keyValues.containsKey(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPECIFY)) {
+            diagnosticResult = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPECIFY);
+        }
+
+        if (!TextUtils.isEmpty(diagnosticResult) && !TextUtils.isEmpty(diagnosticTest)) {
+
+            OpdTestConducted opdTestConducted = new OpdTestConducted();
+            opdTestConducted.setResult(diagnosticResult);
+            opdTestConducted.setTest(diagnosticTest);
+            opdTestConducted.setVisitId(mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID));
+            opdTestConducted.setBaseEntityId(event.getBaseEntityId());
+            opdTestConducted.setId(valueIds[0]);
+            opdTestConducted.setCreatedAt(Utils.convertDateFormat(new DateTime()));
+            opdTestConducted.setUpdatedAt(Utils.convertDateFormat(new DateTime()));
+
+            boolean result = OpdLibrary.getInstance().getOpdTestConductedRepository().saveOrUpdate(opdTestConducted);
+
+            if (result) {
+                Timber.i("Opd processTestConducted for %s saved", event.getBaseEntityId());
+                return;
+            }
+            Timber.e("Opd processTestConducted for %s not saved", event.getBaseEntityId());
         }
     }
 
@@ -123,7 +360,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
             }
 
             OpdCheckIn checkIn = generateCheckInRecordFromCheckInEvent(event, client, keyValues, visitId, visitDate);
-            saved = OpdLibrary.getInstance().getCheckInRepository(). addCheckIn(checkIn);
+            saved = OpdLibrary.getInstance().getCheckInRepository().addCheckIn(checkIn);
 
             if (!saved) {
                 abortTransaction();
@@ -134,7 +371,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
 
             // Update the detail
             OpdDetails opdDetails = generateOpdDetailsFromCheckInEvent(event, visitId, visitDate);
-            saved = OpdLibrary.getInstance().getOpdDetailsRepository().addOrUpdateOpdDetails(opdDetails);
+            saved = OpdLibrary.getInstance().getOpdDetailsRepository().saveOrUpdate(opdDetails);
 
             if (!saved) {
                 abortTransaction();
@@ -171,7 +408,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
     private void generateKeyValuesFromEvent(@NonNull Event event, HashMap<String, String> keyValues) {
         List<Obs> obs = event.getObs();
 
-        for (Obs observation: obs) {
+        for (Obs observation : obs) {
             String key = observation.getFormSubmissionField();
             List<Object> values = observation.getValues();
 
@@ -204,7 +441,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         contentValues.put("last_interacted_with", lastInteractedWithDate);
 
         int recordsUpdated = OpdLibrary.getInstance().getRepository().getWritableDatabase()
-                .update(tableName,  contentValues,"base_entity_id = ?", new String[]{event.getBaseEntityId()});
+                .update(tableName, contentValues, "base_entity_id = ?", new String[]{event.getBaseEntityId()});
 
         if (recordsUpdated < 1) {
             abortTransaction();
@@ -228,7 +465,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
 
         if (commonrepository.isFts()) {
             recordsUpdated = OpdLibrary.getInstance().getRepository().getWritableDatabase()
-                    .update(CommonFtsObject.searchTableName(tableName),  contentValues,fieldName + " = ?", new String[]{event.getBaseEntityId()});
+                    .update(CommonFtsObject.searchTableName(tableName), contentValues, fieldName + " = ?", new String[]{event.getBaseEntityId()});
             isUpdated = recordsUpdated > 0;
         }
 
@@ -266,7 +503,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         // This code and flag is useless now - Todo: Work on disabling the flag in the query by deleting the current_visit_date & change this flag to diagnose_and_treat_ongoing
         // Set Pending diagnose and treat if we have not lapsed the max check-in duration in minutes set in the opd library configuration
         if (visitDate != null) {
-            long timeDifferenceInMinutes = ((new Date().getTime()) - visitDate.getTime())/(60 * 1000);
+            long timeDifferenceInMinutes = ((new Date().getTime()) - visitDate.getTime()) / (60 * 1000);
             opdDetails.setPendingDiagnoseAndTreat(timeDifferenceInMinutes <= OpdLibrary.getInstance().getOpdConfiguration().getMaxCheckInDurationInMinutes());
         }
 
