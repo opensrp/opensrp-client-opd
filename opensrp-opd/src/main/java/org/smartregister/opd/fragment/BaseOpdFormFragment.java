@@ -35,6 +35,7 @@ import org.smartregister.opd.adapter.ClientLookUpListAdapter;
 import org.smartregister.opd.pojos.OpdMetadata;
 import org.smartregister.opd.presenter.OpdFormFragmentPresenter;
 import org.smartregister.opd.utils.OpdConstants;
+import org.smartregister.opd.utils.OpdDbConstants;
 
 import java.util.HashMap;
 import java.util.List;
@@ -230,8 +231,16 @@ public class BaseOpdFormFragment extends JsonFormFragment implements ClientLookU
     }
 
     protected void startActivityOnLookUp(@NonNull CommonPersonObjectClient client) {
-        Intent intent = new Intent(getActivity(), null);
-        intent.putExtra(OpdConstants.CLIENT_TYPE, client);
+        Intent intent = new Intent(getActivity(), OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata().getProfileActivity());
+
+        // Add register_id FROM opensrp_id
+        String opensrpId = client.getColumnmaps().get(OpdDbConstants.Column.Client.OPENSRP_ID);
+        client.getColumnmaps().put(OpdConstants.ColumnMapKey.REGISTER_ID, opensrpId);
+        client.getDetails().put(OpdConstants.ColumnMapKey.REGISTER_ID, opensrpId);
+
+        intent.putExtra(OpdConstants.IntentKey.BASE_ENTITY_ID, client.getCaseId());
+        intent.putExtra(OpdConstants.IntentKey.CLIENT_OBJECT, client);
+        intent.putExtra(OpdConstants.IntentKey.CLIENT_MAP, (HashMap<String, String>) client.getColumnmaps());
         startActivity(intent);
     }
 

@@ -76,6 +76,10 @@ public class OpdConstants extends AllConstants {
         String ENTITY_TABLE = "entity_table";
     }
 
+    public interface ColumnMapKey {
+        String REGISTER_ID = "register_id";
+    }
+
     public interface Event {
 
         interface Visit {
