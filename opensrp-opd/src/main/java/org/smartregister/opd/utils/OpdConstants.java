@@ -140,33 +140,8 @@ public class OpdConstants extends AllConstants {
         public static final String CLOSE_OPD_VISIT = "OPD Close Visit";
     }
 
-    public interface IntentKey {
-        String BASE_ENTITY_ID = "base-entity-id";
-        String CLIENT_MAP = "client_map";
-        String CLIENT_OBJECT = "common_person_object_client";
-        String CONTACT_NO = "contact_number";
-        String ENTITY_TABLE = "entity_table";
-    }
-
     public interface ColumnMapKey {
         String REGISTER_ID = "register_id";
-    }
-
-    public interface Event {
-
-        interface Visit {
-            interface Detail {
-                String VISIT_ID = "visitId";
-                String VISIT_DATE = "visitDate";
-            }
-        }
-
-        interface CheckIn {
-            interface Detail {
-                String VISIT_ID = "visitId";
-                String VISIT_DATE = "visitDate";
-            }
-        }
     }
   
     public interface DateFormat {

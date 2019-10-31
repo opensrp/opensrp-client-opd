@@ -210,9 +210,7 @@ public class BaseOpdFormFragment extends JsonWizardFormFragment implements Clien
         client.getColumnmaps().put(OpdConstants.ColumnMapKey.REGISTER_ID, opensrpId);
         client.getDetails().put(OpdConstants.ColumnMapKey.REGISTER_ID, opensrpId);
 
-        intent.putExtra(OpdConstants.IntentKey.BASE_ENTITY_ID, client.getCaseId());
         intent.putExtra(OpdConstants.IntentKey.CLIENT_OBJECT, client);
-        intent.putExtra(OpdConstants.IntentKey.CLIENT_MAP, (HashMap<String, String>) client.getColumnmaps());
         startActivity(intent);
     }
 

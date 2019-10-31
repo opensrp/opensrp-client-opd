@@ -35,7 +35,7 @@ import org.smartregister.repository.Repository;
 public class BaseOpdFormFragmentTest {
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", null);
     }
 
