@@ -37,7 +37,7 @@ public interface OpdRegisterActivityContract {
 
         void saveForm(String jsonString, @NonNull RegisterParams registerParams);
 
-        void saveVisitOrDiagnosisForm(@NonNull String eventType, String jsonString, @Nullable Intent data);
+        void saveVisitOrDiagnosisForm(@NonNull String eventType, @Nullable Intent data);
 
         void startForm(String formName, String entityId, String metaData, String locationId, @Nullable HashMap<String, String> injectedFieldValues, @Nullable String entityTable);
     }
@@ -75,7 +75,7 @@ public interface OpdRegisterActivityContract {
 
         void saveRegistration(List<OpdEventClient> opdEventClientList, String jsonString, RegisterParams registerParams, OpdRegisterActivityContract.InteractorCallBack callBack);
 
-        void saveEvent(@NonNull Event event, @NonNull OpdRegisterActivityContract.InteractorCallBack callBack);
+        void saveEvents(@NonNull List<Event> events, @NonNull InteractorCallBack callBack);
     }
 
     interface InteractorCallBack {

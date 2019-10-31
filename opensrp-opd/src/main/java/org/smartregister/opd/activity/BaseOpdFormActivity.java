@@ -5,25 +5,28 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
 
 import com.vijay.jsonwizard.activities.JsonFormActivity;
 import com.vijay.jsonwizard.activities.JsonWizardFormActivity;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 
+import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
+import org.smartregister.opd.dao.OpdDiagnosisAndTreatmentFormDao;
 import org.smartregister.opd.fragment.BaseOpdFormFragment;
-import org.smartregister.opd.pojos.OpdMetadata;
+import org.smartregister.opd.pojos.OpdDiagnosisAndTreatmentForm;
+import org.smartregister.opd.utils.AppExecutors;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
+import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.util.LangUtils;
+import org.smartregister.util.Utils;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 
 import timber.log.Timber;
@@ -58,7 +61,7 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
             Bundle extras = getIntent().getExtras();
             Set<String> keySet = extras.keySet();
 
-            for (String key: keySet) {
+            for (String key : keySet) {
                 if (!key.equals(OpdConstants.JSON_FORM_EXTRA.JSON)) {
                     Object objectValue = extras.get(key);
 
@@ -92,7 +95,7 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
     }
 
     protected void initializeFormFragmentCore() {
-        opdFormFragment = BaseOpdFormFragment.getFormFragment(JsonFormConstants.FIRST_STEP_NAME);
+        opdFormFragment = (BaseOpdFormFragment) BaseOpdFormFragment.getFormFragment(JsonFormConstants.FIRST_STEP_NAME);
         getSupportFragmentManager().beginTransaction().add(com.vijay.jsonwizard.R.id.container, opdFormFragment).commit();
     }
 
@@ -108,10 +111,6 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
     public void writeValue(String stepName, String key, String value, String openMrsEntityParent, String openMrsEntity,
                            String openMrsEntityId, boolean popup) throws JSONException {
         super.writeValue(stepName, key, value, openMrsEntityParent, openMrsEntity, openMrsEntityId, popup);
-        OpdMetadata opdMetadata = OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata();
-        if (opdMetadata != null && opdMetadata.isFormWizardValidateRequiredFieldsBefore()) {
-            validateActivateNext();
-        }
     }
 
     @Override
@@ -120,20 +119,12 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
             throws JSONException {
         super.writeValue(stepName, parentKey, childObjectKey, childKey, value, openMrsEntityParent, openMrsEntity,
                 openMrsEntityId, popup);
-        OpdMetadata opdMetadata = OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata();
-        if (opdMetadata != null && opdMetadata.isFormWizardValidateRequiredFieldsBefore()) {
-            validateActivateNext();
-        }
     }
 
     @Override
     public void writeValue(String stepName, String key, String value, String openMrsEntityParent, String openMrsEntity,
                            String openMrsEntityId) throws JSONException {
         super.writeValue(stepName, key, value, openMrsEntityParent, openMrsEntity, openMrsEntityId);
-        OpdMetadata opdMetadata = OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata();
-        if (opdMetadata != null && opdMetadata.isFormWizardValidateRequiredFieldsBefore()) {
-            validateActivateNext();
-        }
     }
 
     @Override
@@ -141,10 +132,6 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
                            String openMrsEntityParent, String openMrsEntity, String openMrsEntityId) throws JSONException {
         super.writeValue(stepName, parentKey, childObjectKey, childKey, value, openMrsEntityParent, openMrsEntity,
                 openMrsEntityId);
-        OpdMetadata opdMetadata = OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata();
-        if (opdMetadata != null && opdMetadata.isFormWizardValidateRequiredFieldsBefore()) {
-            validateActivateNext();
-        }
     }
 
     /**
@@ -154,15 +141,22 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
     public void onBackPressed() {
         if (enableOnCloseDialog) {
             AlertDialog dialog = new AlertDialog.Builder(this, R.style.AppThemeAlertDialog).setTitle(confirmCloseTitle)
-                    .setMessage(confirmCloseMessage).setNegativeButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    .setMessage(getString(R.string.save_form_fill_session))
+                    .setNegativeButton(R.string.yes, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+                            saveFormFillSession();
                             BaseOpdFormActivity.this.finish();
                         }
                     }).setPositiveButton(R.string.no, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             Timber.d("No button on dialog in %s", JsonFormActivity.class.getCanonicalName());
+                        }
+                    }).setNeutralButton(getString(R.string.end_session), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            BaseOpdFormActivity.this.finish();
                         }
                     }).create();
 
@@ -173,21 +167,17 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
         }
     }
 
-    public void validateActivateNext() {
-        Fragment fragment = getVisibleFragment();
-        if (fragment instanceof BaseOpdFormFragment) {
-            ((BaseOpdFormFragment) fragment).validateActivateNext();
-        }
-    }
-
-    public Fragment getVisibleFragment() {
-        List<Fragment> fragments = this.getSupportFragmentManager().getFragments();
-        if (fragments != null) {
-            for (Fragment fragment : fragments) {
-                if (fragment != null && fragment.isVisible()) return fragment;
+    private void saveFormFillSession() {
+        JSONObject jsonObject = getmJSONObject();
+        final OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm = new OpdDiagnosisAndTreatmentForm(0, OpdUtils.getIntentValue(getIntent(), OpdConstants.IntentKey.BASE_ENTITY_ID),
+                jsonObject.toString(), Utils.convertDateFormat(new DateTime()));
+        final OpdDiagnosisAndTreatmentFormDao opdDiagnosisAndTreatmentFormDao = OpdLibrary.getInstance().getOpdDiagnosisAndTreatmentFormRepository();
+        new AppExecutors().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                opdDiagnosisAndTreatmentFormDao.saveOrUpdate(opdDiagnosisAndTreatmentForm);
             }
-        }
-        return null;
+        });
     }
 
     @NonNull

@@ -121,14 +121,22 @@ public abstract class BaseOpdRegisterActivity extends BaseRegisterActivity imple
     public void startFormActivity(@NonNull JSONObject jsonForm, @Nullable HashMap<String, String> parcelableData) {
 
         Intent intent = new Intent(this, OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata().getOpdFormActivity());
-
         intent.putExtra(OpdConstants.JSON_FORM_EXTRA.JSON, jsonForm.toString());
-
         Form form = new Form();
-        form.setWizard(false);
-        form.setHideSaveLabel(true);
-        form.setNextLabel("");
+        form.setWizard(true);
+        form.setName(OpdConstants.EventType.DIAGNOSIS_AND_TREAT);
 
+        String encounterType = jsonForm.optString(OpdJsonFormUtils.ENCOUNTER_TYPE);
+        if (encounterType.equals(OpdConstants.EventType.CHECK_IN)) {
+            form.setWizard(false);
+            form.setName("");
+        }
+
+        form.setHideSaveLabel(true);
+        form.setPreviousLabel("");
+        form.setNextLabel("");
+        form.setHideNextButton(false);
+        form.setHidePreviousButton(false);
         intent.putExtra(JsonFormConstants.JSON_FORM_KEY.FORM, form);
 
         if (parcelableData != null) {

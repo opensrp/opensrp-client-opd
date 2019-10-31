@@ -16,7 +16,6 @@ import static org.junit.Assert.assertNull;
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-24
  */
-
 public class OpdLibraryTest extends BaseTest {
 
     @Rule
@@ -52,4 +51,5 @@ public class OpdLibraryTest extends BaseTest {
 
         assertNotNull(OpdLibrary.getInstance().getOpdRulesEngineHelper());
     }
+
 }

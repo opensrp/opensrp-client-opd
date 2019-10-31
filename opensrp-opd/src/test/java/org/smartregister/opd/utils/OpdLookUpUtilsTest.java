@@ -1,11 +1,17 @@
 package org.smartregister.opd.utils;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
+import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.Context;
 import org.smartregister.commonregistry.CommonPersonObject;
 import org.smartregister.opd.BuildConfig;
@@ -19,13 +25,27 @@ import java.util.List;
 import java.util.Map;
 
 @RunWith(PowerMockRunner.class)
+@PrepareForTest(OpdLibrary.class)
 public class OpdLookUpUtilsTest {
 
+    @Mock
+    private OpdLibrary opdLibrary;
+
+
+    @Before
+    public void setUp(){
+        MockitoAnnotations.initMocks(this);
+    }
+
     @Test
-    public void testLookUpQueryWhenEntityMapIsNotNull() throws Exception {
+    public void testLookUpQuery() throws Exception {
+        PowerMockito.mockStatic(OpdLibrary.class);
+        PowerMockito.when(OpdLibrary.getInstance()).thenReturn(opdLibrary);
+        PowerMockito.when(opdLibrary.opdLookUpQuery()).thenReturn("");
+
         Map<String, String> entityMap = new HashMap<>();
-        String result = Whitebox.invokeMethod(OpdLookUpUtils.class, "lookUpQuery", entityMap, "");
-        Assert.assertNull(result);
+        String result = Whitebox.invokeMethod(OpdLookUpUtils.class, "lookUpQuery", entityMap);
+        Assert.assertEquals(";", result);
     }
 
     @Test
@@ -75,6 +95,11 @@ public class OpdLookUpUtilsTest {
         List<CommonPersonObject> result = Whitebox.invokeMethod(OpdLookUpUtils.class, "clientLookUp", PowerMockito.mock(Context.class), entityLookUp);
         List<CommonPersonObject> expectedResult = new ArrayList<>();
         Assert.assertEquals(expectedResult, result);
+    }
+
+    @After
+    public void tearDown(){
+        ReflectionHelpers.setStaticField(OpdLibrary.class,"instance", null);
     }
 
 }

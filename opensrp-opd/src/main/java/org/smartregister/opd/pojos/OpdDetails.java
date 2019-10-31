@@ -24,6 +24,14 @@ public class OpdDetails {
 
     private Date createdAt;
 
+    public OpdDetails() {
+    }
+
+    public OpdDetails(String baseEntityId, String currentVisitId) {
+        this.baseEntityId = baseEntityId;
+        this.currentVisitId = currentVisitId;
+    }
+
     public int getId() {
         return id;
     }
