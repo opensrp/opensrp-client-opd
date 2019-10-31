@@ -1,19 +1,13 @@
 package org.smartregister.opd;
 
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.Context;
 import org.smartregister.opd.configuration.OpdConfiguration;
-import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.repository.Repository;
 
 import static org.junit.Assert.assertNotNull;
@@ -22,17 +16,10 @@ import static org.junit.Assert.assertNull;
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-24
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(OpdJsonFormUtils.class)
 public class OpdLibraryTest extends BaseTest {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
-
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-    }
 
     @Test
     public void initShouldCreateNewLibraryInstanceWhenInstanceIsNull() {

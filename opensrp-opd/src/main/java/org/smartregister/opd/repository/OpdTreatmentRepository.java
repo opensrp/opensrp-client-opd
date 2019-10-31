@@ -33,8 +33,8 @@ public class OpdTreatmentRepository extends BaseRepository implements OpdTreatme
             "(" + OpdDbConstants.Column.OpdTreatment.BASE_ENTITY_ID + " COLLATE NOCASE);";
 
     private static final String INDEX_VISIT_ID = "CREATE INDEX " + OpdDbConstants.Table.OPD_TREATMENT
-            + "_" + OpdDbConstants.Column.OpdServiceDetail.VISIT_ID + "_index ON " + OpdDbConstants.Table.OPD_TREATMENT +
-            "(" + OpdDbConstants.Column.OpdServiceDetail.VISIT_ID + " COLLATE NOCASE);";
+            + "_" + OpdDbConstants.Column.OpdTreatment.VISIT_ID + "_index ON " + OpdDbConstants.Table.OPD_TREATMENT +
+            "(" + OpdDbConstants.Column.OpdTreatment.VISIT_ID + " COLLATE NOCASE);";
 
 //    private String[] columns = new String[]{
 //            OpdDbConstants.Column.OpdTreatment.ID,
