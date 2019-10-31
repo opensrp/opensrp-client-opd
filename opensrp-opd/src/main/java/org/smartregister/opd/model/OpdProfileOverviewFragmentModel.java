@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.contract.OpdProfileOverviewFragmentContract;
 import org.smartregister.opd.pojos.OpdCheckIn;
+import org.smartregister.opd.pojos.OpdDetails;
 import org.smartregister.opd.pojos.OpdVisit;
 import org.smartregister.opd.utils.AppExecutors;
 
@@ -15,6 +16,7 @@ import org.smartregister.opd.utils.AppExecutors;
 public class OpdProfileOverviewFragmentModel implements OpdProfileOverviewFragmentContract.Model {
 
     private AppExecutors appExecutors;
+    OpdDetails opdDetails = null;
 
     public OpdProfileOverviewFragmentModel() {
         this.appExecutors = new AppExecutors();
@@ -29,11 +31,18 @@ public class OpdProfileOverviewFragmentModel implements OpdProfileOverviewFragme
                 final OpdVisit visit = OpdLibrary.getInstance().getVisitRepository().getLatestVisit(baseEntityId);
                 final OpdCheckIn checkIn = visit != null ? OpdLibrary.getInstance().getCheckInRepository().getCheckInByVisit(visit.getId()) : null;
 
+                opdDetails = null;
+
+                if (visit != null) {
+                    opdDetails = new OpdDetails(baseEntityId, visit.getId());
+                    opdDetails = OpdLibrary.getInstance().getOpdDetailsRepository().findOne(opdDetails);
+                }
+
                 appExecutors.mainThread().execute(new Runnable() {
 
                     @Override
                     public void run() {
-                        onFetchedCallback.onFetched(checkIn, visit);
+                        onFetchedCallback.onFetched(checkIn, visit, opdDetails);
                     }
                 });
             }

@@ -132,4 +132,9 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
     public void openDiagnoseAndTreatForm() {
         //startFormActivity(OpdConstants.Form.OPD_DIAGNOSIS_AND_TREAT, commonPersonObjectClient.getCaseId(), null, injectedValues, entityTable);
     }
+
+    @Override
+    public void openCheckInForm() {
+
+    }
 }

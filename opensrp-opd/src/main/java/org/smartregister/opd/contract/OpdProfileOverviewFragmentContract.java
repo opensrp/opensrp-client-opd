@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import org.jeasy.rules.api.Facts;
 import org.smartregister.opd.domain.YamlConfigWrapper;
 import org.smartregister.opd.pojos.OpdCheckIn;
+import org.smartregister.opd.pojos.OpdDetails;
 import org.smartregister.opd.pojos.OpdVisit;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public interface OpdProfileOverviewFragmentContract {
 
         void loadOverviewFacts(@NonNull String baseEntityId, @NonNull OnFinishedCallback onFinishedCallback);
 
-        void loadOverviewDataAndDisplay(@Nullable OpdCheckIn opdCheckIn, @Nullable OpdVisit opdVisit, @NonNull final OnFinishedCallback onFinishedCallback);
+        void loadOverviewDataAndDisplay(@Nullable OpdCheckIn opdCheckIn, @Nullable OpdVisit opdVisit, @Nullable OpdDetails opdDetails, @NonNull final OnFinishedCallback onFinishedCallback);
 
         interface OnFinishedCallback {
 
@@ -38,7 +39,7 @@ public interface OpdProfileOverviewFragmentContract {
 
         interface OnFetchedCallback {
 
-            void onFetched(@Nullable OpdCheckIn opdCheckIn, @Nullable OpdVisit opdVisit);
+            void onFetched(@Nullable OpdCheckIn opdCheckIn, @Nullable OpdVisit opdVisit, @Nullable OpdDetails opdDetails);
         }
     }
 }

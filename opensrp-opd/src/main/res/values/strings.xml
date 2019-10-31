@@ -51,5 +51,6 @@
     <string name="opd_checked_in">OPD: CHECKED IN</string>
 
     <string name="diagnose_and_treat"><![CDATA[DIAGNOSE & TREAT]]></string>
+    <string name="check_in">CHECK IN</string>
 
 </resources>

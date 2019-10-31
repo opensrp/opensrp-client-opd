@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.jeasy.rules.api.Facts;
+import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.contract.OpdProfileOverviewFragmentContract;
 import org.smartregister.opd.domain.YamlConfig;
@@ -11,6 +12,7 @@ import org.smartregister.opd.domain.YamlConfigItem;
 import org.smartregister.opd.domain.YamlConfigWrapper;
 import org.smartregister.opd.model.OpdProfileOverviewFragmentModel;
 import org.smartregister.opd.pojos.OpdCheckIn;
+import org.smartregister.opd.pojos.OpdDetails;
 import org.smartregister.opd.pojos.OpdVisit;
 import org.smartregister.opd.utils.FilePath;
 import org.smartregister.opd.utils.OpdDbConstants;
@@ -33,6 +35,7 @@ import timber.log.Timber;
 public class OpdProfileOverviewFragmentPresenter implements OpdProfileOverviewFragmentContract.Presenter {
 
     private OpdProfileOverviewFragmentModel model;
+    private CommonPersonObjectClient client;
 
     public OpdProfileOverviewFragmentPresenter() {
         model = new OpdProfileOverviewFragmentModel();
@@ -42,20 +45,17 @@ public class OpdProfileOverviewFragmentPresenter implements OpdProfileOverviewFr
     public void loadOverviewFacts(@NonNull String baseEntityId, @NonNull final OnFinishedCallback onFinishedCallback) {
         model.fetchLastCheckAndVisit(baseEntityId, new OpdProfileOverviewFragmentContract.Model.OnFetchedCallback() {
             @Override
-            public void onFetched(@Nullable OpdCheckIn opdCheckIn, @Nullable OpdVisit opdVisit) {
-                loadOverviewDataAndDisplay(opdCheckIn, opdVisit, onFinishedCallback);
+            public void onFetched(@Nullable OpdCheckIn opdCheckIn, @Nullable OpdVisit opdVisit, @Nullable OpdDetails opdDetails) {
+                loadOverviewDataAndDisplay(opdCheckIn, opdVisit, opdDetails, onFinishedCallback);
             }
         });
     }
 
     @Override
-    public void loadOverviewDataAndDisplay(@Nullable OpdCheckIn opdCheckIn, @Nullable OpdVisit opdVisit, @NonNull final OnFinishedCallback onFinishedCallback) {
+    public void loadOverviewDataAndDisplay(@Nullable OpdCheckIn opdCheckIn, @Nullable OpdVisit opdVisit, @Nullable OpdDetails opdDetails, @NonNull final OnFinishedCallback onFinishedCallback) {
         List<YamlConfigWrapper> yamlConfigListGlobal = new ArrayList<>(); //This makes sure no data duplication happens
         Facts facts = new Facts();
-
-        if (opdVisit != null && opdCheckIn != null) {
-            setDataFromCheckIn(opdCheckIn, opdVisit, facts);
-        }
+        setDataFromCheckIn(opdCheckIn, opdVisit, opdDetails, facts);
 
         try {
             generateYamlConfigList(facts, yamlConfigListGlobal);
@@ -102,19 +102,29 @@ public class OpdProfileOverviewFragmentPresenter implements OpdProfileOverviewFr
         }
     }
 
-    private void setDataFromCheckIn(@NonNull OpdCheckIn checkIn, @NonNull OpdVisit visit, @NonNull Facts facts) {
-        facts.put("pregnancy_status", checkIn.getPregnancyStatus());
-        facts.put("is_previously_tested_hiv", checkIn.getHasHivTestPreviously());
-        facts.put("patient_on_art", checkIn.getIsTakingArt());
-        facts.put("hiv_status", checkIn.getCurrentHivResult());
-        facts.put("visit_type", checkIn.getVisitType());
-        facts.put("previous_appointment", checkIn.getAppointmentScheduledPreviously());
-        facts.put("date_of_appointment", checkIn.getAppointmentDueDate());
+    private void setDataFromCheckIn(@Nullable OpdCheckIn checkIn, @Nullable OpdVisit visit, @Nullable OpdDetails opdDetails, @NonNull Facts facts) {
+        if (checkIn != null) {
+            facts.put("pregnancy_status", checkIn.getPregnancyStatus());
+            facts.put("is_previously_tested_hiv", checkIn.getHasHivTestPreviously());
+            facts.put("patient_on_art", checkIn.getIsTakingArt());
+            facts.put("hiv_status", checkIn.getCurrentHivResult());
+            facts.put("visit_type", checkIn.getVisitType());
+            facts.put("previous_appointment", checkIn.getAppointmentScheduledPreviously());
+            facts.put("date_of_appointment", checkIn.getAppointmentDueDate());
+        } else {
+            if ("female".equals(client.getColumnmaps().get("gender"))) {
+                facts.put("pregnancy_status", "Unknown");
+            } else {
+                facts.put("hiv_status", "Unknown");
+            }
+        }
 
         Date latestValidCheckInDate = OpdLibrary.getInstance().getLatestValidCheckInDate();
-        facts.put(OpdDbConstants.Column.OpdDetails.PENDING_DIAGNOSE_AND_TREAT, latestValidCheckInDate.after(visit.getVisitDate()));
+        boolean shouldCheckIn = visit == null || latestValidCheckInDate.after(visit.getVisitDate()) || (opdDetails != null && opdDetails.getCurrentVisitEndDate() != null);
 
-        if (visit.getVisitDate() != null && checkIn.getAppointmentDueDate() != null) {
+        facts.put(OpdDbConstants.Column.OpdDetails.PENDING_DIAGNOSE_AND_TREAT,  !shouldCheckIn);
+
+        if (visit != null && visit.getVisitDate() != null && checkIn != null && checkIn.getAppointmentDueDate() != null) {
             facts.put("visit_to_appointment_date", getVisitToAppointmentDateDuration(visit.getVisitDate(), checkIn.getAppointmentDueDate()));
         }
     }

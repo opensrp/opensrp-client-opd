@@ -36,6 +36,7 @@ public class OpdProfileOverviewFragment extends BaseProfileFragment implements O
     private OpdProfileOverviewFragmentContract.Presenter presenter;
 
     private LinearLayout opdCheckinSectionLayout;
+    private Button checkInDiagnoseAndTreatBtn;
 
     public static OpdProfileOverviewFragment newInstance(Bundle bundle) {
         Bundle args = bundle;
@@ -72,8 +73,10 @@ public class OpdProfileOverviewFragment extends BaseProfileFragment implements O
                     if (getActivity() != null && facts != null && yamlConfigListGlobal != null) {
                         Boolean isPendingDiagnoseAndTreat = facts.get(OpdDbConstants.Column.OpdDetails.PENDING_DIAGNOSE_AND_TREAT);
 
-                        if (isPendingDiagnoseAndTreat) {
-                            opdCheckinSectionLayout.setVisibility(View.VISIBLE);
+                        if (isPendingDiagnoseAndTreat != null && isPendingDiagnoseAndTreat) {
+                            showDiagnoseAndTreatBtn();
+                        } else {
+                            showCheckInBtn();
                         }
 
                         OpdProfileOverviewAdapter adapter = new OpdProfileOverviewAdapter(getActivity(), yamlConfigListGlobal, facts);
@@ -89,23 +92,51 @@ public class OpdProfileOverviewFragment extends BaseProfileFragment implements O
         }
     }
 
+    private void showCheckInBtn() {
+        if (getActivity() != null) {
+            opdCheckinSectionLayout.setVisibility(View.VISIBLE);
+            checkInDiagnoseAndTreatBtn.setText(R.string.check_in);
+            checkInDiagnoseAndTreatBtn.setBackgroundResource(R.drawable.check_in_btn_overview_bg);
+            checkInDiagnoseAndTreatBtn.setTextColor(getActivity().getResources().getColorStateList(R.color.check_in_btn_overview_text_color));
+            checkInDiagnoseAndTreatBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    FragmentActivity activity = getActivity();
+
+                    if (activity instanceof BaseOpdProfileActivity) {
+                        ((BaseOpdProfileActivity) activity).openDiagnoseAndTreatForm();
+                    }
+                }
+            });
+        }
+    }
+
+    private void showDiagnoseAndTreatBtn() {
+        if (getActivity() != null) {
+            opdCheckinSectionLayout.setVisibility(View.VISIBLE);
+            checkInDiagnoseAndTreatBtn.setText(R.string.diagnose_and_treat);
+            checkInDiagnoseAndTreatBtn.setBackgroundResource(R.drawable.diagnose_treat_bg);
+            checkInDiagnoseAndTreatBtn.setTextColor(getActivity().getResources().getColor(R.color.diagnose_treat_txt_color));
+            checkInDiagnoseAndTreatBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    FragmentActivity activity = getActivity();
+
+                    if (activity instanceof BaseOpdProfileActivity) {
+                        ((BaseOpdProfileActivity) activity).openDiagnoseAndTreatForm();
+                    }
+                }
+            });
+        }
+    }
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view =  inflater.inflate(R.layout.opd_fragment_profile_overview, container, false);
 
         opdCheckinSectionLayout = view.findViewById(R.id.ll_opdFragmentProfileOverview_checkinLayout);
 
-        Button diagnoseAndTreat = view.findViewById(R.id.btn_opdFragmentProfileOverview_diagnoseAndTreat);
-        diagnoseAndTreat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FragmentActivity activity = getActivity();
-
-                if (activity instanceof BaseOpdProfileActivity) {
-                    ((BaseOpdProfileActivity) activity).openDiagnoseAndTreatForm();
-                }
-            }
-        });
+        checkInDiagnoseAndTreatBtn = view.findViewById(R.id.btn_opdFragmentProfileOverview_diagnoseAndTreat);
 
         return view;
     }

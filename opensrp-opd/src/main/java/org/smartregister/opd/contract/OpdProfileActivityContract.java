@@ -44,6 +44,8 @@ public interface OpdProfileActivityContract {
 
         void openDiagnoseAndTreatForm();
 
+        void openCheckInForm();
+
     }
 
     interface Interactor {
