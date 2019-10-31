@@ -9,9 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import org.jeasy.rules.api.Facts;
 import org.smartregister.opd.R;
 import org.smartregister.opd.pojos.OpdVisitSummary;
+import org.smartregister.opd.utils.OpdUtils;
 
 import java.util.List;
 
@@ -22,14 +22,11 @@ public class OpdProfileVisitsAdapter extends RecyclerView.Adapter<OpdProfileVisi
 
     private List<OpdVisitSummary> mData;
     private LayoutInflater mInflater;
-    private Facts facts;
-    private Context context;
 
     // data is passed into the constructor
     public OpdProfileVisitsAdapter(@NonNull Context context, @NonNull List<OpdVisitSummary> opdVisitSummaryList) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = opdVisitSummaryList;
-        this.context = context;
     }
 
     // inflates the row layout from xml when needed
@@ -44,6 +41,10 @@ public class OpdProfileVisitsAdapter extends RecyclerView.Adapter<OpdProfileVisi
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         OpdVisitSummary opdVisitSummary = mData.get(position);
+
+        if (opdVisitSummary.getVisitDate() != null) {
+            holder.visitDate.setText(OpdUtils.convertDate(opdVisitSummary.getVisitDate(), "d MMM yyyy"));
+        }
 
         if (!TextUtils.isEmpty(opdVisitSummary.getTestName())) {
             setVisible(holder.testName, holder.testResult);

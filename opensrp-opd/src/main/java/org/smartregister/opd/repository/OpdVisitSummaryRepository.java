@@ -37,14 +37,14 @@ public class OpdVisitSummaryRepository extends BaseRepository {
             SQLiteDatabase db = getWritableDatabase();
             
             String query = String.format("SELECT %s.%s, %s.%s, %s.%s, %s.%s, %s.%s, %s.%s, %s.%s, %s.%s FROM %s LEFT JOIN %s ON %s.%s = %s.%s LEFT JOIN %s ON %s.%s = %s.%s LEFT JOIN %s ON %s.%s = %s.%s WHERE %s.%s = '%s'"
-                    , OpdDbConstants.Column.OpdVisit.VISIT_DATE, OpdDbConstants.Table.OPD_VISIT
-                    , OpdDbConstants.Column.OpdTestConducted.TEST, OpdDbConstants.Table.OPD_TEST_CONDUCTED
-                    , OpdDbConstants.Column.OpdTestConducted.RESULT, OpdDbConstants.Table.OPD_TEST_CONDUCTED
-                    , OpdDbConstants.Column.OpdDiagnosis.DIAGNOSIS, OpdDbConstants.Table.OPD_DIAGNOSIS
-                    , OpdDbConstants.Column.OpdDiagnosis.CODE, OpdDbConstants.Table.OPD_DIAGNOSIS
-                    , OpdDbConstants.Column.OpdTreatment.MEDICINE, OpdDbConstants.Table.OPD_TREATMENT
-                    , OpdDbConstants.Column.OpdTreatment.DOSAGE, OpdDbConstants.Table.OPD_TREATMENT
-                    , OpdDbConstants.Column.OpdTreatment.DURATION, OpdDbConstants.Table.OPD_TREATMENT
+                    , OpdDbConstants.Table.OPD_VISIT, OpdDbConstants.Column.OpdVisit.VISIT_DATE
+                    , OpdDbConstants.Table.OPD_TEST_CONDUCTED, OpdDbConstants.Column.OpdTestConducted.TEST
+                    , OpdDbConstants.Table.OPD_TEST_CONDUCTED, OpdDbConstants.Column.OpdTestConducted.RESULT
+                    , OpdDbConstants.Table.OPD_DIAGNOSIS, OpdDbConstants.Column.OpdDiagnosis.DIAGNOSIS
+                    , OpdDbConstants.Table.OPD_DIAGNOSIS, OpdDbConstants.Column.OpdDiagnosis.CODE
+                    , OpdDbConstants.Table.OPD_TREATMENT, OpdDbConstants.Column.OpdTreatment.MEDICINE
+                    , OpdDbConstants.Table.OPD_TREATMENT, OpdDbConstants.Column.OpdTreatment.DOSAGE
+                    , OpdDbConstants.Table.OPD_TREATMENT, OpdDbConstants.Column.OpdTreatment.DURATION
                     , OpdDbConstants.Table.OPD_VISIT
                     , OpdDbConstants.Table.OPD_TEST_CONDUCTED
                     , OpdDbConstants.Table.OPD_VISIT, OpdDbConstants.Column.OpdVisit.ID
