@@ -2,17 +2,29 @@ package org.smartregister.opd.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentHostCallback;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
 
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
+import org.smartregister.opd.BuildConfig;
+import org.smartregister.opd.OpdLibrary;
+import org.smartregister.opd.activity.BaseOpdFormActivity;
+import org.smartregister.opd.activity.BaseOpdProfileActivity;
+import org.smartregister.opd.configuration.BaseOpdRegisterProviderMetadata;
+import org.smartregister.opd.configuration.OpdConfiguration;
+import org.smartregister.opd.configuration.OpdRegisterQueryProviderContract;
+import org.smartregister.opd.pojos.OpdMetadata;
+import org.smartregister.repository.Repository;
 
 
 /**
@@ -22,8 +34,26 @@ import org.smartregister.commonregistry.CommonPersonObjectClient;
 @RunWith(MockitoJUnitRunner.class)
 public class BaseOpdFormFragmentTest {
 
+    @After
+    public void tearDown() throws Exception {
+        ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", null);
+    }
+
     @Test
     public void startActivityOnLookUpShouldCallStartActivity() {
+        OpdConfiguration opdConfiguration = new OpdConfiguration.Builder(OpdRegisterQueryProvider.class)
+                .setOpdRegisterProviderMetadata(BaseOpdRegisterProviderMetadata.class)
+                .setOpdMetadata(new OpdMetadata("form-name"
+                        , "table-name"
+                        , "register-event-type"
+                        , "update-event-type"
+                        , "config"
+                        , BaseOpdFormActivity.class
+                        , BaseOpdProfileActivity.class
+                        , false))
+                .build();
+
+        OpdLibrary.init(Mockito.mock(org.smartregister.Context.class), Mockito.mock(Repository.class), opdConfiguration, BuildConfig.VERSION_CODE, 1);
         CommonPersonObjectClient client = Mockito.mock(CommonPersonObjectClient.class);
 
         BaseOpdFormFragment baseOpdFormFragment = new BaseOpdFormFragment();
@@ -61,5 +91,26 @@ public class BaseOpdFormFragmentTest {
         // Verification
         Mockito.verify(baseOpdFormFragment, Mockito.times(1))
                 .startActivityOnLookUp(Mockito.eq(client));
+    }
+
+    static class OpdRegisterQueryProvider extends OpdRegisterQueryProviderContract {
+
+        @NonNull
+        @Override
+        public String getObjectIdsQuery(@Nullable String filters) {
+            return null;
+        }
+
+        @NonNull
+        @Override
+        public String[] countExecuteQueries(@Nullable String filters) {
+            return new String[0];
+        }
+
+        @NonNull
+        @Override
+        public String mainSelectWhereIDsIn() {
+            return null;
+        }
     }
 }

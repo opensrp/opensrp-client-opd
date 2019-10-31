@@ -14,7 +14,6 @@ import org.smartregister.opd.R;
 import org.smartregister.opd.adapter.OpdProfileOverviewAdapter;
 import org.smartregister.opd.contract.OpdProfileOverviewFragmentContract;
 import org.smartregister.opd.domain.YamlConfigWrapper;
-import org.smartregister.opd.pojos.OpdCheckIn;
 import org.smartregister.opd.presenter.OpdProfileOverviewFragmentPresenter;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.view.fragment.BaseProfileFragment;
