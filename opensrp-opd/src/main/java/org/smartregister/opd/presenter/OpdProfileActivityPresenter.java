@@ -1,9 +1,14 @@
 package org.smartregister.opd.presenter;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.vijay.jsonwizard.constants.JsonFormConstants;
+import com.vijay.jsonwizard.domain.Form;
+
+import org.apache.commons.lang3.tuple.Triple;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.AllConstants;
@@ -17,9 +22,13 @@ import org.smartregister.opd.listener.OpdEventActionCallBack;
 import org.smartregister.opd.model.OpdProfileActivityModel;
 import org.smartregister.opd.pojos.OpdDiagnosisAndTreatmentForm;
 import org.smartregister.opd.utils.AppExecutors;
+import org.smartregister.opd.pojos.OpdMetadata;
+import org.smartregister.opd.tasks.FetchRegistrationDataTask;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.opd.utils.OpdEventUtils;
+import org.smartregister.opd.utils.OpdUtils;
+import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.util.Utils;
 
@@ -188,6 +197,11 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
     }
 
     @Override
+    public HashMap<String, String> saveFinishForm(@NonNull Map<String, String> client) {
+        return null;
+    }
+
+    @Override
     public void onOpdEventSaved() {
         if (mProfileView != null) {
             OpdProfileActivityContract.View view = mProfileView.get();
@@ -196,5 +210,27 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
             view.getActionListenerForVisitFragment().onActionReceive();
             view.hideProgressDialog();
         }
+    }
+
+    @Override
+    public void onUpdateRegistrationBtnCLicked(@NonNull String baseEntityId) {
+        Utils.startAsyncTask(new FetchRegistrationDataTask(new WeakReference<Context>(getProfileView().getContext()), new FetchRegistrationDataTask.OnTaskComplete() {
+            @Override
+            public void onSuccess(@Nullable String client) {
+                Context context = getProfileView().getContext();
+
+                OpdMetadata metadata = OpdUtils.metadata();
+                if (metadata != null) {
+                    Intent intent = new Intent(context, metadata.getOpdFormActivity());
+                    Form formParam = new Form();
+                    formParam.setWizard(false);
+                    formParam.setHideSaveLabel(true);
+                    formParam.setNextLabel("");
+                    intent.putExtra(JsonFormConstants.JSON_FORM_KEY.FORM, formParam);
+                    intent.putExtra(JsonFormConstants.JSON_FORM_KEY.JSON, client);
+                    getProfileView().startActivityForResult(intent, OpdJsonFormUtils.REQUEST_CODE_GET_JSON);
+                }
+            }
+        }), new String[]{baseEntityId});
     }
 }

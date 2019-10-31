@@ -1,10 +1,13 @@
 package org.smartregister.opd.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -38,6 +41,8 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
     private TextView genderView;
     private TextView ancIdView;
     private ImageView imageView;
+    private Button btnRegistrationInfo;
+    private String baseEntityId;
     private OnSendActionToFragment sendActionListenerForProfileOverview;
     private OnSendActionToFragment sendActionListenerToVisitsFragment;
 
@@ -107,7 +112,8 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
     @Override
     protected void onResumption() {
         super.onResumption();
-        commonPersonObjectClient = (CommonPersonObjectClient) getIntent()
+        baseEntityId = getIntent().getStringExtra(OpdConstants.IntentKey.BASE_ENTITY_ID);
+        CommonPersonObjectClient commonPersonObjectClient = (CommonPersonObjectClient) getIntent()
                 .getSerializableExtra(OpdConstants.IntentKey.CLIENT_OBJECT);
         ((OpdProfileActivityPresenter) presenter).refreshProfileTopSection(commonPersonObjectClient.getColumnmaps());
     }
@@ -207,5 +213,22 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
     @Override
     public void setContentView(int layoutResID) {
         super.setContentView(R.layout.opd_activity_base_profile);
+    }
+
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.btn_profile_registration_info) {
+            if (presenter instanceof OpdProfileActivityContract.Presenter) {
+                ((OpdProfileActivityContract.Presenter) presenter).onUpdateRegistrationBtnCLicked(baseEntityId);
+            }
+        } else {
+            super.onClick(view);
+        }
+    }
+
+    @NonNull
+    @Override
+    public Context getContext() {
+        return this;
     }
 }
