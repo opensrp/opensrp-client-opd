@@ -1,6 +1,7 @@
 package org.smartregister.opd.utils;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -11,9 +12,17 @@ import org.jeasy.rules.api.Facts;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
 import org.smartregister.opd.pojos.OpdMetadata;
+import org.smartregister.util.JsonFormUtils;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+
+import timber.log.Timber;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-13
@@ -95,5 +104,47 @@ public class OpdUtils extends org.smartregister.util.Utils {
     @Nullable
     public static OpdMetadata metadata() {
         return OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata();
+    }
+
+    @Nullable
+    public static String getIntentValue(@Nullable Intent data, @NonNull String key) {
+        if (data == null) {
+            return null;
+        }
+
+        return data.hasExtra(key) ? data.getStringExtra(key) : null;
+    }
+
+    @NonNull
+    public static String convertDate(@NonNull Date date, @NonNull String dateFormat) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat, Locale.US);
+        return simpleDateFormat.format(date);
+    }
+
+    @Nullable
+    public static Date convertStringToDate(@NonNull String pattern, @NonNull String dateString) {
+        Date date = null;
+        DateFormat dateFormat = new SimpleDateFormat(pattern, Locale.ENGLISH);
+
+        if (!TextUtils.isEmpty(dateString) && !TextUtils.isEmpty(pattern)) {
+            try {
+                date = dateFormat.parse(dateString);
+            } catch (ParseException e) {
+                Timber.e(e);
+            }
+        }
+        return date;
+    }
+
+    public static String generateNIds(int n) {
+        StringBuilder strIds = new StringBuilder();
+        for (int i = 0; i < n; i++) {
+            if ((i + 1) == n) {
+                strIds.append(JsonFormUtils.generateRandomUUIDString());
+            } else {
+                strIds.append(JsonFormUtils.generateRandomUUIDString()).append(",");
+            }
+        }
+        return strIds.toString();
     }
 }

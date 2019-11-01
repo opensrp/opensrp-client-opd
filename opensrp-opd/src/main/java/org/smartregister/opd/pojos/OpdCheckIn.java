@@ -1,5 +1,7 @@
 package org.smartregister.opd.pojos;
 
+import android.support.annotation.Nullable;
+
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-30
  */
@@ -8,7 +10,7 @@ public class OpdCheckIn {
 
     private int id;
     private String eventId;
-    private int visitId;
+    private String visitId;
     private String baseEntityId;
     private String pregnancyStatus;
     private String hasHivTestPreviously;
@@ -18,8 +20,8 @@ public class OpdCheckIn {
     private String visitType;
     private String appointmentScheduledPreviously;
     private String appointmentDueDate;
-    private int updatedAt;
-    private int createdAt;
+    private long updatedAt;
+    private long createdAt;
 
 
     public int getId() {
@@ -38,11 +40,11 @@ public class OpdCheckIn {
         this.eventId = eventId;
     }
 
-    public int getVisitId() {
+    public String getVisitId() {
         return visitId;
     }
 
-    public void setVisitId(int visitId) {
+    public void setVisitId(String visitId) {
         this.visitId = visitId;
     }
 
@@ -110,6 +112,7 @@ public class OpdCheckIn {
         this.appointmentScheduledPreviously = appointmentScheduledPreviously;
     }
 
+    @Nullable
     public String getAppointmentDueDate() {
         return appointmentDueDate;
     }
@@ -118,19 +121,19 @@ public class OpdCheckIn {
         this.appointmentDueDate = appointmentDueDate;
     }
 
-    public int getUpdatedAt() {
+    public long getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(int updatedAt) {
+    public void setUpdatedAt(long updatedAt) {
         this.updatedAt = updatedAt;
     }
 
-    public int getCreatedAt() {
+    public long getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(int createdAt) {
+    public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
     }
 }

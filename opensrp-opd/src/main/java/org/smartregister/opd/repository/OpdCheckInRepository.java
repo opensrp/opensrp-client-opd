@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 
 import net.sqlcipher.Cursor;
 import net.sqlcipher.database.SQLiteDatabase;
+import net.sqlcipher.database.SQLiteException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.smartregister.opd.dao.OpdCheckInDao;
@@ -25,15 +26,15 @@ public class OpdCheckInRepository extends BaseRepository implements OpdCheckInDa
     private static final String CREATE_TABLE_SQL = "CREATE TABLE " + OpdDbConstants.Table.OPD_CHECK_IN + "("
             + OpdCheckIn.ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"
             + OpdCheckIn.EVENT_ID + " VARCHAR NOT NULL, "
-            + OpdCheckIn.VISIT_ID + " INT NOT NULL, "
+            + OpdCheckIn.VISIT_ID + " VARCHAR NOT NULL, "
             + OpdCheckIn.BASE_ENTITY_ID + " VARCHAR NOT NULL, "
             + OpdCheckIn.PREGNANCY_STATUS + " VARCHAR, "
-            + OpdCheckIn.HAS_HIV_TEST_PREVIOUSLY + " VARCHAR NOT NULL, "
+            + OpdCheckIn.HAS_HIV_TEST_PREVIOUSLY + " VARCHAR, "
             + OpdCheckIn.HIV_RESULTS_PREVIOUSLY + " VARCHAR, "
             + OpdCheckIn.IS_TAKING_ART + " VARCHAR, "
-            + OpdCheckIn.CURRENT_HIV_RESULT + " VARCHAR NOT NULL, "
+            + OpdCheckIn.CURRENT_HIV_RESULT + " VARCHAR, "
             + OpdCheckIn.VISIT_TYPE + " VARCHAR NOT NULL, "
-            + OpdCheckIn.APPOINTMENT_SCHEDULED_PREVIOUSLY + " VARCHAR NOT NULL, "
+            + OpdCheckIn.APPOINTMENT_SCHEDULED_PREVIOUSLY + " VARCHAR, "
             + OpdCheckIn.APPOINTMENT_DUE_DATE + " INTEGER, "
             + OpdCheckIn.CREATED_AT + " INTEGER NOT NULL, "
             + OpdCheckIn.UPDATED_AT + " INTEGER NOT NULL, UNIQUE(" + OpdCheckIn.VISIT_ID + ", " + OpdCheckIn.BASE_ENTITY_ID + ") ON CONFLICT REPLACE)";
@@ -75,7 +76,10 @@ public class OpdCheckInRepository extends BaseRepository implements OpdCheckInDa
     public ContentValues createValuesFor(@NonNull org.smartregister.opd.pojos.OpdCheckIn checkIn) {
         ContentValues contentValues = new ContentValues();
 
-        contentValues.put(OpdCheckIn.ID, checkIn.getId());
+        if (checkIn.getId() != 0) {
+            contentValues.put(OpdCheckIn.ID, checkIn.getId());
+        }
+
         contentValues.put(OpdCheckIn.EVENT_ID, checkIn.getEventId());
         contentValues.put(OpdCheckIn.VISIT_ID, checkIn.getVisitId());
         contentValues.put(OpdCheckIn.BASE_ENTITY_ID, checkIn.getBaseEntityId());
@@ -87,6 +91,8 @@ public class OpdCheckInRepository extends BaseRepository implements OpdCheckInDa
         contentValues.put(OpdCheckIn.VISIT_TYPE, checkIn.getVisitType());
         contentValues.put(OpdCheckIn.APPOINTMENT_SCHEDULED_PREVIOUSLY, checkIn.getAppointmentScheduledPreviously());
         contentValues.put(OpdCheckIn.APPOINTMENT_DUE_DATE, checkIn.getAppointmentDueDate());
+        contentValues.put(OpdCheckIn.CREATED_AT, checkIn.getCreatedAt());
+        contentValues.put(OpdCheckIn.UPDATED_AT, checkIn.getUpdatedAt());
 
         return contentValues;
     }
@@ -125,13 +131,13 @@ public class OpdCheckInRepository extends BaseRepository implements OpdCheckInDa
 
     @Nullable
     @Override
-    public org.smartregister.opd.pojos.OpdCheckIn getCheckInByVisit(int visitId) {
+    public org.smartregister.opd.pojos.OpdCheckIn getCheckInByVisit(@NonNull String visitId) {
         Cursor mCursor = null;
         org.smartregister.opd.pojos.OpdCheckIn checkIn = null;
         try {
             SQLiteDatabase db = getWritableDatabase();
             mCursor = db.query(OpdDbConstants.Table.OPD_CHECK_IN, columns, OpdCheckIn.VISIT_ID + " = ?"
-                    , new String[]{String.valueOf(visitId)}
+                    , new String[]{visitId}
                     , null
                     , null
                     , OpdCheckIn.CREATED_AT + " DESC"
@@ -157,7 +163,7 @@ public class OpdCheckInRepository extends BaseRepository implements OpdCheckInDa
 
         checkIn.setId(cursor.getInt(cursor.getColumnIndex(OpdCheckIn.ID)));
         checkIn.setEventId(cursor.getString(cursor.getColumnIndex(OpdCheckIn.EVENT_ID)));
-        checkIn.setVisitId(cursor.getInt(cursor.getColumnIndex(OpdCheckIn.VISIT_ID)));
+        checkIn.setVisitId(cursor.getString(cursor.getColumnIndex(OpdCheckIn.VISIT_ID)));
         checkIn.setBaseEntityId(cursor.getString(cursor.getColumnIndex(OpdCheckIn.BASE_ENTITY_ID)));
         checkIn.setPregnancyStatus(cursor.getString(cursor.getColumnIndex(OpdCheckIn.PREGNANCY_STATUS)));
         checkIn.setHasHivTestPreviously(cursor.getString(cursor.getColumnIndex(OpdCheckIn.HAS_HIV_TEST_PREVIOUSLY)));
@@ -171,5 +177,17 @@ public class OpdCheckInRepository extends BaseRepository implements OpdCheckInDa
         checkIn.setUpdatedAt(cursor.getInt(cursor.getColumnIndex(OpdCheckIn.UPDATED_AT)));
 
         return checkIn;
+    }
+
+    @Override
+    public boolean addCheckIn(@NonNull org.smartregister.opd.pojos.OpdCheckIn checkIn) throws SQLiteException {
+        ContentValues contentValues = createValuesFor(checkIn);
+
+        //TODO: Check for duplicates
+
+        SQLiteDatabase database = getWritableDatabase();
+        long recordId = database.insertOrThrow(OpdDbConstants.Table.OPD_CHECK_IN, null, contentValues);
+
+        return recordId != -1;
     }
 }

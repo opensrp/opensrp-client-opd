@@ -15,6 +15,8 @@ public interface OpdCheckInDao {
     OpdCheckIn getLatestCheckIn(@NonNull String clientBaseEntityId);
 
     @Nullable
-    OpdCheckIn getCheckInByVisit(int visitId);
+    OpdCheckIn getCheckInByVisit(@NonNull String visitId);
+
+    boolean addCheckIn(@NonNull OpdCheckIn checkIn);
 
 }

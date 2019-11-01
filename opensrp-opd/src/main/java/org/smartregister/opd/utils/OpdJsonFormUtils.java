@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -55,8 +56,29 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
     public static final String ZEIR_ID = "zeir_id";
 
     public static JSONObject getFormAsJson(@NonNull JSONObject form, @NonNull String formName, @NonNull String id, @NonNull String currentLocationId) throws JSONException {
+        return getFormAsJson(form, formName, id, currentLocationId, null);
+    }
+
+    public static JSONObject getFormAsJson(@NonNull JSONObject form, @NonNull String formName, @NonNull String id, @NonNull String currentLocationId, @Nullable HashMap<String, String> injectedFieldValues) throws JSONException {
         String entityId = id;
         form.getJSONObject(METADATA).put(ENCOUNTER_LOCATION, currentLocationId);
+
+        // Inject the field values
+        if (injectedFieldValues != null && injectedFieldValues.size() > 0) {
+            JSONObject stepOne = form.getJSONObject(OpdJsonFormUtils.STEP1);
+            JSONArray jsonArray = stepOne.getJSONArray(OpdJsonFormUtils.FIELDS);
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                String fieldKey = jsonObject.getString(OpdJsonFormUtils.KEY);
+
+                String fieldValue = injectedFieldValues.get(fieldKey);
+
+                if (!TextUtils.isEmpty(fieldValue)) {
+                    jsonObject.put(OpdJsonFormUtils.VALUE, fieldValue);
+                }
+            }
+        }
 
         if (OpdUtils.metadata().getOpdRegistrationFormName().equals(formName)) {
             if (StringUtils.isBlank(entityId)) {
@@ -88,6 +110,7 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
         } else {
             Timber.w("OpdJsonFormUtils --> Unsupported form requested for launch %s", formName);
         }
+
         Timber.d("OpdJsonFormUtils --> form is %s", form.toString());
         return form;
     }
@@ -103,8 +126,8 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
                 allLevels = metadata.getLocationLevels();
                 healthFacilities = metadata.getHealthFacilityLevels();
             } else {
-                allLevels = DefaultOpdLocationUtils.getLocationLevels();;
-                healthFacilities = DefaultOpdLocationUtils.getLocationLevels();;
+                allLevels = DefaultOpdLocationUtils.getLocationLevels();
+                healthFacilities = DefaultOpdLocationUtils.getLocationLevels();
             }
 
             List<String> defaultLocation = LocationHelper.getInstance().generateDefaultLocationHierarchy(allLevels);
@@ -218,7 +241,7 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
         }
     }
 
-    protected static Event tagSyncMetadata(@NonNull Event event) {
+    public static Event tagSyncMetadata(@NonNull Event event) {
         AllSharedPreferences allSharedPreferences = OpdUtils.getAllSharedPreferences();
         String providerId = allSharedPreferences.fetchRegisteredANM();
         event.setProviderId(providerId);
@@ -316,6 +339,17 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
                 } catch (IllegalArgumentException e) {
                     Timber.e(e);
                 }
+        }
+    }
+
+    public static void addKeyPairToJsonForm(@NonNull JSONArray fields, String key, String value) {
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put(OpdConstants.KEY.KEY, key);
+            jsonObject.put(OpdConstants.KEY.VALUE, value);
+            fields.put(jsonObject);
+        } catch (JSONException e) {
+            Timber.e(e, "OpdJsonFormUtils --> add %s:%s to Json Form", key, value);
         }
     }
 

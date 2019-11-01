@@ -62,10 +62,11 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
 
     @Override
     protected void fetchProfileData() {
-        String baseEntityId = getIntent().getStringExtra(OpdConstants.IntentKey.BASE_ENTITY_ID);
-        ((OpdProfileActivityPresenter) presenter).fetchProfileData(baseEntityId);
         CommonPersonObjectClient commonPersonObjectClient = (CommonPersonObjectClient) getIntent()
                 .getSerializableExtra(OpdConstants.IntentKey.CLIENT_OBJECT);
+        String baseEntityId = commonPersonObjectClient.getCaseId();
+
+        ((OpdProfileActivityPresenter) presenter).fetchProfileData(baseEntityId);
         ((OpdProfileActivityPresenter) presenter).refreshProfileTopSection(commonPersonObjectClient.getColumnmaps());
     }
 
@@ -83,11 +84,11 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
     @Override
     protected void onResumption() {
         super.onResumption();
-        String baseEntityId = getIntent().getStringExtra(OpdConstants.IntentKey.BASE_ENTITY_ID);
-        ((OpdProfileActivityPresenter) presenter).refreshProfileView(baseEntityId);
-
         CommonPersonObjectClient commonPersonObjectClient = (CommonPersonObjectClient) getIntent()
                 .getSerializableExtra(OpdConstants.IntentKey.CLIENT_OBJECT);
+        String baseEntityId = commonPersonObjectClient.getCaseId();
+
+        ((OpdProfileActivityPresenter) presenter).refreshProfileView(baseEntityId);
         ((OpdProfileActivityPresenter) presenter).refreshProfileTopSection(commonPersonObjectClient.getColumnmaps());
     }
 

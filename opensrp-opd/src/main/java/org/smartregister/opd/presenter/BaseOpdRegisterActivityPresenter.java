@@ -1,13 +1,28 @@
 package org.smartregister.opd.presenter;
 
 
+import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Triple;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.smartregister.clientandeventmodel.Event;
+import org.smartregister.domain.FetchStatus;
+import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
-import org.smartregister.opd.pojos.RegisterParams;
+import org.smartregister.opd.interactor.BaseOpdRegisterActivityInteractor;
+import org.smartregister.opd.pojos.OpdDiagnosisAndTreatmentForm;
+import org.smartregister.opd.utils.OpdConstants;
 
 import java.lang.ref.WeakReference;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+
+import timber.log.Timber;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-13
@@ -15,12 +30,13 @@ import java.util.List;
 
 public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterActivityContract.Presenter, OpdRegisterActivityContract.InteractorCallBack {
 
-    private WeakReference<OpdRegisterActivityContract.View> viewReference;
-    private OpdRegisterActivityContract.Interactor interactor;
-    private OpdRegisterActivityContract.Model model;
+    protected WeakReference<OpdRegisterActivityContract.View> viewReference;
+    protected OpdRegisterActivityContract.Interactor interactor;
+    protected OpdRegisterActivityContract.Model model;
 
     public BaseOpdRegisterActivityPresenter(OpdRegisterActivityContract.View view, OpdRegisterActivityContract.Model model) {
         viewReference = new WeakReference<>(view);
+        interactor = new BaseOpdRegisterActivityInteractor();
         this.model = model;
     }
 
@@ -73,7 +89,77 @@ public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterAct
     }
 
     @Override
-    public void saveForm(String jsonString, RegisterParams registerParams) {
+    public void saveVisitOrDiagnosisForm(@NonNull String eventType, @Nullable Intent data) {
+        String jsonString = null;
+        if (data != null) {
+            jsonString = data.getStringExtra(OpdConstants.JSON_FORM_EXTRA.JSON);
+        }
 
+        if (jsonString == null) {
+            return;
+        }
+
+        if (eventType.equals(OpdConstants.EventType.CHECK_IN)) {
+            try {
+                Event opdVisitEvent = OpdLibrary.getInstance().processOpdCheckInForm(eventType, jsonString, data);
+                interactor.saveEvents(Collections.singletonList(opdVisitEvent), this);
+            } catch (JSONException e) {
+                Timber.e(e);
+            }
+        } else if (eventType.equals(OpdConstants.EventType.DIAGNOSIS_AND_TREAT)) {
+            try {
+                List<Event> opdDiagnosisAndTreatment = OpdLibrary.getInstance().processOpdDiagnosisAndTreatmentForm(jsonString, data);
+                interactor.saveEvents(opdDiagnosisAndTreatment, this);
+            } catch (JSONException e) {
+                Timber.e(e);
+            }
+        }
+    }
+
+    @Override
+    public void onEventSaved() {
+        if (getView() != null) {
+            getView().refreshList(FetchStatus.fetched);
+            getView().hideProgressDialog();
+        }
+    }
+
+    @Override
+    public void startForm(@NonNull String formName, @NonNull String entityId, @NonNull String metaData
+            , @NonNull String locationId, @Nullable HashMap<String, String> injectedFieldValues, @Nullable String entityTable) {
+        if (StringUtils.isBlank(entityId)) {
+            Triple<String, String, String> triple = Triple.of(formName, metaData, locationId);
+            interactor.getNextUniqueId(triple, this);
+            return;
+        }
+
+        JSONObject form = null;
+        try {
+
+            form = model.getFormAsJson(formName, entityId, locationId, injectedFieldValues);
+
+            if (formName.equals(OpdConstants.Form.OPD_DIAGNOSIS_AND_TREAT)) {
+                OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm = new OpdDiagnosisAndTreatmentForm(entityId);
+                if (OpdLibrary.getInstance().getOpdDiagnosisAndTreatmentFormRepository().findOne(opdDiagnosisAndTreatmentForm) != null) {
+                    form = new JSONObject(OpdLibrary.getInstance().getOpdDiagnosisAndTreatmentFormRepository().findOne(opdDiagnosisAndTreatmentForm).getForm());
+                }
+            }
+
+        } catch (JSONException e) {
+            Timber.e(e);
+        }
+
+        if (getView() != null && form != null) {
+            HashMap<String, String> intentKeys = new HashMap<>();
+            intentKeys.put(OpdConstants.IntentKey.BASE_ENTITY_ID, entityId);
+            intentKeys.put(OpdConstants.IntentKey.ENTITY_TABLE, entityTable);
+
+            getView().startFormActivity(form, intentKeys);
+        }
+    }
+
+    @Override
+    public void onUniqueIdFetched(@NonNull Triple<String, String, String> triple, @NonNull String entityId) {
+        startForm(triple.getLeft(), entityId, triple.getMiddle(), triple.getRight(), null, null);
     }
 }

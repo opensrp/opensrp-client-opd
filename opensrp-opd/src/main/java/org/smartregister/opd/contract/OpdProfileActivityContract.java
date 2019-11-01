@@ -41,6 +41,7 @@ public interface OpdProfileActivityContract {
         void setProfileGender(@NonNull String gender);
 
         void setProfileImage(@NonNull String baseEntityId);
+
     }
 
     interface Interactor {

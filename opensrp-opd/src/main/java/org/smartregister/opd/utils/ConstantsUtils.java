@@ -5,6 +5,7 @@ package org.smartregister.opd.utils;
  */
 
 public class ConstantsUtils {
+
     public static final String DOB = "dob";
 
     public static class SuffixUtils {

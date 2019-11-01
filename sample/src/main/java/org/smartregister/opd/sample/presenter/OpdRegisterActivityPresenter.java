@@ -3,10 +3,7 @@ package org.smartregister.opd.sample.presenter;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Triple;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.smartregister.domain.FetchStatus;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
 import org.smartregister.opd.pojos.OpdEventClient;
@@ -54,30 +51,6 @@ public class OpdRegisterActivityPresenter extends BaseOpdRegisterActivityPresent
     }
 
     @Override
-    public void startForm(@NonNull String formName, @NonNull String entityId, @NonNull String metaData, @NonNull String locationId) {
-        if (StringUtils.isBlank(entityId)) {
-            Triple<String, String, String> triple = Triple.of(formName, metaData, locationId);
-            interactor.getNextUniqueId(triple, this);
-            return;
-        }
-
-        JSONObject form = null;
-        try {
-            form = model.getFormAsJson(formName, entityId, locationId);
-        } catch (JSONException e) {
-            Timber.e(e);
-        } catch (IllegalArgumentException e) {
-            Timber.e(e);
-        }
-
-        if (getView() != null && form != null) {
-            getView().startFormActivity(form);
-        } else {
-            Timber.e("Could not start FormActivity");
-        }
-    }
-
-    @Override
     public void onNoUniqueId() {
         if (getView() != null) {
             getView().displayShortToast(R.string.no_unique_id);
@@ -87,7 +60,7 @@ public class OpdRegisterActivityPresenter extends BaseOpdRegisterActivityPresent
     @Override
     public void onUniqueIdFetched(@NonNull Triple<String, String, String> triple, @NonNull String entityId) {
         try {
-            startForm(triple.getLeft(), entityId, triple.getMiddle(), triple.getRight());
+            startForm(triple.getLeft(), entityId, triple.getMiddle(), triple.getRight(), null, null);
         } catch (Exception e) {
             Timber.e(e);
             if (getView() != null) {

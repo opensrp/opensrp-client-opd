@@ -21,6 +21,7 @@ public interface OpdProfileFragmentContract {
 
     interface View {
 
+
     }
 
     interface Interactor {
