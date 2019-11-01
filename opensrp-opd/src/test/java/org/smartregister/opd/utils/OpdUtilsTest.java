@@ -3,7 +3,6 @@ package org.smartregister.opd.utils;
 import android.content.Intent;
 
 import org.jeasy.rules.api.Facts;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
