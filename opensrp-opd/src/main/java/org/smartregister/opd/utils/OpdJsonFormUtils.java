@@ -342,17 +342,6 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
         }
     }
 
-    public static void addKeyPairToJsonForm(@NonNull JSONArray fields, String key, String value) {
-        try {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put(OpdConstants.KEY.KEY, key);
-            jsonObject.put(OpdConstants.KEY.VALUE, value);
-            fields.put(jsonObject);
-        } catch (JSONException e) {
-            Timber.e(e, "OpdJsonFormUtils --> add %s:%s to Json Form", key, value);
-        }
-    }
-
     protected static void lastInteractedWith(@NonNull JSONArray fields) {
         try {
             JSONObject lastInteractedWith = new JSONObject();

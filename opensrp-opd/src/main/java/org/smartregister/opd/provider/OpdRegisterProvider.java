@@ -95,7 +95,7 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
     public void getFooterView(RecyclerView.ViewHolder viewHolder, int currentPageCount, int totalPageCount, boolean hasNext, boolean hasPrevious) {
         FooterViewHolder footerViewHolder = (FooterViewHolder) viewHolder;
         footerViewHolder.pageInfoView.setText(
-                MessageFormat.format(context.getString(org.smartregister.R.string.str_page_info), currentPageCount,
+                MessageFormat.format(context.getString(R.string.str_page_info), currentPageCount,
                         totalPageCount));
 
         footerViewHolder.nextPageView.setVisibility(hasNext ? View.VISIBLE : View.INVISIBLE);
