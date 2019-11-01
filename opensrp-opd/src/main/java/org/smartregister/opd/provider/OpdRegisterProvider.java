@@ -21,7 +21,6 @@ import org.smartregister.opd.configuration.OpdRegisterRowOptions;
 import org.smartregister.opd.holders.FooterViewHolder;
 import org.smartregister.opd.holders.OpdRegisterViewHolder;
 import org.smartregister.opd.utils.ConfigurationInstancesHelper;
-import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.opd.utils.OpdViewConstants;
 import org.smartregister.util.Utils;
 import org.smartregister.view.contract.SmartRegisterClient;
@@ -84,7 +83,7 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
         if (opdRegisterRowOptions != null && opdRegisterRowOptions.isDefaultPopulatePatientColumn()) {
             opdRegisterRowOptions.populateClientRow(cursor, pc, client, viewHolder);
         } else {
-            populatePatientColumn(pc, client, viewHolder);
+            populatePatientColumn(pc, viewHolder);
 
             if (opdRegisterRowOptions != null) {
                 opdRegisterRowOptions.populateClientRow(cursor, pc, client, viewHolder);
@@ -155,7 +154,7 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
         return viewHolder instanceof FooterViewHolder;
     }
 
-    public void populatePatientColumn(CommonPersonObjectClient commonPersonObjectClient, SmartRegisterClient smartRegisterClient, OpdRegisterViewHolder viewHolder) {
+    public void populatePatientColumn(CommonPersonObjectClient commonPersonObjectClient, OpdRegisterViewHolder viewHolder) {
         Map<String, String> patientColumnMaps = commonPersonObjectClient.getColumnmaps();
 
         if (opdRegisterProviderMetadata.isClientHaveGuardianDetails(patientColumnMaps)) {
@@ -179,9 +178,11 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
         String childName = org.smartregister.util.Utils.getName(firstName, middleName + " " + lastName);
 
         String dobString = Utils.getDuration(opdRegisterProviderMetadata.getDob(patientColumnMaps));
-        int year = dobString.contains("y") ? Integer.parseInt(dobString.substring(0, dobString.indexOf("y"))) : 0;
-        dobString = year >= 5 ? dobString.substring(0, dobString.indexOf("y")) : dobString;
-        fillValue(viewHolder.textViewChildName, WordUtils.capitalize(childName) + ", " + WordUtils.capitalize(OpdUtils.getTranslatedDate(dobString, context)));
+        String translatedYearInitial = context.getResources().getString(R.string.abbrv_years);
+        String extractedYear = dobString.substring(0, dobString.indexOf(translatedYearInitial));
+        int year = dobString.contains(translatedYearInitial) ? Integer.parseInt(extractedYear) : 0;
+        dobString = year >= 5 ? extractedYear : dobString;
+        fillValue(viewHolder.textViewChildName, WordUtils.capitalize(childName) + ", " + WordUtils.capitalize(dobString));
         String registerType = opdRegisterProviderMetadata.getRegisterType(patientColumnMaps);
 
         if (!TextUtils.isEmpty(registerType)) {
