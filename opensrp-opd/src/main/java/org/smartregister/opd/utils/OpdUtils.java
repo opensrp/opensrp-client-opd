@@ -9,6 +9,7 @@ import android.util.DisplayMetrics;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jeasy.rules.api.Facts;
+import org.jetbrains.annotations.NotNull;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.pojos.OpdMetadata;
 import org.smartregister.util.JsonFormUtils;
@@ -136,5 +137,15 @@ public class OpdUtils extends org.smartregister.util.Utils {
             }
         }
         return strIds.toString();
+    }
+
+    @NotNull
+    public static String getClientAge(String dobString, String translatedYearInitial) {
+        if (dobString.contains(translatedYearInitial)) {
+            String extractedYear = dobString.substring(0, dobString.indexOf(translatedYearInitial));
+            int year = dobString.contains(translatedYearInitial) ? Integer.parseInt(extractedYear) : 0;
+            dobString = year >= 5 ? extractedYear : dobString;
+        }
+        return dobString;
     }
 }

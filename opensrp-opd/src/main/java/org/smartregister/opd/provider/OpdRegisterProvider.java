@@ -21,6 +21,7 @@ import org.smartregister.opd.configuration.OpdRegisterRowOptions;
 import org.smartregister.opd.holders.FooterViewHolder;
 import org.smartregister.opd.holders.OpdRegisterViewHolder;
 import org.smartregister.opd.utils.ConfigurationInstancesHelper;
+import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.opd.utils.OpdViewConstants;
 import org.smartregister.util.Utils;
 import org.smartregister.view.contract.SmartRegisterClient;
@@ -179,10 +180,8 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
 
         String dobString = Utils.getDuration(opdRegisterProviderMetadata.getDob(patientColumnMaps));
         String translatedYearInitial = context.getResources().getString(R.string.abbrv_years);
-        String extractedYear = dobString.substring(0, dobString.indexOf(translatedYearInitial));
-        int year = dobString.contains(translatedYearInitial) ? Integer.parseInt(extractedYear) : 0;
-        dobString = year >= 5 ? extractedYear : dobString;
-        fillValue(viewHolder.textViewChildName, WordUtils.capitalize(childName) + ", " + WordUtils.capitalize(dobString));
+        fillValue(viewHolder.textViewChildName, WordUtils.capitalize(childName) + ", " +
+                WordUtils.capitalize(OpdUtils.getClientAge(dobString, translatedYearInitial)));
         String registerType = opdRegisterProviderMetadata.getRegisterType(patientColumnMaps);
 
         if (!TextUtils.isEmpty(registerType)) {
