@@ -32,6 +32,7 @@ import org.smartregister.repository.Repository;
 import org.smartregister.util.JsonFormUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 @PrepareForTest(OpdUtils.class)
 @RunWith(PowerMockRunner.class)
@@ -97,6 +98,48 @@ public class OpdJsonFormUtilsTest {
 
         JSONObject result = OpdJsonFormUtils.getFormAsJson(jsonObject, OpdConstants.JSON_FORM_KEY.NAME, "23", "currentLocation");
         Assert.assertEquals(result, jsonObject);
+    }
+
+    @Test
+    public void testGetFormAsJsonWithNonEmptyJsonObjectAndInjectableFields() throws Exception {
+        OpdMetadata opdMetadata = new OpdMetadata(OpdConstants.JSON_FORM_KEY.NAME
+                , OpdDbConstants.KEY.TABLE
+                , OpdConstants.EventType.OPD_REGISTRATION
+                , OpdConstants.EventType.UPDATE_OPD_REGISTRATION
+                , OpdConstants.CONFIG
+                , Class.class
+                , Class.class
+                , true);
+
+        OpdConfiguration opdConfiguration = new OpdConfiguration.Builder(OpdRegisterQueryProviderTest.class)
+                .setOpdMetadata(opdMetadata)
+                .build();
+
+        OpdLibrary.init(PowerMockito.mock(Context.class), PowerMockito.mock(Repository.class), opdConfiguration,
+                BuildConfig.VERSION_CODE, 1);
+
+        JSONObject jsonArrayFieldsJsonObject = new JSONObject();
+        jsonArrayFieldsJsonObject.put(OpdJsonFormUtils.KEY, OpdJsonFormUtils.OPENSRP_ID);
+
+        JSONObject injectableField = new JSONObject();
+        injectableField.put(OpdJsonFormUtils.KEY, "Injectable");
+
+        JSONArray jsonArrayFields = new JSONArray();
+        jsonArrayFields.put(jsonArrayFieldsJsonObject);
+        jsonArrayFields.put(injectableField);
+
+        JSONObject jsonObjectForFields = new JSONObject();
+        jsonObjectForFields.put(OpdJsonFormUtils.FIELDS, jsonArrayFields);
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("metadata", new JSONObject());
+        jsonObject.put(OpdJsonFormUtils.STEP1, jsonObjectForFields);
+
+        HashMap<String, String> injectableFields = new HashMap<>();
+        injectableFields.put("Injectable", "Injectable value");
+        JSONObject result = OpdJsonFormUtils.getFormAsJson(jsonObject, OpdConstants.JSON_FORM_KEY.NAME, "23", "currentLocation", injectableFields);
+        Assert.assertEquals(result, jsonObject);
+        Assert.assertEquals("Injectable value", injectableField.getString(OpdJsonFormUtils.VALUE));
     }
 
     @Test

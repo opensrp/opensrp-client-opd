@@ -9,8 +9,8 @@ import android.util.DisplayMetrics;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jeasy.rules.api.Facts;
+import org.jetbrains.annotations.NotNull;
 import org.smartregister.opd.OpdLibrary;
-import org.smartregister.opd.R;
 import org.smartregister.opd.pojos.OpdMetadata;
 import org.smartregister.util.JsonFormUtils;
 
@@ -31,15 +31,6 @@ import timber.log.Timber;
 public class OpdUtils extends org.smartregister.util.Utils {
 
     private static final String OTHER_SUFFIX = ", other]";
-
-    @NonNull
-    public static String getTranslatedDate(@NonNull String str_date, @NonNull Context context) {
-        return str_date
-                .replace("d", context.getString(R.string.abbrv_days))
-                .replace("w", context.getString(R.string.abbrv_weeks))
-                .replace("m", context.getString(R.string.abbrv_months))
-                .replace("y", context.getString(R.string.abbrv_years));
-    }
 
     public static float convertDpToPixel(float dp, @NonNull Context context) {
         return dp * ((float) context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
@@ -146,5 +137,18 @@ public class OpdUtils extends org.smartregister.util.Utils {
             }
         }
         return strIds.toString();
+    }
+
+    @NotNull
+    public static String getClientAge(String dobString, String translatedYearInitial) {
+        String age = dobString;
+        if (dobString.contains(translatedYearInitial)) {
+            String extractedYear = dobString.substring(0, dobString.indexOf(translatedYearInitial));
+            int year = dobString.contains(translatedYearInitial) ? Integer.parseInt(extractedYear) : 0;
+            if (year >= 5) {
+                age = extractedYear;
+            }
+        }
+        return age;
     }
 }
