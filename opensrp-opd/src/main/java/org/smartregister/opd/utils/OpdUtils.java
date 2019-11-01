@@ -141,11 +141,14 @@ public class OpdUtils extends org.smartregister.util.Utils {
 
     @NotNull
     public static String getClientAge(String dobString, String translatedYearInitial) {
+        String age = dobString;
         if (dobString.contains(translatedYearInitial)) {
             String extractedYear = dobString.substring(0, dobString.indexOf(translatedYearInitial));
             int year = dobString.contains(translatedYearInitial) ? Integer.parseInt(extractedYear) : 0;
-            dobString = year >= 5 ? extractedYear : dobString;
+            if (year >= 5) {
+                age = extractedYear;
+            }
         }
-        return dobString;
+        return age;
     }
 }

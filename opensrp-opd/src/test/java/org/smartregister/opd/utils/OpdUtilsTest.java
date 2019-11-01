@@ -95,12 +95,12 @@ public class OpdUtilsTest {
 
     @Test
     public void testGetClientAge(){
-        Assert.assertEquals("13", OpdUtils.getClientAge("13y 4m", "y"));
-        Assert.assertEquals("4m", OpdUtils.getClientAge("4m", "y"));
-        Assert.assertEquals("5", OpdUtils.getClientAge("5y 4w", "y"));
-        Assert.assertEquals("3y", OpdUtils.getClientAge("3y", "y"));
-        Assert.assertEquals("5w 6d", OpdUtils.getClientAge("5w 6d", "y"));
-        Assert.assertEquals("6d", OpdUtils.getClientAge("6d", "y"));
+        assertEquals("13", OpdUtils.getClientAge("13y 4m", "y"));
+        assertEquals("4m", OpdUtils.getClientAge("4m", "y"));
+        assertEquals("5", OpdUtils.getClientAge("5y 4w", "y"));
+        assertEquals("3y", OpdUtils.getClientAge("3y", "y"));
+        assertEquals("5w 6d", OpdUtils.getClientAge("5w 6d", "y"));
+        assertEquals("6d", OpdUtils.getClientAge("6d", "y"));
     }
 
 }
