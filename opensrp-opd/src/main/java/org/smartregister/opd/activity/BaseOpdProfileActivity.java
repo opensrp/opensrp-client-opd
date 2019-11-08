@@ -1,20 +1,31 @@
 package org.smartregister.opd.activity;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.opd.R;
 import org.smartregister.opd.adapter.ViewPagerAdapter;
 import org.smartregister.opd.contract.OpdProfileActivityContract;
 import org.smartregister.opd.fragment.OpdProfileOverviewFragment;
 import org.smartregister.opd.fragment.OpdProfileVisitFragment;
+import org.smartregister.opd.listener.OnSendActionToFragment;
 import org.smartregister.opd.presenter.OpdProfileActivityPresenter;
 import org.smartregister.opd.utils.OpdConstants;
+import org.smartregister.opd.utils.OpdJsonFormUtils;
+import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.view.activity.BaseProfileActivity;
+
+import java.util.HashMap;
+
+import timber.log.Timber;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-27
@@ -27,6 +38,8 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
     private TextView genderView;
     private TextView ancIdView;
     private ImageView imageView;
+    private OnSendActionToFragment sendActionListenerForProfileOverview;
+    private OnSendActionToFragment sendActionListenerToVisitsFragment;
 
     private CommonPersonObjectClient commonPersonObjectClient;
 
@@ -52,7 +65,10 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
         OpdProfileOverviewFragment profileOverviewFragment = OpdProfileOverviewFragment.newInstance(this.getIntent().getExtras());
+        setSendActionListenerForProfileOverview(profileOverviewFragment);
+
         OpdProfileVisitFragment profileVisitsFragment = OpdProfileVisitFragment.newInstance(this.getIntent().getExtras());
+        setSendActionListenerToVisitsFragment(profileVisitsFragment);
 
         adapter.addFragment(profileOverviewFragment, this.getString(R.string.overview));
         adapter.addFragment(profileVisitsFragment, this.getString(R.string.visits));
@@ -60,6 +76,14 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
         viewPager.setAdapter(adapter);
 
         return viewPager;
+    }
+
+    public void setSendActionListenerForProfileOverview(OnSendActionToFragment sendActionListenerForProfileOverview) {
+        this.sendActionListenerForProfileOverview = sendActionListenerForProfileOverview;
+    }
+
+    public void setSendActionListenerToVisitsFragment(OnSendActionToFragment sendActionListenerToVisitsFragment) {
+        this.sendActionListenerToVisitsFragment = sendActionListenerToVisitsFragment;
     }
 
     @Override
@@ -130,11 +154,61 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
 
     @Override
     public void openDiagnoseAndTreatForm() {
-        //startFormActivity(OpdConstants.Form.OPD_DIAGNOSIS_AND_TREAT, commonPersonObjectClient.getCaseId(), null, injectedValues, entityTable);
+        if (commonPersonObjectClient != null) {
+            ((OpdProfileActivityPresenter) presenter).startForm(OpdConstants.Form.OPD_DIAGNOSIS_AND_TREAT, commonPersonObjectClient);
+        }
     }
+
+    public OnSendActionToFragment getActionListenerForVisitFragment() {
+        return sendActionListenerToVisitsFragment;
+    }
+
+    public OnSendActionToFragment getActionListenerForProfileOverview() {
+        return sendActionListenerForProfileOverview;
+    }
+
 
     @Override
     public void openCheckInForm() {
+        if (commonPersonObjectClient != null) {
+            ((OpdProfileActivityPresenter) presenter).startForm(OpdConstants.Form.OPD_CHECK_IN, commonPersonObjectClient);
+        }
+    }
 
+    @Override
+    public void startFormActivity(@NonNull JSONObject form, @NonNull HashMap<String, String> intentKeys) {
+        Intent intent = OpdUtils.buildFormActivityIntent(form, intentKeys, this);
+        startActivityForResult(intent, OpdJsonFormUtils.REQUEST_CODE_GET_JSON);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.clear();
+        menu.add("Menu 1");
+        menu.add("Menu 2");
+        return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == OpdJsonFormUtils.REQUEST_CODE_GET_JSON && resultCode == RESULT_OK) {
+            try {
+                String jsonString = data.getStringExtra(OpdConstants.JSON_FORM_EXTRA.JSON);
+                Timber.d("JSONResult : %s", jsonString);
+
+                JSONObject form = new JSONObject(jsonString);
+                String encounterType = form.getString(OpdJsonFormUtils.ENCOUNTER_TYPE);
+                if (encounterType.equals(OpdConstants.EventType.CHECK_IN)) {
+                    showProgressDialog(R.string.saving_dialog_title);
+                    ((OpdProfileActivityPresenter) presenter).saveVisitOrDiagnosisForm(encounterType, data);
+                } else if (encounterType.equals(OpdConstants.EventType.DIAGNOSIS_AND_TREAT)) {
+                    showProgressDialog(R.string.saving_dialog_title);
+                    ((OpdProfileActivityPresenter) presenter).saveVisitOrDiagnosisForm(encounterType, data);
+                }
+
+            } catch (JSONException e) {
+                Timber.e(e);
+            }
+        }
     }
 }

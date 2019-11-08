@@ -12,6 +12,7 @@ import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.opd.R;
 import org.smartregister.opd.adapter.OpdProfileVisitsAdapter;
 import org.smartregister.opd.contract.OpdProfileFragmentContract;
+import org.smartregister.opd.listener.OnSendActionToFragment;
 import org.smartregister.opd.pojos.OpdVisitSummary;
 import org.smartregister.opd.presenter.OpdProfileFragmentPresenter;
 import org.smartregister.opd.utils.OpdConstants;
@@ -23,7 +24,7 @@ import java.util.List;
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-27
  */
 
-public class OpdProfileVisitFragment extends BaseProfileFragment implements OpdProfileFragmentContract.View {
+public class OpdProfileVisitFragment extends BaseProfileFragment implements OpdProfileFragmentContract.View, OnSendActionToFragment {
 
     private RecyclerView recyclerView;
     private OpdProfileFragmentContract.Presenter presenter;
@@ -87,5 +88,10 @@ public class OpdProfileVisitFragment extends BaseProfileFragment implements OpdP
 
         recyclerView = fragmentView.findViewById(R.id.rv_opdFragmentProfileVisit_recyclerView);
         return fragmentView;
+    }
+
+    @Override
+    public void onActionReceive() {
+        onResumption();
     }
 }

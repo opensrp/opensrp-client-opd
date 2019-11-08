@@ -42,8 +42,8 @@ public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements 
 
         TextView txtSelectedItemInMultiSelectList = view.findViewById(R.id.txtSelectedItemInMultiSelectList);
         txtSelectedItemInMultiSelectList.setText(multiSelectItem.getKey());
-        final EditText edtTreatmentDuration = view.findViewById(R.id.edtTreatmentDosage);
-        final EditText edtTreatmentDosage = view.findViewById(R.id.edtTreatmentDuration);
+        final EditText edtTreatmentDosage = view.findViewById(R.id.edtTreatmentDosage);
+        final EditText edtTreatmentDuration = view.findViewById(R.id.edtTreatmentDuration);
         edtTreatmentDosage.addTextChangedListener(this);
         edtTreatmentDuration.addTextChangedListener(this);
         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.FullScreenDialogStyle);

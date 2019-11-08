@@ -15,7 +15,17 @@ public class OpdVisitSummary {
     private String treatment;
     private String dosage;
     private String duration;
+    private String disease;
+    private String diagnosisType;
     private Date visitDate;
+
+    public String getDisease() {
+        return disease;
+    }
+
+    public void setDisease(String disease) {
+        this.disease = disease;
+    }
 
     public String getTestName() {
         return testName;
@@ -79,5 +89,13 @@ public class OpdVisitSummary {
 
     public void setVisitDate(Date visitDate) {
         this.visitDate = visitDate;
+    }
+
+    public void setDiagnosisType(String diagnosisType) {
+        this.diagnosisType = diagnosisType;
+    }
+
+    public String getDiagnosisType() {
+        return diagnosisType;
     }
 }

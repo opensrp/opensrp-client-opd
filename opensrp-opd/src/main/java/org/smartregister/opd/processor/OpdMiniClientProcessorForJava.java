@@ -227,7 +227,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                 boolean result = OpdLibrary.getInstance().getOpdTreatmentRepository().saveOrUpdate(opdTreatment);
                 if (result) {
                     Timber.i("Opd processTreatment for %s saved", event.getBaseEntityId());
-                    return;
+                    continue;
                 }
                 Timber.e("Opd processTreatment for %s not saved", event.getBaseEntityId());
             }
@@ -270,7 +270,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                 boolean result = OpdLibrary.getInstance().getOpdDiagnosisRepository().saveOrUpdate(opdDiagnosis);
                 if (result) {
                     Timber.i("Opd processDiagnosis for %s saved", event.getBaseEntityId());
-                    return;
+                    continue;
                 }
                 Timber.e("Opd processDiagnosis for %s not saved", event.getBaseEntityId());
             }
@@ -278,7 +278,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
 
     }
 
-    private void processTestConducted(@NonNull Event event) throws JSONException {
+    private void processTestConducted(@NonNull Event event) {
 
         Map<String, String> mapDetails = event.getDetails();
 

@@ -34,8 +34,10 @@ import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.repository.Repository;
 import org.smartregister.repository.UniqueIdRepository;
+import org.smartregister.sync.ClientProcessorForJava;
 import org.smartregister.sync.helper.ECSyncHelper;
 import org.smartregister.util.JsonFormUtils;
+import org.smartregister.view.activity.DrishtiApplication;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
@@ -227,6 +229,11 @@ public class OpdLibrary {
         return compressor;
     }
 
+    @NonNull
+    public ClientProcessorForJava getClientProcessorForJava() {
+        return DrishtiApplication.getInstance().getClientProcessor();
+    }
+
 
     public int getDatabaseVersion() {
         return databaseVersion;
@@ -371,9 +378,15 @@ public class OpdLibrary {
     }
 
     public String opdLookUpQuery() {
-        String lookUpQueryForChild = "select id as _id, relationalid, first_name, last_name, gender, dob, base_entity_id, null as national_id from ec_child where [condition] ";
-        String lookUpQueryForMother = "select id as _id, relationalid, first_name, last_name, gender, dob, base_entity_id, nrc_number as national_id from ec_mother where [condition] ";
-        String lookUpQueryForOpdClient = "select id as _id, relationalid, first_name, last_name, gender, dob, base_entity_id, null as national_id from ec_client where [condition] ";
+        String lookUpQueryForChild = "select id as _id, %s, %s, %s, %s, %s, %s, zeir_id as %s from ec_child where [condition] ";
+        lookUpQueryForChild = String.format(lookUpQueryForChild, OpdConstants.KEY.RELATIONALID, OpdConstants.KEY.FIRST_NAME,
+                OpdConstants.KEY.LAST_NAME, OpdConstants.KEY.GENDER, OpdConstants.KEY.DOB, OpdConstants.KEY.BASE_ENTITY_ID, OpdDbConstants.KEY.OPENSRP_ID);
+        String lookUpQueryForMother = "select id as _id, %s, %s, %s, %s, %s, %s, register_id as %s from ec_mother where [condition] ";
+        lookUpQueryForMother = String.format(lookUpQueryForMother, OpdConstants.KEY.RELATIONALID, OpdConstants.KEY.FIRST_NAME,
+                OpdConstants.KEY.LAST_NAME, OpdConstants.KEY.GENDER, OpdConstants.KEY.DOB, OpdConstants.KEY.BASE_ENTITY_ID, OpdDbConstants.KEY.OPENSRP_ID);
+        String lookUpQueryForOpdClient = "select id as _id, %s, %s, %s, %s, %s, %s, %s from ec_client where [condition] ";
+        lookUpQueryForOpdClient = String.format(lookUpQueryForOpdClient, OpdConstants.KEY.RELATIONALID, OpdConstants.KEY.FIRST_NAME,
+                OpdConstants.KEY.LAST_NAME, OpdConstants.KEY.GENDER, OpdConstants.KEY.DOB, OpdConstants.KEY.BASE_ENTITY_ID, OpdDbConstants.KEY.OPENSRP_ID);
         return lookUpQueryForChild + " union all " + lookUpQueryForMother + " union all " + lookUpQueryForOpdClient;
     }
 

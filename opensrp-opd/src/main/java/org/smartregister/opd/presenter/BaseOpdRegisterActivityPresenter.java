@@ -125,7 +125,7 @@ public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterAct
     }
 
     @Override
-    public void startForm(@NonNull String formName, @NonNull String entityId, @NonNull String metaData
+    public void startForm(@NonNull String formName, @NonNull String entityId, String metaData
             , @NonNull String locationId, @Nullable HashMap<String, String> injectedFieldValues, @Nullable String entityTable) {
         if (StringUtils.isBlank(entityId)) {
             Triple<String, String, String> triple = Triple.of(formName, metaData, locationId);

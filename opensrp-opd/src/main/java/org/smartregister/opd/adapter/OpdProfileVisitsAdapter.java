@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import org.smartregister.opd.R;
 import org.smartregister.opd.pojos.OpdVisitSummary;
+import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdUtils;
 
 import java.util.List;
@@ -43,7 +44,7 @@ public class OpdProfileVisitsAdapter extends RecyclerView.Adapter<OpdProfileVisi
         OpdVisitSummary opdVisitSummary = mData.get(position);
 
         if (opdVisitSummary.getVisitDate() != null) {
-            holder.visitDate.setText(OpdUtils.convertDate(opdVisitSummary.getVisitDate(), "d MMM yyyy"));
+            holder.visitDate.setText(OpdUtils.convertDate(opdVisitSummary.getVisitDate(), OpdConstants.DateFormat.d_MMM_yyyy));
         }
 
         if (!TextUtils.isEmpty(opdVisitSummary.getTestName())) {
@@ -60,10 +61,16 @@ public class OpdProfileVisitsAdapter extends RecyclerView.Adapter<OpdProfileVisi
             holder.diagnosis.setText(opdVisitSummary.getDiagnosis());
         }
 
-        boolean isDiseaseCode = !TextUtils.isEmpty(opdVisitSummary.getDiseaseCode());
+        boolean hasDiagnosisType = !TextUtils.isEmpty(opdVisitSummary.getDiagnosisType());
+        setVisibility(hasDiagnosisType, holder.diagnosisTypeLabel, holder.diagnosisType);
+        if (hasDiagnosisType) {
+            holder.diagnosisType.setText(opdVisitSummary.getDiagnosisType());
+        }
+
+        boolean isDiseaseCode = !TextUtils.isEmpty(opdVisitSummary.getDisease());
         setVisibility(isDiseaseCode, holder.diseaseCodeLabel, holder.diseaseCode);
         if (isDiseaseCode) {
-            holder.diseaseCode.setText(opdVisitSummary.getDiseaseCode());
+            holder.diseaseCode.setText(opdVisitSummary.getDisease());
         }
 
         boolean isTreatment = !TextUtils.isEmpty(opdVisitSummary.getTreatment());
@@ -127,6 +134,10 @@ public class OpdProfileVisitsAdapter extends RecyclerView.Adapter<OpdProfileVisi
         private TextView dose;
         private TextView durationLabel;
         private TextView duration;
+        private TextView diagnosisType;
+        private TextView diseaseLabel;
+        private TextView disease;
+        private TextView diagnosisTypeLabel;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -136,14 +147,19 @@ public class OpdProfileVisitsAdapter extends RecyclerView.Adapter<OpdProfileVisi
             testResult = itemView.findViewById(R.id.visit_row_test_result);
             diagnosis = itemView.findViewById(R.id.visit_row_diagnosis);
             diagnosisLabel = itemView.findViewById(R.id.visit_row_diagnosis_label);
+            diagnosisType = itemView.findViewById(R.id.visit_row_diagnosis_type);
+            diagnosisTypeLabel = itemView.findViewById(R.id.visit_row_diagnosis_type_label);
             diseaseCodeLabel = itemView.findViewById(R.id.visit_row_disease_code_label);
             diseaseCode = itemView.findViewById(R.id.visit_row_disease_code);
+//            disease = itemView.findViewById(R.id.visit_row_disease);
+//            diseaseLabel = itemView.findViewById(R.id.visit_row_disease_label);
             treatmentLabel = itemView.findViewById(R.id.visit_row_treatment_label);
             treatment = itemView.findViewById(R.id.visit_row_treatment);
             doseLabel = itemView.findViewById(R.id.visit_row_dosage_label);
             dose = itemView.findViewById(R.id.visit_row_dosage);
             durationLabel = itemView.findViewById(R.id.visit_row_duration_label);
             duration = itemView.findViewById(R.id.visit_row_duration);
+
 
             parent = itemView;
         }

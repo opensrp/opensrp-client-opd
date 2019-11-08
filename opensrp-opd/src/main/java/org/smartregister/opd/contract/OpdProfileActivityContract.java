@@ -1,9 +1,13 @@
 package org.smartregister.opd.contract;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.apache.commons.lang3.tuple.Triple;
+import org.json.JSONObject;
+import org.smartregister.commonregistry.CommonPersonObjectClient;
+import org.smartregister.opd.listener.OnSendActionToFragment;
 import org.smartregister.view.contract.BaseProfileContract;
 
 import java.util.HashMap;
@@ -28,6 +32,10 @@ public interface OpdProfileActivityContract {
         void refreshProfileTopSection(@NonNull Map<String, String> client);
 
         HashMap<String, String> saveFinishForm(@NonNull Map<String, String> client);
+
+        void startForm(String formName, CommonPersonObjectClient commonPersonObjectClient);
+
+        void saveVisitOrDiagnosisForm(String eventType, Intent data);
     }
 
     interface View extends BaseProfileContract.View {
@@ -46,6 +54,11 @@ public interface OpdProfileActivityContract {
 
         void openCheckInForm();
 
+        void startFormActivity(JSONObject form, HashMap<String, String> intentKeys);
+
+        OnSendActionToFragment getActionListenerForVisitFragment();
+
+        OnSendActionToFragment getActionListenerForProfileOverview();
     }
 
     interface Interactor {

@@ -3,6 +3,7 @@
 
     <application>
         <activity android:name=".activity.BaseOpdFormActivity"></activity>
+        <activity android:name=".activity.BaseOpdRegisterActivity"></activity>
         <activity android:name=".activity.BaseOpdProfileActivity"></activity>
     </application>
 

@@ -19,6 +19,7 @@ import org.smartregister.opd.activity.BaseOpdProfileActivity;
 import org.smartregister.opd.adapter.OpdProfileOverviewAdapter;
 import org.smartregister.opd.contract.OpdProfileOverviewFragmentContract;
 import org.smartregister.opd.domain.YamlConfigWrapper;
+import org.smartregister.opd.listener.OnSendActionToFragment;
 import org.smartregister.opd.presenter.OpdProfileOverviewFragmentPresenter;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;
@@ -30,7 +31,7 @@ import java.util.List;
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-30
  */
-public class OpdProfileOverviewFragment extends BaseProfileFragment implements OpdProfileOverviewFragmentContract.View {
+public class OpdProfileOverviewFragment extends BaseProfileFragment implements OpdProfileOverviewFragmentContract.View, OnSendActionToFragment {
 
     private String baseEntityId;
     private OpdProfileOverviewFragmentContract.Presenter presenter;
@@ -104,7 +105,7 @@ public class OpdProfileOverviewFragment extends BaseProfileFragment implements O
                     FragmentActivity activity = getActivity();
 
                     if (activity instanceof BaseOpdProfileActivity) {
-                        ((BaseOpdProfileActivity) activity).openDiagnoseAndTreatForm();
+                        ((BaseOpdProfileActivity) activity).openCheckInForm();
                     }
                 }
             });
@@ -141,4 +142,8 @@ public class OpdProfileOverviewFragment extends BaseProfileFragment implements O
         return view;
     }
 
+    @Override
+    public void onActionReceive() {
+        onResumption();
+    }
 }

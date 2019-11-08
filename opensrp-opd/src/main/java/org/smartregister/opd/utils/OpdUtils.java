@@ -7,11 +7,16 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 
+import com.vijay.jsonwizard.constants.JsonFormConstants;
+import com.vijay.jsonwizard.domain.Form;
+
 import org.apache.commons.lang3.StringUtils;
 import org.jeasy.rules.api.Facts;
+import org.json.JSONObject;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
 import org.smartregister.opd.pojos.OpdMetadata;
+import org.smartregister.util.FormUtils;
 import org.smartregister.util.JsonFormUtils;
 
 import java.text.DateFormat;
@@ -19,6 +24,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -31,6 +37,7 @@ import timber.log.Timber;
 public class OpdUtils extends org.smartregister.util.Utils {
 
     private static final String OTHER_SUFFIX = ", other]";
+    private static FormUtils formUtils;
 
     @NonNull
     public static String getTranslatedDate(@NonNull String str_date, @NonNull Context context) {
@@ -147,4 +154,53 @@ public class OpdUtils extends org.smartregister.util.Utils {
         }
         return strIds.toString();
     }
+
+    public static Intent buildFormActivityIntent(JSONObject jsonForm, HashMap<String, String> parcelableData, Context context) {
+        Intent intent = new Intent(context, OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata().getOpdFormActivity());
+        intent.putExtra(OpdConstants.JSON_FORM_EXTRA.JSON, jsonForm.toString());
+        Form form = new Form();
+        form.setWizard(false);
+        form.setName("");
+        String encounterType = jsonForm.optString(OpdJsonFormUtils.ENCOUNTER_TYPE);
+        if (encounterType.equals(OpdConstants.EventType.DIAGNOSIS_AND_TREAT)) {
+            form.setName(OpdConstants.EventType.DIAGNOSIS_AND_TREAT);
+            form.setWizard(true);
+        }
+        form.setHideSaveLabel(true);
+        form.setPreviousLabel("");
+        form.setNextLabel("");
+        form.setHideNextButton(false);
+        form.setHidePreviousButton(false);
+        intent.putExtra(JsonFormConstants.JSON_FORM_KEY.FORM, form);
+
+        if (parcelableData != null) {
+            for (String intentKey : parcelableData.keySet()) {
+                intent.putExtra(intentKey, parcelableData.get(intentKey));
+            }
+        }
+        return intent;
+    }
+
+    public static JSONObject getJsonFormToJsonObject(String formName){
+        if (getFormUtils() == null) {
+            return null;
+        }
+
+        return getFormUtils().getFormJson(formName);
+    }
+
+
+    @Nullable
+    private static FormUtils getFormUtils() {
+        if (formUtils == null) {
+            try {
+                formUtils = FormUtils.getInstance(OpdLibrary.getInstance().context().applicationContext());
+            } catch (Exception e) {
+                Timber.e(e);
+            }
+        }
+        return formUtils;
+    }
+
+
 }
