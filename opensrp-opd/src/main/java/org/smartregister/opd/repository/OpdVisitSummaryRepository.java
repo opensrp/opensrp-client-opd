@@ -40,7 +40,7 @@ public class OpdVisitSummaryRepository extends BaseRepository {
             String query = String.format("SELECT %s.%s, %s.%s, %s.%s, %s.%s, %s.%s, %s.%s, %s.%s, %s.%s, %s.%s, %s.%s FROM %s " +
                             "LEFT JOIN %s ON %s.%s = %s.%s " +
                             "LEFT JOIN %s ON %s.%s = %s.%s " +
-                            "LEFT JOIN %s ON %s.%s = %s.%s WHERE %s.%s = '%s'"
+                            "LEFT JOIN %s ON %s.%s = %s.%s WHERE %s.%s = '%s' ORDER BY %s.%s DESC"
                     , OpdDbConstants.Table.OPD_VISIT, OpdDbConstants.Column.OpdVisit.VISIT_DATE
                     , OpdDbConstants.Table.OPD_TEST_CONDUCTED, OpdDbConstants.Column.OpdTestConducted.TEST
                     , OpdDbConstants.Table.OPD_TEST_CONDUCTED, OpdDbConstants.Column.OpdTestConducted.RESULT
@@ -63,6 +63,7 @@ public class OpdVisitSummaryRepository extends BaseRepository {
                     , OpdDbConstants.Table.OPD_TREATMENT, OpdDbConstants.Column.OpdTreatment.VISIT_ID
                     , OpdDbConstants.Table.OPD_VISIT, OpdDbConstants.Column.OpdVisit.BASE_ENTITY_ID
                     , baseEntityId
+                    , OpdDbConstants.Table.OPD_VISIT, OpdDbConstants.Column.OpdVisit.VISIT_DATE
             );
 
             if (StringUtils.isNotBlank(baseEntityId)) {
