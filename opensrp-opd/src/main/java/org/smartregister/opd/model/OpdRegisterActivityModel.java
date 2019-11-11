@@ -7,19 +7,15 @@ import org.json.JSONObject;
 import org.smartregister.configurableviews.ConfigurableViewsLibrary;
 import org.smartregister.domain.tag.FormTag;
 import org.smartregister.location.helper.LocationHelper;
-import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
 import org.smartregister.opd.pojos.OpdEventClient;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.opd.utils.OpdUtils;
-import org.smartregister.util.FormUtils;
 import org.smartregister.util.Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import timber.log.Timber;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-13

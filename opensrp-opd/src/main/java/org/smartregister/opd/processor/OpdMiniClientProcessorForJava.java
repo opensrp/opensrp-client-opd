@@ -101,6 +101,10 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
 
         if (event.getEventType().equals(OpdConstants.EventType.CHECK_IN)) {
             try {
+                if (eventClient.getClient() == null) {
+                    throw new CheckInEventProcessException(String.format("Client %s referenced by %s event does not exist", event.getBaseEntityId(), OpdConstants.EventType.CHECK_IN));
+                }
+
                 processCheckIn(event, eventClient.getClient());
                 CoreLibrary.getInstance().context().getEventClientRepository().markEventAsProcessed(eventClient.getEvent().getFormSubmissionId());
             } catch (CheckInEventProcessException ex) {
