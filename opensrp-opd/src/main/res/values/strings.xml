@@ -48,6 +48,7 @@
     <string name="add_treatment_medicine">Add treatment/medicine</string>
     <string name="drug_picker_dialog_save">SAVE</string>
     <string name="opd_dosage_duration_text">Dose: %s, Duration: %s</string>
+    <string name="opd">OPD</string>
     <string name="opd_checked_in">OPD: CHECKED IN</string>
 
     <string name="diagnose_and_treat"><![CDATA[DIAGNOSE & TREAT]]></string>

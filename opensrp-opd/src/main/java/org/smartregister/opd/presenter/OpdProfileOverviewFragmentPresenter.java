@@ -116,7 +116,6 @@ public class OpdProfileOverviewFragmentPresenter implements OpdProfileOverviewFr
             OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.HIV_STATUS, checkIn.getCurrentHivResult());
             OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.VISIT_TYPE, checkIn.getVisitType());
             OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.PREVIOUS_APPOINTMENT, checkIn.getAppointmentScheduledPreviously());
-
             OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.DATE_OF_APPOINTMENT, checkIn.getAppointmentDueDate());
         } else {
             if (client != null) {
@@ -128,9 +127,7 @@ public class OpdProfileOverviewFragmentPresenter implements OpdProfileOverviewFr
             }
         }
 
-        Date latestValidCheckInDate = OpdLibrary.getInstance().getLatestValidCheckInDate();
-        boolean shouldCheckIn = visit == null || latestValidCheckInDate.before(visit.getVisitDate()) || (opdDetails != null && opdDetails.getCurrentVisitEndDate() != null);
-
+        boolean shouldCheckIn = OpdLibrary.getInstance().canPatientCheckInInsteadOfDiagnoseAndTreat(visit, opdDetails);
         facts.put(OpdDbConstants.Column.OpdDetails.PENDING_DIAGNOSE_AND_TREAT,  !shouldCheckIn);
 
         if (visit != null && visit.getVisitDate() != null && checkIn != null && checkIn.getAppointmentDueDate() != null) {

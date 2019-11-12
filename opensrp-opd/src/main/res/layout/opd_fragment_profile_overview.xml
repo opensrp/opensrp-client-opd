@@ -15,6 +15,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
+            android:id="@+id/tv_opdFragmentProfileOverview_checkedInTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/overview_sub_header_bg"
@@ -35,11 +36,11 @@
             android:layout_margin="10dp"
             android:textColor="@color/diagnose_treat_txt_color"
             android:background="@drawable/diagnose_treat_bg"
+            style="?android:attr/borderlessButtonStyle"
             android:textAppearance="?android:textAppearanceMedium"
             android:text="@string/diagnose_and_treat"/>
 
     </LinearLayout>
-
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/profile_overview_recycler"
@@ -49,7 +50,5 @@
         app:layout_constraintTop_toBottomOf="@id/ll_opdFragmentProfileOverview_checkinLayout"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:layout_constraintBottom_toTopOf="@+id/patient_detail_button_footer" />
-
-    <include layout="@layout/opd_footer_due_button" />
 
 </android.support.constraint.ConstraintLayout>
