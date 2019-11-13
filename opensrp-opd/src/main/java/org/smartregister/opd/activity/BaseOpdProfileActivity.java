@@ -138,13 +138,13 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
 
     @Override
     public void setProfileAge(@NonNull String age) {
-        ageView.setText(String.format(getString(R.string.age_details), age));
+        genderView.setText(String.format(getString(R.string.age_details), age));
 
     }
 
     @Override
     public void setProfileGender(@NonNull String gender) {
-        genderView.setText(String.format(getString(R.string.gender_details), gender));
+        ageView.setText(gender);
     }
 
     @Override
@@ -183,9 +183,6 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.clear();
-        menu.add("Menu 1");
-        menu.add("Menu 2");
         return true;
     }
 

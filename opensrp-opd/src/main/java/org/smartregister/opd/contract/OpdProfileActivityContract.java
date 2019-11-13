@@ -3,6 +3,7 @@ package org.smartregister.opd.contract;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 
 import org.apache.commons.lang3.tuple.Triple;
 import org.json.JSONObject;
@@ -59,6 +60,9 @@ public interface OpdProfileActivityContract {
         OnSendActionToFragment getActionListenerForVisitFragment();
 
         OnSendActionToFragment getActionListenerForProfileOverview();
+
+        @Nullable
+        String getString(@StringRes int resId);
     }
 
     interface Interactor {

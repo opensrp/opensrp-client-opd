@@ -112,19 +112,26 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
 
     @Override
     public void refreshProfileTopSection(@NonNull Map<String, String> client) {
-        if (getProfileView() != null) {
-            getProfileView()
-                    .setProfileName(client.get(OpdDbConstants.KEY.FIRST_NAME) + " " + client.get(OpdDbConstants.KEY.LAST_NAME));
-            getProfileView().setProfileAge(String.valueOf(Utils.getDuration(client.get(OpdDbConstants.KEY.DOB))));
+        OpdProfileActivityContract.View profileView = getProfileView();
+        if (profileView != null) {
+            profileView.setProfileName(client.get(OpdDbConstants.KEY.FIRST_NAME) + " " + client.get(OpdDbConstants.KEY.LAST_NAME));
+                String translatedYearInitial = profileView.getString(R.string.abbrv_years);
+            String dobString = client.get(OpdConstants.KEY.DOB);
+
+            if (dobString != null) {
+                String clientAge = OpdUtils.getClientAge(Utils.getDuration(dobString), translatedYearInitial);
+                profileView.setProfileAge(clientAge);
+            }
 
             try {
-                getProfileView().setProfileGender(Utils.getValue(client, OpdDbConstants.KEY.GENDER, true));
+                profileView.setProfileGender(Utils.getValue(client, OpdDbConstants.KEY.GENDER, true));
             } catch (Exception e) {
                 Timber.e(e);
-                getProfileView().setProfileGender("");
+                profileView.setProfileGender("");
             }
-            getProfileView().setProfileID(Utils.getValue(client, OpdDbConstants.KEY.REGISTER_ID, false));
-            getProfileView().setProfileImage(Utils.getValue(client, OpdDbConstants.KEY.BASE_ENTITY_ID, false));
+
+            profileView.setProfileID(Utils.getValue(client, OpdDbConstants.KEY.REGISTER_ID, false));
+            profileView.setProfileImage(Utils.getValue(client, OpdDbConstants.KEY.BASE_ENTITY_ID, false));
         }
     }
 

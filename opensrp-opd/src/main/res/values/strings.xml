@@ -29,8 +29,7 @@
     <string name="visits">VISITS</string>
 
     <string name="all_results">All results</string>
-    <string name="gender_details">GENDER: %s</string>
-    <string name="age_details">AGE: %s</string>
+    <string name="age_details">Age: %s</string>
     <string name="id_detail">ID: %s</string>
 
 
