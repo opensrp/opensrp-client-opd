@@ -70,7 +70,7 @@ public class OpdProfileOverviewFragmentPresenter implements OpdProfileOverviewFr
     }
 
     private void generateYamlConfigList(@NonNull Facts facts, @NonNull List<YamlConfigWrapper> yamlConfigListGlobal) throws IOException {
-        Iterable<Object> ruleObjects = loadFile(FilePath.FILE.PROFILE_OVERVIEW);
+        Iterable<Object> ruleObjects = loadFile(FilePath.FILE.OPD_PROFILE_OVERVIEW);
 
         for (Object ruleObject : ruleObjects) {
             List<YamlConfigWrapper> yamlConfigList = new ArrayList<>();

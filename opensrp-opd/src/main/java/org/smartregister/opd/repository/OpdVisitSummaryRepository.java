@@ -13,8 +13,11 @@ import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.repository.BaseRepository;
 import org.smartregister.repository.Repository;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import timber.log.Timber;
 
@@ -30,8 +33,7 @@ public class OpdVisitSummaryRepository extends BaseRepository {
 
     @NonNull
     public List<OpdVisitSummary> getOpdVisitSummaries(@NonNull String baseEntityId) {
-
-        ArrayList<OpdVisitSummary> opdVisitSummaries = new ArrayList<>();
+        HashMap<String, OpdVisitSummary> opdVisitSummaries = new HashMap<>();
 
         Cursor mCursor = null;
         try {
@@ -71,7 +73,25 @@ public class OpdVisitSummaryRepository extends BaseRepository {
 
                 if (mCursor != null) {
                     while (mCursor.moveToNext()) {
-                        opdVisitSummaries.add(getVisitSummaryResult(mCursor));
+                        OpdVisitSummary visitSummaryResult = getVisitSummaryResult(mCursor);
+                        String dateString = (new SimpleDateFormat(OpdConstants.DateFormat.YYYY_MM_DD_HH_MM_SS, Locale.ENGLISH)).format(visitSummaryResult.getVisitDate());
+
+                        OpdVisitSummary existingOpdVisitSummary = opdVisitSummaries.get(dateString);
+                        if (existingOpdVisitSummary != null) {
+                            // Add any extra disease codes
+                            String disease = visitSummaryResult.getDisease();
+                            if (disease != null && !existingOpdVisitSummary.getDisease().contains(disease)) {
+                                existingOpdVisitSummary.addDisease(disease);
+                            }
+
+                            // Add any extra treatments/medicines
+                            OpdVisitSummary.Treatment treatment = visitSummaryResult.getTreatment();
+                            if (treatment != null && treatment.getMedicine() != null && !existingOpdVisitSummary.getTreatments().containsKey(treatment.getMedicine())) {
+                                existingOpdVisitSummary.addTreatment(treatment);
+                            }
+                        } else {
+                            opdVisitSummaries.put(dateString, visitSummaryResult);
+                        }
                     }
                 }
             }
@@ -84,23 +104,34 @@ public class OpdVisitSummaryRepository extends BaseRepository {
             }
         }
 
-        return opdVisitSummaries;
+        return new ArrayList<>(opdVisitSummaries.values());
     }
 
+    @NonNull
     public OpdVisitSummary getVisitSummaryResult(@NonNull Cursor cursor) {
-        OpdVisitSummary opdVisitSummary = new OpdVisitSummary();
+        OpdVisitSummary opdVisitModel = new OpdVisitSummary();
 
-        opdVisitSummary.setTestName(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTestConducted.TEST)));
-        opdVisitSummary.setTestResult(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTestConducted.RESULT)));
-        opdVisitSummary.setDiagnosis(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdDiagnosis.DIAGNOSIS)));
-        opdVisitSummary.setDiagnosisType(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdDiagnosis.TYPE)));
-        opdVisitSummary.setDiseaseCode(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdDiagnosis.CODE)));
-        opdVisitSummary.setDisease(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdDiagnosis.DISEASE)));
-        opdVisitSummary.setTreatment(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTreatment.MEDICINE)));
-        opdVisitSummary.setDosage(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTreatment.DOSAGE)));
-        opdVisitSummary.setDuration(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTreatment.DURATION)));
-        opdVisitSummary.setVisitDate(OpdUtils.convertStringToDate(OpdConstants.DateFormat.YYYY_MM_DD_HH_MM_SS, cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdVisit.VISIT_DATE))));
+        opdVisitModel.setTestName(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTestConducted.TEST)));
+        opdVisitModel.setTestResult(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTestConducted.RESULT)));
+        opdVisitModel.setDiagnosis(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdDiagnosis.DIAGNOSIS)));
+        opdVisitModel.setDiagnosisType(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdDiagnosis.TYPE)));
+        opdVisitModel.setDiseaseCode(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdDiagnosis.CODE)));
+        opdVisitModel.setDisease(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdDiagnosis.DISEASE)));
 
-        return opdVisitSummary;
+        String medicine = cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTreatment.MEDICINE));
+
+        if (medicine != null) {
+            OpdVisitSummary.Treatment treatment = new OpdVisitSummary.Treatment();
+            treatment.setMedicine(medicine);
+            treatment.setDosage(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTreatment.DOSAGE)));
+            treatment.setDuration(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTreatment.DURATION)));
+            opdVisitModel.setTreatment(treatment);
+        }
+
+        opdVisitModel.setVisitDate(OpdUtils.convertStringToDate(OpdConstants.DateFormat.YYYY_MM_DD_HH_MM_SS, cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdVisit.VISIT_DATE))));
+
+        return opdVisitModel;
     }
+
+
 }

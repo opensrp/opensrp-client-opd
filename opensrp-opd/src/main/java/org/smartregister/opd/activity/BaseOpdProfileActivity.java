@@ -15,7 +15,7 @@ import org.smartregister.opd.R;
 import org.smartregister.opd.adapter.ViewPagerAdapter;
 import org.smartregister.opd.contract.OpdProfileActivityContract;
 import org.smartregister.opd.fragment.OpdProfileOverviewFragment;
-import org.smartregister.opd.fragment.OpdProfileVisitFragment;
+import org.smartregister.opd.fragment.OpdProfileVisitsFragment;
 import org.smartregister.opd.listener.OnSendActionToFragment;
 import org.smartregister.opd.presenter.OpdProfileActivityPresenter;
 import org.smartregister.opd.utils.OpdConstants;
@@ -67,7 +67,7 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
         OpdProfileOverviewFragment profileOverviewFragment = OpdProfileOverviewFragment.newInstance(this.getIntent().getExtras());
         setSendActionListenerForProfileOverview(profileOverviewFragment);
 
-        OpdProfileVisitFragment profileVisitsFragment = OpdProfileVisitFragment.newInstance(this.getIntent().getExtras());
+        OpdProfileVisitsFragment profileVisitsFragment = OpdProfileVisitsFragment.newInstance(this.getIntent().getExtras());
         setSendActionListenerToVisitsFragment(profileVisitsFragment);
 
         adapter.addFragment(profileOverviewFragment, this.getString(R.string.overview));

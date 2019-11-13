@@ -48,6 +48,21 @@ public class OpdConstants extends AllConstants {
             String DATE_OF_APPOINTMENT = "date_of_appointment";
         }
 
+        interface OpdVisit {
+            String VISIT_DATE = "visit_date";
+            String TEST_NAME = "test_name";
+            String TEST_RESULT = "test_result";
+            String DIAGNOSIS = "diagnosis";
+            String DIAGNOSIS_TYPE = "diagnosis_type";
+            String DISEASE_CODE = "disease_code";
+            String TREATMENT = "treatment";
+
+            String DIAGNOSIS_LABEL = "diagnosis_label";
+            String DIAGNOSIS_TYPE_LABEL = "diagnosis_type_label";
+            String DISEASE_CODE_LABEL = "disease_code_label";
+            String TREATMENT_LABEL = "treatment_label";
+        }
+
     }
 
     public interface JsonFormField {

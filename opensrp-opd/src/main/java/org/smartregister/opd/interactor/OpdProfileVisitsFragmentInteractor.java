@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.smartregister.opd.OpdLibrary;
-import org.smartregister.opd.contract.OpdProfileFragmentContract;
+import org.smartregister.opd.contract.OpdProfileVisitsFragmentContract;
 import org.smartregister.opd.pojos.OpdVisitSummary;
 import org.smartregister.opd.utils.AppExecutors;
 
@@ -13,12 +13,12 @@ import java.util.List;
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-27
  */
-public class OpdProfileFragmentInteractor implements OpdProfileFragmentContract.Interactor {
+public class OpdProfileVisitsFragmentInteractor implements OpdProfileVisitsFragmentContract.Interactor {
 
-    private OpdProfileFragmentContract.Presenter mProfileFrgamentPresenter;
+    private OpdProfileVisitsFragmentContract.Presenter mProfileFrgamentPresenter;
     private AppExecutors appExecutors;
 
-    public OpdProfileFragmentInteractor(@NonNull OpdProfileFragmentContract.Presenter presenter) {
+    public OpdProfileVisitsFragmentInteractor(@NonNull OpdProfileVisitsFragmentContract.Presenter presenter) {
         this.mProfileFrgamentPresenter = presenter;
         appExecutors = new AppExecutors();
     }
@@ -36,7 +36,7 @@ public class OpdProfileFragmentInteractor implements OpdProfileFragmentContract.
     }
 
     @Override
-    public void fetchVisits(@NonNull final String baseEntityId, @NonNull final OpdProfileFragmentContract.Presenter.OnFinishedCallback onFinishedCallback) {
+    public void fetchVisits(@NonNull final String baseEntityId, @NonNull final OpdProfileVisitsFragmentContract.Presenter.OnVisitsLoadedCallback onVisitsLoadedCallback) {
         appExecutors.diskIO().execute(new Runnable() {
             @Override
             public void run() {
@@ -45,7 +45,7 @@ public class OpdProfileFragmentInteractor implements OpdProfileFragmentContract.
                 appExecutors.mainThread().execute(new Runnable() {
                     @Override
                     public void run() {
-                        onFinishedCallback.onFinished(summaries);
+                        onVisitsLoadedCallback.onVisitsLoaded(summaries);
                     }
                 });
             }
@@ -53,7 +53,7 @@ public class OpdProfileFragmentInteractor implements OpdProfileFragmentContract.
     }
 
     @Nullable
-    public OpdProfileFragmentContract.View getProfileView() {
+    public OpdProfileVisitsFragmentContract.View getProfileView() {
         return mProfileFrgamentPresenter.getProfileView();
     }
 }
