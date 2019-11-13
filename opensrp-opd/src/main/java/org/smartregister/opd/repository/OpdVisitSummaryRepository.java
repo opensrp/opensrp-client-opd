@@ -39,7 +39,7 @@ public class OpdVisitSummaryRepository extends BaseRepository {
 
             String query = String.format("SELECT %s.%s, %s.%s, %s.%s, %s.%s, %s.%s, %s.%s, %s.%s, %s.%s, %s.%s, %s.%s FROM %s " +
                             "LEFT JOIN %s ON %s.%s = %s.%s " +
-                            "LEFT JOIN %s ON %s.%s = %s.%s " +
+                            "INNER JOIN %s ON %s.%s = %s.%s " +
                             "LEFT JOIN %s ON %s.%s = %s.%s WHERE %s.%s = '%s' ORDER BY %s.%s DESC"
                     , OpdDbConstants.Table.OPD_VISIT, OpdDbConstants.Column.OpdVisit.VISIT_DATE
                     , OpdDbConstants.Table.OPD_TEST_CONDUCTED, OpdDbConstants.Column.OpdTestConducted.TEST
