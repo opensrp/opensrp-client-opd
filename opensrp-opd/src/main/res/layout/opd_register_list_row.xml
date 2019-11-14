@@ -150,7 +150,6 @@
             android:text="@string/check_in"
             android:textAllCaps="true"
             android:textAppearance="?android:textAppearanceSmall"
-            style="?android:attr/borderlessButtonStyle"
             android:textSize="15sp"
             android:typeface="normal" />
 

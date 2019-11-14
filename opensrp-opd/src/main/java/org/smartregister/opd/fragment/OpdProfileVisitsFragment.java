@@ -2,12 +2,15 @@ package org.smartregister.opd.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.util.Pair;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 
 import org.jeasy.rules.api.Facts;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
@@ -33,6 +36,9 @@ public class OpdProfileVisitsFragment extends BaseProfileFragment implements Opd
     private RecyclerView recyclerView;
     private OpdProfileVisitsFragmentContract.Presenter presenter;
     private String baseEntityId;
+    private Button nextPageBtn;
+    private Button previousPageBtn;
+    private TextView pageCounter;
 
     public static OpdProfileVisitsFragment newInstance(Bundle bundle) {
         Bundle args = bundle;
@@ -66,17 +72,11 @@ public class OpdProfileVisitsFragment extends BaseProfileFragment implements Opd
 
     @Override
     protected void onResumption() {
+        presenter.loadPageCounter(baseEntityId);
         presenter.loadVisits(baseEntityId, new OpdProfileVisitsFragmentContract.Presenter.OnFinishedCallback() {
             @Override
-            public void onFinished(@NonNull List<OpdVisitSummary> opdVisitSummaries, ArrayList<Pair<YamlConfigWrapper, Facts>> items) {
-                if (getActivity() != null) {
-                    OpdProfileVisitsAdapter adapter = new OpdProfileVisitsAdapter(getActivity(), opdVisitSummaries, items);
-                    adapter.notifyDataSetChanged();
-
-                    // set up the RecyclerView
-                    recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                    recyclerView.setAdapter(adapter);
-                }
+            public void onFinished(@NonNull List<OpdVisitSummary> opdVisitSummaries, @NonNull ArrayList<Pair<YamlConfigWrapper, Facts>> items) {
+                displayVisits(opdVisitSummaries, items);
             }
         });
     }
@@ -92,11 +92,63 @@ public class OpdProfileVisitsFragment extends BaseProfileFragment implements Opd
         View fragmentView = inflater.inflate(R.layout.opd_fragment_profile_visits, container, false);
 
         recyclerView = fragmentView.findViewById(R.id.rv_opdFragmentProfileVisit_recyclerView);
+        nextPageBtn = fragmentView.findViewById(R.id.btn_opdFragmentProfileVisit_nextPageBtn);
+        previousPageBtn = fragmentView.findViewById(R.id.btn_opdFragmentProfileVisit_previousPageBtn);
+        pageCounter = fragmentView.findViewById(R.id.tv_opdFragmentProfileVisit_pageCounter);
+
+        nextPageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.onNextPageClicked();
+            }
+        });
+        previousPageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.onPreviousPageClicked();
+            }
+        });
+
         return fragmentView;
     }
 
     @Override
     public void onActionReceive() {
         onResumption();
+    }
+
+    @Override
+    public void showPageCountText(@NonNull String pageCounterText) {
+        this.pageCounter.setText(pageCounterText);
+    }
+
+    @Override
+    public void showNextPageBtn(boolean show) {
+        nextPageBtn.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
+        nextPageBtn.setClickable(show);
+    }
+
+    @Override
+    public void showPreviousPageBtn(boolean show) {
+        previousPageBtn.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
+        previousPageBtn.setClickable(show);
+    }
+
+    @Override
+    public void displayVisits(@NonNull List<OpdVisitSummary> opdVisitSummaries, @NonNull ArrayList<Pair<YamlConfigWrapper, Facts>> items) {
+        if (getActivity() != null) {
+            OpdProfileVisitsAdapter adapter = new OpdProfileVisitsAdapter(getActivity(), opdVisitSummaries, items);
+            adapter.notifyDataSetChanged();
+
+            // set up the RecyclerView
+            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            recyclerView.setAdapter(adapter);
+        }
+    }
+
+    @Nullable
+    @Override
+    public String getClientBaseEntityId() {
+        return baseEntityId;
     }
 }

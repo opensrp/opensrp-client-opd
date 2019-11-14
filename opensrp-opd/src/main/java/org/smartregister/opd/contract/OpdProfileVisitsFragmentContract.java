@@ -29,11 +29,17 @@ public interface OpdProfileVisitsFragmentContract {
 
         void loadVisits(@NonNull String baseEntityId, @NonNull OnFinishedCallback onFinishedCallback);
 
-        void populateWrapperDataAndFacts(@NonNull List<OpdVisitSummary> opdVisitSummaries, ArrayList<Pair<YamlConfigWrapper, Facts>> items);
+        void loadPageCounter(@NonNull String baseEntityId);
+
+        void populateWrapperDataAndFacts(@NonNull List<OpdVisitSummary> opdVisitSummaries, @NonNull ArrayList<Pair<YamlConfigWrapper, Facts>> items);
+
+        void onNextPageClicked();
+
+        void onPreviousPageClicked();
 
         interface OnFinishedCallback {
 
-            void onFinished(@NonNull List<OpdVisitSummary> opdVisitSummaries, ArrayList<Pair<YamlConfigWrapper, Facts>> items);
+            void onFinished(@NonNull List<OpdVisitSummary> opdVisitSummaries, @NonNull ArrayList<Pair<YamlConfigWrapper, Facts>> items);
         }
 
         interface OnVisitsLoadedCallback {
@@ -46,6 +52,17 @@ public interface OpdProfileVisitsFragmentContract {
 
         String getString(@StringRes int resId);
 
+        void showPageCountText(@NonNull String pageCounter);
+
+        void showNextPageBtn(boolean show);
+
+        void showPreviousPageBtn(boolean show);
+
+        void displayVisits(@NonNull List<OpdVisitSummary> opdVisitSummaries, @NonNull ArrayList<Pair<YamlConfigWrapper, Facts>> items);
+
+        @Nullable
+        String getClientBaseEntityId();
+
     }
 
     interface Interactor {
@@ -54,6 +71,13 @@ public interface OpdProfileVisitsFragmentContract {
 
         void refreshProfileView(@NonNull String baseEntityId, boolean isForEdit);
 
-        void fetchVisits(@NonNull String baseEntityId, @NonNull Presenter.OnVisitsLoadedCallback onVisitsLoadedCallback);
+        void fetchVisits(@NonNull String baseEntityId, int pageNo, @NonNull Presenter.OnVisitsLoadedCallback onVisitsLoadedCallback);
+
+        void fetchVisitsPageCount(@NonNull String baseEntityId, @NonNull OnFetchVisitsPageCountCallback onTotalVisitCountCallback);
+
+        interface OnFetchVisitsPageCountCallback {
+
+            void onFetchVisitsPageCount(int visitsPageCount);
+        }
     }
 }

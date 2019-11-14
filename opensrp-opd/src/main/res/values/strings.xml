@@ -60,6 +60,9 @@
     <string name="medication_dose">Dose: %s</string>
     <string name="medication_duration">Duration: %s</string>
     <string name="dose_or_duration_html"><![CDATA[<font color=\'#7f7f7f\'>%s</font>]]></string>
+    <string name="next_page"><![CDATA[NEXT >>]]></string>
+    <string name="current_page_of_total_pages">Page %d of %d</string>
+    <string name="previous_page"><![CDATA[<< Previous]]></string>
 
 
 </resources>

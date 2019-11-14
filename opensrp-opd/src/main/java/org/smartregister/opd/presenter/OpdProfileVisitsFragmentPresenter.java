@@ -38,6 +38,8 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
 
     private WeakReference<OpdProfileVisitsFragmentContract.View> mProfileView;
     private OpdProfileVisitsFragmentContract.Interactor mProfileInteractor;
+    private int currentPageNo = 0;
+    private int totalPages = 0;
 
     public OpdProfileVisitsFragmentPresenter(@NonNull OpdProfileVisitsFragmentContract.View profileView) {
         mProfileView = new WeakReference<>(profileView);
@@ -62,21 +64,48 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
     @Override
     public void loadVisits(@NonNull String baseEntityId, @NonNull final OnFinishedCallback onFinishedCallback) {
         if (mProfileInteractor != null) {
-            mProfileInteractor.fetchVisits(baseEntityId, new OnVisitsLoadedCallback() {
+            mProfileInteractor.fetchVisits(baseEntityId, currentPageNo, new OnVisitsLoadedCallback() {
 
                 @Override
                 public void onVisitsLoaded(@NonNull List<OpdVisitSummary> opdVisitSummaries) {
-                    ArrayList<Pair<YamlConfigWrapper, Facts>> items = new ArrayList<>();
+                    updatePageCounter();
 
+                    ArrayList<Pair<YamlConfigWrapper, Facts>> items = new ArrayList<>();
                     populateWrapperDataAndFacts(opdVisitSummaries, items);
                     onFinishedCallback.onFinished(opdVisitSummaries, items);
+                }
+            });
+
+        }
+    }
+
+    @Override
+    public void loadPageCounter(@NonNull String baseEntityId) {
+        if (mProfileInteractor != null) {
+            mProfileInteractor.fetchVisitsPageCount(baseEntityId, new OpdProfileVisitsFragmentContract.Interactor.OnFetchVisitsPageCountCallback() {
+                @Override
+                public void onFetchVisitsPageCount(int visitsPageCount) {
+                    totalPages = visitsPageCount;
+                    updatePageCounter();
                 }
             });
         }
     }
 
+    private void updatePageCounter() {
+        String pageCounterTemplate = getString(R.string.current_page_of_total_pages);
+
+        OpdProfileVisitsFragmentContract.View profileView = getProfileView();
+        if (profileView != null && pageCounterTemplate != null) {
+            profileView.showPageCountText(String.format(pageCounterTemplate, (currentPageNo + 1), totalPages));
+
+            profileView.showPreviousPageBtn(currentPageNo > 0);
+            profileView.showNextPageBtn(currentPageNo < (totalPages -1));
+        }
+    }
+
     @Override
-    public void populateWrapperDataAndFacts(@NonNull List<OpdVisitSummary> opdVisitSummaries, ArrayList<Pair<YamlConfigWrapper, Facts>> items) {
+    public void populateWrapperDataAndFacts(@NonNull List<OpdVisitSummary> opdVisitSummaries, @NonNull ArrayList<Pair<YamlConfigWrapper, Facts>> items) {
         for (OpdVisitSummary opdVisitSummary: opdVisitSummaries) {
             Facts facts = generateOpdVisitSummaryFact(opdVisitSummary);
             Iterable<Object> ruleObjects = null;
@@ -115,6 +144,38 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
         }
     }
 
+    @Override
+    public void onNextPageClicked() {
+        if (currentPageNo < totalPages && getProfileView() != null && getProfileView().getClientBaseEntityId() != null) {
+            currentPageNo++;
+
+            loadVisits(getProfileView().getClientBaseEntityId(), new OnFinishedCallback() {
+                @Override
+                public void onFinished(@NonNull List<OpdVisitSummary> opdVisitSummaries, @NonNull ArrayList<Pair<YamlConfigWrapper, Facts>> items) {
+                    if (getProfileView() != null) {
+                        getProfileView().displayVisits(opdVisitSummaries, items);
+                    }
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onPreviousPageClicked() {
+        if (currentPageNo > 0 && getProfileView() != null && getProfileView().getClientBaseEntityId() != null) {
+            currentPageNo--;
+
+            loadVisits(getProfileView().getClientBaseEntityId(), new OnFinishedCallback() {
+                @Override
+                public void onFinished(@NonNull List<OpdVisitSummary> opdVisitSummaries, @NonNull ArrayList<Pair<YamlConfigWrapper, Facts>> items) {
+                    if (getProfileView() != null) {
+                        getProfileView().displayVisits(opdVisitSummaries, items);
+                    }
+                }
+            });
+        }
+    }
+
     @NonNull
     private Facts generateOpdVisitSummaryFact(@NonNull OpdVisitSummary opdVisitSummary) {
         Facts facts = new Facts();
@@ -144,6 +205,7 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
                 }
             }
         }
+
         OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.DISEASE_CODE, stringBuilder.toString());
 
         HashMap<String, OpdVisitSummaryResultModel.Treatment> treatments = opdVisitSummary.getTreatments();

@@ -208,4 +208,9 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
             }
         }
     }
+
+    @Override
+    public void setContentView(int layoutResID) {
+        super.setContentView(R.layout.opd_activity_base_profile);
+    }
 }

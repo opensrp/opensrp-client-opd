@@ -36,16 +36,33 @@ public class OpdProfileVisitsFragmentInteractor implements OpdProfileVisitsFragm
     }
 
     @Override
-    public void fetchVisits(@NonNull final String baseEntityId, @NonNull final OpdProfileVisitsFragmentContract.Presenter.OnVisitsLoadedCallback onVisitsLoadedCallback) {
+    public void fetchVisits(@NonNull final String baseEntityId, final int pageNo, @NonNull final OpdProfileVisitsFragmentContract.Presenter.OnVisitsLoadedCallback onVisitsLoadedCallback) {
         appExecutors.diskIO().execute(new Runnable() {
             @Override
             public void run() {
-                final List<OpdVisitSummary> summaries = OpdLibrary.getInstance().getOpdVisitSummaryRepository().getOpdVisitSummaries(baseEntityId);
+                final List<OpdVisitSummary> summaries = OpdLibrary.getInstance().getOpdVisitSummaryRepository().getOpdVisitSummaries(baseEntityId, pageNo);
 
                 appExecutors.mainThread().execute(new Runnable() {
                     @Override
                     public void run() {
                         onVisitsLoadedCallback.onVisitsLoaded(summaries);
+                    }
+                });
+            }
+        });
+    }
+
+    @Override
+    public void fetchVisitsPageCount(@NonNull final String baseEntityId, @NonNull final OnFetchVisitsPageCountCallback onFetchVisitsPageCountCallback) {
+        appExecutors.diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                final int visitsPageCount = OpdLibrary.getInstance().getOpdVisitSummaryRepository().getVisitPageCount(baseEntityId);
+
+                appExecutors.mainThread().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        onFetchVisitsPageCountCallback.onFetchVisitsPageCount(visitsPageCount);
                     }
                 });
             }
