@@ -8,8 +8,10 @@ import android.support.v4.util.Pair;
 import org.jeasy.rules.api.Facts;
 import org.smartregister.opd.domain.YamlConfigWrapper;
 import org.smartregister.opd.pojos.OpdVisitSummary;
+import org.smartregister.opd.pojos.OpdVisitSummaryResultModel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -36,6 +38,12 @@ public interface OpdProfileVisitsFragmentContract {
         void onNextPageClicked();
 
         void onPreviousPageClicked();
+
+        @NonNull
+        String generateMedicationText(@NonNull HashMap<String, OpdVisitSummaryResultModel.Treatment> treatments);
+
+        @NonNull
+        String generateDiseasesText(@NonNull OpdVisitSummary opdVisitSummary);
 
         interface OnFinishedCallback {
 

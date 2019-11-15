@@ -8,6 +8,7 @@ import android.support.annotation.StringRes;
 import org.json.JSONObject;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.opd.listener.OnSendActionToFragment;
+import org.smartregister.opd.pojos.OpdDiagnosisAndTreatmentForm;
 import org.smartregister.view.contract.BaseProfileContract;
 
 import java.util.HashMap;
@@ -26,8 +27,6 @@ public interface OpdProfileActivityContract {
         OpdProfileActivityContract.View getProfileView();
 
         void refreshProfileTopSection(@NonNull Map<String, String> client);
-
-        HashMap<String, String> saveFinishForm(@NonNull Map<String, String> client);
 
         void startForm(String formName, CommonPersonObjectClient commonPersonObjectClient);
 
@@ -62,11 +61,16 @@ public interface OpdProfileActivityContract {
 
     interface Interactor {
 
+        void fetchSavedDiagnosisAndTreatmentForm(@NonNull String baseEntityId, @NonNull String entityTable);
+
         void onDestroy(boolean isChangingConfiguration);
     }
 
     interface InteractorCallBack {
 
         void onRegistrationSaved(boolean isEdit);
+
+        void onFetchedSavedDiagnosisAndTreatmentForm(@Nullable OpdDiagnosisAndTreatmentForm diagnosisAndTreatmentForm, @NonNull String caseId, @NonNull String entityTable);
+
     }
 }

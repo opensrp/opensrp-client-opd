@@ -41,6 +41,7 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
     private OpdProfileActivityContract.Interactor mProfileInteractor;
 
     private OpdProfileActivityModel model;
+    private JSONObject form = null;
 
     public OpdProfileActivityPresenter(OpdProfileActivityContract.View profileView) {
         mProfileView = new WeakReference<>(profileView);
@@ -48,16 +49,11 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
         model = new OpdProfileActivityModel();
     }
 
-
     @Override
     public void onDestroy(boolean isChangingConfiguration) {
         mProfileView = null;//set to null on destroy
 
         // Inform interactor
-        if (mProfileInteractor != null) {
-            mProfileInteractor.onDestroy(isChangingConfiguration);
-        }
-
         if (mProfileInteractor != null) {
             mProfileInteractor.onDestroy(isChangingConfiguration);
         }
@@ -73,15 +69,37 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
     public OpdProfileActivityContract.View getProfileView() {
         if (mProfileView != null) {
             return mProfileView.get();
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     @Override
     public void onRegistrationSaved(boolean isEdit) {
         if (getProfileView() != null) {
             getProfileView().hideProgressDialog();
+        }
+    }
+
+    @Override
+    public void onFetchedSavedDiagnosisAndTreatmentForm(@Nullable OpdDiagnosisAndTreatmentForm diagnosisAndTreatmentForm, @NonNull String caseId, @NonNull String entityTable) {
+        try {
+            if (diagnosisAndTreatmentForm != null) {
+                form = new JSONObject(diagnosisAndTreatmentForm.getForm());
+            }
+
+            startFormActivity(form, caseId, entityTable);
+        } catch (JSONException ex) {
+            Timber.e(ex);
+        }
+    }
+
+    private void startFormActivity(@Nullable JSONObject form, @NonNull String caseId, @NonNull String entityTable) {
+        if (getProfileView() != null && form != null) {
+            HashMap<String, String> intentKeys = new HashMap<>();
+            intentKeys.put(OpdConstants.IntentKey.BASE_ENTITY_ID, caseId);
+            intentKeys.put(OpdConstants.IntentKey.ENTITY_TABLE, entityTable);
+            (mProfileView.get()).startFormActivity(form, intentKeys);
         }
     }
 
@@ -110,43 +128,31 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
         }
     }
 
-    @Nullable
-    @Override
-    public HashMap<String, String> saveFinishForm(@NonNull Map<String, String> client) {
-        return null;
-    }
-
     @Override
     public void startForm(String formName, CommonPersonObjectClient commonPersonObjectClient) {
         Map<String, String> clientMap = commonPersonObjectClient.getColumnmaps();
         HashMap<String, String> injectedValues = new HashMap<>();
         injectedValues.put("patient_gender", clientMap.get("gender"));
         String entityTable = clientMap.get(OpdConstants.IntentKey.ENTITY_TABLE);
+
         startFormActivity(formName, commonPersonObjectClient.getCaseId(), entityTable, injectedValues);
     }
 
     public void startFormActivity(String formName, String caseId, String entityTable, HashMap<String, String> injectedValues) {
         if (mProfileView != null) {
-            JSONObject form = null;
+            form = null;
             try {
                 String locationId = OpdUtils.context().allSharedPreferences().getPreference(AllConstants.CURRENT_LOCATION_ID);
                 form = model.getFormAsJson(formName, caseId, locationId, injectedValues);
+
+                // Fetch saved form & continue editing
                 if (formName.equals(OpdConstants.Form.OPD_DIAGNOSIS_AND_TREAT)) {
-                    OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm = new OpdDiagnosisAndTreatmentForm(caseId);
-                    OpdDiagnosisAndTreatmentForm savedOpdDiagnosisAndTreatmentForm = OpdLibrary.getInstance().getOpdDiagnosisAndTreatmentFormRepository().findOne(opdDiagnosisAndTreatmentForm);
-                    if (savedOpdDiagnosisAndTreatmentForm != null) {
-                        form = new JSONObject(savedOpdDiagnosisAndTreatmentForm.getForm());
-                    }
+                    mProfileInteractor.fetchSavedDiagnosisAndTreatmentForm(caseId, entityTable);
+                } else {
+                    startFormActivity(form, caseId, entityTable);
                 }
             } catch (JSONException e) {
                 Timber.e(e);
-            }
-
-            if (getProfileView() != null && form != null) {
-                HashMap<String, String> intentKeys = new HashMap<>();
-                intentKeys.put(OpdConstants.IntentKey.BASE_ENTITY_ID, caseId);
-                intentKeys.put(OpdConstants.IntentKey.ENTITY_TABLE, entityTable);
-                (mProfileView.get()).startFormActivity(form, intentKeys);
             }
         }
     }
@@ -183,9 +189,11 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
     @Override
     public void onOpdEventSaved() {
         if (mProfileView != null) {
-            mProfileView.get().getActionListenerForProfileOverview().onActionReceive();
-            mProfileView.get().getActionListenerForVisitFragment().onActionReceive();
-            mProfileView.get().hideProgressDialog();
+            OpdProfileActivityContract.View view = mProfileView.get();
+
+            view.getActionListenerForProfileOverview().onActionReceive();
+            view.getActionListenerForVisitFragment().onActionReceive();
+            view.hideProgressDialog();
         }
     }
 }

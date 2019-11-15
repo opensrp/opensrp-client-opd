@@ -189,27 +189,25 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
         OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.DIAGNOSIS, opdVisitSummary.getDiagnosis());
         OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.DIAGNOSIS_TYPE, opdVisitSummary.getDiagnosisType());
 
-        // Build the disease code label list
-        HashSet<String> diseases = opdVisitSummary.getDiseases();
-        Iterator<String> diseaseIterator = diseases.iterator();
+        // Put the diseases text
+        String diseasesText = generateDiseasesText(opdVisitSummary);
+        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.DISEASE_CODE, diseasesText);
 
-        StringBuilder stringBuilder = new StringBuilder();
-
-        while (diseaseIterator.hasNext()) {
-            String disease = diseaseIterator.next();
-            if (disease != null) {
-                stringBuilder.append(disease);
-
-                if (diseaseIterator.hasNext()) {
-                    stringBuilder.append("\n");
-                }
-            }
-        }
-
-        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.DISEASE_CODE, stringBuilder.toString());
-
+        // Put the treatment text
         HashMap<String, OpdVisitSummaryResultModel.Treatment> treatments = opdVisitSummary.getTreatments();
-        stringBuilder = new StringBuilder();
+        String medicationText = generateMedicationText(treatments);
+        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.TREATMENT, medicationText);
+
+        // Add translate-able labels
+        setLabelsInFacts(facts);
+
+        return facts;
+    }
+
+    @Override
+    @NonNull
+    public String generateMedicationText(@NonNull HashMap<String, OpdVisitSummaryResultModel.Treatment> treatments) {
+        StringBuilder stringBuilder = new StringBuilder();
         for (OpdVisitSummaryResultModel.Treatment treatment : treatments.values()) {
             if (treatment != null && treatment.getMedicine() != null) {
                 if (stringBuilder.length() > 1) {
@@ -250,16 +248,35 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
                 }
             }
         }
+        return stringBuilder.toString();
+    }
 
-        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.TREATMENT, stringBuilder.toString());
+    @Override
+    @NonNull
+    public String generateDiseasesText(@NonNull OpdVisitSummary opdVisitSummary) {
+        HashSet<String> diseases = opdVisitSummary.getDiseases();
+        Iterator<String> diseaseIterator = diseases.iterator();
 
-        // Add translate-able labels
+        StringBuilder stringBuilder = new StringBuilder();
+
+        while (diseaseIterator.hasNext()) {
+            String disease = diseaseIterator.next();
+            if (disease != null) {
+                stringBuilder.append(disease);
+
+                if (diseaseIterator.hasNext()) {
+                    stringBuilder.append("\n");
+                }
+            }
+        }
+        return stringBuilder.toString();
+    }
+
+    private void setLabelsInFacts(@NonNull Facts facts) {
         OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.DIAGNOSIS_LABEL, getString(R.string.diagnosis));
         OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.DIAGNOSIS_TYPE_LABEL, getString(R.string.diagnosis_type));
         OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.DISEASE_CODE_LABEL, getString(R.string.disease_code));
         OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.TREATMENT_LABEL, getString(R.string.treatment));
-
-        return facts;
     }
 
     @Nullable

@@ -90,7 +90,6 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
     protected void fetchProfileData() {
         CommonPersonObjectClient commonPersonObjectClient = (CommonPersonObjectClient) getIntent()
                 .getSerializableExtra(OpdConstants.IntentKey.CLIENT_OBJECT);
-        String baseEntityId = commonPersonObjectClient.getCaseId();
         ((OpdProfileActivityPresenter) presenter).refreshProfileTopSection(commonPersonObjectClient.getColumnmaps());
     }
 
@@ -110,8 +109,6 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
         super.onResumption();
         commonPersonObjectClient = (CommonPersonObjectClient) getIntent()
                 .getSerializableExtra(OpdConstants.IntentKey.CLIENT_OBJECT);
-
-        String baseEntityId = commonPersonObjectClient.getCaseId();
         ((OpdProfileActivityPresenter) presenter).refreshProfileTopSection(commonPersonObjectClient.getColumnmaps());
     }
 
@@ -192,6 +189,7 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
 
                 JSONObject form = new JSONObject(jsonString);
                 String encounterType = form.getString(OpdJsonFormUtils.ENCOUNTER_TYPE);
+
                 if (encounterType.equals(OpdConstants.EventType.CHECK_IN)) {
                     showProgressDialog(R.string.saving_dialog_title);
                     ((OpdProfileActivityPresenter) presenter).saveVisitOrDiagnosisForm(encounterType, data);

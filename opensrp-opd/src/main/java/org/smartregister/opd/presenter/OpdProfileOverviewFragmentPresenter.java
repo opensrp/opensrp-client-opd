@@ -130,19 +130,17 @@ public class OpdProfileOverviewFragmentPresenter implements OpdProfileOverviewFr
                 OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.DATE_OF_APPOINTMENT, checkIn.getAppointmentDueDate());
             }
         } else {
-            if (client != null) {
-                if (unknownString != null) {
-                    if (AllConstants.FEMALE_GENDER.equalsIgnoreCase(client.getColumnmaps().get("gender"))) {
-                        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.PREGNANCY_STATUS, unknownString);
-                    } else {
-                        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.HIV_STATUS, unknownString);
-                    }
+            if (client != null && unknownString != null) {
+                if (AllConstants.FEMALE_GENDER.equalsIgnoreCase(client.getColumnmaps().get("gender"))) {
+                    OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.PREGNANCY_STATUS, unknownString);
+                } else {
+                    OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.HIV_STATUS, unknownString);
                 }
             }
         }
 
         boolean shouldCheckIn = OpdLibrary.getInstance().canPatientCheckInInsteadOfDiagnoseAndTreat(visit, opdDetails);
-        facts.put(OpdDbConstants.Column.OpdDetails.PENDING_DIAGNOSE_AND_TREAT,  !shouldCheckIn);
+        facts.put(OpdDbConstants.Column.OpdDetails.PENDING_DIAGNOSE_AND_TREAT, !shouldCheckIn);
 
         if (visit != null && visit.getVisitDate() != null && checkIn != null && checkIn.getAppointmentDueDate() != null) {
             facts.put(OpdConstants.FactKey.VISIT_TO_APPOINTMENT_DATE, getVisitToAppointmentDateDuration(visit.getVisitDate(), checkIn.getAppointmentDueDate()));

@@ -28,7 +28,6 @@ import java.util.List;
 public class OpdProfileVisitsAdapter extends RecyclerView.Adapter<OpdProfileVisitsAdapter.YamlViewHolder> {
 
     private Context context;
-    private List<OpdVisitSummary> mData;
     private LayoutInflater mInflater;
     private ArrayList<Pair<YamlConfigWrapper, Facts>> items;
 
@@ -36,7 +35,6 @@ public class OpdProfileVisitsAdapter extends RecyclerView.Adapter<OpdProfileVisi
     public OpdProfileVisitsAdapter(@NonNull Context context, @NonNull List<OpdVisitSummary> opdVisitSummaryList, ArrayList<Pair<YamlConfigWrapper, Facts>> items) {
         this.context = context;
         this.mInflater = LayoutInflater.from(context);
-        this.mData = opdVisitSummaryList;
         this.items = items;
     }
 
