@@ -7,6 +7,7 @@ import org.jeasy.rules.api.Facts;
 import org.smartregister.AllConstants;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.opd.OpdLibrary;
+import org.smartregister.opd.R;
 import org.smartregister.opd.contract.OpdProfileOverviewFragmentContract;
 import org.smartregister.opd.domain.YamlConfig;
 import org.smartregister.opd.domain.YamlConfigItem;
@@ -22,6 +23,7 @@ import org.smartregister.opd.utils.OpdFactsUtil;
 import org.smartregister.util.DateUtil;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -39,8 +41,10 @@ public class OpdProfileOverviewFragmentPresenter implements OpdProfileOverviewFr
 
     private OpdProfileOverviewFragmentModel model;
     private CommonPersonObjectClient client;
+    private WeakReference<OpdProfileOverviewFragmentContract.View> view;
 
-    public OpdProfileOverviewFragmentPresenter() {
+    public OpdProfileOverviewFragmentPresenter(@NonNull OpdProfileOverviewFragmentContract.View view) {
+        this.view = new WeakReference<>(view);
         model = new OpdProfileOverviewFragmentModel();
     }
 
@@ -106,23 +110,33 @@ public class OpdProfileOverviewFragmentPresenter implements OpdProfileOverviewFr
     }
 
     private void setDataFromCheckIn(@Nullable OpdCheckIn checkIn, @Nullable OpdVisit visit, @Nullable OpdDetails opdDetails, @NonNull Facts facts) {
+        String unknownString = getString(R.string.unknown);
         if (checkIn != null) {
             if (client != null && AllConstants.FEMALE_GENDER.equalsIgnoreCase(client.getColumnmaps().get("gender"))) {
                 OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.PREGNANCY_STATUS, checkIn.getPregnancyStatus());
             }
 
-            OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.IS_PREVIOUSLY_TESTED_HIV, checkIn.getHasHivTestPreviously());
+            String currentHivResult = checkIn.getCurrentHivResult() != null ? checkIn.getCurrentHivResult() : unknownString;
+
+            OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.HIV_STATUS, currentHivResult);
             OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.PATIENT_ON_ART, checkIn.getIsTakingArt());
-            OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.HIV_STATUS, checkIn.getCurrentHivResult());
-            OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.VISIT_TYPE, checkIn.getVisitType());
-            OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.PREVIOUS_APPOINTMENT, checkIn.getAppointmentScheduledPreviously());
-            OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.DATE_OF_APPOINTMENT, checkIn.getAppointmentDueDate());
+
+            // Client is currently checked-in, show the current check-in details
+            if (OpdLibrary.getInstance().isClientCurrentlyCheckedIn(visit, opdDetails)) {
+                OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.IS_PREVIOUSLY_TESTED_HIV, checkIn.getHasHivTestPreviously());
+
+                OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.VISIT_TYPE, checkIn.getVisitType());
+                OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.PREVIOUS_APPOINTMENT, checkIn.getAppointmentScheduledPreviously());
+                OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.DATE_OF_APPOINTMENT, checkIn.getAppointmentDueDate());
+            }
         } else {
             if (client != null) {
-                if (AllConstants.FEMALE_GENDER.equalsIgnoreCase(client.getColumnmaps().get("gender"))) {
-                    facts.put(OpdConstants.FactKey.ProfileOverview.PREGNANCY_STATUS, "Unknown");
-                } else {
-                    facts.put(OpdConstants.FactKey.ProfileOverview.HIV_STATUS, "Unknown");
+                if (unknownString != null) {
+                    if (AllConstants.FEMALE_GENDER.equalsIgnoreCase(client.getColumnmaps().get("gender"))) {
+                        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.PREGNANCY_STATUS, unknownString);
+                    } else {
+                        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.HIV_STATUS, unknownString);
+                    }
                 }
             }
         }
@@ -155,4 +169,27 @@ public class OpdProfileOverviewFragmentPresenter implements OpdProfileOverviewFr
     public void setClient(@NonNull CommonPersonObjectClient client) {
         this.client = client;
     }
+
+    @Nullable
+    @Override
+    public OpdProfileOverviewFragmentContract.View getProfileView() {
+        OpdProfileOverviewFragmentContract.View view = this.view.get();
+        if (view != null) {
+            return view;
+        }
+
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public String getString(int stringId) {
+        if (getProfileView() != null) {
+            return getProfileView().getString(stringId);
+        }
+
+        return null;
+    }
+
+
 }

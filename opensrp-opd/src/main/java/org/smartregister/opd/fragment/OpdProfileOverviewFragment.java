@@ -53,7 +53,7 @@ public class OpdProfileOverviewFragment extends BaseProfileFragment implements O
 
     @Override
     protected void onCreation() {
-        presenter = new OpdProfileOverviewFragmentPresenter();
+        presenter = new OpdProfileOverviewFragmentPresenter(this);
 
         if (getArguments() != null) {
             CommonPersonObjectClient commonPersonObjectClient = (CommonPersonObjectClient) getArguments()

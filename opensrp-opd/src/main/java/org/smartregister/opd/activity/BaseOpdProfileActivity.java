@@ -91,8 +91,6 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
         CommonPersonObjectClient commonPersonObjectClient = (CommonPersonObjectClient) getIntent()
                 .getSerializableExtra(OpdConstants.IntentKey.CLIENT_OBJECT);
         String baseEntityId = commonPersonObjectClient.getCaseId();
-
-        ((OpdProfileActivityPresenter) presenter).fetchProfileData(baseEntityId);
         ((OpdProfileActivityPresenter) presenter).refreshProfileTopSection(commonPersonObjectClient.getColumnmaps());
     }
 
@@ -112,9 +110,8 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
         super.onResumption();
         commonPersonObjectClient = (CommonPersonObjectClient) getIntent()
                 .getSerializableExtra(OpdConstants.IntentKey.CLIENT_OBJECT);
-        String baseEntityId = commonPersonObjectClient.getCaseId();
 
-        ((OpdProfileActivityPresenter) presenter).refreshProfileView(baseEntityId);
+        String baseEntityId = commonPersonObjectClient.getCaseId();
         ((OpdProfileActivityPresenter) presenter).refreshProfileTopSection(commonPersonObjectClient.getColumnmaps());
     }
 
@@ -191,7 +188,7 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
         if (requestCode == OpdJsonFormUtils.REQUEST_CODE_GET_JSON && resultCode == RESULT_OK) {
             try {
                 String jsonString = data.getStringExtra(OpdConstants.JSON_FORM_EXTRA.JSON);
-                Timber.d("JSONResult : %s", jsonString);
+                Timber.d("JSON-Result : %s", jsonString);
 
                 JSONObject form = new JSONObject(jsonString);
                 String encounterType = form.getString(OpdJsonFormUtils.ENCOUNTER_TYPE);

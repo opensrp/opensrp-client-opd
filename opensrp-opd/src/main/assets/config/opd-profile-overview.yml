@@ -18,6 +18,9 @@ fields:
     relevance: "hiv_status != ''"
     isRedFont: "hiv_status == 'positive' || hiv_status == 'Positive'"
 
+  - template: "Taking ART?: {patient_on_art}"
+    relevance: "patient_on_art != ''"
+
 ---
 sub_group: current_visit
 fields:

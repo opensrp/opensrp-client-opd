@@ -453,4 +453,8 @@ public class OpdLibrary {
         // If your opd
         return visit == null || visit.getVisitDate().before(latestValidCheckInDate) || (opdDetails != null && opdDetails.getCurrentVisitEndDate() != null);
     }
+
+    public boolean isClientCurrentlyCheckedIn(@Nullable OpdVisit opdVisit, @Nullable OpdDetails opdDetails) {
+        return !canPatientCheckInInsteadOfDiagnoseAndTreat(opdVisit, opdDetails);
+    }
 }

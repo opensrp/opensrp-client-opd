@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 
-import org.apache.commons.lang3.tuple.Triple;
 import org.json.JSONObject;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.opd.listener.OnSendActionToFragment;
@@ -25,10 +24,6 @@ public interface OpdProfileActivityContract {
 
         @Nullable
         OpdProfileActivityContract.View getProfileView();
-
-        void fetchProfileData(@NonNull String baseEntityId);
-
-        void refreshProfileView(@NonNull String baseEntityId);
 
         void refreshProfileTopSection(@NonNull Map<String, String> client);
 
@@ -68,15 +63,9 @@ public interface OpdProfileActivityContract {
     interface Interactor {
 
         void onDestroy(boolean isChangingConfiguration);
-
-        void refreshProfileView(@NonNull String baseEntityId, boolean isForEdit);
     }
 
     interface InteractorCallBack {
-
-        void onUniqueIdFetched(Triple<String, String, String> triple, String entityId);
-
-        void onNoUniqueId();
 
         void onRegistrationSaved(boolean isEdit);
     }

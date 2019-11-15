@@ -63,6 +63,8 @@
     <string name="next_page"><![CDATA[NEXT >>]]></string>
     <string name="current_page_of_total_pages">Page %d of %d</string>
     <string name="previous_page"><![CDATA[<< Previous]]></string>
+    <string name="unknown">Unknown</string>
+    <string name="positive">positive</string>
 
 
 </resources>

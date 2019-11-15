@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.apache.commons.lang3.tuple.Triple;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.AllConstants;
@@ -52,7 +51,6 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
 
     @Override
     public void onDestroy(boolean isChangingConfiguration) {
-
         mProfileView = null;//set to null on destroy
 
         // Inform interactor
@@ -70,16 +68,6 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
         }
     }
 
-    @Override
-    public void fetchProfileData(@NonNull String baseEntityId) {
-        mProfileInteractor.refreshProfileView(baseEntityId, true);
-    }
-
-    @Override
-    public void refreshProfileView(@NonNull String baseEntityId) {
-        mProfileInteractor.refreshProfileView(baseEntityId, false);
-    }
-
     @Nullable
     @Override
     public OpdProfileActivityContract.View getProfileView() {
@@ -91,21 +79,8 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
     }
 
     @Override
-    public void onUniqueIdFetched(Triple<String, String, String> triple, String entityId) {
-        //Overriden
-    }
-
-    @Override
-    public void onNoUniqueId() {
-        if (getProfileView() != null) {
-            getProfileView().displayToast(R.string.no_openmrs_id);
-        }
-    }
-
-    @Override
     public void onRegistrationSaved(boolean isEdit) {
         if (getProfileView() != null) {
-            this.refreshProfileView(getProfileView().getIntentString(OpdConstants.IntentKey.BASE_ENTITY_ID));
             getProfileView().hideProgressDialog();
         }
     }
@@ -158,8 +133,9 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
                 form = model.getFormAsJson(formName, caseId, locationId, injectedValues);
                 if (formName.equals(OpdConstants.Form.OPD_DIAGNOSIS_AND_TREAT)) {
                     OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm = new OpdDiagnosisAndTreatmentForm(caseId);
-                    if (OpdLibrary.getInstance().getOpdDiagnosisAndTreatmentFormRepository().findOne(opdDiagnosisAndTreatmentForm) != null) {
-                        form = new JSONObject(OpdLibrary.getInstance().getOpdDiagnosisAndTreatmentFormRepository().findOne(opdDiagnosisAndTreatmentForm).getForm());
+                    OpdDiagnosisAndTreatmentForm savedOpdDiagnosisAndTreatmentForm = OpdLibrary.getInstance().getOpdDiagnosisAndTreatmentFormRepository().findOne(opdDiagnosisAndTreatmentForm);
+                    if (savedOpdDiagnosisAndTreatmentForm != null) {
+                        form = new JSONObject(savedOpdDiagnosisAndTreatmentForm.getForm());
                     }
                 }
             } catch (JSONException e) {

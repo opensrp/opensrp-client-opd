@@ -1,7 +1,5 @@
 package org.smartregister.opd.interactor;
 
-import android.support.annotation.NonNull;
-
 import org.smartregister.opd.contract.OpdProfileActivityContract;
 
 /**
@@ -19,14 +17,5 @@ public class OpdProfileInteractor implements OpdProfileActivityContract.Interact
         if (!isChangingConfiguration) {
             mProfilePresenter = null;
         }
-    }
-
-    @Override
-    public void refreshProfileView(@NonNull String baseEntityId, boolean isForEdit) {
-        // Todo: Add code for refreshing the profile view
-    }
-
-    public OpdProfileActivityContract.View getProfileView() {
-        return mProfilePresenter.getProfileView();
     }
 }
