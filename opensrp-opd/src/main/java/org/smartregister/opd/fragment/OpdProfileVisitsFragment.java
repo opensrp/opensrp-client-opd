@@ -137,7 +137,7 @@ public class OpdProfileVisitsFragment extends BaseProfileFragment implements Opd
     @Override
     public void displayVisits(@NonNull List<OpdVisitSummary> opdVisitSummaries, @NonNull ArrayList<Pair<YamlConfigWrapper, Facts>> items) {
         if (getActivity() != null) {
-            OpdProfileVisitsAdapter adapter = new OpdProfileVisitsAdapter(getActivity(), opdVisitSummaries, items);
+            OpdProfileVisitsAdapter adapter = new OpdProfileVisitsAdapter(getActivity(), items);
             adapter.notifyDataSetChanged();
 
             // set up the RecyclerView

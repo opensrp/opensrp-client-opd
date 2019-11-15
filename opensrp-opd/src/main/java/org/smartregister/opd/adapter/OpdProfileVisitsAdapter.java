@@ -3,6 +3,7 @@ package org.smartregister.opd.adapter;
 import android.content.Context;
 import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.util.Pair;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -16,11 +17,9 @@ import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
 import org.smartregister.opd.domain.YamlConfigItem;
 import org.smartregister.opd.domain.YamlConfigWrapper;
-import org.smartregister.opd.pojos.OpdVisitSummary;
 import org.smartregister.opd.utils.OpdUtils;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-30
@@ -32,7 +31,7 @@ public class OpdProfileVisitsAdapter extends RecyclerView.Adapter<OpdProfileVisi
     private ArrayList<Pair<YamlConfigWrapper, Facts>> items;
 
     // data is passed into the constructor
-    public OpdProfileVisitsAdapter(@NonNull Context context, @NonNull List<OpdVisitSummary> opdVisitSummaryList, ArrayList<Pair<YamlConfigWrapper, Facts>> items) {
+    public OpdProfileVisitsAdapter(@NonNull Context context, ArrayList<Pair<YamlConfigWrapper, Facts>> items) {
         this.context = context;
         this.mInflater = LayoutInflater.from(context);
         this.items = items;
@@ -42,7 +41,6 @@ public class OpdProfileVisitsAdapter extends RecyclerView.Adapter<OpdProfileVisi
     @Override
     @NonNull
     public YamlViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        //View view = mInflater.inflate(R.layout.opd_profile_visit_row, parent, false);
         View view = mInflater.inflate(R.layout.opd_profile_overview_row, parent, false);
         return new YamlViewHolder(view);
     }
@@ -80,38 +78,8 @@ public class OpdProfileVisitsAdapter extends RecyclerView.Adapter<OpdProfileVisi
             if (yamlConfigWrapper.getYamlConfigItem() != null) {
                 YamlConfigItem yamlConfigItem = yamlConfigWrapper.getYamlConfigItem();
 
-                if (yamlConfigItem != null && yamlConfigItem.getTemplate() != null) {
-                    OpdProfileVisitsAdapter.Template template = getTemplate(yamlConfigItem.getTemplate());
-
-                    boolean isHtml = yamlConfigItem.getHtml() != null && yamlConfigItem.getHtml();
-
-                    if (OpdUtils.isTemplate(template.detail)) {
-                        String output = OpdUtils.fillTemplate(isHtml, template.detail, facts);
-
-                        if (isHtml) {
-                            OpdUtils.setTextAsHtml(holder.sectionDetails, output);
-                        } else {
-                            holder.sectionDetails.setText(output);//Perhaps refactor to use Json Form Parser Implementation
-                        }
-                    } else {
-                        holder.sectionDetails.setText(template.detail);
-                    }
-
-                    if (OpdUtils.isTemplate(template.title)) {
-                        String output = OpdUtils.fillTemplate(template.title, facts);
-                        holder.sectionDetailTitle.setText(output);
-                    } else {
-                        holder.sectionDetailTitle.setText(template.title);
-                    }
-                }
-
-                if (yamlConfigItem != null && yamlConfigItem.getIsRedFont() != null && OpdLibrary.getInstance().getOpdRulesEngineHelper().getRelevance(facts, yamlConfigItem.getIsRedFont())) {
-                    holder.sectionDetailTitle.setTextColor(getColor(R.color.overview_font_red));
-                    holder.sectionDetails.setTextColor(getColor(R.color.overview_font_red));
-                } else {
-                    holder.sectionDetailTitle.setTextColor(getColor(R.color.overview_font_left));
-                    holder.sectionDetails.setTextColor(getColor(R.color.overview_font_right));
-                }
+                fillSectionDetailAndTemplate(holder, facts, yamlConfigItem);
+                setRowRedFontText(holder, facts, yamlConfigItem);
 
                 holder.sectionDetailTitle.setVisibility(View.VISIBLE);
                 holder.sectionDetails.setVisibility(View.VISIBLE);
@@ -120,6 +88,43 @@ public class OpdProfileVisitsAdapter extends RecyclerView.Adapter<OpdProfileVisi
                 holder.sectionDetailTitle.setVisibility(View.GONE);
                 holder.sectionDetails.setVisibility(View.GONE);
             }
+        }
+    }
+
+    private void fillSectionDetailAndTemplate(@NonNull YamlViewHolder holder, @NonNull Facts facts, @Nullable YamlConfigItem yamlConfigItem) {
+        if (yamlConfigItem != null && yamlConfigItem.getTemplate() != null) {
+            Template template = getTemplate(yamlConfigItem.getTemplate());
+
+            boolean isHtml = yamlConfigItem.getHtml() != null && yamlConfigItem.getHtml();
+
+            if (OpdUtils.isTemplate(template.detail)) {
+                String output = OpdUtils.fillTemplate(isHtml, template.detail, facts);
+
+                if (isHtml) {
+                    OpdUtils.setTextAsHtml(holder.sectionDetails, output);
+                } else {
+                    holder.sectionDetails.setText(output);//Perhaps refactor to use Json Form Parser Implementation
+                }
+            } else {
+                holder.sectionDetails.setText(template.detail);
+            }
+
+            if (OpdUtils.isTemplate(template.title)) {
+                String output = OpdUtils.fillTemplate(template.title, facts);
+                holder.sectionDetailTitle.setText(output);
+            } else {
+                holder.sectionDetailTitle.setText(template.title);
+            }
+        }
+    }
+
+    private void setRowRedFontText(@NonNull YamlViewHolder holder, @NonNull Facts facts, @Nullable YamlConfigItem yamlConfigItem) {
+        if (yamlConfigItem != null && yamlConfigItem.getIsRedFont() != null && OpdLibrary.getInstance().getOpdRulesEngineHelper().getRelevance(facts, yamlConfigItem.getIsRedFont())) {
+            holder.sectionDetailTitle.setTextColor(getColor(R.color.overview_font_red));
+            holder.sectionDetails.setTextColor(getColor(R.color.overview_font_red));
+        } else {
+            holder.sectionDetailTitle.setTextColor(getColor(R.color.overview_font_left));
+            holder.sectionDetails.setTextColor(getColor(R.color.overview_font_right));
         }
     }
 
