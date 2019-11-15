@@ -1,6 +1,5 @@
 package org.smartregister.opd.widgets;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
@@ -14,14 +13,20 @@ import android.widget.TextView;
 
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.domain.MultiSelectItem;
+import com.vijay.jsonwizard.utils.MultiSelectListUtils;
 import com.vijay.jsonwizard.widgets.MultiSelectListFactory;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
+import org.smartregister.opd.pojos.OpdMultiSelectOption;
+import org.smartregister.opd.repository.OpdMultiSelectOptionsRepository;
 import org.smartregister.opd.utils.OpdConstants;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 
 import timber.log.Timber;
 
@@ -30,7 +35,7 @@ public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements 
     private Button opd_btn_save_drug;
 
     @Override
-    protected void handleClickEventOnListData(@NonNull MultiSelectItem multiSelectItem, @NonNull Context context) {
+    protected void handleClickEventOnListData(@NonNull MultiSelectItem multiSelectItem) {
         createAdditionalDetailsDialog(multiSelectItem);
     }
 
@@ -41,9 +46,9 @@ public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements 
         opd_btn_save_drug = view.findViewById(R.id.opd_btn_save_drug);
 
         TextView txtSelectedItemInMultiSelectList = view.findViewById(R.id.txtSelectedItemInMultiSelectList);
-        txtSelectedItemInMultiSelectList.setText(multiSelectItem.getKey());
-        final EditText edtTreatmentDosage = view.findViewById(R.id.edtTreatmentDosage);
-        final EditText edtTreatmentDuration = view.findViewById(R.id.edtTreatmentDuration);
+        txtSelectedItemInMultiSelectList.setText(multiSelectItem.getText());
+        final EditText edtTreatmentDuration = view.findViewById(R.id.edtTreatmentDosage);
+        final EditText edtTreatmentDosage = view.findViewById(R.id.edtTreatmentDuration);
         edtTreatmentDosage.addTextChangedListener(this);
         edtTreatmentDuration.addTextChangedListener(this);
         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.FullScreenDialogStyle);
@@ -76,7 +81,7 @@ public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements 
 
                 writeAdditionalDetails(duration, dosage, multiSelectItem);
 
-                writeToForm(multiSelectItem);
+                writeToForm();
 
                 alertDialog.dismiss();
 
@@ -102,7 +107,7 @@ public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements 
         }
 
         multiSelectItem.setValue(jsonObject.toString());
-        updateSelectedData(Collections.singletonList(multiSelectItem), false);
+        updateSelectedData(multiSelectItem, false);
     }
 
     @Override
@@ -128,4 +133,18 @@ public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements 
         }
     }
 
+    @Override
+    public List<MultiSelectItem> fetchData() {
+        OpdMultiSelectOptionsRepository opdMultiSelectOptionsRepository = OpdLibrary.getInstance()
+                .getOpdMultiSelectOptionsRepository();
+        OpdMultiSelectOption multiSelectOption = opdMultiSelectOptionsRepository.getLatest(currentAdapterKey);
+        JSONArray jsonArray;
+        try {
+            jsonArray = new JSONArray(multiSelectOption.getJson());
+            return MultiSelectListUtils.processOptionsJsonArray(jsonArray);
+        } catch (JSONException e) {
+            Timber.e(e);
+            return new ArrayList<>();
+        }
+    }
 }

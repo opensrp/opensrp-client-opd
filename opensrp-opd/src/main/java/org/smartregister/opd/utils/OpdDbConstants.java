@@ -53,6 +53,15 @@ public interface OpdDbConstants {
             String UPDATED_AT = "updated_at";
         }
 
+        interface OpdMultiSelectOptions {
+            String ID = "_id";
+            String JSON = "json";
+            String TYPE = "type";
+            String VERSION = "version";
+            String CREATED_AT = "created_at";
+            String APP_VERSION = "app_version";
+        }
+
         interface OpdVisit {
             String ID = "_id";
             String VISIT_DATE = "visit_date";
@@ -150,6 +159,7 @@ public interface OpdDbConstants {
         String OPD_TREATMENT = "opd_treatment";
         String OPD_SERVICE_DETAIL = "opd_service_detail";
         String OPD_TEST_CONDUCTED = "opd_test_conducted";
+        String OPD_MULTI_SELECT_LIST_OPTION = "opd_multi_select_list_option";
 
     }
 }
