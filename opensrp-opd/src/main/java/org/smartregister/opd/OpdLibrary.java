@@ -3,11 +3,14 @@ package org.smartregister.opd;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
+import com.vijay.jsonwizard.constants.JsonFormConstants;
+
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.smartregister.AllConstants;
 import org.smartregister.Context;
 import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.domain.tag.FormTag;
@@ -21,6 +24,7 @@ import org.smartregister.opd.repository.OpdCheckInRepository;
 import org.smartregister.opd.repository.OpdDetailsRepository;
 import org.smartregister.opd.repository.OpdDiagnosisAndTreatmentFormRepository;
 import org.smartregister.opd.repository.OpdDiagnosisRepository;
+import org.smartregister.opd.repository.OpdMultiSelectOptionsRepository;
 import org.smartregister.opd.repository.OpdServiceDetailRepository;
 import org.smartregister.opd.repository.OpdTestConductedRepository;
 import org.smartregister.opd.repository.OpdTreatmentRepository;
@@ -47,6 +51,7 @@ import java.util.Date;
 import java.util.List;
 
 import id.zelory.compressor.Compressor;
+import timber.log.Timber;
 
 import static org.smartregister.opd.utils.OpdJsonFormUtils.METADATA;
 
@@ -71,6 +76,7 @@ public class OpdLibrary {
     private OpdDiagnosisRepository opdDiagnosisRepository;
     private OpdTreatmentRepository opdTreatmentRepository;
     private OpdTestConductedRepository opdTestConductedRepository;
+    private OpdMultiSelectOptionsRepository opdMultiSelectOptionsRepository;
     private Compressor compressor;
     private int applicationVersion;
     private int databaseVersion;
@@ -145,6 +151,14 @@ public class OpdLibrary {
             opdDetailsRepository = new OpdDetailsRepository(getRepository());
         }
         return opdDetailsRepository;
+    }
+
+    @NonNull
+    public OpdMultiSelectOptionsRepository getOpdMultiSelectOptionsRepository() {
+        if (opdMultiSelectOptionsRepository == null) {
+            opdMultiSelectOptionsRepository = new OpdMultiSelectOptionsRepository(getRepository());
+        }
+        return opdMultiSelectOptionsRepository;
     }
 
     @NonNull
@@ -290,6 +304,7 @@ public class OpdLibrary {
         JSONObject step2JsonObject = jsonFormObject.optJSONObject(OpdConstants.JSON_FORM_EXTRA.STEP2);
 
         JSONObject step3JsonObject = jsonFormObject.optJSONObject(OpdConstants.JSON_FORM_EXTRA.STEP3);
+
         JSONObject step4JsonObject = jsonFormObject.optJSONObject(OpdConstants.JSON_FORM_EXTRA.STEP4);
 
         String entityId = OpdUtils.getIntentValue(data, OpdConstants.IntentKey.BASE_ENTITY_ID);
@@ -309,28 +324,42 @@ public class OpdLibrary {
             JSONArray fields = step.getJSONArray(OpdJsonFormUtils.FIELDS);
             String valueIds = null;
             JSONObject jsonObject;
+            JSONArray valueJsonArray = null;
             if (i == 0 || i == 3) {
                 valueIds = OpdUtils.generateNIds(1);
             } else if (i == 1) {
                 jsonObject = JsonFormUtils.getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.DISEASE_CODE);
+                JSONObject jsonDiagnosisType = JsonFormUtils.getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.DIAGNOSIS_TYPE);
+                String diagnosisType = jsonDiagnosisType.optString(OpdConstants.KEY.VALUE);
                 String value = jsonObject.optString(OpdConstants.KEY.VALUE);
-                if (TextUtils.isEmpty(value)) {
-                    continue;
+                if (StringUtils.isBlank(value) || (new JSONArray(value).length() == 0)) {
+                    valueIds = OpdUtils.generateNIds(1);
+                } else {
+                    valueJsonArray = new JSONArray(value);
+                    JSONArray jsonArrayWithOpenMrsIds = addOpenMrsEntityId(diagnosisType.toLowerCase(), valueJsonArray);
+                    jsonObject.put(OpdConstants.KEY.VALUE, jsonArrayWithOpenMrsIds);
+                    valueIds = OpdUtils.generateNIds(valueJsonArray.length());
                 }
-                valueIds = OpdUtils.generateNIds(new JSONArray(value).length());
             } else if (i == 2) {
                 jsonObject = JsonFormUtils.getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.MEDICINE);
+                jsonObject.put(AllConstants.TYPE, AllConstants.MULTI_SELECT_LIST);
                 String value = jsonObject.optString(OpdConstants.KEY.VALUE);
-                if (TextUtils.isEmpty(value)) {
-                    continue;
+                if (StringUtils.isBlank(value) || (new JSONArray(value).length() == 0)) {
+                    valueIds = OpdUtils.generateNIds(1);
+                } else {
+                    valueJsonArray = new JSONArray(value);
+                    valueIds = OpdUtils.generateNIds(valueJsonArray.length());
                 }
-                valueIds = OpdUtils.generateNIds(new JSONArray(value).length());
             }
             Event baseEvent = JsonFormUtils.createEvent(fields, jsonFormObject.getJSONObject(METADATA),
                     formTag, entityId, getDiagnosisAndTreatmentEventArray()[i], getDiagnosisAndTreatmentTableArray()[i]);
             OpdJsonFormUtils.tagSyncMetadata(baseEvent);
             baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_ID, visitId);
             baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.ID, valueIds);
+            if (valueJsonArray != null) {
+                baseEvent.addDetails(OpdConstants.KEY.VALUE, valueJsonArray.toString());
+            }
+
             eventList.add(baseEvent);
         }
 
@@ -346,6 +375,21 @@ public class OpdLibrary {
         eventList.add(closeOpdVisit);
 
         return eventList;
+    }
+
+    private JSONArray addOpenMrsEntityId(String diagnosisType, JSONArray jsonArray) {
+        try {
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.optJSONObject(i);
+                jsonObject.put(JsonFormConstants.OPENMRS_ENTITY_ID, jsonObject.optJSONObject(JsonFormConstants.MultiSelectUtils.PROPERTY)
+                        .optString(diagnosisType.concat("-id")));
+            }
+
+            return jsonArray;
+        } catch (JSONException e) {
+            Timber.e(e);
+        }
+        return jsonArray;
     }
 
     protected String[] getDiagnosisAndTreatmentEventArray() {

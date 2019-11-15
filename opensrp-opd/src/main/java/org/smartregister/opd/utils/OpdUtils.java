@@ -7,11 +7,17 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 
+import com.vijay.jsonwizard.processor.MultiSelectListCsvFileProcessorImpl;
+import com.vijay.jsonwizard.reader.AssetMultiSelectListFileReaderImpl;
+import com.vijay.jsonwizard.reader.MultiSelectListFileReader;
+import com.vijay.jsonwizard.task.MultiSelectListSaveOptionsTask;
+
 import org.apache.commons.lang3.StringUtils;
 import org.jeasy.rules.api.Facts;
 import org.jetbrains.annotations.NotNull;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.pojos.OpdMetadata;
+import org.smartregister.opd.reader.OpdMultiSelectListOptionsReader;
 import org.smartregister.util.JsonFormUtils;
 
 import java.text.DateFormat;
@@ -151,4 +157,11 @@ public class OpdUtils extends org.smartregister.util.Utils {
         }
         return age;
     }
+
+    public static void saveMultiSelectListOptions(android.content.Context context) {
+        MultiSelectListFileReader csvReader = new AssetMultiSelectListFileReaderImpl(context, "native.form/multiselectlist");
+        OpdMultiSelectListOptionsReader opdMultiSelectListOptionsReader = new OpdMultiSelectListOptionsReader(csvReader, new MultiSelectListCsvFileProcessorImpl());
+        new MultiSelectListSaveOptionsTask(context, opdMultiSelectListOptionsReader).execute();
+    }
+
 }

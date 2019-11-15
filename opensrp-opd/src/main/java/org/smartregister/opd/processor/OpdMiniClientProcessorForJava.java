@@ -10,6 +10,7 @@ import com.vijay.jsonwizard.constants.JsonFormConstants;
 
 import net.sqlcipher.database.SQLiteException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,7 +35,6 @@ import org.smartregister.opd.pojos.OpdTreatment;
 import org.smartregister.opd.pojos.OpdVisit;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;
-import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.sync.ClientProcessorForJava;
 import org.smartregister.util.Utils;
@@ -202,32 +202,45 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
             return;
         }
         String[] valueIds = id.split(",");
+
+        JSONArray valueJsonArray = null;
+        if(mapDetails.containsKey(OpdConstants.KEY.VALUE)) {
+            String strValue = mapDetails.get(OpdConstants.KEY.VALUE);
+            if (!StringUtils.isBlank(strValue)) {
+                valueJsonArray = new JSONArray(strValue);
+            }
+        }
+
         HashMap<String, String> keyValues = new HashMap<>();
         generateKeyValuesFromEvent(event, keyValues);
         String medicine = keyValues.get(OpdConstants.JSON_FORM_KEY.MEDICINE);
         if (!TextUtils.isEmpty(medicine)) {
-            JSONArray medicineJsonArray = new JSONArray(medicine);
-            for (int i = 0; i < medicineJsonArray.length(); i++) {
-                JSONObject jsonObject = medicineJsonArray.getJSONObject(i);
-                String key = jsonObject.optString(OpdConstants.KEY.KEY);
-                JSONObject property = jsonObject.optJSONObject(JsonFormConstants.MultiSelectUtils.PROPERTY);
-                JSONObject meta = property.optJSONObject(OpdConstants.JSON_FORM_KEY.META);
+            for (int i = 0; i < valueIds.length; i++) {
                 OpdTreatment opdTreatment = new OpdTreatment();
                 opdTreatment.setId(valueIds[i]);
                 opdTreatment.setBaseEntityId(event.getBaseEntityId());
                 opdTreatment.setVisitId(mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID));
-                if (meta != null) {
-                    opdTreatment.setDosage(meta.optString(OpdConstants.JSON_FORM_KEY.DOSAGE));
-                    opdTreatment.setDuration(meta.optString(OpdConstants.JSON_FORM_KEY.DURATION));
-                    opdTreatment.setNote(meta.optString(OpdConstants.JSON_FORM_KEY.INFO));
-                }
-                opdTreatment.setMedicine(key);
                 opdTreatment.setCreatedAt(Utils.convertDateFormat(new DateTime()));
                 opdTreatment.setUpdatedAt(Utils.convertDateFormat(new DateTime()));
+
+                if(valueJsonArray != null) {
+                    JSONObject valueJsonObject = valueJsonArray.optJSONObject(i);
+
+                    JSONObject propertyJsonObject = valueJsonObject.optJSONObject(JsonFormConstants.MultiSelectUtils.PROPERTY);
+                    JSONObject meta = propertyJsonObject.optJSONObject(OpdConstants.JSON_FORM_KEY.META);
+                    if (meta != null) {
+                        opdTreatment.setDosage(meta.optString(OpdConstants.JSON_FORM_KEY.DOSAGE));
+                        opdTreatment.setDuration(meta.optString(OpdConstants.JSON_FORM_KEY.DURATION));
+                        opdTreatment.setNote(meta.optString(OpdConstants.JSON_FORM_KEY.INFO));
+                    }
+                    opdTreatment.setMedicine(valueJsonObject.optString(propertyJsonObject.optString(JsonFormConstants.MultiSelectUtils.TEXT)));
+                }
+
+
                 boolean result = OpdLibrary.getInstance().getOpdTreatmentRepository().saveOrUpdate(opdTreatment);
                 if (result) {
                     Timber.i("Opd processTreatment for %s saved", event.getBaseEntityId());
-                    return;
+                    continue;
                 }
                 Timber.e("Opd processTreatment for %s not saved", event.getBaseEntityId());
             }
@@ -237,40 +250,51 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
     private void processDiagnosis(@NonNull Event event) throws JSONException {
         Map<String, String> mapDetails = event.getDetails();
         String id = mapDetails.get(OpdConstants.JSON_FORM_KEY.ID);
+        String visitId = mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID);
         if (id == null) {
             return;
         }
         String[] valueIds = id.split(",");
+
+        JSONArray valuesJsonArray = null;
+        if(mapDetails.containsKey(OpdConstants.KEY.VALUE)) {
+            String strValue = mapDetails.get(OpdConstants.KEY.VALUE);
+            if (!StringUtils.isBlank(strValue)) {
+                valuesJsonArray = new JSONArray(strValue);
+            }
+        }
 
         HashMap<String, String> keyValues = new HashMap<>();
         generateKeyValuesFromEvent(event, keyValues);
 
         String diagnosis = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSIS);
         String diagnosisType = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSIS_TYPE);
-        String diseaseCode = keyValues.get(OpdConstants.JSON_FORM_KEY.DISEASE_CODE);
 
-        if (!TextUtils.isEmpty(diseaseCode) && !TextUtils.isEmpty(diagnosis)) {
-            JSONArray diseaseCodesJsonArray = new JSONArray(diseaseCode);
-            for (int i = 0; i < diseaseCodesJsonArray.length(); i++) {
-                JSONObject jsonObject = diseaseCodesJsonArray.getJSONObject(i);
-                String key = jsonObject.optString(OpdJsonFormUtils.KEY);
-                JSONObject property = jsonObject.optJSONObject(JsonFormConstants.MultiSelectUtils.PROPERTY);
+        if (!TextUtils.isEmpty(diagnosis)) {
+            for (int i = 0; i < valueIds.length; i++) {
                 OpdDiagnosis opdDiagnosis = new OpdDiagnosis();
-                opdDiagnosis.setId(valueIds[i]);
                 opdDiagnosis.setBaseEntityId(event.getBaseEntityId());
-                opdDiagnosis.setVisitId(mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID));
-                opdDiagnosis.setIcd10Code(property.optString(OpdConstants.JSON_FORM_KEY.ICD10));
-                opdDiagnosis.setCode(property.optString(OpdConstants.JSON_FORM_KEY.CODE));
-                opdDiagnosis.setDetails(property.optString(OpdConstants.JSON_FORM_KEY.META));
+                opdDiagnosis.setDiagnosis(diagnosis);
                 opdDiagnosis.setType(diagnosisType);
                 opdDiagnosis.setCreatedAt(Utils.convertDateFormat(new DateTime()));
                 opdDiagnosis.setUpdatedAt(Utils.convertDateFormat(new DateTime()));
-                opdDiagnosis.setDisease(key);
-                opdDiagnosis.setDiagnosis(diagnosis);
+                opdDiagnosis.setVisitId(visitId);
+                opdDiagnosis.setId(valueIds[i]);
+
+                if(valuesJsonArray != null) {
+                    JSONObject valueJsonObject = valuesJsonArray.optJSONObject(i);
+                    JSONObject propertyJsonObject = valueJsonObject.optJSONObject(JsonFormConstants.MultiSelectUtils.PROPERTY);
+                    opdDiagnosis.setIcd10Code(propertyJsonObject.optString(OpdConstants.JSON_FORM_KEY.ICD10));
+                    opdDiagnosis.setCode(propertyJsonObject.optString(OpdConstants.JSON_FORM_KEY.CODE));
+                    opdDiagnosis.setDetails(propertyJsonObject.optString(OpdConstants.JSON_FORM_KEY.META));
+                    opdDiagnosis.setDisease(valueJsonObject.optString(JsonFormConstants.MultiSelectUtils.TEXT));
+                }
+
+
                 boolean result = OpdLibrary.getInstance().getOpdDiagnosisRepository().saveOrUpdate(opdDiagnosis);
                 if (result) {
                     Timber.i("Opd processDiagnosis for %s saved", event.getBaseEntityId());
-                    return;
+                    continue;
                 }
                 Timber.e("Opd processDiagnosis for %s not saved", event.getBaseEntityId());
             }
@@ -278,7 +302,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
 
     }
 
-    private void processTestConducted(@NonNull Event event) throws JSONException {
+    private void processTestConducted(@NonNull Event event) {
 
         Map<String, String> mapDetails = event.getDetails();
 
@@ -299,12 +323,21 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         if (keyValues.containsKey(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_OTHER)) {
             diagnosticTest = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_OTHER);
         }
+
         if (keyValues.containsKey(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST)) {
             diagnosticTest = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST);
         }
 
         if (keyValues.containsKey(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPECIFY)) {
             diagnosticResult = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPECIFY);
+        }
+
+        if (keyValues.containsKey(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER_BLOOD_TYPE)) {
+            diagnosticResult = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER_BLOOD_TYPE);
+        }
+
+        if (keyValues.containsKey(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_GLUCOSE)) {
+            diagnosticResult = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_GLUCOSE);
         }
 
         if (!TextUtils.isEmpty(diagnosticResult) && !TextUtils.isEmpty(diagnosticTest)) {

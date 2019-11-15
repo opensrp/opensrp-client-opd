@@ -50,6 +50,11 @@ public class OpdConstants extends AllConstants {
         String MULTI_SELECT_DRUG_PICKER = "multi_select_drug_picker";
     }
 
+    public interface OpdMultiDrugPicker {
+        String CONFIRMED_ID = "consumed-id";
+        String PRESUMED_ID = "presumed-id";
+    }
+
     public static class JSON_FORM_KEY {
         public static final String OPTIONS = "options";
         public static final String LAST_INTERACTED_WITH = "last_interacted_with";
@@ -79,6 +84,8 @@ public class OpdConstants extends AllConstants {
         public static final String DIAGNOSTIC_TEST_RESULT_SPECIFY = "diagnostic_test_result_specify";
         public static final String ID = "ID";
         public static final String VISIT_END_DATE = "visit_end_date";
+        public static final String DIAGNOSTIC_TEST_RESULT_GLUCOSE = "diagnostic_test_result_glucose";
+        public static final String DIAGNOSTIC_TEST_RESULT_SPINNER_BLOOD_TYPE = "diagnostic_test_result_spinner_blood_type";
     }
 
     public static class JsonFormNameUtils {
@@ -143,7 +150,7 @@ public class OpdConstants extends AllConstants {
     public interface ColumnMapKey {
         String REGISTER_ID = "register_id";
     }
-  
+
     public interface DateFormat {
         String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
     }
