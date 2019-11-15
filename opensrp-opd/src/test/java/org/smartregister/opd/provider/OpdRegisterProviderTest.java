@@ -13,19 +13,27 @@ import android.widget.Button;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.robolectric.util.ReflectionHelpers;
+import org.smartregister.CoreLibrary;
+import org.smartregister.SyncConfiguration;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.opd.BaseTest;
 import org.smartregister.opd.BuildConfig;
 import org.smartregister.opd.OpdLibrary;
+import org.smartregister.opd.R;
 import org.smartregister.opd.configuration.BaseOpdRegisterProviderMetadata;
 import org.smartregister.opd.configuration.OpdConfiguration;
 import org.smartregister.opd.configuration.OpdRegisterQueryProviderContract;
 import org.smartregister.opd.configuration.OpdRegisterRowOptions;
 import org.smartregister.opd.holders.OpdRegisterViewHolder;
 import org.smartregister.repository.Repository;
+import org.smartregister.util.Utils;
 import org.smartregister.view.contract.SmartRegisterClient;
 
 import java.util.Map;
@@ -33,7 +41,8 @@ import java.util.Map;
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-24
  */
-
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(Utils.class)
 public class OpdRegisterProviderTest extends BaseTest {
 
     private OpdRegisterProvider opdRegisterProvider;
@@ -78,21 +87,28 @@ public class OpdRegisterProviderTest extends BaseTest {
 
     @Test
     public void populatePatientColumnShouldCallProviderMetadataForDataValues() {
+        CoreLibrary.init(PowerMockito.mock(org.smartregister.Context.class), PowerMockito.mock(SyncConfiguration.class));
+        PowerMockito.mockStatic(Utils.class);
         CommonPersonObjectClient client = Mockito.mock(CommonPersonObjectClient.class);
+
         Mockito.doReturn(true)
                 .when(opdRegisterProviderMetadata)
                 .isClientHaveGuardianDetails(Mockito.any(Map.class));
+        Mockito.doReturn("2016-07-24T03:00:00.000+03:00")
+                .when(opdRegisterProviderMetadata)
+                .getDob(Mockito.any(Map.class));
+        PowerMockito.when(Utils.getDuration("2016-07-24T03:00:00.000+03:00")).thenReturn("3y 4m");
 
         Resources resources = Mockito.mock(Resources.class);
         Mockito.doReturn(resources).when(context).getResources();
-        Mockito.doReturn("CG").when(resources).getString(Mockito.anyInt());
-        Mockito.doReturn("CG").when(context).getString(Mockito.anyInt());
+        Mockito.doReturn("CG").when(resources).getString(R.string.care_giver_initials);
+        Mockito.doReturn("y").when(resources).getString(R.string.abbrv_years);
 
         OpdRegisterViewHolder viewHolder = Mockito.mock(OpdRegisterViewHolder.class);
         viewHolder.childColumn = Mockito.mock(View.class);
         viewHolder.dueButton = Mockito.mock(Button.class);
 
-        opdRegisterProvider.populatePatientColumn(client, client, viewHolder);
+        opdRegisterProvider.populatePatientColumn(client, viewHolder);
 
         Mockito.verify(opdRegisterProviderMetadata, Mockito.times(1))
                 .getGuardianFirstName(Mockito.eq(client.getColumnmaps()));
