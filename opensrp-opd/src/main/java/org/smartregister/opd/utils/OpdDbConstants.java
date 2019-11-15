@@ -62,6 +62,7 @@ public interface OpdDbConstants {
         }
 
         interface Client {
+            String ID = "_id";
             String PHOTO = "photo";
             String FIRST_NAME = "first_name";
             String LAST_NAME = "last_name";

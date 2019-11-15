@@ -131,7 +131,7 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
             }
 
             profileView.setProfileID(Utils.getValue(client, OpdDbConstants.KEY.REGISTER_ID, false));
-            profileView.setProfileImage(Utils.getValue(client, OpdDbConstants.KEY.BASE_ENTITY_ID, false));
+            profileView.setProfileImage(Utils.getValue(client, OpdDbConstants.Column.Client.ID, false));
         }
     }
 
