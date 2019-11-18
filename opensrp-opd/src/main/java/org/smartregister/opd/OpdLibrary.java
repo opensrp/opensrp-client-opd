@@ -287,13 +287,11 @@ public class OpdLibrary {
         Event opdCheckinEvent = OpdJsonFormUtils.createEvent(fieldsArray, jsonFormObject.getJSONObject(METADATA)
                 , formTag, baseEntityId, eventType, entityTable);
 
-        // Generate the eventId and add it
-        opdCheckinEvent.setEventId(JsonFormUtils.generateRandomUUIDString());
-
         AllSharedPreferences allSharedPreferences = OpdUtils.getAllSharedPreferences();
         String providerId = allSharedPreferences.fetchRegisteredANM();
         opdCheckinEvent.setProviderId(providerId);
         opdCheckinEvent.setLocationId(OpdJsonFormUtils.locationId(allSharedPreferences));
+        opdCheckinEvent.setFormSubmissionId(opdCheckinEvent.getFormSubmissionId());
 
         opdCheckinEvent.setTeam(allSharedPreferences.fetchDefaultTeam(providerId));
         opdCheckinEvent.setTeamId(allSharedPreferences.fetchDefaultTeamId(providerId));

@@ -38,7 +38,7 @@ public interface OpdDbConstants {
 
         interface OpdCheckIn {
             String ID = "_id";
-            String EVENT_ID = "event_id";
+            String FORM_SUBMISSION_ID = "form_submission_id";
             String VISIT_ID = "visit_id";
             String BASE_ENTITY_ID = "base_entity_id";
             String PREGNANCY_STATUS = "pregnancy_status";

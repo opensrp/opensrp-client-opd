@@ -51,14 +51,14 @@ public class OpdCheckInRepositoryTest {
     public void createValuesForShouldPopulateContentValueWithCorrectKeys() {
         OpdCheckIn opdCheckIn = new OpdCheckIn();
         opdCheckIn.setId(1);
-        opdCheckIn.setEventId("event-id");
+        opdCheckIn.setFormSubmissionId("event-id");
 
         OpdCheckInRepository opdCheckInRepository = new OpdCheckInRepository(Mockito.mock(Repository.class));
 
         ContentValues contentValues = opdCheckInRepository.createValuesFor(opdCheckIn);
 
         assertTrue(contentValues.containsKey(OpdDbConstants.Column.OpdCheckIn.ID));
-        assertTrue(contentValues.containsKey(OpdDbConstants.Column.OpdCheckIn.EVENT_ID));
+        assertTrue(contentValues.containsKey(OpdDbConstants.Column.OpdCheckIn.FORM_SUBMISSION_ID));
         assertTrue(contentValues.containsKey(OpdDbConstants.Column.OpdCheckIn.VISIT_ID));
         assertTrue(contentValues.containsKey(OpdDbConstants.Column.OpdCheckIn.BASE_ENTITY_ID));
         assertTrue(contentValues.containsKey(OpdDbConstants.Column.OpdCheckIn.PREGNANCY_STATUS));
@@ -78,7 +78,7 @@ public class OpdCheckInRepositoryTest {
         Mockito.doReturn(database).when(repository).getWritableDatabase();
 
         MatrixCursor matrixCursor = new MatrixCursor(new String[]{OpdDbConstants.Column.OpdCheckIn.ID
-                , OpdDbConstants.Column.OpdCheckIn.EVENT_ID
+                , OpdDbConstants.Column.OpdCheckIn.FORM_SUBMISSION_ID
                 , OpdDbConstants.Column.OpdCheckIn.VISIT_ID
                 , OpdDbConstants.Column.OpdCheckIn.BASE_ENTITY_ID
                 , OpdDbConstants.Column.OpdCheckIn.PREGNANCY_STATUS
@@ -141,7 +141,7 @@ public class OpdCheckInRepositoryTest {
         Mockito.doReturn(database).when(repository).getWritableDatabase();
 
         MatrixCursor matrixCursor = new MatrixCursor(new String[]{OpdDbConstants.Column.OpdCheckIn.ID
-                , OpdDbConstants.Column.OpdCheckIn.EVENT_ID
+                , OpdDbConstants.Column.OpdCheckIn.FORM_SUBMISSION_ID
                 , OpdDbConstants.Column.OpdCheckIn.VISIT_ID
                 , OpdDbConstants.Column.OpdCheckIn.BASE_ENTITY_ID
                 , OpdDbConstants.Column.OpdCheckIn.PREGNANCY_STATUS
@@ -201,7 +201,7 @@ public class OpdCheckInRepositoryTest {
     public void getCheckInResultShoudlGenerateValidCheckInObjectFromCursor() {
 
         MatrixCursor matrixCursor = new MatrixCursor(new String[]{OpdDbConstants.Column.OpdCheckIn.ID
-                , OpdDbConstants.Column.OpdCheckIn.EVENT_ID
+                , OpdDbConstants.Column.OpdCheckIn.FORM_SUBMISSION_ID
                 , OpdDbConstants.Column.OpdCheckIn.VISIT_ID
                 , OpdDbConstants.Column.OpdCheckIn.BASE_ENTITY_ID
                 , OpdDbConstants.Column.OpdCheckIn.PREGNANCY_STATUS
@@ -242,7 +242,7 @@ public class OpdCheckInRepositoryTest {
 
         assertEquals(1, checkIn.getId());
         assertEquals("visit-id", checkIn.getVisitId());
-        assertEquals(eventId, checkIn.getEventId());
+        assertEquals(eventId, checkIn.getFormSubmissionId());
         assertEquals(checkInDate, checkIn.getUpdatedAt());
         assertNull(checkIn.getAppointmentDueDate());
     }
