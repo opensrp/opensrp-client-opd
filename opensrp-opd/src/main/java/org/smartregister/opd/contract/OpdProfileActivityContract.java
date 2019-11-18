@@ -28,7 +28,9 @@ public interface OpdProfileActivityContract {
 
         void refreshProfileTopSection(@NonNull Map<String, String> client);
 
-        void startForm(String formName, CommonPersonObjectClient commonPersonObjectClient);
+        void startForm(@NonNull String formName, @NonNull CommonPersonObjectClient commonPersonObjectClient);
+
+        void startFormActivity(@Nullable JSONObject form, @NonNull String caseId, @NonNull String entityTable);
 
         void saveVisitOrDiagnosisForm(String eventType, Intent data);
     }

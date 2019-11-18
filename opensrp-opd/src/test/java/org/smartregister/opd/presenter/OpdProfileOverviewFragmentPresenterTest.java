@@ -1,6 +1,7 @@
 package org.smartregister.opd.presenter;
 
 import org.jeasy.rules.api.Facts;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,7 +34,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-11-18
@@ -57,6 +58,11 @@ public class OpdProfileOverviewFragmentPresenterTest extends BaseTest {
         OpdProfileOverviewFragmentContract.Model model = ReflectionHelpers.getField(presenter, "model");
         this.model = Mockito.spy(model);
         ReflectionHelpers.setField(presenter, "model", this.model);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", null);
     }
 
     @Test

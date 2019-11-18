@@ -94,7 +94,8 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
         }
     }
 
-    private void startFormActivity(@Nullable JSONObject form, @NonNull String caseId, @NonNull String entityTable) {
+    @Override
+    public void startFormActivity(@Nullable JSONObject form, @NonNull String caseId, @NonNull String entityTable) {
         if (getProfileView() != null && form != null) {
             HashMap<String, String> intentKeys = new HashMap<>();
             intentKeys.put(OpdConstants.IntentKey.BASE_ENTITY_ID, caseId);
@@ -124,12 +125,12 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
             }
 
             profileView.setProfileID(Utils.getValue(client, OpdDbConstants.KEY.REGISTER_ID, false));
-            profileView.setProfileImage(Utils.getValue(client, OpdDbConstants.Column.Client.ID, false));
+            profileView.setProfileImage(Utils.getValue(client, OpdDbConstants.KEY.ID, false));
         }
     }
 
     @Override
-    public void startForm(String formName, CommonPersonObjectClient commonPersonObjectClient) {
+    public void startForm(@NonNull String formName, @NonNull CommonPersonObjectClient commonPersonObjectClient) {
         Map<String, String> clientMap = commonPersonObjectClient.getColumnmaps();
         HashMap<String, String> injectedValues = new HashMap<>();
         injectedValues.put("patient_gender", clientMap.get("gender"));
