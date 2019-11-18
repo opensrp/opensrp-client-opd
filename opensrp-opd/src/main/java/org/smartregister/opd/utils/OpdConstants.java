@@ -38,14 +38,16 @@ public class OpdConstants extends AllConstants {
         String VISIT_TO_APPOINTMENT_DATE = "visit_to_appointment_date";
 
         interface ProfileOverview {
-
             String PREGNANCY_STATUS = "pregnancy_status";
             String IS_PREVIOUSLY_TESTED_HIV = "is_previously_tested_hiv";
+            String PREVIOUSLY_HIV_STATUS_RESULTS = "previous_hiv_status";
             String PATIENT_ON_ART = "patient_on_art";
             String HIV_STATUS = "hiv_status";
+            String CURRENT_HIV_STATUS = "current_hiv_status";
             String VISIT_TYPE = "visit_type";
-            String PREVIOUS_APPOINTMENT = "previous_appointment";
+            String APPOINTMENT_SCHEDULED_PREVIOUSLY = "previous_appointment";
             String DATE_OF_APPOINTMENT = "date_of_appointment";
+            String PENDING_DIAGNOSE_AND_TREAT = "pending_diagnose_and_treat";
         }
 
         interface OpdVisit {

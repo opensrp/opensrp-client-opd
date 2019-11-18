@@ -109,7 +109,8 @@ public class OpdProfileOverviewFragmentPresenter implements OpdProfileOverviewFr
         }
     }
 
-    private void setDataFromCheckIn(@Nullable OpdCheckIn checkIn, @Nullable OpdVisit visit, @Nullable OpdDetails opdDetails, @NonNull Facts facts) {
+    @Override
+    public void setDataFromCheckIn(@Nullable OpdCheckIn checkIn, @Nullable OpdVisit visit, @Nullable OpdDetails opdDetails, @NonNull Facts facts) {
         String unknownString = getString(R.string.unknown);
         if (checkIn != null) {
             if (client != null && AllConstants.FEMALE_GENDER.equalsIgnoreCase(client.getColumnmaps().get("gender"))) {
@@ -118,16 +119,21 @@ public class OpdProfileOverviewFragmentPresenter implements OpdProfileOverviewFr
 
             String currentHivResult = checkIn.getCurrentHivResult() != null ? checkIn.getCurrentHivResult() : unknownString;
 
-            OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.HIV_STATUS, currentHivResult);
+
             OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.PATIENT_ON_ART, checkIn.getIsTakingArt());
 
             // Client is currently checked-in, show the current check-in details
             if (OpdLibrary.getInstance().isClientCurrentlyCheckedIn(visit, opdDetails)) {
                 OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.IS_PREVIOUSLY_TESTED_HIV, checkIn.getHasHivTestPreviously());
+                OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.PREVIOUSLY_HIV_STATUS_RESULTS, checkIn.getHivResultsPreviously());
+
+                OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.CURRENT_HIV_STATUS, currentHivResult);
 
                 OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.VISIT_TYPE, checkIn.getVisitType());
-                OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.PREVIOUS_APPOINTMENT, checkIn.getAppointmentScheduledPreviously());
+                OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.APPOINTMENT_SCHEDULED_PREVIOUSLY, checkIn.getAppointmentScheduledPreviously());
                 OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.DATE_OF_APPOINTMENT, checkIn.getAppointmentDueDate());
+            } else {
+                OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.HIV_STATUS, currentHivResult);
             }
         } else {
             if (client != null && unknownString != null) {
