@@ -230,8 +230,4 @@ public class OpdProfileActivityPresenterTest extends BaseTest {
                 , Mockito.any(Intent.class));
         ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", null);
     }
-
-    @Test
-    public void onOpdEventSaved() {
-    }
 }
