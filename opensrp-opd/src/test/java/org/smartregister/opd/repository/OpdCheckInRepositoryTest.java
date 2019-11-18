@@ -44,7 +44,7 @@ public class OpdCheckInRepositoryTest {
         Mockito.verify(database, Mockito.times(1))
                 .execSQL(Mockito.contains("CREATE INDEX opd_check_in_visit_id"));
         Mockito.verify(database, Mockito.times(1))
-                .execSQL(Mockito.contains("CREATE INDEX opd_check_in_event_id"));
+                .execSQL(Mockito.contains("CREATE INDEX opd_check_in_form_submission_id"));
     }
 
     @Test

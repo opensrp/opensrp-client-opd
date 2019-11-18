@@ -523,7 +523,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         checkIn.setVisitType(keyValues.get(OpdConstants.JsonFormField.VISIT_TYPE));
         checkIn.setAppointmentScheduledPreviously(keyValues.get(OpdConstants.JsonFormField.APPOINTMENT_DUE));
         checkIn.setAppointmentDueDate(keyValues.get(OpdConstants.JsonFormField.APPOINTMENT_DUE_DATE));
-        checkIn.setFormSubmissionId(event.getEventId());
+        checkIn.setFormSubmissionId(event.getFormSubmissionId());
         checkIn.setBaseEntityId(client.getBaseEntityId());
         checkIn.setUpdatedAt(new Date().getTime());
 
