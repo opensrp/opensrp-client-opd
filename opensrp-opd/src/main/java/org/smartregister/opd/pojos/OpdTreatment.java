@@ -6,6 +6,7 @@ public class OpdTreatment {
     private String medicine;
     private String dosage;
     private String note;
+    private String property;
     private String duration;
     private String createdAt;
     private String updatedAt;
@@ -81,5 +82,13 @@ public class OpdTreatment {
 
     public void setVisitId(String visitId) {
         this.visitId = visitId;
+    }
+
+    public String getProperty() {
+        return property;
+    }
+
+    public void setProperty(String property) {
+        this.property = property;
     }
 }
