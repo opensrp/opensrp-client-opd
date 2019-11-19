@@ -1,6 +1,5 @@
 package org.smartregister.opd.contract;
 
-import android.content.Intent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -9,10 +8,11 @@ import android.support.annotation.StringRes;
 
 import org.json.JSONObject;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
+import org.smartregister.domain.tag.FormTag;
 import org.smartregister.opd.listener.OnSendActionToFragment;
 import org.smartregister.opd.pojos.OpdDiagnosisAndTreatmentForm;
-import org.apache.commons.lang3.tuple.Triple;
-import org.smartregister.opd.utils.OpdJsonFormUtils;
+import org.smartregister.opd.pojos.OpdEventClient;
+import org.smartregister.opd.pojos.RegisterParams;
 import org.smartregister.view.contract.BaseProfileContract;
 
 import java.util.HashMap;
@@ -38,7 +38,10 @@ public interface OpdProfileActivityContract {
 
         void saveVisitOrDiagnosisForm(String eventType, Intent data);
 
-        HashMap<String, String> saveFinishForm(@NonNull Map<String, String> client);
+        void saveUpdateRegistrationForm(@NonNull String jsonString, @NonNull RegisterParams registerParams);
+
+        @Nullable
+        OpdEventClient processRegistration(@NonNull String jsonString, @NonNull FormTag formTag);
 
         void onUpdateRegistrationBtnCLicked(@NonNull String baseEntityId);
     }
@@ -74,11 +77,18 @@ public interface OpdProfileActivityContract {
 
         void startActivityForResult(@NonNull Intent intent, int requestCode);
 
+        @Nullable
+        CommonPersonObjectClient getClient();
+
+        void setClient(@NonNull CommonPersonObjectClient client);
+
     }
 
     interface Interactor {
 
         void fetchSavedDiagnosisAndTreatmentForm(@NonNull String baseEntityId, @NonNull String entityTable);
+
+        void saveRegistration(@NonNull OpdEventClient opdEventClient, @NonNull String jsonString, RegisterParams registerParams, @NonNull OpdProfileActivityContract.InteractorCallBack callBack);
 
         void onDestroy(boolean isChangingConfiguration);
     }

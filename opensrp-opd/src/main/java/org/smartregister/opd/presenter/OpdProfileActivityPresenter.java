@@ -8,26 +8,28 @@ import android.support.annotation.Nullable;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.domain.Form;
 
-import org.apache.commons.lang3.tuple.Triple;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.AllConstants;
 import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
+import org.smartregister.domain.tag.FormTag;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
+import org.smartregister.opd.activity.BaseOpdProfileActivity;
 import org.smartregister.opd.contract.OpdProfileActivityContract;
 import org.smartregister.opd.interactor.OpdProfileInteractor;
 import org.smartregister.opd.listener.OpdEventActionCallBack;
 import org.smartregister.opd.model.OpdProfileActivityModel;
 import org.smartregister.opd.pojos.OpdDiagnosisAndTreatmentForm;
-import org.smartregister.opd.utils.AppExecutors;
+import org.smartregister.opd.pojos.OpdEventClient;
 import org.smartregister.opd.pojos.OpdMetadata;
+import org.smartregister.opd.pojos.RegisterParams;
 import org.smartregister.opd.tasks.FetchRegistrationDataTask;
+import org.smartregister.opd.utils.AppExecutors;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.opd.utils.OpdEventUtils;
-import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.util.Utils;
@@ -87,6 +89,13 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
     public void onRegistrationSaved(boolean isEdit) {
         if (getProfileView() != null) {
             getProfileView().hideProgressDialog();
+
+            if (isEdit) {
+                CommonPersonObjectClient client = getProfileView().getClient();
+                if (client != null) {
+                    refreshProfileTopSection(client.getColumnmaps());
+                }
+            }
         }
     }
 
@@ -197,8 +206,35 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
     }
 
     @Override
-    public HashMap<String, String> saveFinishForm(@NonNull Map<String, String> client) {
-        return null;
+    public void saveUpdateRegistrationForm(@NonNull String jsonString, @NonNull RegisterParams registerParams) {
+        try {
+            if (registerParams.getFormTag() == null) {
+                registerParams.setFormTag(OpdJsonFormUtils.formTag(OpdUtils.getAllSharedPreferences()));
+            }
+
+            OpdEventClient opdEventClient = processRegistration(jsonString, registerParams.getFormTag());
+            if (opdEventClient == null) {
+                return;
+            }
+
+            mProfileInteractor.saveRegistration(opdEventClient, jsonString, registerParams, this);
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+    }
+
+    @Nullable
+    @Override
+    public OpdEventClient processRegistration(@NonNull String jsonString, @NonNull FormTag formTag) {
+        OpdEventClient opdEventClient = OpdJsonFormUtils.processOpdDetailsForm(jsonString, formTag);
+        //TODO: Show the user this error toast
+        //showErrorToast();
+
+        if (opdEventClient == null) {
+            return null;
+        }
+
+        return opdEventClient;
     }
 
     @Override
