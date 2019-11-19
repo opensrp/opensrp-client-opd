@@ -16,7 +16,6 @@ import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.domain.tag.FormTag;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
-import org.smartregister.opd.activity.BaseOpdProfileActivity;
 import org.smartregister.opd.contract.OpdProfileActivityContract;
 import org.smartregister.opd.interactor.OpdProfileInteractor;
 import org.smartregister.opd.listener.OpdEventActionCallBack;
@@ -86,12 +85,17 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
     }
 
     @Override
-    public void onRegistrationSaved(boolean isEdit) {
+    public void onRegistrationSaved(@Nullable CommonPersonObjectClient client, boolean isEdit) {
         if (getProfileView() != null) {
             getProfileView().hideProgressDialog();
 
+            if (client != null) {
+                getProfileView().setClient(client);
+            } else {
+                client = getProfileView().getClient();
+            }
+
             if (isEdit) {
-                CommonPersonObjectClient client = getProfileView().getClient();
                 if (client != null) {
                     refreshProfileTopSection(client.getColumnmaps());
                 }

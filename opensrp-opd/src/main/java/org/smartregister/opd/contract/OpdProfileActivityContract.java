@@ -90,12 +90,15 @@ public interface OpdProfileActivityContract {
 
         void saveRegistration(@NonNull OpdEventClient opdEventClient, @NonNull String jsonString, RegisterParams registerParams, @NonNull OpdProfileActivityContract.InteractorCallBack callBack);
 
+        @Nullable
+        CommonPersonObjectClient retrieveUpdatedClient(@NonNull String baseEntityId);
+
         void onDestroy(boolean isChangingConfiguration);
     }
 
     interface InteractorCallBack {
 
-        void onRegistrationSaved(boolean isEdit);
+        void onRegistrationSaved(@Nullable CommonPersonObjectClient client, boolean isEdit);
 
         void onFetchedSavedDiagnosisAndTreatmentForm(@Nullable OpdDiagnosisAndTreatmentForm diagnosisAndTreatmentForm, @NonNull String caseId, @NonNull String entityTable);
 

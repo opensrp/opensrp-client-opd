@@ -1,5 +1,6 @@
 package org.smartregister.opd.interactor;
 
+import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -8,12 +9,17 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.clientandeventmodel.Client;
 import org.smartregister.clientandeventmodel.Event;
+import org.smartregister.commonregistry.CommonPersonObject;
+import org.smartregister.commonregistry.CommonPersonObjectClient;
+import org.smartregister.commonregistry.CommonRepository;
 import org.smartregister.opd.OpdLibrary;
+import org.smartregister.opd.configuration.OpdRegisterQueryProviderContract;
 import org.smartregister.opd.contract.OpdProfileActivityContract;
 import org.smartregister.opd.pojos.OpdDiagnosisAndTreatmentForm;
 import org.smartregister.opd.pojos.OpdEventClient;
 import org.smartregister.opd.pojos.RegisterParams;
 import org.smartregister.opd.utils.AppExecutors;
+import org.smartregister.opd.utils.ConfigurationInstancesHelper;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.repository.EventClientRepository;
@@ -68,17 +74,44 @@ public class OpdProfileInteractor implements OpdProfileActivityContract.Interact
             @Override
             public void run() {
                 saveRegistration(opdEventClient, jsonString, registerParams);
+                final CommonPersonObjectClient client = retrieveUpdatedClient(opdEventClient.getEvent().getBaseEntityId());
+
 
                 appExecutors.mainThread().execute(new Runnable() {
                     @Override
                     public void run() {
-                        callBack.onRegistrationSaved(registerParams.isEditMode());
+                        callBack.onRegistrationSaved(client, registerParams.isEditMode());
                     }
                 });
             }
         };
 
         appExecutors.diskIO().execute(runnable);
+    }
+
+    @Nullable
+    @Override
+    public CommonPersonObjectClient retrieveUpdatedClient(@NonNull String baseEntityId) {
+        OpdRegisterQueryProviderContract queryProviderContract = ConfigurationInstancesHelper.newInstance(OpdLibrary.getInstance().getOpdConfiguration().getOpdRegisterQueryProvider());
+        String query = queryProviderContract.mainSelectWhereIDsIn();
+
+
+        String joinedIds = "'" + baseEntityId + "'";
+        query = query.replace("%s", joinedIds);
+
+        CommonRepository commonRepository = OpdLibrary.getInstance().context().commonrepository("ec_client");
+        Cursor cursor = commonRepository.rawCustomQueryForAdapter(query);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            CommonPersonObject commonPersonObject = commonRepository.getCommonPersonObjectFromCursor(cursor);
+            CommonPersonObjectClient client = new CommonPersonObjectClient(commonPersonObject.getCaseId(),
+                    commonPersonObject.getDetails(), commonPersonObject.getDetails().get("FWHOHFNAME"));
+            client.setColumnmaps(commonPersonObject.getDetails());
+
+            return client;
+        }
+
+        return null;
     }
 
     private void saveRegistration(@NonNull OpdEventClient opdEventClient, @NonNull String jsonString
