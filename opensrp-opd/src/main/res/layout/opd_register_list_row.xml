@@ -149,6 +149,7 @@
             android:paddingRight="10dp"
             android:text="@string/check_in"
             android:textAllCaps="true"
+            style="@style/Widget.AppCompat.Button.Borderless"
             android:textAppearance="?android:textAppearanceSmall"
             android:textSize="15sp"
             android:typeface="normal" />

@@ -159,7 +159,7 @@ public class OpdProfileOverviewFragmentPresenter implements OpdProfileOverviewFr
 
     @NonNull
     private String getVisitToAppointmentDateDuration(@NonNull Date visitDate, @NonNull String appointmentDueDateString) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(OpdDbConstants.DATE_FORMAT, Locale.US);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(OpdConstants.DateFormat.YYYY_MM_DD, Locale.US);
         try {
             Date appointmentDueDate = dateFormat.parse(appointmentDueDateString);
 

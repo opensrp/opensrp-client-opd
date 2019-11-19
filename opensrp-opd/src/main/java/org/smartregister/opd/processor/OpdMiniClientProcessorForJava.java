@@ -88,7 +88,6 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         }
 
         return eventTypes;
-
     }
 
     @Override

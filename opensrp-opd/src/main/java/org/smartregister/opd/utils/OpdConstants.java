@@ -216,6 +216,7 @@ public class OpdConstants extends AllConstants {
     public interface DateFormat {
         String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
         String d_MMM_yyyy = "d MMM yyyy";
+        String YYYY_MM_DD = "yyyy-MM-dd";
     }
 
     public interface Form {
