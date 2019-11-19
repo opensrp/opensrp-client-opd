@@ -25,7 +25,8 @@ public class OpdTreatmentRepository extends BaseRepository implements OpdTreatme
             + OpdDbConstants.Column.OpdTreatment.NOTE + " VARCHAR NULL, "
             + OpdDbConstants.Column.OpdTreatment.VISIT_ID + " VARCHAR NOT NULL, "
             + OpdDbConstants.Column.OpdTreatment.UPDATED_AT + " INTEGER NOT NULL, "
-            + OpdDbConstants.Column.OpdTreatment.CREATED_AT + " INTEGER NOT NULL ," +
+            + OpdDbConstants.Column.OpdTreatment.CREATED_AT + " INTEGER NOT NULL ,"
+            + OpdDbConstants.Column.OpdTreatment.PROPERTY + " VARCHAR NOT NULL ," +
             "UNIQUE(" + OpdDbConstants.Column.OpdTreatment.ID + ") ON CONFLICT REPLACE)";
 
     private static final String INDEX_BASE_ENTITY_ID = "CREATE INDEX " + OpdDbConstants.Table.OPD_TREATMENT
@@ -69,6 +70,7 @@ public class OpdTreatmentRepository extends BaseRepository implements OpdTreatme
         contentValues.put(OpdDbConstants.Column.OpdTreatment.DURATION, opdTreatment.getDuration());
         contentValues.put(OpdDbConstants.Column.OpdTreatment.NOTE, opdTreatment.getNote());
         contentValues.put(OpdDbConstants.Column.OpdTreatment.VISIT_ID, opdTreatment.getVisitId());
+        contentValues.put(OpdDbConstants.Column.OpdTreatment.PROPERTY, opdTreatment.getProperty());
         contentValues.put(OpdDbConstants.Column.OpdTreatment.CREATED_AT, opdTreatment.getCreatedAt());
         contentValues.put(OpdDbConstants.Column.OpdTreatment.UPDATED_AT, opdTreatment.getUpdatedAt());
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();
