@@ -12,11 +12,6 @@ import android.widget.TextView;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.domain.Form;
 
-import com.vijay.jsonwizard.processor.MultiSelectListCsvFileProcessorImpl;
-import com.vijay.jsonwizard.reader.AssetMultiSelectListFileReaderImpl;
-import com.vijay.jsonwizard.reader.MultiSelectListFileReader;
-import com.vijay.jsonwizard.task.MultiSelectListSaveOptionsTask;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.jeasy.rules.api.Facts;
@@ -24,7 +19,6 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.pojos.OpdMetadata;
-import org.smartregister.opd.reader.OpdMultiSelectListOptionsReader;
 import org.smartregister.util.FormUtils;
 import org.smartregister.util.JsonFormUtils;
 
@@ -260,12 +254,6 @@ public class OpdUtils extends org.smartregister.util.Utils {
         } else {
             return raw;
         }
-    }
-
-    public static void saveMultiSelectListOptions(android.content.Context context) {
-        MultiSelectListFileReader csvReader = new AssetMultiSelectListFileReaderImpl(context, "native.form/multiselectlist");
-        OpdMultiSelectListOptionsReader opdMultiSelectListOptionsReader = new OpdMultiSelectListOptionsReader(csvReader, new MultiSelectListCsvFileProcessorImpl());
-        new MultiSelectListSaveOptionsTask(context, opdMultiSelectListOptionsReader).execute();
     }
 
 }

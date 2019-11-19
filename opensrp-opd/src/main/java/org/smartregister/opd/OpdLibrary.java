@@ -26,7 +26,6 @@ import org.smartregister.opd.repository.OpdCheckInRepository;
 import org.smartregister.opd.repository.OpdDetailsRepository;
 import org.smartregister.opd.repository.OpdDiagnosisAndTreatmentFormRepository;
 import org.smartregister.opd.repository.OpdDiagnosisRepository;
-import org.smartregister.opd.repository.OpdMultiSelectOptionsRepository;
 import org.smartregister.opd.repository.OpdServiceDetailRepository;
 import org.smartregister.opd.repository.OpdTestConductedRepository;
 import org.smartregister.opd.repository.OpdTreatmentRepository;
@@ -86,8 +85,6 @@ public class OpdLibrary {
     private OpdTreatmentRepository opdTreatmentRepository;
     private OpdTestConductedRepository opdTestConductedRepository;
     private OpdVisitSummaryRepository opdVisitSummaryRepository;
-
-    private OpdMultiSelectOptionsRepository opdMultiSelectOptionsRepository;
 
     private Compressor compressor;
     private int applicationVersion;
@@ -163,14 +160,6 @@ public class OpdLibrary {
             opdDetailsRepository = new OpdDetailsRepository(getRepository());
         }
         return opdDetailsRepository;
-    }
-
-    @NonNull
-    public OpdMultiSelectOptionsRepository getOpdMultiSelectOptionsRepository() {
-        if (opdMultiSelectOptionsRepository == null) {
-            opdMultiSelectOptionsRepository = new OpdMultiSelectOptionsRepository(getRepository());
-        }
-        return opdMultiSelectOptionsRepository;
     }
 
     @NonNull
