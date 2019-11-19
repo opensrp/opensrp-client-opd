@@ -84,6 +84,11 @@ public class OpdConstants extends AllConstants {
         String MULTI_SELECT_DRUG_PICKER = "multi_select_drug_picker";
     }
 
+    public interface SettingsConfig {
+        String OPD_MEDICINE = "opd_medicine";
+        String OPD_DISEASE_CODES = "opd_disease_codes";
+    }
+
     public interface OpdMultiDrugPicker {
         String CONFIRMED_ID = "consumed-id";
         String PRESUMED_ID = "presumed-id";
