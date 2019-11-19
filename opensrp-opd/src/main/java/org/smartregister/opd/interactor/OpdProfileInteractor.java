@@ -1,11 +1,29 @@
 package org.smartregister.opd.interactor;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
+import org.apache.commons.lang3.StringUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.smartregister.clientandeventmodel.Client;
+import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.contract.OpdProfileActivityContract;
 import org.smartregister.opd.pojos.OpdDiagnosisAndTreatmentForm;
+import org.smartregister.opd.pojos.OpdEventClient;
+import org.smartregister.opd.pojos.RegisterParams;
 import org.smartregister.opd.utils.AppExecutors;
+import org.smartregister.opd.utils.OpdConstants;
+import org.smartregister.opd.utils.OpdJsonFormUtils;
+import org.smartregister.repository.EventClientRepository;
+import org.smartregister.view.activity.DrishtiApplication;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import timber.log.Timber;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-27
@@ -41,6 +59,105 @@ public class OpdProfileInteractor implements OpdProfileActivityContract.Interact
                 });
             }
         });
+    }
+
+    @Override
+    public void saveRegistration(final @NonNull OpdEventClient opdEventClient, final @NonNull String jsonString
+            , final @NonNull RegisterParams registerParams, final @NonNull OpdProfileActivityContract.InteractorCallBack callBack) {
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                saveRegistration(opdEventClient, jsonString, registerParams);
+
+                appExecutors.mainThread().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        callBack.onRegistrationSaved(registerParams.isEditMode());
+                    }
+                });
+            }
+        };
+
+        appExecutors.diskIO().execute(runnable);
+    }
+
+    private void saveRegistration(@NonNull OpdEventClient opdEventClient, @NonNull String jsonString
+            , @NonNull RegisterParams params) {
+        try {
+            List<String> currentFormSubmissionIds = new ArrayList<>();
+            try {
+
+                Client baseClient = opdEventClient.getClient();
+                Event baseEvent = opdEventClient.getEvent();
+
+                if (baseClient != null) {
+                    if (params.isEditMode()) {
+                        try {
+                            OpdJsonFormUtils.mergeAndSaveClient(baseClient);
+                        } catch (Exception e) {
+                            Timber.e(e);
+                        }
+                    }
+                }
+
+                String formSubmissionId = addEvent(params, baseEvent);
+
+                if (formSubmissionId != null) {
+                    currentFormSubmissionIds.add(formSubmissionId);
+                }
+
+                updateOpenSRPId(jsonString, params, baseClient);
+                addImageLocation(jsonString, baseClient, baseEvent);
+            } catch (Exception e) {
+                Timber.e(e);
+            }
+
+            long lastSyncTimeStamp = OpdLibrary.getInstance().context().allSharedPreferences().fetchLastUpdatedAtDate(0);
+            Date lastSyncDate = new Date(lastSyncTimeStamp);
+            DrishtiApplication.getInstance().getClientProcessor().processClient(OpdLibrary.getInstance().getEcSyncHelper().getEvents(currentFormSubmissionIds));
+            OpdLibrary.getInstance().context().allSharedPreferences().saveLastUpdatedAtDate(lastSyncDate.getTime());
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+    }
+
+    private void addImageLocation(@NonNull String jsonString, @Nullable Client baseClient, @Nullable Event baseEvent) {
+        if (baseClient != null || baseEvent != null) {
+            String imageLocation = OpdJsonFormUtils.getFieldValue(jsonString, OpdConstants.KEY.PHOTO);
+            if (StringUtils.isNotBlank(imageLocation)) {
+                OpdJsonFormUtils.saveImage(baseEvent.getProviderId(), baseClient.getBaseEntityId(), imageLocation);
+            }
+        }
+    }
+
+    private void updateOpenSRPId(String jsonString, RegisterParams params, Client baseClient) {
+        if (params.isEditMode()) {
+            // Unassign current OPENSRP ID
+            if (baseClient != null) {
+                try {
+                    String newOpenSRPId = baseClient.getIdentifier(OpdJsonFormUtils.OPENSRP_ID).replace("-", "");
+                    String currentOpenSRPId = OpdJsonFormUtils.getString(jsonString, OpdJsonFormUtils.CURRENT_OPENSRP_ID).replace("-", "");
+                    if (!newOpenSRPId.equals(currentOpenSRPId)) {
+                        //OPENSRP ID was changed
+                        OpdLibrary.getInstance().getUniqueIdRepository().open(currentOpenSRPId);
+                    }
+                } catch (Exception e) {//might crash if M_ZEIR
+                    Timber.d(e);
+                }
+            }
+
+        }
+    }
+
+    @Nullable
+    private String addEvent(RegisterParams params, Event baseEvent) throws JSONException {
+        if (baseEvent != null) {
+            JSONObject eventJson = new JSONObject(OpdJsonFormUtils.gson.toJson(baseEvent));
+            OpdLibrary.getInstance().getEcSyncHelper().addEvent(baseEvent.getBaseEntityId(), eventJson, params.getStatus());
+            return eventJson.getString(EventClientRepository.event_column.formSubmissionId.toString());
+        }
+
+        return null;
     }
 
     @Override

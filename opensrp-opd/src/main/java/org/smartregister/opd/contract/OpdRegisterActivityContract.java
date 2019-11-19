@@ -62,7 +62,6 @@ public interface OpdRegisterActivityContract {
         JSONObject getFormAsJson(String formName, String entityId,
                                  String currentLocationId) throws JSONException;
 
-
         @Nullable
         JSONObject getFormAsJson(String formName, String entityId,
                                  String currentLocationId, @Nullable HashMap<String, String> injectedValues) throws JSONException;

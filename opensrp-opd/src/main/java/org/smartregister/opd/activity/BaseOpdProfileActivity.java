@@ -3,6 +3,7 @@ package org.smartregister.opd.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,6 +21,7 @@ import org.smartregister.opd.contract.OpdProfileActivityContract;
 import org.smartregister.opd.fragment.OpdProfileOverviewFragment;
 import org.smartregister.opd.fragment.OpdProfileVisitsFragment;
 import org.smartregister.opd.listener.OnSendActionToFragment;
+import org.smartregister.opd.pojos.RegisterParams;
 import org.smartregister.opd.presenter.OpdProfileActivityPresenter;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
@@ -112,9 +114,9 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
     @Override
     protected void onResumption() {
         super.onResumption();
-        baseEntityId = getIntent().getStringExtra(OpdConstants.IntentKey.BASE_ENTITY_ID);
-        CommonPersonObjectClient commonPersonObjectClient = (CommonPersonObjectClient) getIntent()
+        commonPersonObjectClient = (CommonPersonObjectClient) getIntent()
                 .getSerializableExtra(OpdConstants.IntentKey.CLIENT_OBJECT);
+        baseEntityId = commonPersonObjectClient.getCaseId();
         ((OpdProfileActivityPresenter) presenter).refreshProfileTopSection(commonPersonObjectClient.getColumnmaps());
     }
 
@@ -202,6 +204,15 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
                 } else if (encounterType.equals(OpdConstants.EventType.DIAGNOSIS_AND_TREAT)) {
                     showProgressDialog(R.string.saving_dialog_title);
                     ((OpdProfileActivityPresenter) presenter).saveVisitOrDiagnosisForm(encounterType, data);
+                } else if (encounterType.equals(OpdConstants.EventType.UPDATE_OPD_REGISTRATION)) {
+                    showProgressDialog(R.string.saving_dialog_title);
+
+                    RegisterParams registerParam = new RegisterParams();
+                    registerParam.setEditMode(true);
+                    registerParam.setFormTag(OpdJsonFormUtils.formTag(OpdUtils.context().allSharedPreferences()));
+                    showProgressDialog(R.string.saving_dialog_title);
+
+                    ((OpdProfileActivityPresenter) presenter).saveUpdateRegistrationForm(jsonString, registerParam);
                 }
 
             } catch (JSONException e) {
@@ -230,5 +241,16 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
     @Override
     public Context getContext() {
         return this;
+    }
+
+    @Nullable
+    @Override
+    public CommonPersonObjectClient getClient() {
+        return commonPersonObjectClient;
+    }
+
+    @Override
+    public void setClient(@NonNull CommonPersonObjectClient client) {
+
     }
 }
