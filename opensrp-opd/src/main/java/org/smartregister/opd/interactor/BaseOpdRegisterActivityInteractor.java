@@ -51,7 +51,7 @@ public class BaseOpdRegisterActivityInteractor implements OpdRegisterActivityCon
     }
 
     @Override
-    public void fetchSavedDiagnosisAndTreatmentForm(final @NonNull String baseEntityId, final @Nullable String entityTable) {
+    public void fetchSavedDiagnosisAndTreatmentForm(final @NonNull String baseEntityId, final @Nullable String entityTable, @NonNull final OpdRegisterActivityContract.InteractorCallBack interactorCallBack) {
         appExecutors.diskIO().execute(new Runnable() {
             @Override
             public void run() {
@@ -63,10 +63,7 @@ public class BaseOpdRegisterActivityInteractor implements OpdRegisterActivityCon
                 appExecutors.mainThread().execute(new Runnable() {
                     @Override
                     public void run() {
-                        if (presenter instanceof OpdProfileActivityContract.InteractorCallBack) {
-                            ((OpdRegisterActivityContract.InteractorCallBack) presenter)
-                                    .onFetchedSavedDiagnosisAndTreatmentForm(diagnosisAndTreatmentForm, baseEntityId, entityTable);
-                        }
+                        interactorCallBack.onFetchedSavedDiagnosisAndTreatmentForm(diagnosisAndTreatmentForm, baseEntityId, entityTable);
                     }
                 });
             }
