@@ -233,10 +233,9 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                         opdTreatment.setDuration(meta.optString(OpdConstants.JSON_FORM_KEY.DURATION));
                         opdTreatment.setNote(meta.optString(OpdConstants.JSON_FORM_KEY.INFO));
                     }
-                    opdTreatment.setMedicine(valueJsonObject.optString(propertyJsonObject.optString(JsonFormConstants.MultiSelectUtils.TEXT)));
+                    opdTreatment.setMedicine(valueJsonObject.optString(JsonFormConstants.MultiSelectUtils.TEXT));
                     opdTreatment.setProperty(valueJsonArray.toString());
                 }
-
 
                 boolean result = OpdLibrary.getInstance().getOpdTreatmentRepository().saveOrUpdate(opdTreatment);
                 if (result) {
@@ -449,7 +448,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
             if (values.size() > 0) {
                 String value = (String) values.get(0);
 
-                if (value != null) {
+                if (!TextUtils.isEmpty(value)) {
                     keyValues.put(key, value);
                     continue;
                 }
@@ -459,7 +458,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
             if (humanReadableValues.size() > 0) {
                 String value = (String) humanReadableValues.get(0);
 
-                if (value != null) {
+                if (!TextUtils.isEmpty(value)) {
                     keyValues.put(key, value);
                     continue;
                 }
