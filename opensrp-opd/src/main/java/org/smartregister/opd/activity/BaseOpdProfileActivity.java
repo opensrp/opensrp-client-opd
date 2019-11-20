@@ -15,14 +15,17 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
+import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
 import org.smartregister.opd.adapter.ViewPagerAdapter;
+import org.smartregister.opd.configuration.OpdRegisterSwitcher;
 import org.smartregister.opd.contract.OpdProfileActivityContract;
 import org.smartregister.opd.fragment.OpdProfileOverviewFragment;
 import org.smartregister.opd.fragment.OpdProfileVisitsFragment;
 import org.smartregister.opd.listener.OnSendActionToFragment;
 import org.smartregister.opd.pojos.RegisterParams;
 import org.smartregister.opd.presenter.OpdProfileActivityPresenter;
+import org.smartregister.opd.utils.ConfigurationInstancesHelper;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.opd.utils.OpdUtils;
@@ -43,12 +46,12 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
     private TextView genderView;
     private TextView ancIdView;
     private ImageView imageView;
-    private Button btnRegistrationInfo;
     private String baseEntityId;
     private OnSendActionToFragment sendActionListenerForProfileOverview;
     private OnSendActionToFragment sendActionListenerToVisitsFragment;
 
     private CommonPersonObjectClient commonPersonObjectClient;
+    private Button switchRegBtn;
 
     @Override
     protected void initializePresenter() {
@@ -57,7 +60,6 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
 
     @Override
     protected void setupViews() {
-
         super.setupViews();
 
         ageView = findViewById(R.id.textview_detail_two);
@@ -65,6 +67,9 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
         ancIdView = findViewById(R.id.textview_detail_one);
         nameView = findViewById(R.id.textview_name);
         imageView = findViewById(R.id.imageview_profile);
+        switchRegBtn = findViewById(R.id.btn_opdActivityBaseProfile_switchRegView);
+
+        setTitle("");
     }
 
     @Override
@@ -81,7 +86,6 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
         adapter.addFragment(profileVisitsFragment, this.getString(R.string.visits));
 
         viewPager.setAdapter(adapter);
-
         return viewPager;
     }
 
@@ -118,6 +122,26 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
                 .getSerializableExtra(OpdConstants.IntentKey.CLIENT_OBJECT);
         baseEntityId = commonPersonObjectClient.getCaseId();
         ((OpdProfileActivityPresenter) presenter).refreshProfileTopSection(commonPersonObjectClient.getColumnmaps());
+
+        // Enable switcher
+        configureRegisterSwitcher();
+    }
+
+    private void configureRegisterSwitcher() {
+        Class<? extends OpdRegisterSwitcher> opdRegisterSwitcherClass = OpdLibrary.getInstance().getOpdConfiguration().getOpdRegisterSwitcher();
+        if (opdRegisterSwitcherClass != null) {
+            final OpdRegisterSwitcher opdRegisterSwitcher = ConfigurationInstancesHelper.newInstance(opdRegisterSwitcherClass);
+
+            switchRegBtn.setVisibility(opdRegisterSwitcher.showRegisterSwitcher(commonPersonObjectClient) ? View.VISIBLE : View.GONE);
+            switchRegBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    opdRegisterSwitcher.switchFromOpdRegister(commonPersonObjectClient, BaseOpdProfileActivity.this);
+                }
+            });
+        } else {
+            switchRegBtn.setVisibility(View.GONE);
+        }
     }
 
     @Override

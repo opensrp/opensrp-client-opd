@@ -65,6 +65,7 @@
     <string name="previous_page"><![CDATA[<< Previous]]></string>
     <string name="unknown">Unknown</string>
     <string name="positive">positive</string>
+    <string name="switch_register_view">SWITCH REGISTER VIEW</string>
 
 
 </resources>

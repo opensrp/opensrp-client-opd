@@ -11,7 +11,6 @@ import org.json.JSONObject;
 import org.smartregister.CoreLibrary;
 import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.opd.OpdLibrary;
-import org.smartregister.opd.contract.OpdProfileActivityContract;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
 import org.smartregister.opd.pojos.OpdDiagnosisAndTreatmentForm;
 import org.smartregister.opd.pojos.OpdEventClient;
