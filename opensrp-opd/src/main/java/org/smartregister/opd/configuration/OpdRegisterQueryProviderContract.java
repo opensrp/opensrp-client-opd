@@ -21,7 +21,7 @@ public abstract class OpdRegisterQueryProviderContract {
      * @return
      */
     @NonNull
-    public abstract String getObjectIdsQuery(@Nullable String filters);
+    public abstract String getObjectIdsQuery(@Nullable String filters, @Nullable String mainCondition);
 
     /**
      * Return query(s) to be used to perform the total count of register clients eg. If OPD combines records
@@ -32,7 +32,7 @@ public abstract class OpdRegisterQueryProviderContract {
      * @return
      */
     @NonNull
-    public abstract String[] countExecuteQueries(@Nullable String filters);
+    public abstract String[] countExecuteQueries(@Nullable String filters, @Nullable String mainCondition);
 
     /**
      * Return query to be used to retrieve the client details. This query should have a "WHERE base_entity_id IN (%s)" clause where

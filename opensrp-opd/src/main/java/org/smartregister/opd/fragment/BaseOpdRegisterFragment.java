@@ -3,8 +3,10 @@ package org.smartregister.opd.fragment;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.SwitchCompat;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -116,6 +118,8 @@ public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment imple
         dueOnlyLayout = view.findViewById(R.id.due_only_layout);
         dueOnlyLayout.setVisibility(View.VISIBLE);
         dueOnlyLayout.setOnClickListener(registerActionHandler);
+
+        ((TextView) view.findViewById(R.id.due_only_text_view)).setText(getDueOnlyText());
 
         topRightLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -244,16 +248,15 @@ public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment imple
 
     abstract protected void goToClientDetailActivity(@NonNull CommonPersonObjectClient commonPersonObjectClient);
 
-    public void toggleFilterSelection(View dueOnlyLayout) {
-        if (dueOnlyLayout != null) {
-            if (dueOnlyLayout.getTag() == null) {
-                // Let's enable the due-filter
-                dueFilterActive = true;
-                enableDueOnlyFilter(dueOnlyLayout, true);
-            } else if (dueOnlyLayout.getTag().toString().equals(DUE_FILTER_TAG)) {
-                // Let's disable the due-filter
-                dueFilterActive = false;
-                enableDueOnlyFilter(dueOnlyLayout, false);
+    protected void toggleFilterSelection(@Nullable View filterSection) {
+        if (filterSection != null) {
+            String tagString = "PRESSED";
+            if (filterSection.getTag() == null) {
+                filter(searchText(), "", presenter().getDueFilterCondition(), false);
+                filterSection.setTag(tagString);
+            } else if (filterSection.getTag().toString().equals(tagString)) {
+                filter(searchText(), "", "", false);
+                filterSection.setTag(null);
             }
         }
     }
@@ -336,7 +339,7 @@ public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment imple
         String query = "";
         try {
             if (isValidFilterForFts(commonRepository())) {
-                String sql = opdRegisterQueryProvider.getObjectIdsQuery(filters);
+                String sql = opdRegisterQueryProvider.getObjectIdsQuery(filters, mainCondition);
                 sql = sqb.addlimitandOffset(sql, clientAdapter.getCurrentlimit(), clientAdapter.getCurrentoffset());
 
                 List<String> ids = commonRepository().findSearchIds(sql);
@@ -365,7 +368,7 @@ public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment imple
     public void countExecute() {
         try {
             int totalCount = 0;
-            for (String sql : opdRegisterQueryProvider.countExecuteQueries(filters)) {
+            for (String sql : opdRegisterQueryProvider.countExecuteQueries(filters, mainCondition)) {
                 Timber.i(sql);
                 totalCount += commonRepository().countSearchIds(sql);
             }
@@ -378,5 +381,12 @@ public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment imple
         } catch (Exception e) {
             Timber.e(e);
         }
+    }
+
+
+    @NonNull
+    @Override
+    public String getDueOnlyText() {
+        return getString(R.string.due_only);
     }
 }

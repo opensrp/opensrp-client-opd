@@ -1,6 +1,8 @@
 package org.smartregister.opd.contract;
 
 
+import android.support.annotation.NonNull;
+
 import org.json.JSONArray;
 import org.smartregister.configurableviews.model.Field;
 import org.smartregister.domain.Response;
@@ -20,6 +22,9 @@ public interface OpdRegisterFragmentContract {
         void initializeAdapter();
 
         Presenter presenter();
+
+        @NonNull
+        String getDueOnlyText();
 
     }
 
