@@ -15,7 +15,7 @@ import org.smartregister.opd.R;
 import org.smartregister.opd.adapter.ViewPagerAdapter;
 import org.smartregister.opd.contract.OpdProfileActivityContract;
 import org.smartregister.opd.fragment.OpdProfileOverviewFragment;
-import org.smartregister.opd.fragment.OpdProfileVisitFragment;
+import org.smartregister.opd.fragment.OpdProfileVisitsFragment;
 import org.smartregister.opd.listener.OnSendActionToFragment;
 import org.smartregister.opd.presenter.OpdProfileActivityPresenter;
 import org.smartregister.opd.utils.OpdConstants;
@@ -67,7 +67,7 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
         OpdProfileOverviewFragment profileOverviewFragment = OpdProfileOverviewFragment.newInstance(this.getIntent().getExtras());
         setSendActionListenerForProfileOverview(profileOverviewFragment);
 
-        OpdProfileVisitFragment profileVisitsFragment = OpdProfileVisitFragment.newInstance(this.getIntent().getExtras());
+        OpdProfileVisitsFragment profileVisitsFragment = OpdProfileVisitsFragment.newInstance(this.getIntent().getExtras());
         setSendActionListenerToVisitsFragment(profileVisitsFragment);
 
         adapter.addFragment(profileOverviewFragment, this.getString(R.string.overview));
@@ -90,9 +90,6 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
     protected void fetchProfileData() {
         CommonPersonObjectClient commonPersonObjectClient = (CommonPersonObjectClient) getIntent()
                 .getSerializableExtra(OpdConstants.IntentKey.CLIENT_OBJECT);
-        String baseEntityId = commonPersonObjectClient.getCaseId();
-
-        ((OpdProfileActivityPresenter) presenter).fetchProfileData(baseEntityId);
         ((OpdProfileActivityPresenter) presenter).refreshProfileTopSection(commonPersonObjectClient.getColumnmaps());
     }
 
@@ -112,9 +109,6 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
         super.onResumption();
         commonPersonObjectClient = (CommonPersonObjectClient) getIntent()
                 .getSerializableExtra(OpdConstants.IntentKey.CLIENT_OBJECT);
-        String baseEntityId = commonPersonObjectClient.getCaseId();
-
-        ((OpdProfileActivityPresenter) presenter).refreshProfileView(baseEntityId);
         ((OpdProfileActivityPresenter) presenter).refreshProfileTopSection(commonPersonObjectClient.getColumnmaps());
     }
 
@@ -138,13 +132,13 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
 
     @Override
     public void setProfileAge(@NonNull String age) {
-        ageView.setText(String.format(getString(R.string.age_details), age));
+        genderView.setText(String.format(getString(R.string.age_details), age));
 
     }
 
     @Override
     public void setProfileGender(@NonNull String gender) {
-        genderView.setText(String.format(getString(R.string.gender_details), gender));
+        ageView.setText(gender);
     }
 
     @Override
@@ -183,9 +177,6 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.clear();
-        menu.add("Menu 1");
-        menu.add("Menu 2");
         return true;
     }
 
@@ -194,10 +185,11 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
         if (requestCode == OpdJsonFormUtils.REQUEST_CODE_GET_JSON && resultCode == RESULT_OK) {
             try {
                 String jsonString = data.getStringExtra(OpdConstants.JSON_FORM_EXTRA.JSON);
-                Timber.d("JSONResult : %s", jsonString);
+                Timber.d("JSON-Result : %s", jsonString);
 
                 JSONObject form = new JSONObject(jsonString);
                 String encounterType = form.getString(OpdJsonFormUtils.ENCOUNTER_TYPE);
+
                 if (encounterType.equals(OpdConstants.EventType.CHECK_IN)) {
                     showProgressDialog(R.string.saving_dialog_title);
                     ((OpdProfileActivityPresenter) presenter).saveVisitOrDiagnosisForm(encounterType, data);
@@ -210,5 +202,10 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
                 Timber.e(e);
             }
         }
+    }
+
+    @Override
+    public void setContentView(int layoutResID) {
+        super.setContentView(R.layout.opd_activity_base_profile);
     }
 }

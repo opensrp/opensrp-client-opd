@@ -19,6 +19,7 @@ import org.smartregister.opd.R;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
 import org.smartregister.opd.fragment.BaseOpdRegisterFragment;
 import org.smartregister.opd.model.OpdRegisterActivityModel;
+import org.smartregister.opd.pojos.OpdMetadata;
 import org.smartregister.opd.presenter.BaseOpdRegisterActivityPresenter;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
@@ -112,40 +113,43 @@ public abstract class BaseOpdRegisterActivity extends BaseRegisterActivity imple
             String locationId = OpdUtils.context().allSharedPreferences().getPreference(AllConstants.CURRENT_LOCATION_ID);
             presenter().startForm(formName, entityId, metaData, locationId, injectedFieldValues, entityTable);
         } else {
-
             displayToast(getString(R.string.error_unable_to_start_form));
         }
     }
 
     @Override
     public void startFormActivity(@NonNull JSONObject jsonForm, @Nullable HashMap<String, String> parcelableData) {
+        OpdMetadata opdMetadata = OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata();
+        if (opdMetadata != null) {
+            Intent intent = new Intent(this, opdMetadata.getOpdFormActivity());
+            intent.putExtra(OpdConstants.JSON_FORM_EXTRA.JSON, jsonForm.toString());
+            Form form = new Form();
+            form.setWizard(false);
+            form.setName("");
 
-        Intent intent = new Intent(this, OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata().getOpdFormActivity());
-        intent.putExtra(OpdConstants.JSON_FORM_EXTRA.JSON, jsonForm.toString());
-        Form form = new Form();
-        form.setWizard(false);
-        form.setName("");
+            String encounterType = jsonForm.optString(OpdJsonFormUtils.ENCOUNTER_TYPE);
 
-        String encounterType = jsonForm.optString(OpdJsonFormUtils.ENCOUNTER_TYPE);
-
-        if (encounterType.equals(OpdConstants.EventType.DIAGNOSIS_AND_TREAT)) {
-            form.setName(OpdConstants.EventType.DIAGNOSIS_AND_TREAT);
-            form.setWizard(true);
-        }
-
-        form.setHideSaveLabel(true);
-        form.setPreviousLabel("");
-        form.setNextLabel("");
-        form.setHideNextButton(false);
-        form.setHidePreviousButton(false);
-        intent.putExtra(JsonFormConstants.JSON_FORM_KEY.FORM, form);
-
-        if (parcelableData != null) {
-            for (String intentKey : parcelableData.keySet()) {
-                intent.putExtra(intentKey, parcelableData.get(intentKey));
+            if (encounterType.equals(OpdConstants.EventType.DIAGNOSIS_AND_TREAT)) {
+                form.setName(OpdConstants.EventType.DIAGNOSIS_AND_TREAT);
+                form.setWizard(true);
             }
-        }
 
-        startActivityForResult(intent, OpdJsonFormUtils.REQUEST_CODE_GET_JSON);
+            form.setHideSaveLabel(true);
+            form.setPreviousLabel("");
+            form.setNextLabel("");
+            form.setHideNextButton(false);
+            form.setHidePreviousButton(false);
+
+            intent.putExtra(JsonFormConstants.JSON_FORM_KEY.FORM, form);
+            if (parcelableData != null) {
+                for (String intentKey : parcelableData.keySet()) {
+                    intent.putExtra(intentKey, parcelableData.get(intentKey));
+                }
+            }
+
+            startActivityForResult(intent, OpdJsonFormUtils.REQUEST_CODE_GET_JSON);
+        } else {
+            Timber.e(new Exception(), "FormActivity cannot be started because OpdMetadata is NULL");
+        }
     }
 }

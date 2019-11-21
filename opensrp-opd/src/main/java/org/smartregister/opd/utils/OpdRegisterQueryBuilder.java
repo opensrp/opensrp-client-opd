@@ -11,7 +11,6 @@ import org.smartregister.opd.pojos.InnerJoinObject;
 
 public class OpdRegisterQueryBuilder extends SmartRegisterQueryBuilder {
 
-
     @Override
     public String SelectInitiateMainTableCounts(String tableName) {
         String selectQuery = "SELECT COUNT(*) as sub_count";

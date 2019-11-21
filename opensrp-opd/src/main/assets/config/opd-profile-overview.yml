@@ -14,9 +14,16 @@ fields:
   - template: "Prev. test results: {previous_hiv_status}"
     relevance: "previous_hiv_status != ''"
 
-  - template: "Current results: {hiv_status}"
+  - template: "Status: {hiv_status}"
     relevance: "hiv_status != ''"
     isRedFont: "hiv_status == 'positive' || hiv_status == 'Positive'"
+
+  - template: "Current results: {current_hiv_status}"
+    relevance: "current_hiv_status != ''"
+    isRedFont: "current_hiv_status == 'positive' || current_hiv_status == 'Positive'"
+
+  - template: "Taking ART?: {patient_on_art}"
+    relevance: "patient_on_art != ''"
 
 ---
 sub_group: current_visit

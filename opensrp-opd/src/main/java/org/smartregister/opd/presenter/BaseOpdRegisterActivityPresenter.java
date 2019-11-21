@@ -33,11 +33,18 @@ public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterAct
     protected WeakReference<OpdRegisterActivityContract.View> viewReference;
     protected OpdRegisterActivityContract.Interactor interactor;
     protected OpdRegisterActivityContract.Model model;
+    private JSONObject form;
 
-    public BaseOpdRegisterActivityPresenter(OpdRegisterActivityContract.View view, OpdRegisterActivityContract.Model model) {
+    public BaseOpdRegisterActivityPresenter(@NonNull OpdRegisterActivityContract.View view, @NonNull OpdRegisterActivityContract.Model model) {
         viewReference = new WeakReference<>(view);
-        interactor = new BaseOpdRegisterActivityInteractor();
+        interactor = createInteractor();
         this.model = model;
+    }
+
+    @NonNull
+    @Override
+    public OpdRegisterActivityContract.Interactor createInteractor() {
+        return new BaseOpdRegisterActivityInteractor(this);
     }
 
     public void setModel(OpdRegisterActivityContract.Model model) {
@@ -135,20 +142,33 @@ public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterAct
 
         JSONObject form = null;
         try {
-
             form = model.getFormAsJson(formName, entityId, locationId, injectedFieldValues);
-
             if (formName.equals(OpdConstants.Form.OPD_DIAGNOSIS_AND_TREAT)) {
-                OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm = new OpdDiagnosisAndTreatmentForm(entityId);
-                if (OpdLibrary.getInstance().getOpdDiagnosisAndTreatmentFormRepository().findOne(opdDiagnosisAndTreatmentForm) != null) {
-                    form = new JSONObject(OpdLibrary.getInstance().getOpdDiagnosisAndTreatmentFormRepository().findOne(opdDiagnosisAndTreatmentForm).getForm());
-                }
+                interactor.fetchSavedDiagnosisAndTreatmentForm(entityId, entityTable);
             }
 
         } catch (JSONException e) {
             Timber.e(e);
         }
 
+        // The form will be started for forms that are not OPD Diagnosis And Treatment Forms
+        startFormActivity(entityId, entityTable, form);
+    }
+
+    @Override
+    public void onFetchedSavedDiagnosisAndTreatmentForm(@Nullable OpdDiagnosisAndTreatmentForm diagnosisAndTreatmentForm, @NonNull String caseId, @Nullable String entityTable) {
+        try {
+            if (diagnosisAndTreatmentForm != null) {
+                form = new JSONObject(diagnosisAndTreatmentForm.getForm());
+            }
+
+            startFormActivity(caseId, entityTable, form);
+        } catch (JSONException ex) {
+            Timber.e(ex);
+        }
+    }
+
+    private void startFormActivity(@NonNull String entityId, @Nullable String entityTable, @Nullable JSONObject form) {
         if (getView() != null && form != null) {
             HashMap<String, String> intentKeys = new HashMap<>();
             intentKeys.put(OpdConstants.IntentKey.BASE_ENTITY_ID, entityId);

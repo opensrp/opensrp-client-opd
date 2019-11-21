@@ -33,6 +33,40 @@ public class OpdConstants extends AllConstants {
         }
     }
 
+    public interface FactKey {
+
+        String VISIT_TO_APPOINTMENT_DATE = "visit_to_appointment_date";
+
+        interface ProfileOverview {
+            String PREGNANCY_STATUS = "pregnancy_status";
+            String IS_PREVIOUSLY_TESTED_HIV = "is_previously_tested_hiv";
+            String PREVIOUSLY_HIV_STATUS_RESULTS = "previous_hiv_status";
+            String PATIENT_ON_ART = "patient_on_art";
+            String HIV_STATUS = "hiv_status";
+            String CURRENT_HIV_STATUS = "current_hiv_status";
+            String VISIT_TYPE = "visit_type";
+            String APPOINTMENT_SCHEDULED_PREVIOUSLY = "previous_appointment";
+            String DATE_OF_APPOINTMENT = "date_of_appointment";
+            String PENDING_DIAGNOSE_AND_TREAT = "pending_diagnose_and_treat";
+        }
+
+        interface OpdVisit {
+            String VISIT_DATE = "visit_date";
+            String TEST_NAME = "test_name";
+            String TEST_RESULT = "test_result";
+            String DIAGNOSIS = "diagnosis";
+            String DIAGNOSIS_TYPE = "diagnosis_type";
+            String DISEASE_CODE = "disease_code";
+            String TREATMENT = "treatment";
+
+            String DIAGNOSIS_LABEL = "diagnosis_label";
+            String DIAGNOSIS_TYPE_LABEL = "diagnosis_type_label";
+            String DISEASE_CODE_LABEL = "disease_code_label";
+            String TREATMENT_LABEL = "treatment_label";
+        }
+
+    }
+
     public interface JsonFormField {
         String PATIENT_GENDER = "patient_gender";
         String PREGNANCY_STATUS = "pregnancy_status";

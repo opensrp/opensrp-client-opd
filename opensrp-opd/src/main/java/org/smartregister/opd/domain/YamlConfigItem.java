@@ -9,12 +9,13 @@ import android.support.annotation.Nullable;
 
 public class YamlConfigItem {
 
-    public static final String FIELD_CONTACT_SUMMARY_ITEMS = "contactSummaryItems";
+    public static final String GENERIC_YAML_ITEMS = "generic_yaml_items";
 
     private String template;
     private String relevance;
     private String isRedFont;
     private Boolean isMultiWidget;
+    private Boolean isHtml;
 
     public YamlConfigItem() {
     }
@@ -60,5 +61,14 @@ public class YamlConfigItem {
 
     public void setIsMultiWidget(@Nullable Boolean multiWidget) {
         this.isMultiWidget = multiWidget;
+    }
+
+    @Nullable
+    public Boolean getHtml() {
+        return isHtml;
+    }
+
+    public void setHtml(Boolean html) {
+        isHtml = html;
     }
 }

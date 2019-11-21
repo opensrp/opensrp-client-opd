@@ -29,8 +29,7 @@
     <string name="visits">VISITS</string>
 
     <string name="all_results">All results</string>
-    <string name="gender_details">GENDER: %s</string>
-    <string name="age_details">AGE: %s</string>
+    <string name="age_details">Age: %s</string>
     <string name="id_detail">ID: %s</string>
 
 
@@ -45,13 +44,27 @@
     <string name="end_session">End Session</string>
     <string name="dosage">Dosage</string>
     <string name="duration">Duration</string>
-    <string name="add_treatment_medicine">Add treatment/medicine</string>
+    <string name="add_treatment_medicine">Add treatments/medicine</string>
     <string name="drug_picker_dialog_save">SAVE</string>
     <string name="opd_dosage_duration_text">Dose: %s, Duration: %s</string>
+    <string name="opd">OPD</string>
     <string name="opd_checked_in">OPD: CHECKED IN</string>
 
     <string name="diagnose_and_treat"><![CDATA[DIAGNOSE & TREAT]]></string>
     <string name="check_in">CHECK IN</string>
     <string name="diagnosis">Diagnosis</string>
+    <string name="diagnosis_type">Diagnosis Type</string>
+    <string name="disease_code">Disease Code</string>
+    <string name="treatment">Treatment</string>
+    <string name="single_medicine_visit_preview_summary"><![CDATA[<b><font color=\'black\'>%s</font><br/></b>]]></string>
+    <string name="medication_dose">Dose: %s</string>
+    <string name="medication_duration">Duration: %s</string>
+    <string name="dose_or_duration_html"><![CDATA[<font color=\'#7f7f7f\'>%s</font>]]></string>
+    <string name="next_page"><![CDATA[NEXT >>]]></string>
+    <string name="current_page_of_total_pages">Page %d of %d</string>
+    <string name="previous_page"><![CDATA[<< Previous]]></string>
+    <string name="unknown">Unknown</string>
+    <string name="positive">positive</string>
+
 
 </resources>

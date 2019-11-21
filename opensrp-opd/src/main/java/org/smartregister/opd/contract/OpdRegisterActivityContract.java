@@ -9,6 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.domain.tag.FormTag;
+import org.smartregister.opd.pojos.OpdDiagnosisAndTreatmentForm;
 import org.smartregister.opd.pojos.OpdEventClient;
 import org.smartregister.opd.pojos.RegisterParams;
 import org.smartregister.view.contract.BaseRegisterContract;
@@ -40,6 +41,9 @@ public interface OpdRegisterActivityContract {
         void saveVisitOrDiagnosisForm(@NonNull String eventType, @Nullable Intent data);
 
         void startForm(String formName, String entityId, String metaData, String locationId, @Nullable HashMap<String, String> injectedFieldValues, @Nullable String entityTable);
+
+        @NonNull
+        OpdRegisterActivityContract.Interactor createInteractor();
     }
 
     interface Model {
@@ -69,6 +73,8 @@ public interface OpdRegisterActivityContract {
 
     interface Interactor {
 
+        void fetchSavedDiagnosisAndTreatmentForm(@NonNull String baseEntityId, @Nullable String entityTable);
+
         void getNextUniqueId(Triple<String, String, String> triple, OpdRegisterActivityContract.InteractorCallBack callBack);
 
         void onDestroy(boolean isChangingConfiguration);
@@ -87,6 +93,8 @@ public interface OpdRegisterActivityContract {
         void onRegistrationSaved(boolean isEdit);
 
         void onEventSaved();
+
+        void onFetchedSavedDiagnosisAndTreatmentForm(@Nullable OpdDiagnosisAndTreatmentForm diagnosisAndTreatmentForm, @NonNull String caseId, @Nullable String entityTable);
 
     }
 }

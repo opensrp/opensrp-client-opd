@@ -2,6 +2,7 @@ package org.smartregister.opd.interactor;
 
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 
 import org.apache.commons.lang3.tuple.Triple;
@@ -10,7 +11,9 @@ import org.json.JSONObject;
 import org.smartregister.CoreLibrary;
 import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.opd.OpdLibrary;
+import org.smartregister.opd.contract.OpdProfileActivityContract;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
+import org.smartregister.opd.pojos.OpdDiagnosisAndTreatmentForm;
 import org.smartregister.opd.pojos.OpdEventClient;
 import org.smartregister.opd.pojos.RegisterParams;
 import org.smartregister.opd.utils.AppExecutors;
@@ -33,16 +36,41 @@ import timber.log.Timber;
 
 public class BaseOpdRegisterActivityInteractor implements OpdRegisterActivityContract.Interactor {
 
-    private AppExecutors appExecutors;
+    protected AppExecutors appExecutors;
+    private OpdRegisterActivityContract.Presenter presenter;
 
 
-    public BaseOpdRegisterActivityInteractor() {
-        this(new AppExecutors());
+    public BaseOpdRegisterActivityInteractor(@NonNull OpdRegisterActivityContract.Presenter presenter) {
+        this(presenter, new AppExecutors());
     }
 
     @VisibleForTesting
-    BaseOpdRegisterActivityInteractor(AppExecutors appExecutors) {
+    BaseOpdRegisterActivityInteractor(@NonNull OpdRegisterActivityContract.Presenter presenter, AppExecutors appExecutors) {
         this.appExecutors = appExecutors;
+        this.presenter = presenter;
+    }
+
+    @Override
+    public void fetchSavedDiagnosisAndTreatmentForm(final @NonNull String baseEntityId, final @Nullable String entityTable) {
+        appExecutors.diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                final OpdDiagnosisAndTreatmentForm diagnosisAndTreatmentForm = OpdLibrary
+                        .getInstance()
+                        .getOpdDiagnosisAndTreatmentFormRepository()
+                        .findOne(new OpdDiagnosisAndTreatmentForm(baseEntityId));
+
+                appExecutors.mainThread().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (presenter instanceof OpdProfileActivityContract.InteractorCallBack) {
+                            ((OpdRegisterActivityContract.InteractorCallBack) presenter)
+                                    .onFetchedSavedDiagnosisAndTreatmentForm(diagnosisAndTreatmentForm, baseEntityId, entityTable);
+                        }
+                    }
+                });
+            }
+        });
     }
 
     @Override
@@ -52,7 +80,7 @@ public class BaseOpdRegisterActivityInteractor implements OpdRegisterActivityCon
 
     @Override
     public void onDestroy(boolean isChangingConfiguration) {
-        //TODO set presenter or model to null
+        presenter = null;
     }
 
     @Override

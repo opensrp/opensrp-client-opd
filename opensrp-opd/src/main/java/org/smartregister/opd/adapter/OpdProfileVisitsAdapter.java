@@ -1,7 +1,10 @@
 package org.smartregister.opd.adapter;
 
 import android.content.Context;
+import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.util.Pair;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -9,160 +12,178 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.jeasy.rules.api.Facts;
+import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
-import org.smartregister.opd.pojos.OpdVisitSummary;
-import org.smartregister.opd.utils.OpdConstants;
+import org.smartregister.opd.domain.YamlConfigItem;
+import org.smartregister.opd.domain.YamlConfigWrapper;
 import org.smartregister.opd.utils.OpdUtils;
 
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-30
  */
-public class OpdProfileVisitsAdapter extends RecyclerView.Adapter<OpdProfileVisitsAdapter.ViewHolder> {
+public class OpdProfileVisitsAdapter extends RecyclerView.Adapter<OpdProfileVisitsAdapter.YamlViewHolder> {
 
-    private List<OpdVisitSummary> mData;
+    private Context context;
     private LayoutInflater mInflater;
+    private ArrayList<Pair<YamlConfigWrapper, Facts>> items;
 
     // data is passed into the constructor
-    public OpdProfileVisitsAdapter(@NonNull Context context, @NonNull List<OpdVisitSummary> opdVisitSummaryList) {
+    public OpdProfileVisitsAdapter(@NonNull Context context, ArrayList<Pair<YamlConfigWrapper, Facts>> items) {
+        this.context = context;
         this.mInflater = LayoutInflater.from(context);
-        this.mData = opdVisitSummaryList;
+        this.items = items;
     }
 
     // inflates the row layout from xml when needed
     @Override
     @NonNull
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = mInflater.inflate(R.layout.opd_profile_visit_row, parent, false);
-        return new ViewHolder(view);
+    public YamlViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = mInflater.inflate(R.layout.opd_profile_overview_row, parent, false);
+        return new YamlViewHolder(view);
     }
 
     // binds the data to the TextView in each row
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        OpdVisitSummary opdVisitSummary = mData.get(position);
+    public void onBindViewHolder(@NonNull YamlViewHolder holder, int position) {
+        Pair<YamlConfigWrapper, Facts> pair = items.get(position);
 
-        if (opdVisitSummary.getVisitDate() != null) {
-            holder.visitDate.setText(OpdUtils.convertDate(opdVisitSummary.getVisitDate(), OpdConstants.DateFormat.d_MMM_yyyy));
+        YamlConfigWrapper yamlConfigWrapper = pair.first;
+        Facts facts = pair.second;
+
+        if (yamlConfigWrapper != null && facts != null) {
+            String group = yamlConfigWrapper.getGroup();
+
+            if (!TextUtils.isEmpty(group)) {
+                holder.sectionHeader.setText(processUnderscores(group));
+                holder.sectionHeader.setVisibility(View.VISIBLE);
+            } else {
+                holder.sectionHeader.setVisibility(View.GONE);
+            }
+
+            String subGroup = yamlConfigWrapper.getSubGroup();
+            if (!TextUtils.isEmpty(subGroup)) {
+                if (OpdUtils.isTemplate(subGroup)) {
+                    subGroup = OpdUtils.fillTemplate(subGroup, facts);
+                }
+
+                holder.subSectionHeader.setText(processUnderscores(subGroup));
+                holder.subSectionHeader.setVisibility(View.VISIBLE);
+            } else {
+                holder.subSectionHeader.setVisibility(View.GONE);
+            }
+
+            if (yamlConfigWrapper.getYamlConfigItem() != null) {
+                YamlConfigItem yamlConfigItem = yamlConfigWrapper.getYamlConfigItem();
+
+                fillSectionDetailAndTemplate(holder, facts, yamlConfigItem);
+                setRowRedFontText(holder, facts, yamlConfigItem);
+
+                holder.sectionDetailTitle.setVisibility(View.VISIBLE);
+                holder.sectionDetails.setVisibility(View.VISIBLE);
+
+            } else {
+                holder.sectionDetailTitle.setVisibility(View.GONE);
+                holder.sectionDetails.setVisibility(View.GONE);
+            }
         }
+    }
 
-        if (!TextUtils.isEmpty(opdVisitSummary.getTestName())) {
-            setVisible(holder.testName, holder.testResult);
-            holder.testName.setText(opdVisitSummary.getTestName());
-            holder.testResult.setText(opdVisitSummary.getTestResult());
+    private void fillSectionDetailAndTemplate(@NonNull YamlViewHolder holder, @NonNull Facts facts, @Nullable YamlConfigItem yamlConfigItem) {
+        if (yamlConfigItem != null && yamlConfigItem.getTemplate() != null) {
+            Template template = getTemplate(yamlConfigItem.getTemplate());
+
+            boolean isHtml = yamlConfigItem.getHtml() != null && yamlConfigItem.getHtml();
+
+            if (OpdUtils.isTemplate(template.detail)) {
+                String output = OpdUtils.fillTemplate(isHtml, template.detail, facts);
+
+                if (isHtml) {
+                    OpdUtils.setTextAsHtml(holder.sectionDetails, output);
+                } else {
+                    holder.sectionDetails.setText(output);//Perhaps refactor to use Json Form Parser Implementation
+                }
+            } else {
+                holder.sectionDetails.setText(template.detail);
+            }
+
+            if (OpdUtils.isTemplate(template.title)) {
+                String output = OpdUtils.fillTemplate(template.title, facts);
+                holder.sectionDetailTitle.setText(output);
+            } else {
+                holder.sectionDetailTitle.setText(template.title);
+            }
+        }
+    }
+
+    private void setRowRedFontText(@NonNull YamlViewHolder holder, @NonNull Facts facts, @Nullable YamlConfigItem yamlConfigItem) {
+        if (yamlConfigItem != null && yamlConfigItem.getIsRedFont() != null && OpdLibrary.getInstance().getOpdRulesEngineHelper().getRelevance(facts, yamlConfigItem.getIsRedFont())) {
+            holder.sectionDetailTitle.setTextColor(getColor(R.color.overview_font_red));
+            holder.sectionDetails.setTextColor(getColor(R.color.overview_font_red));
         } else {
-            setGone(holder.testName, holder.testResult);
-        }
-
-        boolean isDiagnosis = !TextUtils.isEmpty(opdVisitSummary.getDiagnosis());
-        setVisibility(isDiagnosis, holder.diagnosisLabel, holder.diagnosis);
-        if (isDiagnosis) {
-            holder.diagnosis.setText(opdVisitSummary.getDiagnosis());
-        }
-
-        boolean hasDiagnosisType = !TextUtils.isEmpty(opdVisitSummary.getDiagnosisType());
-        setVisibility(hasDiagnosisType, holder.diagnosisTypeLabel, holder.diagnosisType);
-        if (hasDiagnosisType) {
-            holder.diagnosisType.setText(opdVisitSummary.getDiagnosisType());
-        }
-
-        boolean isDiseaseCode = !TextUtils.isEmpty(opdVisitSummary.getDisease());
-        setVisibility(isDiseaseCode, holder.diseaseCodeLabel, holder.diseaseCode);
-        if (isDiseaseCode) {
-            holder.diseaseCode.setText(opdVisitSummary.getDisease());
-        }
-
-        boolean isTreatment = !TextUtils.isEmpty(opdVisitSummary.getTreatment());
-        setVisibility(isTreatment, holder.treatmentLabel, holder.treatment);
-        if (isTreatment) {
-            holder.treatment.setText(opdVisitSummary.getTreatment());
-        }
-
-        boolean isDosage = !TextUtils.isEmpty(opdVisitSummary.getDosage());
-        setVisibility(isDosage, holder.doseLabel, holder.dose);
-        if (isDosage) {
-            holder.dose.setText(opdVisitSummary.getDosage());
-        }
-
-        boolean isDuration = !TextUtils.isEmpty(opdVisitSummary.getDuration());
-        setVisibility(isDuration, holder.durationLabel, holder.duration);
-        if (isDuration) {
-            holder.duration.setText(opdVisitSummary.getDuration());
+            holder.sectionDetailTitle.setTextColor(getColor(R.color.overview_font_left));
+            holder.sectionDetails.setTextColor(getColor(R.color.overview_font_right));
         }
     }
 
-    private void setVisibility(boolean isVisible, View... views) {
-        for (View view: views) {
-            view.setVisibility(isVisible ? View.VISIBLE : View.GONE);
-        }
+    private int getColor(@ColorRes int colorId) {
+        return context.getResources().getColor(colorId);
     }
 
-    private void setVisible(View... views) {
-        for (View view: views) {
-            view.setVisibility(View.VISIBLE);
-        }
+    private String processUnderscores(String string) {
+        return string.replace("_", " ").toUpperCase();
     }
 
+    private OpdProfileVisitsAdapter.Template getTemplate(String rawTemplate) {
+        OpdProfileVisitsAdapter.Template template = new OpdProfileVisitsAdapter.Template();
 
-    private void setGone(View... views) {
-        for (View view: views) {
-            view.setVisibility(View.GONE);
+        if (rawTemplate.contains(":")) {
+            String[] templateArray = rawTemplate.split(":");
+            if (templateArray.length > 1) {
+                template.title = templateArray[0].trim();
+                template.detail = templateArray[1].trim();
+            }
+        } else {
+            template.title = rawTemplate;
         }
+
+        return template;
+
     }
 
     // total number of rows
     @Override
     public int getItemCount() {
-        return mData.size();
+        //return size;
+        return items.size();
     }
 
 
     // stores and recycles views as they are scrolled off screen
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class YamlViewHolder extends RecyclerView.ViewHolder {
+
         public View parent;
-        private TextView visitDate;
-        private TextView testName;
-        private TextView testResult;
-        private TextView diagnosisLabel;
-        private TextView diagnosis;
-        private TextView diseaseCodeLabel;
-        private TextView diseaseCode;
-        private TextView treatmentLabel;
-        private TextView treatment;
-        private TextView doseLabel;
-        private TextView dose;
-        private TextView durationLabel;
-        private TextView duration;
-        private TextView diagnosisType;
-        private TextView diseaseLabel;
-        private TextView disease;
-        private TextView diagnosisTypeLabel;
+        private TextView sectionHeader;
+        private TextView subSectionHeader;
+        private TextView sectionDetails;
+        private TextView sectionDetailTitle;
 
-        ViewHolder(View itemView) {
+        YamlViewHolder(View itemView) {
             super(itemView);
-
-            visitDate = itemView.findViewById(R.id.visit_row_date);
-            testName = itemView.findViewById(R.id.visit_row_test_name);
-            testResult = itemView.findViewById(R.id.visit_row_test_result);
-            diagnosis = itemView.findViewById(R.id.visit_row_diagnosis);
-            diagnosisLabel = itemView.findViewById(R.id.visit_row_diagnosis_label);
-            diagnosisType = itemView.findViewById(R.id.visit_row_diagnosis_type);
-            diagnosisTypeLabel = itemView.findViewById(R.id.visit_row_diagnosis_type_label);
-            diseaseCodeLabel = itemView.findViewById(R.id.visit_row_disease_code_label);
-            diseaseCode = itemView.findViewById(R.id.visit_row_disease_code);
-//            disease = itemView.findViewById(R.id.visit_row_disease);
-//            diseaseLabel = itemView.findViewById(R.id.visit_row_disease_label);
-            treatmentLabel = itemView.findViewById(R.id.visit_row_treatment_label);
-            treatment = itemView.findViewById(R.id.visit_row_treatment);
-            doseLabel = itemView.findViewById(R.id.visit_row_dosage_label);
-            dose = itemView.findViewById(R.id.visit_row_dosage);
-            durationLabel = itemView.findViewById(R.id.visit_row_duration_label);
-            duration = itemView.findViewById(R.id.visit_row_duration);
-
+            sectionHeader = itemView.findViewById(R.id.overview_section_header);
+            subSectionHeader = itemView.findViewById(R.id.overview_subsection_header);
+            sectionDetailTitle = itemView.findViewById(R.id.overview_section_details_left);
+            sectionDetails = itemView.findViewById(R.id.overview_section_details_right);
 
             parent = itemView;
         }
+    }
+
+    private class Template {
+        public String title = "";
+        public String detail = "";
     }
 
 }

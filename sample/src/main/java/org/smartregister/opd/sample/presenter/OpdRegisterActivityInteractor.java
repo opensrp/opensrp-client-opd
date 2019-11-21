@@ -10,18 +10,13 @@ import org.json.JSONObject;
 import org.smartregister.clientandeventmodel.Client;
 import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.domain.UniqueId;
-import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
 import org.smartregister.opd.interactor.BaseOpdRegisterActivityInteractor;
 import org.smartregister.opd.pojos.OpdEventClient;
 import org.smartregister.opd.pojos.RegisterParams;
-import org.smartregister.opd.presenter.BaseOpdRegisterActivityPresenter;
-import org.smartregister.opd.utils.AppExecutors;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
-import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.repository.EventClientRepository;
-import org.smartregister.sync.helper.ECSyncHelper;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,14 +26,8 @@ import timber.log.Timber;
 
 public class OpdRegisterActivityInteractor extends BaseOpdRegisterActivityInteractor {
 
-    private AppExecutors appExecutors;
-
-    public OpdRegisterActivityInteractor() {
-        this(new AppExecutors());
-    }
-
-    OpdRegisterActivityInteractor(AppExecutors appExecutors) {
-        this.appExecutors = appExecutors;
+    public OpdRegisterActivityInteractor(@NonNull OpdRegisterActivityContract.Presenter presenter) {
+        super(presenter);
     }
 
     @Override
@@ -62,11 +51,6 @@ public class OpdRegisterActivityInteractor extends BaseOpdRegisterActivityIntera
         };
 
         appExecutors.diskIO().execute(runnable);
-    }
-
-    @Override
-    public void onDestroy(boolean isChangingConfiguration) {
-        //TODO set presenter or model to null
     }
 
     @Override
@@ -177,13 +161,5 @@ public class OpdRegisterActivityInteractor extends BaseOpdRegisterActivityIntera
             currentFormSubmissionIds
                     .add(eventJson.getString(EventClientRepository.event_column.formSubmissionId.toString()));
         }
-    }
-
-    public ECSyncHelper getSyncHelper() {
-        return OpdLibrary.getInstance().getEcSyncHelper();
-    }
-
-    public AllSharedPreferences getAllSharedPreferences() {
-        return OpdLibrary.getInstance().context().allSharedPreferences();
     }
 }

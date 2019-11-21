@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.google.gson.Gson;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 
 import net.sqlcipher.database.SQLiteException;
@@ -96,16 +97,16 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
     }
 
     @Override
-    public void processEventClient(@NonNull EventClient eventClient, @NonNull List<Event> unsyncEvents, @Nullable ClientClassification clientClassification) {
+    public void processEventClient(@NonNull EventClient eventClient, @NonNull List<Event> unsyncEvents, @Nullable ClientClassification clientClassification) throws Exception {
         Event event = eventClient.getEvent();
 
         if (event.getEventType().equals(OpdConstants.EventType.CHECK_IN)) {
-            try {
-                processCheckIn(event, eventClient.getClient());
-                CoreLibrary.getInstance().context().getEventClientRepository().markEventAsProcessed(eventClient.getEvent().getFormSubmissionId());
-            } catch (CheckInEventProcessException ex) {
-                Timber.e(ex);
+            if (eventClient.getClient() == null) {
+                throw new CheckInEventProcessException(String.format("Client %s referenced by %s event does not exist", event.getBaseEntityId(), OpdConstants.EventType.CHECK_IN));
             }
+
+            processCheckIn(event, eventClient.getClient());
+            CoreLibrary.getInstance().context().getEventClientRepository().markEventAsProcessed(eventClient.getEvent().getFormSubmissionId());
         } else if (event.getEventType().equals(OpdConstants.EventType.TEST_CONDUCTED)) {
             try {
                 processTestConducted(event);
@@ -342,7 +343,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         Date visitDate = null;
 
         try {
-            visitDate = dateFormat.parse(visitDateString);
+            visitDate = dateFormat.parse(visitDateString != null ? visitDateString : "");
         } catch (ParseException e) {
             Timber.e(e);
 
@@ -388,7 +389,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
 
             commitSuccessfulTransaction();
         } else {
-            throw new CheckInEventProcessException(String.format("Check-in with visit id %s could not be processed because it the visitDate OR visitId is null", visitId));
+            throw new CheckInEventProcessException(String.format("Check-in of event %s could not be processed because it the visitDate OR visitId is null", new Gson().toJson(event)));
         }
     }
 
@@ -522,7 +523,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         checkIn.setVisitType(keyValues.get(OpdConstants.JsonFormField.VISIT_TYPE));
         checkIn.setAppointmentScheduledPreviously(keyValues.get(OpdConstants.JsonFormField.APPOINTMENT_DUE));
         checkIn.setAppointmentDueDate(keyValues.get(OpdConstants.JsonFormField.APPOINTMENT_DUE_DATE));
-        checkIn.setEventId(event.getEventId());
+        checkIn.setFormSubmissionId(event.getFormSubmissionId());
         checkIn.setBaseEntityId(client.getBaseEntityId());
         checkIn.setUpdatedAt(new Date().getTime());
 

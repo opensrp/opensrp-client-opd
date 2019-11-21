@@ -35,7 +35,6 @@ public class OpdEventUtils {
                 }
 
                 processLatestUnprocessedEvents();
-
                 appExecutors.mainThread().execute(new Runnable() {
                     @Override
                     public void run() {

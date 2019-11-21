@@ -16,7 +16,9 @@ import org.smartregister.opd.domain.YamlConfig;
 import org.smartregister.opd.domain.YamlConfigItem;
 import org.smartregister.opd.helper.OpdRulesEngineHelper;
 import org.smartregister.opd.pojos.OpdCheckIn;
+import org.smartregister.opd.pojos.OpdDetails;
 import org.smartregister.opd.pojos.OpdDiagnosisAndTreatmentForm;
+import org.smartregister.opd.pojos.OpdVisit;
 import org.smartregister.opd.repository.OpdCheckInRepository;
 import org.smartregister.opd.repository.OpdDetailsRepository;
 import org.smartregister.opd.repository.OpdDiagnosisAndTreatmentFormRepository;
@@ -44,13 +46,17 @@ import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import id.zelory.compressor.Compressor;
+import timber.log.Timber;
 
 import static org.smartregister.opd.utils.OpdJsonFormUtils.METADATA;
 
@@ -246,7 +252,7 @@ public class OpdLibrary {
     private void initializeYamlConfigs() {
         Constructor constructor = new Constructor(YamlConfig.class);
         TypeDescription customTypeDescription = new TypeDescription(YamlConfig.class);
-        customTypeDescription.addPropertyParameters(YamlConfigItem.FIELD_CONTACT_SUMMARY_ITEMS, YamlConfigItem.class);
+        customTypeDescription.addPropertyParameters(YamlConfigItem.GENERIC_YAML_ITEMS, YamlConfigItem.class);
         constructor.addTypeDescription(customTypeDescription);
         yaml = new Yaml(constructor);
     }
@@ -281,13 +287,11 @@ public class OpdLibrary {
         Event opdCheckinEvent = OpdJsonFormUtils.createEvent(fieldsArray, jsonFormObject.getJSONObject(METADATA)
                 , formTag, baseEntityId, eventType, entityTable);
 
-        // Generate the eventId and add it
-        opdCheckinEvent.setEventId(JsonFormUtils.generateRandomUUIDString());
-
         AllSharedPreferences allSharedPreferences = OpdUtils.getAllSharedPreferences();
         String providerId = allSharedPreferences.fetchRegisteredANM();
         opdCheckinEvent.setProviderId(providerId);
         opdCheckinEvent.setLocationId(OpdJsonFormUtils.locationId(allSharedPreferences));
+        opdCheckinEvent.setFormSubmissionId(opdCheckinEvent.getFormSubmissionId());
 
         opdCheckinEvent.setTeam(allSharedPreferences.fetchDefaultTeam(providerId));
         opdCheckinEvent.setTeamId(allSharedPreferences.fetchDefaultTeamId(providerId));
@@ -402,5 +406,52 @@ public class OpdLibrary {
         calendar.add(Calendar.DAY_OF_MONTH, -1);
 
         return calendar.getTime();
+    }
+
+    public boolean isPatientInTreatedState(@NonNull String strVisitEndDate) {
+        try {
+            Date visitEndDate = new SimpleDateFormat(OpdConstants.DateFormat.YYYY_MM_DD_HH_MM_SS, Locale.ENGLISH).parse(strVisitEndDate);
+            return isPatientInTreatedState(visitEndDate);
+        } catch (ParseException e) {
+            Timber.e(e);
+        }
+
+        return false;
+    }
+
+    public boolean isPatientInTreatedState(@NonNull Date visitEndDate) {
+        // Get the midnight of that day when the visit happened
+        Calendar date = Calendar.getInstance();
+        date.setTime(visitEndDate);
+        // reset hour, minutes, seconds and millis
+        date.set(Calendar.HOUR_OF_DAY, 0);
+        date.set(Calendar.MINUTE, 0);
+        date.set(Calendar.SECOND, 0);
+        date.set(Calendar.MILLISECOND, 0);
+
+        // next day
+        date.add(Calendar.DAY_OF_MONTH, 1);
+        return new Date().before(date.getTime());
+    }
+
+    /**
+     * This checks if the patient can perform a Check-In evaluated based on their latest visit details & opd details. This however does not consider the TREATED status
+     * which appears after a visit is completed within the same day. If you need to consider the TREATED status, you should first call {@link #isPatientInTreatedState(Date)}
+     * and then call this method if the result is false.
+     *
+     * @param visit
+     * @param opdDetails
+     * @return
+     */
+    public boolean canPatientCheckInInsteadOfDiagnoseAndTreat(@Nullable OpdVisit visit, @Nullable OpdDetails opdDetails) {
+        Date latestValidCheckInDate = OpdLibrary.getInstance().getLatestValidCheckInDate();
+
+        // If we are past the 24 hours or so, then the status should be check-in
+        // If your opd
+        return visit == null || visit.getVisitDate().before(latestValidCheckInDate) || (opdDetails != null && opdDetails.getCurrentVisitEndDate() != null);
+    }
+
+    public boolean isClientCurrentlyCheckedIn(@Nullable OpdVisit opdVisit, @Nullable OpdDetails opdDetails) {
+        return !canPatientCheckInInsteadOfDiagnoseAndTreat(opdVisit, opdDetails);
     }
 }

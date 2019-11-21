@@ -84,7 +84,7 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
         if (opdRegisterRowOptions != null && opdRegisterRowOptions.isDefaultPopulatePatientColumn()) {
             opdRegisterRowOptions.populateClientRow(cursor, pc, client, viewHolder);
         } else {
-            populatePatientColumn(pc, client, viewHolder);
+            populatePatientColumn(pc, viewHolder);
 
             if (opdRegisterRowOptions != null) {
                 opdRegisterRowOptions.populateClientRow(cursor, pc, client, viewHolder);
@@ -96,7 +96,7 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
     public void getFooterView(RecyclerView.ViewHolder viewHolder, int currentPageCount, int totalPageCount, boolean hasNext, boolean hasPrevious) {
         FooterViewHolder footerViewHolder = (FooterViewHolder) viewHolder;
         footerViewHolder.pageInfoView.setText(
-                MessageFormat.format(context.getString(org.smartregister.R.string.str_page_info), currentPageCount,
+                MessageFormat.format(context.getString(R.string.str_page_info), currentPageCount,
                         totalPageCount));
 
         footerViewHolder.nextPageView.setVisibility(hasNext ? View.VISIBLE : View.INVISIBLE);
@@ -155,7 +155,7 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
         return viewHolder instanceof FooterViewHolder;
     }
 
-    public void populatePatientColumn(CommonPersonObjectClient commonPersonObjectClient, SmartRegisterClient smartRegisterClient, OpdRegisterViewHolder viewHolder) {
+    public void populatePatientColumn(CommonPersonObjectClient commonPersonObjectClient, OpdRegisterViewHolder viewHolder) {
         Map<String, String> patientColumnMaps = commonPersonObjectClient.getColumnmaps();
 
         if (opdRegisterProviderMetadata.isClientHaveGuardianDetails(patientColumnMaps)) {
@@ -179,8 +179,9 @@ public class OpdRegisterProvider implements RecyclerViewProvider<OpdRegisterView
         String childName = org.smartregister.util.Utils.getName(firstName, middleName + " " + lastName);
 
         String dobString = Utils.getDuration(opdRegisterProviderMetadata.getDob(patientColumnMaps));
-        //dobString = dobString.contains("y") ? dobString.substring(0, dobString.indexOf("y")) : dobString;
-        fillValue(viewHolder.textViewChildName, WordUtils.capitalize(childName) + ", " + WordUtils.capitalize(OpdUtils.getTranslatedDate(dobString, context)));
+        String translatedYearInitial = context.getResources().getString(R.string.abbrv_years);
+        fillValue(viewHolder.textViewChildName, WordUtils.capitalize(childName) + ", " +
+                WordUtils.capitalize(OpdUtils.getClientAge(dobString, translatedYearInitial)));
         String registerType = opdRegisterProviderMetadata.getRegisterType(patientColumnMaps);
 
         if (!TextUtils.isEmpty(registerType)) {

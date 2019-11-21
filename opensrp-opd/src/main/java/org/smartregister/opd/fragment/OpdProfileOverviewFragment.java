@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import org.jeasy.rules.api.Facts;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
@@ -38,6 +39,7 @@ public class OpdProfileOverviewFragment extends BaseProfileFragment implements O
 
     private LinearLayout opdCheckinSectionLayout;
     private Button checkInDiagnoseAndTreatBtn;
+    private TextView opdCheckedInTv;
 
     public static OpdProfileOverviewFragment newInstance(Bundle bundle) {
         Bundle args = bundle;
@@ -51,7 +53,7 @@ public class OpdProfileOverviewFragment extends BaseProfileFragment implements O
 
     @Override
     protected void onCreation() {
-        presenter = new OpdProfileOverviewFragmentPresenter();
+        presenter = new OpdProfileOverviewFragmentPresenter(this);
 
         if (getArguments() != null) {
             CommonPersonObjectClient commonPersonObjectClient = (CommonPersonObjectClient) getArguments()
@@ -73,10 +75,13 @@ public class OpdProfileOverviewFragment extends BaseProfileFragment implements O
                 public void onFinished(@Nullable Facts facts, @Nullable List<YamlConfigWrapper> yamlConfigListGlobal) {
                     if (getActivity() != null && facts != null && yamlConfigListGlobal != null) {
                         Boolean isPendingDiagnoseAndTreat = facts.get(OpdDbConstants.Column.OpdDetails.PENDING_DIAGNOSE_AND_TREAT);
+                        isPendingDiagnoseAndTreat = isPendingDiagnoseAndTreat == null ? Boolean.FALSE : isPendingDiagnoseAndTreat;
 
-                        if (isPendingDiagnoseAndTreat != null && isPendingDiagnoseAndTreat) {
+                        if (isPendingDiagnoseAndTreat) {
+                            opdCheckedInTv.setText(R.string.opd_checked_in);
                             showDiagnoseAndTreatBtn();
                         } else {
+                            opdCheckedInTv.setText(R.string.opd);
                             showCheckInBtn();
                         }
 
@@ -136,7 +141,7 @@ public class OpdProfileOverviewFragment extends BaseProfileFragment implements O
         View view =  inflater.inflate(R.layout.opd_fragment_profile_overview, container, false);
 
         opdCheckinSectionLayout = view.findViewById(R.id.ll_opdFragmentProfileOverview_checkinLayout);
-
+        opdCheckedInTv = view.findViewById(R.id.tv_opdFragmentProfileOverview_checkedInTitle);
         checkInDiagnoseAndTreatBtn = view.findViewById(R.id.btn_opdFragmentProfileOverview_diagnoseAndTreat);
 
         return view;

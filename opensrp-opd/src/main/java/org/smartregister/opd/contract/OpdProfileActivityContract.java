@@ -3,11 +3,12 @@ package org.smartregister.opd.contract;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 
-import org.apache.commons.lang3.tuple.Triple;
 import org.json.JSONObject;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.opd.listener.OnSendActionToFragment;
+import org.smartregister.opd.pojos.OpdDiagnosisAndTreatmentForm;
 import org.smartregister.view.contract.BaseProfileContract;
 
 import java.util.HashMap;
@@ -25,15 +26,11 @@ public interface OpdProfileActivityContract {
         @Nullable
         OpdProfileActivityContract.View getProfileView();
 
-        void fetchProfileData(@NonNull String baseEntityId);
-
-        void refreshProfileView(@NonNull String baseEntityId);
-
         void refreshProfileTopSection(@NonNull Map<String, String> client);
 
-        HashMap<String, String> saveFinishForm(@NonNull Map<String, String> client);
+        void startForm(@NonNull String formName, @NonNull CommonPersonObjectClient commonPersonObjectClient);
 
-        void startForm(String formName, CommonPersonObjectClient commonPersonObjectClient);
+        void startFormActivity(@Nullable JSONObject form, @NonNull String caseId, @NonNull String entityTable);
 
         void saveVisitOrDiagnosisForm(String eventType, Intent data);
     }
@@ -59,21 +56,23 @@ public interface OpdProfileActivityContract {
         OnSendActionToFragment getActionListenerForVisitFragment();
 
         OnSendActionToFragment getActionListenerForProfileOverview();
+
+        @Nullable
+        String getString(@StringRes int resId);
     }
 
     interface Interactor {
 
-        void onDestroy(boolean isChangingConfiguration);
+        void fetchSavedDiagnosisAndTreatmentForm(@NonNull String baseEntityId, @NonNull String entityTable);
 
-        void refreshProfileView(@NonNull String baseEntityId, boolean isForEdit);
+        void onDestroy(boolean isChangingConfiguration);
     }
 
     interface InteractorCallBack {
 
-        void onUniqueIdFetched(Triple<String, String, String> triple, String entityId);
-
-        void onNoUniqueId();
-
         void onRegistrationSaved(boolean isEdit);
+
+        void onFetchedSavedDiagnosisAndTreatmentForm(@Nullable OpdDiagnosisAndTreatmentForm diagnosisAndTreatmentForm, @NonNull String caseId, @NonNull String entityTable);
+
     }
 }

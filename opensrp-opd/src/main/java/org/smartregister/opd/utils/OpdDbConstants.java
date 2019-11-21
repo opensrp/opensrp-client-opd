@@ -10,6 +10,7 @@ public interface OpdDbConstants {
 
     interface KEY {
 
+        String ID = "_id";
         String MOTHER_FIRST_NAME = "mother_first_name";
         String MOTHER_MIDDLE_NAME = "mother_middle_name";
         String MOTHER_LAST_NAME = "mother_last_name";
@@ -37,7 +38,7 @@ public interface OpdDbConstants {
 
         interface OpdCheckIn {
             String ID = "_id";
-            String EVENT_ID = "event_id";
+            String FORM_SUBMISSION_ID = "form_submission_id";
             String VISIT_ID = "visit_id";
             String BASE_ENTITY_ID = "base_entity_id";
             String PREGNANCY_STATUS = "pregnancy_status";
@@ -62,6 +63,7 @@ public interface OpdDbConstants {
         }
 
         interface Client {
+            String ID = "_id";
             String PHOTO = "photo";
             String FIRST_NAME = "first_name";
             String LAST_NAME = "last_name";
