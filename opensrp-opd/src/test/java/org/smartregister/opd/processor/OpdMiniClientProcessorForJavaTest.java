@@ -103,13 +103,12 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
         PowerMockito.when(opdLibrary.getOpdTreatmentRepository()).thenReturn(opdTreatmentRepository);
         Obs obs = new Obs();
         obs.setFormSubmissionField(OpdConstants.JSON_FORM_KEY.MEDICINE);
-        obs.setValue("[{\"key\":\"Bacteria Killer\",\"property\":{\"meta\":{\"dosage\":\"er\",\"duration\":\"er\"}}}]");
-
+        obs.setValue("[]");
         obs.setFieldDataType("text");
         obs.setFieldCode(OpdConstants.JSON_FORM_KEY.MEDICINE);
         event.addObs(obs);
+        event.addDetails("value", "[{\"key\":\"Bacteria Killer\",\"text\":\"Bacteria Killer\",\"property\":{\"meta\":{\"dosage\":\"er\",\"duration\":\"er\"}}}]");
         event.addDetails(OpdConstants.JSON_FORM_KEY.ID, "id");
-
         Whitebox.invokeMethod(opdMiniClientProcessorForJava, "processTreatment", event);
         Mockito.verify(opdTreatmentRepository, Mockito.times(1)).saveOrUpdate(opdTreatmentArgumentCaptor.capture());
         Assert.assertEquals("er", opdTreatmentArgumentCaptor.getValue().getDuration());
@@ -125,13 +124,11 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
         PowerMockito.mockStatic(OpdLibrary.class);
         PowerMockito.when(OpdLibrary.getInstance()).thenReturn(opdLibrary);
         PowerMockito.when(opdLibrary.getOpdDiagnosisRepository()).thenReturn(opdDiagnosisRepository);
+        event.addDetails("value", "[" +
+                "{\"key\":\"GF5508\",\"text\":\"Bacterial Meningitis\",\"openmrs_entity\":\"\",\"openmrs_entity_id\":\"\",\"openmrs_entity_parent\":\"\"," +
+                "\"property\":{\"presumed-id\":\"er\",\"confirmed-id\":\"er\"}}]");
 
-        Obs obs = new Obs();
-        obs.setFormSubmissionField(OpdConstants.JSON_FORM_KEY.DISEASE_CODE);
-        obs.setValue("[{\"key\":\"Bacterial Meningitis\",\"property\":{\"presumed-id\":\"er\",\"confirmed-id\":\"er\"}}]");
-        obs.setFieldDataType("text");
-        obs.setFieldCode(OpdConstants.JSON_FORM_KEY.DISEASE_CODE);
-        event.addObs(obs);
+
         event.addDetails(OpdConstants.JSON_FORM_KEY.ID, "id");
 
         Obs obs1 = new Obs();
