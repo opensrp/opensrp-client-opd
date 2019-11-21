@@ -125,6 +125,13 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
 
         // Enable switcher
         configureRegisterSwitcher();
+
+        // Disable the registration info button if the client is not in OPD
+        if (commonPersonObjectClient != null) {
+            String register_type = commonPersonObjectClient.getDetails().get(OpdConstants.ColumnMapKey.REGISTER_TYPE);
+            View view = findViewById(R.id.btn_profile_registration_info);
+            view.setEnabled(OpdConstants.RegisterType.OPD.equalsIgnoreCase(register_type));
+        }
     }
 
     private void configureRegisterSwitcher() {
@@ -252,9 +259,14 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
 
     @Override
     public void onClick(View view) {
+        String register_type = commonPersonObjectClient.getDetails().get(OpdConstants.ColumnMapKey.REGISTER_TYPE);
         if (view.getId() == R.id.btn_profile_registration_info) {
-            if (presenter instanceof OpdProfileActivityContract.Presenter) {
-                ((OpdProfileActivityContract.Presenter) presenter).onUpdateRegistrationBtnCLicked(baseEntityId);
+            if (OpdConstants.RegisterType.OPD.equalsIgnoreCase(register_type)) {
+                if (presenter instanceof OpdProfileActivityContract.Presenter) {
+                    ((OpdProfileActivityContract.Presenter) presenter).onUpdateRegistrationBtnCLicked(baseEntityId);
+                }
+            } else {
+                showToast(getString(R.string.edit_opd_registration_failure_message));
             }
         } else {
             super.onClick(view);

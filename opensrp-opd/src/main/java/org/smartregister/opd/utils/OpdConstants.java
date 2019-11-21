@@ -211,6 +211,7 @@ public class OpdConstants extends AllConstants {
 
     public interface ColumnMapKey {
         String REGISTER_ID = "register_id";
+        String REGISTER_TYPE = "register_type";
     }
 
     public interface DateFormat {
@@ -228,5 +229,9 @@ public class OpdConstants extends AllConstants {
         String IS_DOB_UNKNOWN = "isDobUnknown";
         String IS_ENROLLED_IN_MESSAGES = "isEnrolledInSmsMessages";
         String OTHER = "other";
+    }
+
+    public interface RegisterType {
+        String OPD = "opd";
     }
 }
