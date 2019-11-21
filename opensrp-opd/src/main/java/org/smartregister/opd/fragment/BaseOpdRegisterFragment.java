@@ -161,7 +161,7 @@ public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment imple
 
     @Override
     protected String getMainCondition() {
-        return "";
+        return mainCondition;
     }
 
     @Override

@@ -17,7 +17,7 @@ public class OpdRegisterQueryProvider extends OpdRegisterQueryProviderContract {
 
     @NonNull
     @Override
-    public String getObjectIdsQuery(@Nullable String filters) {
+    public String getObjectIdsQuery(@Nullable String filters, @Nullable String mainCondition) {
         if (TextUtils.isEmpty(filters)) {
             return "SELECT object_id FROM " +
                     "(SELECT object_id, last_interacted_with FROM ec_child_search " +
@@ -37,7 +37,7 @@ public class OpdRegisterQueryProvider extends OpdRegisterQueryProviderContract {
 
     @NonNull
     @Override
-    public String[] countExecuteQueries(@Nullable String filters) {
+    public String[] countExecuteQueries(@Nullable String filters, @Nullable String mainCondition) {
         SmartRegisterQueryBuilder sqb = new SmartRegisterQueryBuilder();
 
         return new String[] {
