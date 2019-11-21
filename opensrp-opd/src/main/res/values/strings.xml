@@ -66,6 +66,7 @@
     <string name="unknown">Unknown</string>
     <string name="positive">positive</string>
     <string name="switch_register_view">SWITCH REGISTER VIEW</string>
+    <string name="edit_opd_registration_failure_message">You cannot edit this patient using the OPD Registration. Click on the Register Switcher</string>
 
 
 </resources>
