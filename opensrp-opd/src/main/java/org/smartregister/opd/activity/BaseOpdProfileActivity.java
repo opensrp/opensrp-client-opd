@@ -287,6 +287,6 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
 
     @Override
     public void setClient(@NonNull CommonPersonObjectClient client) {
-
+        this.commonPersonObjectClient = client;
     }
 }
