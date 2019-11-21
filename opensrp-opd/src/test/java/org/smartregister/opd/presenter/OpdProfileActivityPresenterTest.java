@@ -70,7 +70,7 @@ public class OpdProfileActivityPresenterTest extends BaseTest {
 
     @Test
     public void onRegistrationSavedShouldCallViewHideProgressDialog() {
-        presenter.onRegistrationSaved(false);
+        presenter.onRegistrationSaved(null, false);
         Mockito.verify(view, Mockito.times(1)).hideProgressDialog();
     }
 
@@ -172,7 +172,6 @@ public class OpdProfileActivityPresenterTest extends BaseTest {
         Mockito.doReturn(context).when(opdLibrary).context();
         Mockito.doReturn(allSharedPreferences).when(context).allSharedPreferences();
         Mockito.doReturn(allSharedPreferences).when(context).allSharedPreferences();
-
 
         // Mock call to OpdUtils.context().allSharedPreferences().getPreference(AllConstants.CURRENT_LOCATION_ID)
         Mockito.doReturn(locationId).when(allSharedPreferences).getPreference(Mockito.eq(AllConstants.CURRENT_LOCATION_ID));
