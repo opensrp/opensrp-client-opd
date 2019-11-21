@@ -378,18 +378,17 @@ public class OpdLibrary {
     }
 
     public String opdLookUpQuery() {
-        String lookUpQueryForChild = "select id as _id, %s, %s, %s, %s, %s, %s, zeir_id as %s from ec_child where [condition] ";
+        String lookUpQueryForChild = "select id as _id, %s, %s, %s, %s, %s, %s, zeir_id as %s, null as national_id from ec_child where [condition] ";
         lookUpQueryForChild = String.format(lookUpQueryForChild, OpdConstants.KEY.RELATIONALID, OpdConstants.KEY.FIRST_NAME,
                 OpdConstants.KEY.LAST_NAME, OpdConstants.KEY.GENDER, OpdConstants.KEY.DOB, OpdConstants.KEY.BASE_ENTITY_ID, OpdDbConstants.KEY.OPENSRP_ID);
-        String lookUpQueryForMother = "select id as _id, %s, %s, %s, %s, %s, %s, register_id as %s from ec_mother where [condition] ";
+        String lookUpQueryForMother = "select id as _id, %s, %s, %s, %s, %s, %s, register_id as %s, nrc_number as national_id from ec_mother where [condition] ";
         lookUpQueryForMother = String.format(lookUpQueryForMother, OpdConstants.KEY.RELATIONALID, OpdConstants.KEY.FIRST_NAME,
                 OpdConstants.KEY.LAST_NAME, OpdConstants.KEY.GENDER, OpdConstants.KEY.DOB, OpdConstants.KEY.BASE_ENTITY_ID, OpdDbConstants.KEY.OPENSRP_ID);
-        String lookUpQueryForOpdClient = "select id as _id, %s, %s, %s, %s, %s, %s, %s from ec_client where [condition] ";
+        String lookUpQueryForOpdClient = "select id as _id, %s, %s, %s, %s, %s, %s, %s, national_id from ec_client where [condition] ";
         lookUpQueryForOpdClient = String.format(lookUpQueryForOpdClient, OpdConstants.KEY.RELATIONALID, OpdConstants.KEY.FIRST_NAME,
                 OpdConstants.KEY.LAST_NAME, OpdConstants.KEY.GENDER, OpdConstants.KEY.DOB, OpdConstants.KEY.BASE_ENTITY_ID, OpdDbConstants.KEY.OPENSRP_ID);
         return lookUpQueryForChild + " union all " + lookUpQueryForMother + " union all " + lookUpQueryForOpdClient;
     }
-
     /**
      * This method enables us to configure how-long ago we should consider a valid check-in so that
      * we enable the next step which is DIAGNOSE & TREAT. This method returns the latest date that a check-in
