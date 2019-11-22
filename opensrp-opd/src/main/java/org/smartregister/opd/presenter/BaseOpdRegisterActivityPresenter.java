@@ -140,7 +140,7 @@ public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterAct
             return;
         }
 
-        JSONObject form = null;
+        form = null;
         try {
             form = model.getFormAsJson(formName, entityId, locationId, injectedFieldValues);
             if (formName.equals(OpdConstants.Form.OPD_DIAGNOSIS_AND_TREAT)) {
