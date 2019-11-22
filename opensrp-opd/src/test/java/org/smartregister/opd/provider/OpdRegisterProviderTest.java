@@ -180,13 +180,13 @@ public class OpdRegisterProviderTest extends BaseTest {
 
         @NonNull
         @Override
-        public String getObjectIdsQuery(@Nullable String filters) {
+        public String getObjectIdsQuery(@Nullable String filters, @Nullable String mainCondition) {
             return null;
         }
 
         @NonNull
         @Override
-        public String[] countExecuteQueries(@Nullable String filters) {
+        public String[] countExecuteQueries(@Nullable String filters, @Nullable String mainCondition) {
             return new String[0];
         }
 
