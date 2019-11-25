@@ -1,8 +1,14 @@
 package org.smartregister.opd.utils;
 
+import android.content.Context;
 import android.content.Intent;
 
+import com.vijay.jsonwizard.constants.JsonFormConstants;
+import com.vijay.jsonwizard.domain.Form;
+
 import org.jeasy.rules.api.Facts;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,20 +18,27 @@ import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.modules.junit4.PowerMockRunnerDelegate;
+import org.robolectric.RobolectricTestRunner;
 import org.smartregister.opd.OpdLibrary;
+import org.smartregister.opd.activity.BaseOpdFormActivity;
 import org.smartregister.opd.configuration.OpdConfiguration;
 import org.smartregister.opd.pojos.OpdMetadata;
 
 import java.util.Date;
+import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-10-17
  */
 
 @RunWith(PowerMockRunner.class)
+@PowerMockRunnerDelegate(RobolectricTestRunner.class)
 @PrepareForTest(OpdLibrary.class)
 public class OpdUtilsTest {
 
@@ -100,6 +113,41 @@ public class OpdUtilsTest {
         assertEquals("3y", OpdUtils.getClientAge("3y", "y"));
         assertEquals("5w 6d", OpdUtils.getClientAge("5w 6d", "y"));
         assertEquals("6d", OpdUtils.getClientAge("6d", "y"));
+    }
+
+    @Test
+    public void isTemplateShouldReturnFalseIfStringDoesNotContainMatchingBraces() {
+        assertFalse(OpdUtils.isTemplate("{ This is a sytling brace"));
+        assertFalse(OpdUtils.isTemplate("This is display text"));
+    }
+
+    @Test
+    public void isTemplateShouldReturnTrueIfStringContainsMatchingBraces() {
+        assertTrue(OpdUtils.isTemplate("Project Name: {project_name}"));
+    }
+
+    @Test
+    public void buildActivityFormIntentShouldCreateIntentWithWizardEnabledWhenEncounterTypeIsDiagnosisAndTreat() throws JSONException {
+        // Mock calls to OpdLibrary
+        PowerMockito.mockStatic(OpdLibrary.class);
+        PowerMockito.when(OpdLibrary.getInstance()).thenReturn(opdLibrary);
+        PowerMockito.when(opdLibrary.getOpdConfiguration()).thenReturn(opdConfiguration);
+        PowerMockito.when(opdConfiguration.getOpdMetadata()).thenReturn(opdMetadata);
+        Mockito.doReturn(BaseOpdFormActivity.class).when(opdMetadata).getOpdFormActivity();
+
+        JSONObject jsonForm = new JSONObject();
+        jsonForm.put(OpdJsonFormUtils.ENCOUNTER_TYPE, OpdConstants.EventType.DIAGNOSIS_AND_TREAT);
+
+        HashMap<String, String> parcelableData = new HashMap<>();
+        String baseEntityId = "89283-23dsd-23sdf";
+        parcelableData.put(OpdConstants.IntentKey.BASE_ENTITY_ID, baseEntityId);
+
+        Intent actualResult = OpdUtils.buildFormActivityIntent(jsonForm, parcelableData, Mockito.mock(Context.class));
+        Form form = (Form) actualResult.getSerializableExtra(JsonFormConstants.JSON_FORM_KEY.FORM);
+
+        assertTrue(form.isWizard());
+        assertEquals(OpdConstants.EventType.DIAGNOSIS_AND_TREAT, form.getName());
+        assertEquals(baseEntityId, actualResult.getStringExtra(OpdConstants.IntentKey.BASE_ENTITY_ID));
     }
 
 }
