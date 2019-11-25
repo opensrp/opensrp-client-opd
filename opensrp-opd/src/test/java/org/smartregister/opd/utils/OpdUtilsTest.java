@@ -10,16 +10,16 @@ import org.jeasy.rules.api.Facts;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.modules.junit4.PowerMockRunnerDelegate;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.activity.BaseOpdFormActivity;
 import org.smartregister.opd.configuration.OpdConfiguration;
@@ -37,10 +37,11 @@ import static org.junit.Assert.assertTrue;
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-10-17
  */
 
-@RunWith(PowerMockRunner.class)
-@PowerMockRunnerDelegate(RobolectricTestRunner.class)
-@PrepareForTest(OpdLibrary.class)
+@RunWith(RobolectricTestRunner.class)
 public class OpdUtilsTest {
+
+    @Rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private OpdLibrary opdLibrary;
@@ -98,11 +99,13 @@ public class OpdUtilsTest {
 
     @Test
     public void metadata() {
-        PowerMockito.mockStatic(OpdLibrary.class);
-        PowerMockito.when(OpdLibrary.getInstance()).thenReturn(opdLibrary);
-        PowerMockito.when(opdLibrary.getOpdConfiguration()).thenReturn(opdConfiguration);
-        PowerMockito.when(opdConfiguration.getOpdMetadata()).thenReturn(opdMetadata);
+        ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", opdLibrary);
+        Mockito.doReturn(opdConfiguration).when(opdLibrary).getOpdConfiguration();
+        Mockito.doReturn(opdMetadata).when(opdConfiguration).getOpdMetadata();
+
         assertEquals(opdMetadata, OpdUtils.metadata());
+
+        ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", null);
     }
 
     @Test
@@ -129,10 +132,9 @@ public class OpdUtilsTest {
     @Test
     public void buildActivityFormIntentShouldCreateIntentWithWizardEnabledWhenEncounterTypeIsDiagnosisAndTreat() throws JSONException {
         // Mock calls to OpdLibrary
-        PowerMockito.mockStatic(OpdLibrary.class);
-        PowerMockito.when(OpdLibrary.getInstance()).thenReturn(opdLibrary);
-        PowerMockito.when(opdLibrary.getOpdConfiguration()).thenReturn(opdConfiguration);
-        PowerMockito.when(opdConfiguration.getOpdMetadata()).thenReturn(opdMetadata);
+        ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", opdLibrary);
+        Mockito.doReturn(opdConfiguration).when(opdLibrary).getOpdConfiguration();
+        Mockito.doReturn(opdMetadata).when(opdConfiguration).getOpdMetadata();
         Mockito.doReturn(BaseOpdFormActivity.class).when(opdMetadata).getOpdFormActivity();
 
         JSONObject jsonForm = new JSONObject();

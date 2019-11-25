@@ -6,7 +6,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -80,7 +79,7 @@ public class OpdLibraryTest extends BaseTest {
 
         long timeNow = new Date().getTime();
 
-        Assert.assertEquals(timeNow - 24 * 60 * 60 * 1000, OpdLibrary.getInstance().getLatestValidCheckInDate().getTime(), 100);
+        assertEquals(timeNow - 24 * 60 * 60 * 1000, OpdLibrary.getInstance().getLatestValidCheckInDate().getTime(), 100);
     }
 
     @Test
