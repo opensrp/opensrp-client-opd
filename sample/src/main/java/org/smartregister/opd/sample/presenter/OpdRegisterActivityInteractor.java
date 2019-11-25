@@ -26,10 +26,6 @@ import timber.log.Timber;
 
 public class OpdRegisterActivityInteractor extends BaseOpdRegisterActivityInteractor {
 
-    public OpdRegisterActivityInteractor(@NonNull OpdRegisterActivityContract.Presenter presenter) {
-        super(presenter);
-    }
-
     @Override
     public void getNextUniqueId(final Triple<String, String, String> triple, @NonNull final OpdRegisterActivityContract.InteractorCallBack callBack) {
         Runnable runnable = new Runnable() {

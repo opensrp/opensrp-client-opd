@@ -299,11 +299,9 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                 Timber.e("Opd processDiagnosis for %s not saved", event.getBaseEntityId());
             }
         }
-
     }
 
     private void processTestConducted(@NonNull Event event) {
-
         Map<String, String> mapDetails = event.getDetails();
 
         String id = mapDetails.get(OpdConstants.JSON_FORM_KEY.ID);
@@ -311,37 +309,14 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
             return;
         }
         String[] valueIds = id.split(",");
+
         HashMap<String, String> keyValues = new HashMap<>();
         generateKeyValuesFromEvent(event, keyValues);
-        String diagnosticResult = null;
-        String diagnosticTest = null;
 
-        if (keyValues.containsKey(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER)) {
-            diagnosticResult = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER);
-        }
-
-        if (keyValues.containsKey(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_OTHER)) {
-            diagnosticTest = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_OTHER);
-        }
-
-        if (keyValues.containsKey(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST)) {
-            diagnosticTest = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST);
-        }
-
-        if (keyValues.containsKey(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPECIFY)) {
-            diagnosticResult = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPECIFY);
-        }
-
-        if (keyValues.containsKey(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER_BLOOD_TYPE)) {
-            diagnosticResult = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER_BLOOD_TYPE);
-        }
-
-        if (keyValues.containsKey(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_GLUCOSE)) {
-            diagnosticResult = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_GLUCOSE);
-        }
+        String diagnosticTest = extractDiagnosticTest(keyValues);
+        String diagnosticResult = extractDiagnosticResult(keyValues);
 
         if (!TextUtils.isEmpty(diagnosticResult) && !TextUtils.isEmpty(diagnosticTest)) {
-
             OpdTestConducted opdTestConducted = new OpdTestConducted();
             opdTestConducted.setResult(diagnosticResult);
             opdTestConducted.setTest(diagnosticTest);
@@ -357,8 +332,45 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                 Timber.i("Opd processTestConducted for %s saved", event.getBaseEntityId());
                 return;
             }
+
             Timber.e("Opd processTestConducted for %s not saved", event.getBaseEntityId());
         }
+    }
+
+    @Nullable
+    private String extractDiagnosticResult(@NonNull HashMap<String, String> keyValues) {
+        String diagnosticResult = null;
+        if (keyValues.containsKey(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER)) {
+            diagnosticResult = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER);
+        }
+
+        if (keyValues.containsKey(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPECIFY)) {
+            diagnosticResult = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPECIFY);
+        }
+
+        if (keyValues.containsKey(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER_BLOOD_TYPE)) {
+            diagnosticResult = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER_BLOOD_TYPE);
+        }
+
+        if (keyValues.containsKey(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_GLUCOSE)) {
+            diagnosticResult = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_GLUCOSE);
+        }
+
+        return diagnosticResult;
+    }
+
+    @Nullable
+    private String extractDiagnosticTest(@NonNull HashMap<String, String> keyValues) {
+        String diagnosticTest = null;
+        if (keyValues.containsKey(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_OTHER)) {
+            diagnosticTest = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_OTHER);
+        }
+
+        if (keyValues.containsKey(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST)) {
+            diagnosticTest = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST);
+        }
+
+        return diagnosticTest;
     }
 
     protected void processCheckIn(@NonNull Event event, @NonNull Client client) throws CheckInEventProcessException {

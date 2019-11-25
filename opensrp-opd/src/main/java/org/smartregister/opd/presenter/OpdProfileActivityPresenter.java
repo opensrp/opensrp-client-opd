@@ -86,19 +86,18 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
 
     @Override
     public void onRegistrationSaved(@Nullable CommonPersonObjectClient client, boolean isEdit) {
+        CommonPersonObjectClient reassignableClient = client;
         if (getProfileView() != null) {
             getProfileView().hideProgressDialog();
 
-            if (client != null) {
-                getProfileView().setClient(client);
+            if (reassignableClient != null) {
+                getProfileView().setClient(reassignableClient);
             } else {
-                client = getProfileView().getClient();
+                reassignableClient = getProfileView().getClient();
             }
 
-            if (isEdit) {
-                if (client != null) {
-                    refreshProfileTopSection(client.getColumnmaps());
-                }
+            if (isEdit && reassignableClient != null) {
+                refreshProfileTopSection(reassignableClient.getColumnmaps());
             }
         }
     }

@@ -123,13 +123,11 @@ public class OpdProfileInteractor implements OpdProfileActivityContract.Interact
                 Client baseClient = opdEventClient.getClient();
                 Event baseEvent = opdEventClient.getEvent();
 
-                if (baseClient != null) {
-                    if (params.isEditMode()) {
-                        try {
-                            OpdJsonFormUtils.mergeAndSaveClient(baseClient);
-                        } catch (Exception e) {
-                            Timber.e(e);
-                        }
+                if (baseClient != null && params.isEditMode()) {
+                    try {
+                        OpdJsonFormUtils.mergeAndSaveClient(baseClient);
+                    } catch (Exception e) {
+                        Timber.e(e);
                     }
                 }
 
@@ -163,23 +161,21 @@ public class OpdProfileInteractor implements OpdProfileActivityContract.Interact
         }
     }
 
-    private void updateOpenSRPId(String jsonString, RegisterParams params, Client baseClient) {
-        if (params.isEditMode()) {
+    private void updateOpenSRPId(@NonNull String jsonString, @NonNull RegisterParams params, @Nullable Client baseClient) {
+        if (params.isEditMode() && baseClient != null) {
             // Unassign current OPENSRP ID
-            if (baseClient != null) {
-                try {
-                    String newOpenSRPId = baseClient.getIdentifier(OpdJsonFormUtils.OPENSRP_ID).replace("-", "");
-                    String currentOpenSRPId = OpdJsonFormUtils.getString(jsonString, OpdJsonFormUtils.CURRENT_OPENSRP_ID).replace("-", "");
-                    if (!newOpenSRPId.equals(currentOpenSRPId)) {
-                        //OPENSRP ID was changed
-                        OpdLibrary.getInstance().getUniqueIdRepository().open(currentOpenSRPId);
-                    }
-                } catch (Exception e) {//might crash if M_ZEIR
-                    Timber.d(e);
+            try {
+                String newOpenSRPId = baseClient.getIdentifier(OpdJsonFormUtils.OPENSRP_ID).replace("-", "");
+                String currentOpenSRPId = OpdJsonFormUtils.getString(jsonString, OpdJsonFormUtils.CURRENT_OPENSRP_ID).replace("-", "");
+                if (!newOpenSRPId.equals(currentOpenSRPId)) {
+                    //OPENSRP ID was changed
+                    OpdLibrary.getInstance().getUniqueIdRepository().open(currentOpenSRPId);
                 }
+            } catch (Exception e) {//might crash if M_ZEIR
+                Timber.d(e);
             }
-
         }
+
     }
 
     @Nullable

@@ -138,12 +138,12 @@ public class OpdReverseJsonFormUtils {
                 entityHierarchy = new ArrayList<>();
                 entityHierarchy.add(entity);
             } else {
-                entity = LocationHelper.getInstance().getOpenMrsLocationId(entity);
-                entityHierarchy = LocationHelper.getInstance().getOpenMrsLocationHierarchy(entity, true);
+                String locationId = LocationHelper.getInstance().getOpenMrsLocationId(entity);
+                entityHierarchy = LocationHelper.getInstance().getOpenMrsLocationHierarchy(locationId, true);
             }
         }
-        String facilityHierarchyString = AssetHandler.javaToJsonString(entityHierarchy, new TypeToken<List<String>>() {
-        }.getType());
+
+        String facilityHierarchyString = AssetHandler.javaToJsonString(entityHierarchy, new TypeToken<List<String>>() {}.getType());
         if (StringUtils.isNotBlank(facilityHierarchyString)) {
             jsonObject.put(OpdJsonFormUtils.VALUE, facilityHierarchyString);
         }

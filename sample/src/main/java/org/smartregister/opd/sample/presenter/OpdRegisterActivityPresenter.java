@@ -32,7 +32,7 @@ public class OpdRegisterActivityPresenter extends BaseOpdRegisterActivityPresent
     public OpdRegisterActivityPresenter(OpdRegisterActivityContract.View view, OpdRegisterActivityContract.Model model) {
         super(view, model);
         viewReference = new WeakReference<>(view);
-        interactor = new OpdRegisterActivityInteractor(this);
+        interactor = new OpdRegisterActivityInteractor();
         this.model = model;
     }
 

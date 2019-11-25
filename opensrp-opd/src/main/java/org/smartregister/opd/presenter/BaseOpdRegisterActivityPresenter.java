@@ -44,7 +44,7 @@ public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterAct
     @NonNull
     @Override
     public OpdRegisterActivityContract.Interactor createInteractor() {
-        return new BaseOpdRegisterActivityInteractor(this);
+        return new BaseOpdRegisterActivityInteractor();
     }
 
     public void setModel(OpdRegisterActivityContract.Model model) {

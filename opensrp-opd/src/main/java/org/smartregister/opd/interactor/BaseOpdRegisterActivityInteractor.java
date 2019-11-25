@@ -36,17 +36,14 @@ import timber.log.Timber;
 public class BaseOpdRegisterActivityInteractor implements OpdRegisterActivityContract.Interactor {
 
     protected AppExecutors appExecutors;
-    private OpdRegisterActivityContract.Presenter presenter;
 
-
-    public BaseOpdRegisterActivityInteractor(@NonNull OpdRegisterActivityContract.Presenter presenter) {
-        this(presenter, new AppExecutors());
+    public BaseOpdRegisterActivityInteractor() {
+        this(new AppExecutors());
     }
 
     @VisibleForTesting
-    BaseOpdRegisterActivityInteractor(@NonNull OpdRegisterActivityContract.Presenter presenter, AppExecutors appExecutors) {
+    BaseOpdRegisterActivityInteractor(AppExecutors appExecutors) {
         this.appExecutors = appExecutors;
-        this.presenter = presenter;
     }
 
     @Override
@@ -71,17 +68,17 @@ public class BaseOpdRegisterActivityInteractor implements OpdRegisterActivityCon
 
     @Override
     public void getNextUniqueId(final Triple<String, String, String> triple, final OpdRegisterActivityContract.InteractorCallBack callBack) {
-
+        // Do nothing for now, this will be handled by the class that extends this
     }
 
     @Override
     public void onDestroy(boolean isChangingConfiguration) {
-        presenter = null;
+        // Do nothing for now, this will be handled by the class that extends this to nullify the presenter
     }
 
     @Override
     public void saveRegistration(List<OpdEventClient> opdEventClientList, String jsonString, RegisterParams registerParams, OpdRegisterActivityContract.InteractorCallBack callBack) {
-
+        // Do nothing for now, this will be handled by the class that extends this
     }
 
     @Override
