@@ -92,10 +92,6 @@ public class OpdDetailsRepository extends BaseRepository implements OpdDetailsDa
             SQLiteDatabase sqLiteDatabase = getReadableDatabase();
             Cursor cursor = sqLiteDatabase.query(OpdDbConstants.Table.OPD_DETAILS, columns, OpdDetails.BASE_ENTITY_ID + "=? and " + OpdDetails.CURRENT_VISIT_ID + "=?",
                     new String[]{opdDetails.getBaseEntityId(), opdDetails.getCurrentVisitId()}, null, null, null, "1");
-            if (cursor.getCount() == 0) {
-                return null;
-            }
-
             if (cursor.moveToNext()) {
                 details = new org.smartregister.opd.pojos.OpdDetails();
                 details.setId(cursor.getInt(0));
@@ -112,8 +108,8 @@ public class OpdDetailsRepository extends BaseRepository implements OpdDetailsDa
                 details.setCreatedAt(OpdUtils
                         .convertStringToDate(OpdConstants.DateFormat.YYYY_MM_DD_HH_MM_SS,
                                 cursor.getString(6)));
-                cursor.close();
             }
+            cursor.close();
 
         }
         return details;
