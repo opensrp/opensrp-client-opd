@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!--Child register -->
-    <dimen name="child_register_title_size">16sp</dimen>
-    <dimen name="child_register_list_desc_size">16sp</dimen>
-    <dimen name="child_register_list_item_width">120dp</dimen>
+    <!--OPD register -->
+    <dimen name="opd_register_title_size">16sp</dimen>
+    <dimen name="opd_register_list_desc_size">16sp</dimen>
+    <dimen name="opd_register_list_item_width">120dp</dimen>
 
 
     <dimen name="register_list_item_width">130dp</dimen>
