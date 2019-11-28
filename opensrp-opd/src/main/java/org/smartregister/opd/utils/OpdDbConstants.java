@@ -152,6 +152,7 @@ public interface OpdDbConstants {
 
     interface Table {
 
+        String EC_CLIENT = "ec_client";
         String OPD_CHECK_IN = "opd_check_in";
         String OPD_VISIT = "opd_visit";
         String OPD_DETAILS = "opd_details";

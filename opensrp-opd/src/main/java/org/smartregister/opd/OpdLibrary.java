@@ -442,11 +442,9 @@ public class OpdLibrary {
     }
 
     public boolean isPatientInTreatedState(@NonNull String strVisitEndDate) {
-        try {
-            Date visitEndDate = new SimpleDateFormat(OpdConstants.DateFormat.YYYY_MM_DD_HH_MM_SS, Locale.ENGLISH).parse(strVisitEndDate);
+        Date visitEndDate = OpdUtils.convertStringToDate(OpdConstants.DateFormat.YYYY_MM_DD_HH_MM_SS, strVisitEndDate);
+        if (visitEndDate != null) {
             return isPatientInTreatedState(visitEndDate);
-        } catch (ParseException e) {
-            Timber.e(e);
         }
 
         return false;

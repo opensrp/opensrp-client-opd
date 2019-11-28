@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.util.Pair;
+import android.text.TextUtils;
 
 import org.jeasy.rules.api.Facts;
 import org.smartregister.opd.OpdLibrary;
@@ -210,6 +211,7 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
         StringBuilder stringBuilder = new StringBuilder();
         for (OpdVisitSummaryResultModel.Treatment treatment : treatments.values()) {
             if (treatment != null && treatment.getMedicine() != null) {
+                String medicine = treatment.getMedicine();
                 if (stringBuilder.length() > 1) {
                     stringBuilder.append("<br/>");
                 }
@@ -217,25 +219,25 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
                 String medicationTemplate = getString(R.string.single_medicine_visit_preview_summary);
                 String doseOrDurationHtml = getString(R.string.dose_or_duration_html);
 
-                if (medicationTemplate != null) {
+                if (medicationTemplate != null && !TextUtils.isEmpty(medicine)) {
                     stringBuilder.append(String.format(medicationTemplate
-                            , treatment.getMedicine()));
+                            , medicine));
 
                     StringBuilder doseAndDurationText = new StringBuilder();
                     String dosage = treatment.getDosage();
-                    if (dosage != null) {
+                    if (!TextUtils.isEmpty(dosage)) {
                         String medicationDoseTemplate = getString(R.string.medication_dose);
                         if (medicationDoseTemplate != null) {
                             doseAndDurationText.append(String.format(medicationDoseTemplate, dosage));
 
-                            if (treatment.getDuration() != null) {
+                            if (!TextUtils.isEmpty(treatment.getDuration())) {
                                 doseAndDurationText.append(". ");
                             }
                         }
                     }
 
                     String duration = treatment.getDuration();
-                    if (duration != null) {
+                    if (!TextUtils.isEmpty(duration)) {
                         String medicationDurationTemplate = getString(R.string.medication_duration);
                         if (medicationDurationTemplate != null) {
                             doseAndDurationText.append(String.format(medicationDurationTemplate, duration));
@@ -261,7 +263,7 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
 
         while (diseaseIterator.hasNext()) {
             String disease = diseaseIterator.next();
-            if (disease != null) {
+            if (!TextUtils.isEmpty(disease)) {
                 stringBuilder.append(disease);
 
                 if (diseaseIterator.hasNext()) {

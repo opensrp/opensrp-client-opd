@@ -234,4 +234,8 @@ public class OpdConstants extends AllConstants {
     public interface RegisterType {
         String OPD = "opd";
     }
+
+    public interface ClientMapKey {
+        String GENDER = "gender";
+    }
 }

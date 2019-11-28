@@ -21,7 +21,11 @@ import org.smartregister.opd.pojos.RegisterParams;
 import org.smartregister.opd.utils.AppExecutors;
 import org.smartregister.opd.utils.ConfigurationInstancesHelper;
 import org.smartregister.opd.utils.OpdConstants;
+import org.smartregister.opd.utils.OpdDbConstants;
+import org.smartregister.opd.utils.OpdEventUtils;
+import org.smartregister.opd.utils.OpdImageUtils;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
+import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.repository.EventClientRepository;
 import org.smartregister.view.activity.DrishtiApplication;
 
@@ -99,13 +103,15 @@ public class OpdProfileInteractor implements OpdProfileActivityContract.Interact
         String joinedIds = "'" + baseEntityId + "'";
         query = query.replace("%s", joinedIds);
 
-        CommonRepository commonRepository = OpdLibrary.getInstance().context().commonrepository("ec_client");
+        CommonRepository commonRepository = OpdLibrary.getInstance().context().commonrepository(OpdDbConstants.Table.EC_CLIENT);
         Cursor cursor = commonRepository.rawCustomQueryForAdapter(query);
 
         if (cursor != null && cursor.moveToFirst()) {
             CommonPersonObject commonPersonObject = commonRepository.getCommonPersonObjectFromCursor(cursor);
+            String name = commonPersonObject.getColumnmaps().get(OpdDbConstants.KEY.FIRST_NAME)
+                    + " " + commonPersonObject.getColumnmaps().get(OpdDbConstants.KEY.LAST_NAME);
             CommonPersonObjectClient client = new CommonPersonObjectClient(commonPersonObject.getCaseId(),
-                    commonPersonObject.getDetails(), commonPersonObject.getDetails().get("FWHOHFNAME"));
+                    commonPersonObject.getDetails(), name);
             client.setColumnmaps(commonPersonObject.getDetails());
 
             return client;
@@ -145,7 +151,7 @@ public class OpdProfileInteractor implements OpdProfileActivityContract.Interact
 
             long lastSyncTimeStamp = OpdLibrary.getInstance().context().allSharedPreferences().fetchLastUpdatedAtDate(0);
             Date lastSyncDate = new Date(lastSyncTimeStamp);
-            DrishtiApplication.getInstance().getClientProcessor().processClient(OpdLibrary.getInstance().getEcSyncHelper().getEvents(currentFormSubmissionIds));
+            OpdLibrary.getInstance().getClientProcessorForJava().processClient(OpdLibrary.getInstance().getEcSyncHelper().getEvents(currentFormSubmissionIds));
             OpdLibrary.getInstance().context().allSharedPreferences().saveLastUpdatedAtDate(lastSyncDate.getTime());
         } catch (Exception e) {
             Timber.e(e);

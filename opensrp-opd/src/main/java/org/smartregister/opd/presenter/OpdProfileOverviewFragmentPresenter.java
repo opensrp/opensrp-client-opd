@@ -20,6 +20,7 @@ import org.smartregister.opd.utils.FilePath;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.opd.utils.OpdFactsUtil;
+import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.util.DateUtil;
 
 import java.io.IOException;
@@ -113,7 +114,7 @@ public class OpdProfileOverviewFragmentPresenter implements OpdProfileOverviewFr
     public void setDataFromCheckIn(@Nullable OpdCheckIn checkIn, @Nullable OpdVisit visit, @Nullable OpdDetails opdDetails, @NonNull Facts facts) {
         String unknownString = getString(R.string.unknown);
         if (checkIn != null) {
-            if (client != null && AllConstants.FEMALE_GENDER.equalsIgnoreCase(client.getColumnmaps().get("gender"))) {
+            if (client != null && AllConstants.FEMALE_GENDER.equalsIgnoreCase(client.getColumnmaps().get(OpdConstants.ClientMapKey.GENDER))) {
                 OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.PREGNANCY_STATUS, checkIn.getPregnancyStatus());
             }
 
@@ -137,7 +138,7 @@ public class OpdProfileOverviewFragmentPresenter implements OpdProfileOverviewFr
             }
         } else {
             if (client != null && unknownString != null) {
-                if (AllConstants.FEMALE_GENDER.equalsIgnoreCase(client.getColumnmaps().get("gender"))) {
+                if (AllConstants.FEMALE_GENDER.equalsIgnoreCase(client.getColumnmaps().get(OpdConstants.ClientMapKey.GENDER))) {
                     OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.PREGNANCY_STATUS, unknownString);
                 } else {
                     OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.HIV_STATUS, unknownString);
@@ -159,15 +160,12 @@ public class OpdProfileOverviewFragmentPresenter implements OpdProfileOverviewFr
 
     @NonNull
     private String getVisitToAppointmentDateDuration(@NonNull Date visitDate, @NonNull String appointmentDueDateString) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(OpdConstants.DateFormat.YYYY_MM_DD, Locale.US);
-        try {
-            Date appointmentDueDate = dateFormat.parse(appointmentDueDateString);
-
+        Date appointmentDueDate = OpdUtils.convertStringToDate(OpdConstants.DateFormat.YYYY_MM_DD, appointmentDueDateString);
+        if (appointmentDueDate != null) {
             return DateUtil.getDuration(appointmentDueDate.getTime() - visitDate.getTime());
-        } catch (ParseException e) {
-            Timber.e(e);
-            return "";
         }
+
+        return "";
     }
 
     public void setClient(@NonNull CommonPersonObjectClient client) {

@@ -121,7 +121,7 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
             HashMap<String, String> intentKeys = new HashMap<>();
             intentKeys.put(OpdConstants.IntentKey.BASE_ENTITY_ID, caseId);
             intentKeys.put(OpdConstants.IntentKey.ENTITY_TABLE, entityTable);
-            (mProfileView.get()).startFormActivity(form, intentKeys);
+            getProfileView().startFormActivity(form, intentKeys);
         }
     }
 
@@ -154,13 +154,13 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
     public void startForm(@NonNull String formName, @NonNull CommonPersonObjectClient commonPersonObjectClient) {
         Map<String, String> clientMap = commonPersonObjectClient.getColumnmaps();
         HashMap<String, String> injectedValues = new HashMap<>();
-        injectedValues.put("patient_gender", clientMap.get("gender"));
+        injectedValues.put(OpdConstants.JsonFormField.PATIENT_GENDER, clientMap.get(OpdConstants.ClientMapKey.GENDER));
         String entityTable = clientMap.get(OpdConstants.IntentKey.ENTITY_TABLE);
 
         startFormActivity(formName, commonPersonObjectClient.getCaseId(), entityTable, injectedValues);
     }
 
-    public void startFormActivity(String formName, String caseId, String entityTable, HashMap<String, String> injectedValues) {
+    public void startFormActivity(@NonNull String formName, @NonNull String caseId, @NonNull String entityTable, @Nullable HashMap<String, String> injectedValues) {
         if (mProfileView != null) {
             form = null;
             try {
@@ -180,7 +180,7 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
     }
 
     @Override
-    public void saveVisitOrDiagnosisForm(String eventType, Intent data) {
+    public void saveVisitOrDiagnosisForm(@NonNull String eventType, @Nullable Intent data) {
         String jsonString = null;
         OpdEventUtils opdEventUtils = new OpdEventUtils(new AppExecutors());
         if (data != null) {
@@ -242,9 +242,8 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
 
     @Override
     public void onOpdEventSaved() {
-        if (mProfileView != null) {
-            OpdProfileActivityContract.View view = mProfileView.get();
-
+        OpdProfileActivityContract.View view = getProfileView();
+        if (view != null) {
             view.getActionListenerForProfileOverview().onActionReceive();
             view.getActionListenerForVisitFragment().onActionReceive();
             view.hideProgressDialog();
@@ -253,23 +252,26 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
 
     @Override
     public void onUpdateRegistrationBtnCLicked(@NonNull String baseEntityId) {
-        Utils.startAsyncTask(new FetchRegistrationDataTask(new WeakReference<Context>(getProfileView().getContext()), new FetchRegistrationDataTask.OnTaskComplete() {
-            @Override
-            public void onSuccess(@Nullable String client) {
-                Context context = getProfileView().getContext();
+        if (getProfileView() != null) {
+            Utils.startAsyncTask(new FetchRegistrationDataTask(new WeakReference<Context>(getProfileView().getContext()), new FetchRegistrationDataTask.OnTaskComplete() {
+                @Override
+                public void onSuccess(@Nullable String jsonForm) {
+                    OpdMetadata metadata = OpdUtils.metadata();
 
-                OpdMetadata metadata = OpdUtils.metadata();
-                if (metadata != null) {
-                    Intent intent = new Intent(context, metadata.getOpdFormActivity());
-                    Form formParam = new Form();
-                    formParam.setWizard(false);
-                    formParam.setHideSaveLabel(true);
-                    formParam.setNextLabel("");
-                    intent.putExtra(JsonFormConstants.JSON_FORM_KEY.FORM, formParam);
-                    intent.putExtra(JsonFormConstants.JSON_FORM_KEY.JSON, client);
-                    getProfileView().startActivityForResult(intent, OpdJsonFormUtils.REQUEST_CODE_GET_JSON);
+                    OpdProfileActivityContract.View profileView = getProfileView();
+                    if (profileView != null && metadata != null && jsonForm != null) {
+                        Context context = profileView.getContext();
+                        Intent intent = new Intent(context, metadata.getOpdFormActivity());
+                        Form formParam = new Form();
+                        formParam.setWizard(false);
+                        formParam.setHideSaveLabel(true);
+                        formParam.setNextLabel("");
+                        intent.putExtra(JsonFormConstants.JSON_FORM_KEY.FORM, formParam);
+                        intent.putExtra(JsonFormConstants.JSON_FORM_KEY.JSON, jsonForm);
+                        profileView.startActivityForResult(intent, OpdJsonFormUtils.REQUEST_CODE_GET_JSON);
+                    }
                 }
-            }
-        }), new String[]{baseEntityId});
+            }), new String[]{baseEntityId});
+        }
     }
 }

@@ -37,7 +37,7 @@ public class OpdVisitSummaryRepository extends BaseRepository {
 
         Cursor mCursor = null;
         try {
-            SQLiteDatabase db = getWritableDatabase();
+            SQLiteDatabase db = getReadableDatabase();
 
             String[] visitIds = getVisitIds(baseEntityId, pageNo);
 
@@ -115,7 +115,7 @@ public class OpdVisitSummaryRepository extends BaseRepository {
         Cursor mCursor = null;
         int pageCount = 0;
         try {
-            SQLiteDatabase db = getWritableDatabase();
+            SQLiteDatabase db = getReadableDatabase();
 
             String query = String.format("SELECT count(%s) FROM %s WHERE %s = '%s'"
                     , OpdDbConstants.Column.OpdVisit.ID
@@ -130,11 +130,7 @@ public class OpdVisitSummaryRepository extends BaseRepository {
                 if (mCursor != null) {
                     while (mCursor.moveToNext()) {
                         int recordCount = mCursor.getInt(0);
-                        pageCount = recordCount/10;
-
-                        if (recordCount%10 > 0) {
-                            pageCount++;
-                        }
+                        pageCount = (int) Math.ceil(recordCount/10d);
                     }
                 }
             }
@@ -155,7 +151,7 @@ public class OpdVisitSummaryRepository extends BaseRepository {
         ArrayList<String> visitIds = new ArrayList<>();
         Cursor mCursor = null;
         try {
-            SQLiteDatabase db = getWritableDatabase();
+            SQLiteDatabase db = getReadableDatabase();
             int offset = pageNo * 10;
 
             String query = String.format("SELECT %s FROM %s WHERE %s = '%s' ORDER BY %s DESC LIMIT 10 OFFSET %d "

@@ -36,7 +36,7 @@ public interface OpdProfileActivityContract {
 
         void startFormActivity(@Nullable JSONObject form, @NonNull String caseId, @NonNull String entityTable);
 
-        void saveVisitOrDiagnosisForm(String eventType, Intent data);
+        void saveVisitOrDiagnosisForm(@NonNull String eventType, @Nullable Intent data);
 
         void saveUpdateRegistrationForm(@NonNull String jsonString, @NonNull RegisterParams registerParams);
 
@@ -62,7 +62,7 @@ public interface OpdProfileActivityContract {
 
         void openCheckInForm();
 
-        void startFormActivity(JSONObject form, HashMap<String, String> intentKeys);
+        void startFormActivity(@NonNull JSONObject form, @NonNull HashMap<String, String> intentKeys);
 
         OnSendActionToFragment getActionListenerForVisitFragment();
 

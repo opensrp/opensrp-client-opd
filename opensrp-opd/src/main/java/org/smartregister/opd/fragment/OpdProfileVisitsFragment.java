@@ -40,7 +40,7 @@ public class OpdProfileVisitsFragment extends BaseProfileFragment implements Opd
     private Button previousPageBtn;
     private TextView pageCounter;
 
-    public static OpdProfileVisitsFragment newInstance(Bundle bundle) {
+    public static OpdProfileVisitsFragment newInstance(@Nullable Bundle bundle) {
         Bundle args = bundle;
         OpdProfileVisitsFragment fragment = new OpdProfileVisitsFragment();
         if (args == null) {

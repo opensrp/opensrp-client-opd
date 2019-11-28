@@ -33,12 +33,12 @@ public class FetchRegistrationDataTask extends AsyncTask<String, Void, String> {
         return OpdReverseJsonFormUtils.prepareJsonEditOpdRegistrationForm(detailsMap, Arrays.asList(OpdJsonFormUtils.OPENSRP_ID, OpdConstants.JSON_FORM_KEY.BHT_ID), contextWeakReference.get());
     }
 
-    protected void onPostExecute(@Nullable String client) {
-        onTaskComplete.onSuccess(client);
+    protected void onPostExecute(@Nullable String jsonForm) {
+        onTaskComplete.onSuccess(jsonForm);
     }
 
     public interface OnTaskComplete {
 
-        void onSuccess(@Nullable String client);
+        void onSuccess(@Nullable String jsonForm);
     }
 }

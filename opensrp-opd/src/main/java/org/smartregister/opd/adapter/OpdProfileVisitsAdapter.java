@@ -18,6 +18,7 @@ import org.smartregister.opd.R;
 import org.smartregister.opd.domain.YamlConfigItem;
 import org.smartregister.opd.domain.YamlConfigWrapper;
 import org.smartregister.opd.utils.OpdUtils;
+import org.smartregister.util.StringUtil;
 
 import java.util.ArrayList;
 
@@ -57,7 +58,7 @@ public class OpdProfileVisitsAdapter extends RecyclerView.Adapter<OpdProfileVisi
             String group = yamlConfigWrapper.getGroup();
 
             if (!TextUtils.isEmpty(group)) {
-                holder.sectionHeader.setText(processUnderscores(group));
+                holder.sectionHeader.setText(StringUtil.humanize(group));
                 holder.sectionHeader.setVisibility(View.VISIBLE);
             } else {
                 holder.sectionHeader.setVisibility(View.GONE);
@@ -69,7 +70,7 @@ public class OpdProfileVisitsAdapter extends RecyclerView.Adapter<OpdProfileVisi
                     subGroup = OpdUtils.fillTemplate(subGroup, facts);
                 }
 
-                holder.subSectionHeader.setText(processUnderscores(subGroup));
+                holder.subSectionHeader.setText(StringUtil.humanize(subGroup));
                 holder.subSectionHeader.setVisibility(View.VISIBLE);
             } else {
                 holder.subSectionHeader.setVisibility(View.GONE);
@@ -130,10 +131,6 @@ public class OpdProfileVisitsAdapter extends RecyclerView.Adapter<OpdProfileVisi
 
     private int getColor(@ColorRes int colorId) {
         return context.getResources().getColor(colorId);
-    }
-
-    private String processUnderscores(String string) {
-        return string.replace("_", " ").toUpperCase();
     }
 
     private OpdProfileVisitsAdapter.Template getTemplate(String rawTemplate) {
