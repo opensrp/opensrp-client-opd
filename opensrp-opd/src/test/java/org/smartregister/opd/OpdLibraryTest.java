@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -14,16 +15,21 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.Context;
 import org.smartregister.CoreLibrary;
 import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.opd.configuration.OpdConfiguration;
+import org.smartregister.opd.shadows.ShadowOpdLibrary;
 import org.smartregister.opd.utils.OpdConstants;
+import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.repository.Repository;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
@@ -34,6 +40,7 @@ import static org.junit.Assert.assertNull;
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-24
  */
 @RunWith(RobolectricTestRunner.class)
+@Config(shadows = {ShadowOpdLibrary.class})
 public class OpdLibraryTest extends BaseTest {
 
     @Rule
@@ -133,8 +140,7 @@ public class OpdLibraryTest extends BaseTest {
     }
 
 
-/*
-TODO: Fix Robolectric not mocking calendar & date class using shadow class and then these two tests are going to be feasible
+//TODO: Fix Robolectric not mocking calendar & date class using shadow class and then these two tests are going to be feasible
 
     @Test
     public void isPatientInTreatedStateShouldReturnTrueWhenCurrentDateIsBeforeMidnightOfTreatmentDate() throws ParseException {
@@ -143,7 +149,7 @@ TODO: Fix Robolectric not mocking calendar & date class using shadow class and t
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(OpdDbConstants.DATE_FORMAT);
         Date date = simpleDateFormat.parse("2018-10-04 20:23:20");
 
-        ShadowSystemClock.setNanoTime(date.getTime() * 1000000);
+        ShadowOpdLibrary.setMockedTime(date.getTime());
         Assert.assertTrue(OpdLibrary.getInstance().isPatientInTreatedState("2018-10-04 17:23:20"));
     }
 
@@ -154,7 +160,7 @@ TODO: Fix Robolectric not mocking calendar & date class using shadow class and t
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(OpdDbConstants.DATE_FORMAT);
         Date date = simpleDateFormat.parse("2018-10-05 20:23:20");
 
-        ShadowSystemClock.setNanoTime(date.getTime() * 1000000);
+        ShadowOpdLibrary.setMockedTime(date.getTime());
         Assert.assertFalse(OpdLibrary.getInstance().isPatientInTreatedState("2018-10-04 17:23:20"));
-    }*/
+    }
 }

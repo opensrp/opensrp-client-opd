@@ -22,12 +22,8 @@ import org.smartregister.opd.utils.AppExecutors;
 import org.smartregister.opd.utils.ConfigurationInstancesHelper;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;
-import org.smartregister.opd.utils.OpdEventUtils;
-import org.smartregister.opd.utils.OpdImageUtils;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
-import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.repository.EventClientRepository;
-import org.smartregister.view.activity.DrishtiApplication;
 
 import java.util.ArrayList;
 import java.util.Date;

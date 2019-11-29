@@ -3,6 +3,7 @@ package org.smartregister.opd;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 
@@ -49,14 +50,11 @@ import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import id.zelory.compressor.Compressor;
 import timber.log.Timber;
@@ -426,6 +424,7 @@ public class OpdLibrary {
                 OpdConstants.KEY.LAST_NAME, OpdConstants.KEY.GENDER, OpdConstants.KEY.DOB, OpdConstants.KEY.BASE_ENTITY_ID, OpdDbConstants.KEY.OPENSRP_ID);
         return lookUpQueryForChild + " union all " + lookUpQueryForMother + " union all " + lookUpQueryForOpdClient;
     }
+
     /**
      * This method enables us to configure how-long ago we should consider a valid check-in so that
      * we enable the next step which is DIAGNOSE & TREAT. This method returns the latest date that a check-in
@@ -462,7 +461,13 @@ public class OpdLibrary {
 
         // next day
         date.add(Calendar.DAY_OF_MONTH, 1);
-        return new Date().before(date.getTime());
+        return getDateNow().before(date.getTime());
+    }
+
+    @VisibleForTesting
+    @NonNull
+    protected Date getDateNow() {
+        return new Date();
     }
 
     /**

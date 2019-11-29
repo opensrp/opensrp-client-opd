@@ -25,12 +25,9 @@ import org.smartregister.util.DateUtil;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import timber.log.Timber;
 

@@ -1,4 +1,4 @@
-package org.smartregister.opd.sample.activity;
+package org.smartregister.opd.sample.utils;
 
 public interface SampleConstants {
     interface KEY {
