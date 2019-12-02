@@ -155,7 +155,7 @@ public class OpdProfileInteractor implements OpdProfileActivityContract.Interact
     }
 
     private void addImageLocation(@NonNull String jsonString, @Nullable Client baseClient, @Nullable Event baseEvent) {
-        if (baseClient != null || baseEvent != null) {
+        if (baseClient != null && baseEvent != null) {
             String imageLocation = OpdJsonFormUtils.getFieldValue(jsonString, OpdConstants.KEY.PHOTO);
             if (StringUtils.isNotBlank(imageLocation)) {
                 OpdJsonFormUtils.saveImage(baseEvent.getProviderId(), baseClient.getBaseEntityId(), imageLocation);
