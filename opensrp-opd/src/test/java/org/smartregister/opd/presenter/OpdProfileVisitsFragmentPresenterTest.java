@@ -3,7 +3,6 @@ package org.smartregister.opd.presenter;
 import android.support.v4.util.Pair;
 
 import org.jeasy.rules.api.Facts;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -47,7 +46,7 @@ public class OpdProfileVisitsFragmentPresenterTest extends BaseTest {
         presenter.onDestroy(isChangingConfiguration);
 
         Mockito.verify(interactor, Mockito.times(1)).onDestroy(Mockito.eq(isChangingConfiguration));
-        Assert.assertNull(ReflectionHelpers.getField(presenter, "mProfileInteractor"));
+        assertNull(ReflectionHelpers.getField(presenter, "mProfileInteractor"));
     }
 
     @Test
