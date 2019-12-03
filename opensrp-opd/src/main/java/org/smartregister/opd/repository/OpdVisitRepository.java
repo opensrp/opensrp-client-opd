@@ -55,7 +55,7 @@ public class OpdVisitRepository extends BaseRepository implements OpdVisitDao {
     }
 
 
-    public ContentValues createValuesFor(@NonNull org.smartregister.opd.pojos.OpdVisit visit) {
+    public ContentValues createValuesFor(@NonNull org.smartregister.opd.pojo.OpdVisit visit) {
         ContentValues contentValues = new ContentValues();
 
         contentValues.put(OpdVisit.ID, visit.getId());
@@ -69,8 +69,8 @@ public class OpdVisitRepository extends BaseRepository implements OpdVisitDao {
     }
 
     @NonNull
-    protected org.smartregister.opd.pojos.OpdVisit getVisitResult(@NonNull Cursor cursor) {
-        org.smartregister.opd.pojos.OpdVisit visit = new org.smartregister.opd.pojos.OpdVisit();
+    protected org.smartregister.opd.pojo.OpdVisit getVisitResult(@NonNull Cursor cursor) {
+        org.smartregister.opd.pojo.OpdVisit visit = new org.smartregister.opd.pojo.OpdVisit();
 
         visit.setId(cursor.getString(cursor.getColumnIndex(OpdVisit.ID)));
         visit.setVisitDate(new Date(cursor.getLong(cursor.getColumnIndex(OpdVisit.VISIT_DATE))));
@@ -84,10 +84,10 @@ public class OpdVisitRepository extends BaseRepository implements OpdVisitDao {
 
     @Nullable
     @Override
-    public org.smartregister.opd.pojos.OpdVisit getLatestVisit(@NonNull String clientBaseEntityId) {
+    public org.smartregister.opd.pojo.OpdVisit getLatestVisit(@NonNull String clientBaseEntityId) {
 
         Cursor mCursor = null;
-        org.smartregister.opd.pojos.OpdVisit visit = null;
+        org.smartregister.opd.pojo.OpdVisit visit = null;
         try {
             SQLiteDatabase db = getWritableDatabase();
 
@@ -115,7 +115,7 @@ public class OpdVisitRepository extends BaseRepository implements OpdVisitDao {
         return visit;
     }
 
-    public boolean addVisit(@NonNull org.smartregister.opd.pojos.OpdVisit visit) {
+    public boolean addVisit(@NonNull org.smartregister.opd.pojo.OpdVisit visit) {
         ContentValues contentValues = createValuesFor(visit);
 
         //TODO: Check for duplicates

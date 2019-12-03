@@ -10,8 +10,14 @@ import android.util.DisplayMetrics;
 import org.apache.commons.lang3.StringUtils;
 import org.jeasy.rules.api.Facts;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.smartregister.domain.db.Event;
+import org.smartregister.domain.db.Obs;
 import org.smartregister.opd.OpdLibrary;
-import org.smartregister.opd.pojos.OpdMetadata;
+import org.smartregister.opd.pojo.CompositeObs;
+import org.smartregister.opd.pojo.OpdMetadata;
 import org.smartregister.util.JsonFormUtils;
 
 import java.text.DateFormat;
@@ -150,6 +156,68 @@ public class OpdUtils extends org.smartregister.util.Utils {
             }
         }
         return age;
+    }
+
+    public static int buildRepeatingGroupTests(JSONObject step1JsonObject) throws JSONException {
+        ArrayList<String> keysArrayList = new ArrayList<>();
+        JSONArray fields = step1JsonObject.optJSONArray(OpdJsonFormUtils.FIELDS);
+        JSONObject jsonObject = JsonFormUtils.getFieldJSONObject(fields, "tests_repeating_group");
+        JSONArray jsonArray = jsonObject.optJSONArray("value");
+        int repeatedGroupNum = 0;
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject valueField = jsonArray.optJSONObject(i);
+            String fieldKey = valueField.optString("key");
+            keysArrayList.add(fieldKey);
+        }
+
+        for (int k = 0; k < fields.length(); k++) {
+            JSONObject valueField = fields.optJSONObject(k);
+            String fieldKey = valueField.optString("key");
+            String fieldValue = valueField.optString("value");
+
+            if (fieldKey.contains("_")) {
+                fieldKey = fieldKey.substring(0, fieldKey.lastIndexOf("_"));
+                if (keysArrayList.contains(fieldKey) && StringUtils.isNotBlank(fieldValue)) {
+                    valueField.put("key", fieldKey);
+                    repeatedGroupNum ++;
+                }
+            }
+        }
+        //divide by 2 to count number of test&&result pair
+        repeatedGroupNum = repeatedGroupNum / 2;
+        return repeatedGroupNum;
+    }
+
+    public static List<CompositeObs> getAllObsObject(@NonNull Event event) {
+        List<Obs> obs = event.getObs();
+        List<CompositeObs> compositeObsArrayList = new ArrayList<>();
+        for (Obs observation : obs) {
+            CompositeObs compositeObs = new CompositeObs();
+            String key = observation.getFormSubmissionField();
+            compositeObs.setFormSubmissionFieldKey(key);
+            List<Object> values = observation.getValues();
+            String value = "";
+            if (values.size() > 0) {
+                String obsValue = (String) values.get(0);
+                if(StringUtils.isNotBlank(obsValue)){
+                    value = obsValue;
+                }
+            }
+
+            List<Object> humanReadableValues = observation.getHumanReadableValues();
+            if (humanReadableValues.size() > 0) {
+                String humanReadableValue = (String) humanReadableValues.get(0);
+                if(StringUtils.isNotBlank(humanReadableValue)){
+                    value = humanReadableValue;
+                }
+            }
+
+            compositeObs.setValue(value);
+            compositeObsArrayList.add(compositeObs);
+        }
+
+        return compositeObsArrayList;
     }
 
 }

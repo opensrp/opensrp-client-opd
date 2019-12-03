@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 
 import org.apache.commons.lang3.tuple.Triple;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
-import org.smartregister.opd.pojos.RegisterParams;
+import org.smartregister.opd.pojo.RegisterParams;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-20

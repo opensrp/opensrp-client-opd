@@ -23,7 +23,7 @@ import org.smartregister.opd.activity.BaseOpdProfileActivity;
 import org.smartregister.opd.configuration.BaseOpdRegisterProviderMetadata;
 import org.smartregister.opd.configuration.OpdConfiguration;
 import org.smartregister.opd.configuration.OpdRegisterQueryProviderContract;
-import org.smartregister.opd.pojos.OpdMetadata;
+import org.smartregister.opd.pojo.OpdMetadata;
 import org.smartregister.repository.Repository;
 
 

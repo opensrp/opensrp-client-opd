@@ -33,7 +33,7 @@ import org.smartregister.opd.R;
 import org.smartregister.opd.activity.BaseOpdFormActivity;
 import org.smartregister.opd.adapter.ClientLookUpListAdapter;
 import org.smartregister.opd.interactor.OpdFormInteractor;
-import org.smartregister.opd.pojos.OpdMetadata;
+import org.smartregister.opd.pojo.OpdMetadata;
 import org.smartregister.opd.presenter.OpdFormFragmentPresenter;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;

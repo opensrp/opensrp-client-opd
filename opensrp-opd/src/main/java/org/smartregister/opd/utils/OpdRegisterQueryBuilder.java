@@ -3,7 +3,7 @@ package org.smartregister.opd.utils;
 import android.support.annotation.NonNull;
 
 import org.smartregister.cursoradapter.SmartRegisterQueryBuilder;
-import org.smartregister.opd.pojos.InnerJoinObject;
+import org.smartregister.opd.pojo.InnerJoinObject;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-16

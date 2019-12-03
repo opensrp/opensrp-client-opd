@@ -9,8 +9,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.domain.tag.FormTag;
-import org.smartregister.opd.pojos.OpdEventClient;
-import org.smartregister.opd.pojos.RegisterParams;
+import org.smartregister.opd.pojo.OpdEventClient;
+import org.smartregister.opd.pojo.RegisterParams;
 import org.smartregister.view.contract.BaseRegisterContract;
 
 import java.util.HashMap;

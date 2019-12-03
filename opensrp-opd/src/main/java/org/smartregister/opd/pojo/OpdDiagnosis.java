@@ -1,4 +1,4 @@
-package org.smartregister.opd.pojos;
+package org.smartregister.opd.pojo;
 
 public class OpdDiagnosis {
     private String id;

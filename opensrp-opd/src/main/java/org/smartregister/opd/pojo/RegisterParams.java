@@ -1,4 +1,4 @@
-package org.smartregister.opd.pojos;
+package org.smartregister.opd.pojo;
 
 import org.smartregister.domain.tag.FormTag;
 import org.smartregister.repository.BaseRepository;

@@ -9,7 +9,7 @@ import org.smartregister.domain.tag.FormTag;
 import org.smartregister.location.helper.LocationHelper;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
-import org.smartregister.opd.pojos.OpdEventClient;
+import org.smartregister.opd.pojo.OpdEventClient;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.util.FormUtils;
 import org.smartregister.util.Utils;

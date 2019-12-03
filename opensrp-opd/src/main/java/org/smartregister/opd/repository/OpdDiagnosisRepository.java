@@ -7,7 +7,7 @@ import net.sqlcipher.database.SQLiteDatabase;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.smartregister.opd.dao.OpdDiagnosisDao;
-import org.smartregister.opd.pojos.OpdDiagnosis;
+import org.smartregister.opd.pojo.OpdDiagnosis;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.repository.BaseRepository;
 import org.smartregister.repository.Repository;

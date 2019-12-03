@@ -18,8 +18,8 @@ import org.smartregister.opd.configuration.OpdConfiguration;
 import org.smartregister.opd.domain.YamlConfig;
 import org.smartregister.opd.domain.YamlConfigItem;
 import org.smartregister.opd.helper.OpdRulesEngineHelper;
-import org.smartregister.opd.pojos.OpdCheckIn;
-import org.smartregister.opd.pojos.OpdDiagnosisAndTreatmentForm;
+import org.smartregister.opd.pojo.OpdCheckIn;
+import org.smartregister.opd.pojo.OpdDiagnosisAndTreatmentForm;
 import org.smartregister.opd.repository.OpdCheckInRepository;
 import org.smartregister.opd.repository.OpdDetailsRepository;
 import org.smartregister.opd.repository.OpdDiagnosisAndTreatmentFormRepository;
@@ -289,7 +289,10 @@ public class OpdLibrary {
 
     public List<Event> processOpdDiagnosisAndTreatmentForm(@NonNull String jsonString, @NonNull Intent data) throws JSONException {
         JSONObject jsonFormObject = new JSONObject(jsonString);
+
         JSONObject step1JsonObject = jsonFormObject.optJSONObject(OpdConstants.JSON_FORM_EXTRA.STEP1);
+
+        int repeatedGroupNum = OpdUtils.buildRepeatingGroupTests(step1JsonObject);
 
         JSONObject step2JsonObject = jsonFormObject.optJSONObject(OpdConstants.JSON_FORM_EXTRA.STEP2);
 
@@ -301,70 +304,78 @@ public class OpdLibrary {
 
         OpdCheckIn opdCheckIn = OpdLibrary.getInstance().getCheckInRepository().getLatestCheckIn(entityId);
 
-        String visitId = opdCheckIn.getVisitId();
+        if (opdCheckIn != null) {
 
-        List<JSONObject> steps = Arrays.asList(step1JsonObject, step2JsonObject, step3JsonObject, step4JsonObject);
+            String visitId = opdCheckIn.getVisitId();
 
-        FormTag formTag = OpdJsonFormUtils.formTag(OpdUtils.getAllSharedPreferences());
+            List<JSONObject> steps = Arrays.asList(step1JsonObject, step2JsonObject, step3JsonObject, step4JsonObject);
 
-        List<Event> eventList = new ArrayList<>();
+            FormTag formTag = OpdJsonFormUtils.formTag(OpdUtils.getAllSharedPreferences());
 
-        for (int i = 0; i < steps.size(); i++) {
-            JSONObject step = steps.get(i);
-            JSONArray fields = step.getJSONArray(OpdJsonFormUtils.FIELDS);
-            String valueIds = null;
-            JSONObject jsonObject;
-            JSONArray valueJsonArray = null;
-            if (i == 0 || i == 3) {
-                valueIds = OpdUtils.generateNIds(1);
-            } else if (i == 1) {
-                jsonObject = JsonFormUtils.getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.DISEASE_CODE);
-                JSONObject jsonDiagnosisType = JsonFormUtils.getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.DIAGNOSIS_TYPE);
-                String diagnosisType = jsonDiagnosisType.optString(OpdConstants.KEY.VALUE);
-                String value = jsonObject.optString(OpdConstants.KEY.VALUE);
-                if (StringUtils.isBlank(value) || (new JSONArray(value).length() == 0)) {
+            List<Event> eventList = new ArrayList<>();
+
+            for (int i = 0; i < steps.size(); i++) {
+                JSONObject step = steps.get(i);
+                JSONArray fields = step.getJSONArray(OpdJsonFormUtils.FIELDS);
+                String valueIds = null;
+                JSONObject jsonObject;
+                JSONArray valueJsonArray = null;
+                if (i == 0) {
+                    valueIds = OpdUtils.generateNIds(repeatedGroupNum);
+                } else if (i == 1) {
+                    jsonObject = JsonFormUtils.getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.DISEASE_CODE);
+                    JSONObject jsonDiagnosisType = JsonFormUtils.getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.DIAGNOSIS_TYPE);
+                    String diagnosisType = jsonDiagnosisType.optString(OpdConstants.KEY.VALUE);
+                    String value = jsonObject.optString(OpdConstants.KEY.VALUE);
+                    if (StringUtils.isBlank(value) || (new JSONArray(value).length() == 0)) {
+                        valueIds = OpdUtils.generateNIds(1);
+                    } else {
+                        valueJsonArray = new JSONArray(value);
+                        JSONArray jsonArrayWithOpenMrsIds = addOpenMrsEntityId(diagnosisType.toLowerCase(), valueJsonArray);
+                        jsonObject.put(OpdConstants.KEY.VALUE, jsonArrayWithOpenMrsIds);
+                        valueIds = OpdUtils.generateNIds(valueJsonArray.length());
+                    }
+                } else if (i == 2) {
+                    jsonObject = JsonFormUtils.getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.MEDICINE);
+                    jsonObject.put(AllConstants.TYPE, AllConstants.MULTI_SELECT_LIST);
+                    String value = jsonObject.optString(OpdConstants.KEY.VALUE);
+                    if (StringUtils.isBlank(value) || (new JSONArray(value).length() == 0)) {
+                        valueIds = OpdUtils.generateNIds(1);
+                    } else {
+                        valueJsonArray = new JSONArray(value);
+                        valueIds = OpdUtils.generateNIds(valueJsonArray.length());
+                    }
+                } else if (i == 3) {
                     valueIds = OpdUtils.generateNIds(1);
-                } else {
-                    valueJsonArray = new JSONArray(value);
-                    JSONArray jsonArrayWithOpenMrsIds = addOpenMrsEntityId(diagnosisType.toLowerCase(), valueJsonArray);
-                    jsonObject.put(OpdConstants.KEY.VALUE, jsonArrayWithOpenMrsIds);
-                    valueIds = OpdUtils.generateNIds(valueJsonArray.length());
                 }
-            } else if (i == 2) {
-                jsonObject = JsonFormUtils.getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.MEDICINE);
-                jsonObject.put(AllConstants.TYPE, AllConstants.MULTI_SELECT_LIST);
-                String value = jsonObject.optString(OpdConstants.KEY.VALUE);
-                if (StringUtils.isBlank(value) || (new JSONArray(value).length() == 0)) {
-                    valueIds = OpdUtils.generateNIds(1);
-                } else {
-                    valueJsonArray = new JSONArray(value);
-                    valueIds = OpdUtils.generateNIds(valueJsonArray.length());
+                Event baseEvent = JsonFormUtils.createEvent(fields, jsonFormObject.getJSONObject(METADATA),
+                        formTag, entityId, getDiagnosisAndTreatmentEventArray()[i], getDiagnosisAndTreatmentTableArray()[i]);
+                OpdJsonFormUtils.tagSyncMetadata(baseEvent);
+                baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_ID, visitId);
+                baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.ID, valueIds);
+                if (valueJsonArray != null) {
+                    baseEvent.addDetails(OpdConstants.KEY.VALUE, valueJsonArray.toString());
                 }
-            }
-            Event baseEvent = JsonFormUtils.createEvent(fields, jsonFormObject.getJSONObject(METADATA),
-                    formTag, entityId, getDiagnosisAndTreatmentEventArray()[i], getDiagnosisAndTreatmentTableArray()[i]);
-            OpdJsonFormUtils.tagSyncMetadata(baseEvent);
-            baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_ID, visitId);
-            baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.ID, valueIds);
-            if (valueJsonArray != null) {
-                baseEvent.addDetails(OpdConstants.KEY.VALUE, valueJsonArray.toString());
+
+                eventList.add(baseEvent);
             }
 
-            eventList.add(baseEvent);
+            //remove any saved sessions
+            OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm = new OpdDiagnosisAndTreatmentForm(entityId);
+            OpdLibrary.getInstance().getOpdDiagnosisAndTreatmentFormRepository().delete(opdDiagnosisAndTreatmentForm);
+
+            Event closeOpdVisit = JsonFormUtils.createEvent(new JSONArray(), new JSONObject(),
+                    formTag, entityId, OpdConstants.EventType.CLOSE_OPD_VISIT, "");
+            OpdJsonFormUtils.tagSyncMetadata(closeOpdVisit);
+            closeOpdVisit.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_ID, visitId);
+            closeOpdVisit.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_END_DATE, OpdUtils.convertDate(new Date(), OpdConstants.DateFormat.YYYY_MM_DD_HH_MM_SS));
+            eventList.add(closeOpdVisit);
+
+            return eventList;
+        } else {
+            Timber.e("Corresponding OpdCheckIn for EntityId %s is missing", entityId);
+            return null;
         }
-
-        //remove any saved sessions
-        OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm = new OpdDiagnosisAndTreatmentForm(entityId);
-        OpdLibrary.getInstance().getOpdDiagnosisAndTreatmentFormRepository().delete(opdDiagnosisAndTreatmentForm);
-
-        Event closeOpdVisit = JsonFormUtils.createEvent(new JSONArray(), new JSONObject(),
-                formTag, entityId, OpdConstants.EventType.CLOSE_OPD_VISIT, "");
-        OpdJsonFormUtils.tagSyncMetadata(closeOpdVisit);
-        closeOpdVisit.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_ID, visitId);
-        closeOpdVisit.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_END_DATE, OpdUtils.convertDate(new Date(), OpdConstants.DateFormat.YYYY_MM_DD_HH_MM_SS));
-        eventList.add(closeOpdVisit);
-
-        return eventList;
     }
 
     private JSONArray addOpenMrsEntityId(String diagnosisType, JSONArray jsonArray) {

@@ -52,7 +52,7 @@ public class OpdDetailsRepository extends BaseRepository implements OpdDetailsDa
     }
 
     @NonNull
-    public ContentValues createValuesFor(@NonNull org.smartregister.opd.pojos.OpdDetails opdDetails) {
+    public ContentValues createValuesFor(@NonNull org.smartregister.opd.pojo.OpdDetails opdDetails) {
         ContentValues contentValues = new ContentValues();
 
         if (opdDetails.getId() != 0) {
@@ -75,7 +75,7 @@ public class OpdDetailsRepository extends BaseRepository implements OpdDetailsDa
     }
 
     @Override
-    public boolean saveOrUpdate(@NonNull org.smartregister.opd.pojos.OpdDetails opdDetails) {
+    public boolean saveOrUpdate(@NonNull org.smartregister.opd.pojo.OpdDetails opdDetails) {
         ContentValues contentValues = createValuesFor(opdDetails);
 
         SQLiteDatabase database = getWritableDatabase();
@@ -86,14 +86,14 @@ public class OpdDetailsRepository extends BaseRepository implements OpdDetailsDa
 
     @Nullable
     @Override
-    public org.smartregister.opd.pojos.OpdDetails findOne(@NonNull org.smartregister.opd.pojos.OpdDetails opdDetails) {
-        org.smartregister.opd.pojos.OpdDetails details = null;
+    public org.smartregister.opd.pojo.OpdDetails findOne(@NonNull org.smartregister.opd.pojo.OpdDetails opdDetails) {
+        org.smartregister.opd.pojo.OpdDetails details = null;
         if (opdDetails.getCurrentVisitId() != null && opdDetails.getBaseEntityId() != null) {
             SQLiteDatabase sqLiteDatabase = getReadableDatabase();
             Cursor cursor = sqLiteDatabase.query(OpdDbConstants.Table.OPD_DETAILS, columns, OpdDetails.BASE_ENTITY_ID + "=? and " + OpdDetails.CURRENT_VISIT_ID + "=?",
                     new String[]{opdDetails.getBaseEntityId(), opdDetails.getCurrentVisitId()}, null, null, null, "1");
             if (cursor.moveToNext()) {
-                details = new org.smartregister.opd.pojos.OpdDetails();
+                details = new org.smartregister.opd.pojo.OpdDetails();
                 details.setId(cursor.getInt(0));
                 details.setBaseEntityId(cursor.getString(1));
                 details.setPendingDiagnoseAndTreat((cursor.getInt(2) == 1));
@@ -116,12 +116,12 @@ public class OpdDetailsRepository extends BaseRepository implements OpdDetailsDa
     }
 
     @Override
-    public boolean delete(org.smartregister.opd.pojos.OpdDetails opdDetails) {
+    public boolean delete(org.smartregister.opd.pojo.OpdDetails opdDetails) {
         throw new NotImplementedException("Not Implemented");
     }
 
     @Override
-    public List<org.smartregister.opd.pojos.OpdDetails> findAll() {
+    public List<org.smartregister.opd.pojo.OpdDetails> findAll() {
         throw new NotImplementedException("Not Implemented");
     }
 }

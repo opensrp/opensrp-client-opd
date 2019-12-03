@@ -14,7 +14,7 @@ import org.smartregister.domain.FetchStatus;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
 import org.smartregister.opd.interactor.BaseOpdRegisterActivityInteractor;
-import org.smartregister.opd.pojos.OpdDiagnosisAndTreatmentForm;
+import org.smartregister.opd.pojo.OpdDiagnosisAndTreatmentForm;
 import org.smartregister.opd.utils.OpdConstants;
 
 import java.lang.ref.WeakReference;

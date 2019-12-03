@@ -5,8 +5,8 @@ import android.support.annotation.Nullable;
 
 import org.jeasy.rules.api.Facts;
 import org.smartregister.opd.domain.YamlConfigWrapper;
-import org.smartregister.opd.pojos.OpdCheckIn;
-import org.smartregister.opd.pojos.OpdVisit;
+import org.smartregister.opd.pojo.OpdCheckIn;
+import org.smartregister.opd.pojo.OpdVisit;
 
 import java.util.List;
 
