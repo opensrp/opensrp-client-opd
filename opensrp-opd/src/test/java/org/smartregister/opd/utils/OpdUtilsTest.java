@@ -9,7 +9,6 @@ import com.vijay.jsonwizard.domain.Form;
 import org.jeasy.rules.api.Facts;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -165,7 +164,7 @@ public class OpdUtilsTest {
                 "{\"key\":\"diagnostic_result_specify_128040f1b4034311b34b6ea65a81d3aa\",\"value\":\"wer\"}]}";
         JSONObject step1JsonObject = new JSONObject(strStep1JsonObject);
         int repeatingGroupNum = OpdUtils.buildRepeatingGroupTests(step1JsonObject);
-        Assert.assertEquals(1, repeatingGroupNum);
+        assertEquals(1, repeatingGroupNum);
     }
 
     @Test
@@ -188,12 +187,12 @@ public class OpdUtilsTest {
         event.addObs(obs1);
 
         List<CompositeObs> compositeObsList = OpdUtils.getAllObsObject(event);
-        Assert.assertEquals(2, compositeObsList.size());
-        Assert.assertEquals("positive", compositeObsList.get(0).getValue());
-        Assert.assertEquals(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER, compositeObsList.get(0).getFormSubmissionFieldKey());
+        assertEquals(2, compositeObsList.size());
+        assertEquals("positive", compositeObsList.get(0).getValue());
+        assertEquals(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER, compositeObsList.get(0).getFormSubmissionFieldKey());
 
-        Assert.assertEquals("malaria", compositeObsList.get(1).getValue());
-        Assert.assertEquals(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST, compositeObsList.get(1).getFormSubmissionFieldKey());
+        assertEquals("malaria", compositeObsList.get(1).getValue());
+        assertEquals(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST, compositeObsList.get(1).getFormSubmissionFieldKey());
 
     }
 
