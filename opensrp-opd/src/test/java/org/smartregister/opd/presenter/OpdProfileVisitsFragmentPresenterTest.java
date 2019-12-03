@@ -13,7 +13,7 @@ import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.opd.BaseTest;
 import org.smartregister.opd.contract.OpdProfileVisitsFragmentContract;
 import org.smartregister.opd.domain.YamlConfigWrapper;
-import org.smartregister.opd.pojos.OpdVisitSummary;
+import org.smartregister.opd.pojo.OpdVisitSummary;
 
 import java.util.ArrayList;
 import java.util.List;

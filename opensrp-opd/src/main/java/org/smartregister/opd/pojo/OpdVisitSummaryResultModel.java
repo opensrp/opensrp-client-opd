@@ -1,4 +1,6 @@
-package org.smartregister.opd.pojos;
+package org.smartregister.opd.pojo;
+
+import org.smartregister.opd.pojo.OpdVisitSummary;
 
 import java.util.Date;
 

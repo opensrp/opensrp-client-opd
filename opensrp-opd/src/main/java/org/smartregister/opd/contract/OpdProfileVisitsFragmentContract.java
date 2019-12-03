@@ -7,8 +7,8 @@ import android.support.v4.util.Pair;
 
 import org.jeasy.rules.api.Facts;
 import org.smartregister.opd.domain.YamlConfigWrapper;
-import org.smartregister.opd.pojos.OpdVisitSummary;
-import org.smartregister.opd.pojos.OpdVisitSummaryResultModel;
+import org.smartregister.opd.pojo.OpdVisitSummary;
+import org.smartregister.opd.pojo.OpdVisitSummaryResultModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;

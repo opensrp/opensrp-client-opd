@@ -5,7 +5,7 @@ import android.support.annotation.Nullable;
 
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.contract.OpdProfileVisitsFragmentContract;
-import org.smartregister.opd.pojos.OpdVisitSummary;
+import org.smartregister.opd.pojo.OpdVisitSummary;
 import org.smartregister.opd.utils.AppExecutors;
 
 import java.util.List;
