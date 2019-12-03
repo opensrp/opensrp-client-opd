@@ -23,7 +23,7 @@ import org.smartregister.opd.contract.OpdProfileActivityContract;
 import org.smartregister.opd.fragment.OpdProfileOverviewFragment;
 import org.smartregister.opd.fragment.OpdProfileVisitsFragment;
 import org.smartregister.opd.listener.OnSendActionToFragment;
-import org.smartregister.opd.pojos.RegisterParams;
+import org.smartregister.opd.pojo.RegisterParams;
 import org.smartregister.opd.presenter.OpdProfileActivityPresenter;
 import org.smartregister.opd.utils.ConfigurationInstancesHelper;
 import org.smartregister.opd.utils.OpdConstants;
