@@ -37,7 +37,7 @@ public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements 
         opd_btn_save_drug = view.findViewById(R.id.opd_btn_save_drug);
 
         TextView txtSelectedItemInMultiSelectList = view.findViewById(R.id.txtSelectedItemInMultiSelectList);
-        txtSelectedItemInMultiSelectList.setText(multiSelectItem.getKey());
+        txtSelectedItemInMultiSelectList.setText(multiSelectItem.getText());
         final EditText edtTreatmentDuration = view.findViewById(R.id.edtTreatmentDuration);
         final EditText edtTreatmentDosage = view.findViewById(R.id.edtTreatmentDosage);
         edtTreatmentDosage.addTextChangedListener(this);
