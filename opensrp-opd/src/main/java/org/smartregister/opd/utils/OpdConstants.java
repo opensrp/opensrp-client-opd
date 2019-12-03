@@ -145,6 +145,7 @@ public class OpdConstants extends AllConstants {
 
         public static final String DIAGNOSTIC_TEST_RESULT_GLUCOSE = "diagnostic_test_result_glucose";
         public static final String DIAGNOSTIC_TEST_RESULT_SPINNER_BLOOD_TYPE = "diagnostic_test_result_spinner_blood_type";
+        public static String TESTS_REPEATING_GROUP = "tests_repeating_group";
     }
 
     public static class JsonFormNameUtils {

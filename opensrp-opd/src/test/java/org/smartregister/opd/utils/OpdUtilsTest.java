@@ -9,6 +9,7 @@ import com.vijay.jsonwizard.domain.Form;
 import org.jeasy.rules.api.Facts;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -20,13 +21,17 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.util.ReflectionHelpers;
+import org.smartregister.domain.db.Event;
+import org.smartregister.domain.db.Obs;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.activity.BaseOpdFormActivity;
 import org.smartregister.opd.configuration.OpdConfiguration;
+import org.smartregister.opd.pojo.CompositeObs;
 import org.smartregister.opd.pojo.OpdMetadata;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -109,7 +114,7 @@ public class OpdUtilsTest {
     }
 
     @Test
-    public void testGetClientAge(){
+    public void testGetClientAge() {
         assertEquals("13", OpdUtils.getClientAge("13y 4m", "y"));
         assertEquals("4m", OpdUtils.getClientAge("4m", "y"));
         assertEquals("5", OpdUtils.getClientAge("5y 4w", "y"));
@@ -150,6 +155,46 @@ public class OpdUtilsTest {
         assertTrue(form.isWizard());
         assertEquals(OpdConstants.EventType.DIAGNOSIS_AND_TREAT, form.getName());
         assertEquals(baseEntityId, actualResult.getStringExtra(OpdConstants.IntentKey.BASE_ENTITY_ID));
+    }
+
+    @Test
+    public void buildRepeatingGroupTests() throws JSONException {
+        String strStep1JsonObject = "{\"fields\":[{\"key\":\"tests_repeating_group\",\"type\":\"repeating_group\",\"value\"" +
+                ":[{\"key\":\"diagnostic_test\"},{\"key\":\"diagnostic_result_specify\"}]}," +
+                "{\"key\":\"diagnostic_test_128040f1b4034311b34b6ea65a81d3aa\",\"values\":[\"Ultra sound\"],\"value\":\"Ultra sound\"}," +
+                "{\"key\":\"diagnostic_result_specify_128040f1b4034311b34b6ea65a81d3aa\",\"value\":\"wer\"}]}";
+        JSONObject step1JsonObject = new JSONObject(strStep1JsonObject);
+        int repeatingGroupNum = OpdUtils.buildRepeatingGroupTests(step1JsonObject);
+        Assert.assertEquals(1, repeatingGroupNum);
+    }
+
+    @Test
+    public void getAllObsObject() {
+        Event event = new Event();
+        Obs obs = new Obs();
+        obs.setFormSubmissionField(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER);
+        obs.setValue("positive");
+        obs.addToHumanReadableValuesList("");
+        obs.setFieldDataType("text");
+        obs.setFieldCode(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER);
+        event.addObs(obs);
+
+        Obs obs1 = new Obs();
+        obs1.setFormSubmissionField(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST);
+        obs1.setValue("malaria");
+        obs1.setFieldDataType("text");
+        obs1.addToHumanReadableValuesList("");
+        obs1.setFieldCode(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST);
+        event.addObs(obs1);
+
+        List<CompositeObs> compositeObsList = OpdUtils.getAllObsObject(event);
+        Assert.assertEquals(2, compositeObsList.size());
+        Assert.assertEquals("positive", compositeObsList.get(0).getValue());
+        Assert.assertEquals(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER, compositeObsList.get(0).getFormSubmissionFieldKey());
+
+        Assert.assertEquals("malaria", compositeObsList.get(1).getValue());
+        Assert.assertEquals(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST, compositeObsList.get(1).getFormSubmissionFieldKey());
+
     }
 
 }
