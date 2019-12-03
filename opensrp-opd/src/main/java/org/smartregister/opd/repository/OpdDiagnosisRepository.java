@@ -21,7 +21,7 @@ public class OpdDiagnosisRepository extends BaseRepository implements OpdDiagnos
             + OpdDbConstants.Column.OpdDiagnosis.BASE_ENTITY_ID + " VARCHAR NOT NULL, "
             + OpdDbConstants.Column.OpdDiagnosis.DIAGNOSIS + " VARCHAR NOT NULL, "
             + OpdDbConstants.Column.OpdDiagnosis.TYPE + " VARCHAR NOT NULL, "
-            + OpdDbConstants.Column.OpdDiagnosis.DISEASE + " VARCHAR NOT NULL, "
+            + OpdDbConstants.Column.OpdDiagnosis.DISEASE + " VARCHAR NULL, "
             + OpdDbConstants.Column.OpdDiagnosis.ICD10_CODE + " VARCHAR NULL, "
             + OpdDbConstants.Column.OpdDiagnosis.CODE + " VARCHAR NULL, "
             + OpdDbConstants.Column.OpdDiagnosis.DETAILS + " VARCHAR NULL, "

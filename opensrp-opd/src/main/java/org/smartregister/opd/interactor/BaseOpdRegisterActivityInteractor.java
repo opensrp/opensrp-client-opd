@@ -2,6 +2,7 @@ package org.smartregister.opd.interactor;
 
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 
 import org.apache.commons.lang3.tuple.Triple;
@@ -11,6 +12,7 @@ import org.smartregister.CoreLibrary;
 import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
+import org.smartregister.opd.pojos.OpdDiagnosisAndTreatmentForm;
 import org.smartregister.opd.pojos.OpdEventClient;
 import org.smartregister.opd.pojos.RegisterParams;
 import org.smartregister.opd.utils.AppExecutors;
@@ -33,8 +35,7 @@ import timber.log.Timber;
 
 public class BaseOpdRegisterActivityInteractor implements OpdRegisterActivityContract.Interactor {
 
-    private AppExecutors appExecutors;
-
+    protected AppExecutors appExecutors;
 
     public BaseOpdRegisterActivityInteractor() {
         this(new AppExecutors());
@@ -46,18 +47,38 @@ public class BaseOpdRegisterActivityInteractor implements OpdRegisterActivityCon
     }
 
     @Override
-    public void getNextUniqueId(final Triple<String, String, String> triple, final OpdRegisterActivityContract.InteractorCallBack callBack) {
+    public void fetchSavedDiagnosisAndTreatmentForm(final @NonNull String baseEntityId, final @Nullable String entityTable, @NonNull final OpdRegisterActivityContract.InteractorCallBack interactorCallBack) {
+        appExecutors.diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                final OpdDiagnosisAndTreatmentForm diagnosisAndTreatmentForm = OpdLibrary
+                        .getInstance()
+                        .getOpdDiagnosisAndTreatmentFormRepository()
+                        .findOne(new OpdDiagnosisAndTreatmentForm(baseEntityId));
 
+                appExecutors.mainThread().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        interactorCallBack.onFetchedSavedDiagnosisAndTreatmentForm(diagnosisAndTreatmentForm, baseEntityId, entityTable);
+                    }
+                });
+            }
+        });
+    }
+
+    @Override
+    public void getNextUniqueId(final Triple<String, String, String> triple, final OpdRegisterActivityContract.InteractorCallBack callBack) {
+        // Do nothing for now, this will be handled by the class that extends this
     }
 
     @Override
     public void onDestroy(boolean isChangingConfiguration) {
-        //TODO set presenter or model to null
+        // Do nothing for now, this will be handled by the class that extends this to nullify the presenter
     }
 
     @Override
     public void saveRegistration(List<OpdEventClient> opdEventClientList, String jsonString, RegisterParams registerParams, OpdRegisterActivityContract.InteractorCallBack callBack) {
-
+        // Do nothing for now, this will be handled by the class that extends this
     }
 
     @Override

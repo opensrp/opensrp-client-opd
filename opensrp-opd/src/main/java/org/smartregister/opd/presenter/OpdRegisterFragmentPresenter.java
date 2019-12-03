@@ -110,7 +110,7 @@ public class OpdRegisterFragmentPresenter implements OpdRegisterFragmentContract
 
     @Override
     public String getDueFilterCondition() {
-        return "";
+        return "DUE_ONLY";
     }
 
     public void setModel(OpdRegisterFragmentContract.Model model) {

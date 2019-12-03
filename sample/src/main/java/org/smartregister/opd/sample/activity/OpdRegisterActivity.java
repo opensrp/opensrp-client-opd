@@ -21,6 +21,7 @@ import org.smartregister.opd.pojos.RegisterParams;
 import org.smartregister.opd.presenter.BaseOpdRegisterActivityPresenter;
 import org.smartregister.opd.sample.fragment.OpdRegisterFragment;
 import org.smartregister.opd.sample.presenter.OpdRegisterActivityPresenter;
+import org.smartregister.opd.sample.utils.SampleConstants;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.opd.utils.OpdUtils;

@@ -9,7 +9,7 @@ public interface OpdDbConstants {
     String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     interface KEY {
-
+        String ID = "_id";
         String MOTHER_FIRST_NAME = "mother_first_name";
         String MOTHER_MIDDLE_NAME = "mother_middle_name";
         String MOTHER_LAST_NAME = "mother_last_name";
@@ -37,7 +37,7 @@ public interface OpdDbConstants {
 
         interface OpdCheckIn {
             String ID = "_id";
-            String EVENT_ID = "event_id";
+            String FORM_SUBMISSION_ID = "form_submission_id";
             String VISIT_ID = "visit_id";
             String BASE_ENTITY_ID = "base_entity_id";
             String PREGNANCY_STATUS = "pregnancy_status";
@@ -52,6 +52,15 @@ public interface OpdDbConstants {
             String UPDATED_AT = "updated_at";
         }
 
+        interface OpdMultiSelectOptions {
+            String ID = "_id";
+            String JSON = "json";
+            String TYPE = "type";
+            String VERSION = "version";
+            String CREATED_AT = "created_at";
+            String APP_VERSION = "app_version";
+        }
+
         interface OpdVisit {
             String ID = "_id";
             String VISIT_DATE = "visit_date";
@@ -62,6 +71,7 @@ public interface OpdDbConstants {
         }
 
         interface Client {
+            String ID = "_id";
             String PHOTO = "photo";
             String FIRST_NAME = "first_name";
             String LAST_NAME = "last_name";
@@ -115,6 +125,7 @@ public interface OpdDbConstants {
             String CREATED_AT = "created_at";
             String UPDATED_AT = "updated_at";
             String VISIT_ID = "visit_id";
+            String PROPERTY = "property";
         }
 
         interface OpdServiceDetail {
@@ -140,6 +151,7 @@ public interface OpdDbConstants {
 
     interface Table {
 
+        String EC_CLIENT = "ec_client";
         String OPD_CHECK_IN = "opd_check_in";
         String OPD_VISIT = "opd_visit";
         String OPD_DETAILS = "opd_details";
@@ -148,6 +160,7 @@ public interface OpdDbConstants {
         String OPD_TREATMENT = "opd_treatment";
         String OPD_SERVICE_DETAIL = "opd_service_detail";
         String OPD_TEST_CONDUCTED = "opd_test_conducted";
+        String OPD_MULTI_SELECT_LIST_OPTION = "opd_multi_select_list_option";
 
     }
 }

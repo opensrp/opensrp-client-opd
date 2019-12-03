@@ -33,6 +33,40 @@ public class OpdConstants extends AllConstants {
         }
     }
 
+    public interface FactKey {
+
+        String VISIT_TO_APPOINTMENT_DATE = "visit_to_appointment_date";
+
+        interface ProfileOverview {
+            String PREGNANCY_STATUS = "pregnancy_status";
+            String IS_PREVIOUSLY_TESTED_HIV = "is_previously_tested_hiv";
+            String PREVIOUSLY_HIV_STATUS_RESULTS = "previous_hiv_status";
+            String PATIENT_ON_ART = "patient_on_art";
+            String HIV_STATUS = "hiv_status";
+            String CURRENT_HIV_STATUS = "current_hiv_status";
+            String VISIT_TYPE = "visit_type";
+            String APPOINTMENT_SCHEDULED_PREVIOUSLY = "previous_appointment";
+            String DATE_OF_APPOINTMENT = "date_of_appointment";
+            String PENDING_DIAGNOSE_AND_TREAT = "pending_diagnose_and_treat";
+        }
+
+        interface OpdVisit {
+            String VISIT_DATE = "visit_date";
+            String TEST_NAME = "test_name";
+            String TEST_RESULT = "test_result";
+            String DIAGNOSIS = "diagnosis";
+            String DIAGNOSIS_TYPE = "diagnosis_type";
+            String DISEASE_CODE = "disease_code";
+            String TREATMENT = "treatment";
+
+            String DIAGNOSIS_LABEL = "diagnosis_label";
+            String DIAGNOSIS_TYPE_LABEL = "diagnosis_type_label";
+            String DISEASE_CODE_LABEL = "disease_code_label";
+            String TREATMENT_LABEL = "treatment_label";
+        }
+
+    }
+
     public interface JsonFormField {
         String PATIENT_GENDER = "patient_gender";
         String PREGNANCY_STATUS = "pregnancy_status";
@@ -50,6 +84,16 @@ public class OpdConstants extends AllConstants {
         String MULTI_SELECT_DRUG_PICKER = "multi_select_drug_picker";
     }
 
+    public interface SettingsConfig {
+        String OPD_MEDICINE = "opd_medicine";
+        String OPD_DISEASE_CODES = "opd_disease_codes";
+    }
+
+    public interface OpdMultiDrugPicker {
+        String CONFIRMED_ID = "consumed-id";
+        String PRESUMED_ID = "presumed-id";
+    }
+
     public static class JSON_FORM_KEY {
         public static final String OPTIONS = "options";
         public static final String LAST_INTERACTED_WITH = "last_interacted_with";
@@ -61,6 +105,7 @@ public class OpdConstants extends AllConstants {
         public static final String ADDRESS_WIDGET_KEY = "home_address";
         public static final String NAME = "opd_registration";
         public static final String REMINDERS = "reminders";
+
         public static final String SERVICE_FEE = "service_fee";
         public static final String VISIT_ID = "visitId";
         public static final String MEDICINE = "medicine";
@@ -79,6 +124,27 @@ public class OpdConstants extends AllConstants {
         public static final String DIAGNOSTIC_TEST_RESULT_SPECIFY = "diagnostic_test_result_specify";
         public static final String ID = "ID";
         public static final String VISIT_END_DATE = "visit_end_date";
+
+        public static final String FIRST_NAME = "first_name";
+        public static final String LAST_NAME = "last_name";
+        public static final String BHT_ID = "bht_mid";
+        public static final String PHONE_NUMBER = "phone_number";
+        public static final String NATIONAL_ID = "national_id";
+        public static final String HOME_ADDRESS = "home_address";
+        public static final String AGE_CALCULATED = "age_calculated";
+        public static final String GENDER = "gender";
+        public static final String ENCOUNTER_TYPE = "encounter_type";
+        public static final String ENTITY_ID = "entity_id";
+        public static final String ENCOUNTER = "encounter";
+        public static final String ENCOUNTER_LOCATION = "encounter_location";
+        public static final String UNIQUE_ID = "unique_id";
+        public static final String AGE = "age";
+        public static final String OPD_EDIT_FORM_TITLE = "Update Opd Registration";
+        public static final String FORM_TITLE = "title";
+        public static final String OPENSRP_ID = "opensrp_id";
+
+        public static final String DIAGNOSTIC_TEST_RESULT_GLUCOSE = "diagnostic_test_result_glucose";
+        public static final String DIAGNOSTIC_TEST_RESULT_SPINNER_BLOOD_TYPE = "diagnostic_test_result_spinner_blood_type";
     }
 
     public static class JsonFormNameUtils {
@@ -94,6 +160,8 @@ public class OpdConstants extends AllConstants {
         public static final String STEP3 = "step3";
         public static final String STEP4 = "step4";
 
+        public static final String ZEIR_ID = "zeir_id";
+        public static final String ID = "id";
     }
 
     public static class OPENMRS {
@@ -113,6 +181,7 @@ public class OpdConstants extends AllConstants {
         public static final String OPENSRP_ID = "opensrp_id";
         public static final String RELATIONALID = "relationalid";
         public static final String NATIONAL_ID = "national_id";
+        public static final String GENDER = "gender";
     }
 
     public static class ENTITY {
@@ -142,13 +211,31 @@ public class OpdConstants extends AllConstants {
 
     public interface ColumnMapKey {
         String REGISTER_ID = "register_id";
+        String REGISTER_TYPE = "register_type";
     }
-  
+
     public interface DateFormat {
         String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
+        String d_MMM_yyyy = "d MMM yyyy";
+        String YYYY_MM_DD = "yyyy-MM-dd";
     }
 
     public interface Form {
         String OPD_DIAGNOSIS_AND_TREAT = "opd_diagnose_and_treat";
+        String OPD_CHECK_IN = "opd_checkin";
+    }
+
+    public interface FormValue {
+        String IS_DOB_UNKNOWN = "isDobUnknown";
+        String IS_ENROLLED_IN_MESSAGES = "isEnrolledInSmsMessages";
+        String OTHER = "other";
+    }
+
+    public interface RegisterType {
+        String OPD = "opd";
+    }
+
+    public interface ClientMapKey {
+        String GENDER = "gender";
     }
 }
