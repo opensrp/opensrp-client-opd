@@ -6,8 +6,8 @@ import android.text.TextUtils;
 
 import org.smartregister.cursoradapter.SmartRegisterQueryBuilder;
 import org.smartregister.opd.configuration.OpdRegisterQueryProviderContract;
-import org.smartregister.opd.pojos.InnerJoinObject;
-import org.smartregister.opd.pojos.QueryTable;
+import org.smartregister.opd.pojo.InnerJoinObject;
+import org.smartregister.opd.pojo.QueryTable;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-23

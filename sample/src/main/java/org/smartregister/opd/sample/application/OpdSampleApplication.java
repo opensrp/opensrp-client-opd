@@ -8,7 +8,7 @@ import org.smartregister.commonregistry.CommonFtsObject;
 import org.smartregister.location.helper.LocationHelper;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.configuration.OpdConfiguration;
-import org.smartregister.opd.pojos.OpdMetadata;
+import org.smartregister.opd.pojo.OpdMetadata;
 import org.smartregister.opd.sample.BuildConfig;
 import org.smartregister.opd.sample.activity.OpdFormActivity;
 import org.smartregister.opd.sample.configuration.OpdRegisterQueryProvider;
