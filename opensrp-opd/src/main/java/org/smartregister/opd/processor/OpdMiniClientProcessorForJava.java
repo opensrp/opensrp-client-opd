@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.google.gson.Gson;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 
 import net.sqlcipher.database.SQLiteException;
@@ -89,7 +90,6 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         }
 
         return eventTypes;
-
     }
 
     @Override
@@ -98,16 +98,16 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
     }
 
     @Override
-    public void processEventClient(@NonNull EventClient eventClient, @NonNull List<Event> unsyncEvents, @Nullable ClientClassification clientClassification) {
+    public void processEventClient(@NonNull EventClient eventClient, @NonNull List<Event> unsyncEvents, @Nullable ClientClassification clientClassification) throws Exception {
         Event event = eventClient.getEvent();
 
         if (event.getEventType().equals(OpdConstants.EventType.CHECK_IN)) {
-            try {
-                processCheckIn(event, eventClient.getClient());
-                CoreLibrary.getInstance().context().getEventClientRepository().markEventAsProcessed(eventClient.getEvent().getFormSubmissionId());
-            } catch (CheckInEventProcessException ex) {
-                Timber.e(ex);
+            if (eventClient.getClient() == null) {
+                throw new CheckInEventProcessException(String.format("Client %s referenced by %s event does not exist", event.getBaseEntityId(), OpdConstants.EventType.CHECK_IN));
             }
+
+            processCheckIn(event, eventClient.getClient());
+            CoreLibrary.getInstance().context().getEventClientRepository().markEventAsProcessed(eventClient.getEvent().getFormSubmissionId());
         } else if (event.getEventType().equals(OpdConstants.EventType.TEST_CONDUCTED)) {
             try {
                 processTestConducted(event);
@@ -206,7 +206,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         String[] valueIds = id.split(",");
 
         JSONArray valueJsonArray = null;
-        if (mapDetails.containsKey(OpdConstants.KEY.VALUE)) {
+        if(mapDetails.containsKey(OpdConstants.KEY.VALUE)) {
             String strValue = mapDetails.get(OpdConstants.KEY.VALUE);
             if (!StringUtils.isBlank(strValue)) {
                 valueJsonArray = new JSONArray(strValue);
@@ -225,7 +225,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                 opdTreatment.setCreatedAt(Utils.convertDateFormat(new DateTime()));
                 opdTreatment.setUpdatedAt(Utils.convertDateFormat(new DateTime()));
 
-                if (valueJsonArray != null) {
+                if(valueJsonArray != null) {
                     JSONObject valueJsonObject = valueJsonArray.optJSONObject(i);
 
                     JSONObject propertyJsonObject = valueJsonObject.optJSONObject(JsonFormConstants.MultiSelectUtils.PROPERTY);
@@ -238,7 +238,6 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                     opdTreatment.setMedicine(valueJsonObject.optString(JsonFormConstants.MultiSelectUtils.TEXT));
                     opdTreatment.setProperty(valueJsonArray.toString());
                 }
-
 
                 boolean result = OpdLibrary.getInstance().getOpdTreatmentRepository().saveOrUpdate(opdTreatment);
                 if (result) {
@@ -260,7 +259,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         String[] valueIds = id.split(",");
 
         JSONArray valuesJsonArray = null;
-        if (mapDetails.containsKey(OpdConstants.KEY.VALUE)) {
+        if(mapDetails.containsKey(OpdConstants.KEY.VALUE)) {
             String strValue = mapDetails.get(OpdConstants.KEY.VALUE);
             if (!StringUtils.isBlank(strValue)) {
                 valuesJsonArray = new JSONArray(strValue);
@@ -284,7 +283,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                 opdDiagnosis.setVisitId(visitId);
                 opdDiagnosis.setId(valueIds[i]);
 
-                if (valuesJsonArray != null) {
+                if(valuesJsonArray != null) {
                     JSONObject valueJsonObject = valuesJsonArray.optJSONObject(i);
                     JSONObject propertyJsonObject = valueJsonObject.optJSONObject(JsonFormConstants.MultiSelectUtils.PROPERTY);
                     opdDiagnosis.setIcd10Code(propertyJsonObject.optString(OpdConstants.JSON_FORM_KEY.ICD10));
@@ -302,7 +301,6 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                 Timber.e("Opd processDiagnosis for %s not saved", event.getBaseEntityId());
             }
         }
-
     }
 
     private void processTestConducted(@NonNull Event event) {
@@ -352,7 +350,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
 
                 if (result) {
                     Timber.i("Opd processTestConducted for %s saved", event.getBaseEntityId());
-                    return;
+                    continue;
                 }
                 Timber.e("Opd processTestConducted for %s not saved", event.getBaseEntityId());
             }
@@ -373,7 +371,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         Date visitDate = null;
 
         try {
-            visitDate = dateFormat.parse(visitDateString);
+            visitDate = dateFormat.parse(visitDateString != null ? visitDateString : "");
         } catch (ParseException e) {
             Timber.e(e);
 
@@ -419,7 +417,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
 
             commitSuccessfulTransaction();
         } else {
-            throw new CheckInEventProcessException(String.format("Check-in with visit id %s could not be processed because it the visitDate OR visitId is null", visitId));
+            throw new CheckInEventProcessException(String.format("Check-in of event %s could not be processed because it the visitDate OR visitId is null", new Gson().toJson(event)));
         }
     }
 
@@ -446,7 +444,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
             if (values.size() > 0) {
                 String value = (String) values.get(0);
 
-                if (value != null) {
+                if (!TextUtils.isEmpty(value)) {
                     keyValues.put(key, value);
                     continue;
                 }
@@ -456,7 +454,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
             if (humanReadableValues.size() > 0) {
                 String value = (String) humanReadableValues.get(0);
 
-                if (value != null) {
+                if (!TextUtils.isEmpty(value)) {
                     keyValues.put(key, value);
                     continue;
                 }
@@ -553,7 +551,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         checkIn.setVisitType(keyValues.get(OpdConstants.JsonFormField.VISIT_TYPE));
         checkIn.setAppointmentScheduledPreviously(keyValues.get(OpdConstants.JsonFormField.APPOINTMENT_DUE));
         checkIn.setAppointmentDueDate(keyValues.get(OpdConstants.JsonFormField.APPOINTMENT_DUE_DATE));
-        checkIn.setEventId(event.getEventId());
+        checkIn.setFormSubmissionId(event.getFormSubmissionId());
         checkIn.setBaseEntityId(client.getBaseEntityId());
         checkIn.setUpdatedAt(new Date().getTime());
 

@@ -25,7 +25,7 @@ public class OpdCheckInRepository extends BaseRepository implements OpdCheckInDa
 
     private static final String CREATE_TABLE_SQL = "CREATE TABLE " + OpdDbConstants.Table.OPD_CHECK_IN + "("
             + OpdCheckIn.ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"
-            + OpdCheckIn.EVENT_ID + " VARCHAR NOT NULL, "
+            + OpdCheckIn.FORM_SUBMISSION_ID + " VARCHAR NOT NULL, "
             + OpdCheckIn.VISIT_ID + " VARCHAR NOT NULL, "
             + OpdCheckIn.BASE_ENTITY_ID + " VARCHAR NOT NULL, "
             + OpdCheckIn.PREGNANCY_STATUS + " VARCHAR, "
@@ -44,10 +44,10 @@ public class OpdCheckInRepository extends BaseRepository implements OpdCheckInDa
     private static final String INDEX_VISIT_ID = "CREATE INDEX " + OpdDbConstants.Table.OPD_CHECK_IN
             + "_" + OpdCheckIn.VISIT_ID + "_index ON " + OpdDbConstants.Table.OPD_CHECK_IN + "(" + OpdCheckIn.VISIT_ID + ");";
     private static final String INDEX_EVENT_ID = "CREATE INDEX " + OpdDbConstants.Table.OPD_CHECK_IN
-            + "_" + OpdCheckIn.EVENT_ID + "_index ON " + OpdDbConstants.Table.OPD_CHECK_IN + "(" + OpdCheckIn.EVENT_ID + " COLLATE NOCASE);";
+            + "_" + OpdCheckIn.FORM_SUBMISSION_ID + "_index ON " + OpdDbConstants.Table.OPD_CHECK_IN + "(" + OpdCheckIn.FORM_SUBMISSION_ID + " COLLATE NOCASE);";
 
     private String[] columns = new String[]{OpdCheckIn.ID
-            , OpdCheckIn.EVENT_ID
+            , OpdCheckIn.FORM_SUBMISSION_ID
             , OpdCheckIn.VISIT_ID
             , OpdCheckIn.BASE_ENTITY_ID
             , OpdCheckIn.PREGNANCY_STATUS
@@ -80,7 +80,7 @@ public class OpdCheckInRepository extends BaseRepository implements OpdCheckInDa
             contentValues.put(OpdCheckIn.ID, checkIn.getId());
         }
 
-        contentValues.put(OpdCheckIn.EVENT_ID, checkIn.getEventId());
+        contentValues.put(OpdCheckIn.FORM_SUBMISSION_ID, checkIn.getFormSubmissionId());
         contentValues.put(OpdCheckIn.VISIT_ID, checkIn.getVisitId());
         contentValues.put(OpdCheckIn.BASE_ENTITY_ID, checkIn.getBaseEntityId());
         contentValues.put(OpdCheckIn.PREGNANCY_STATUS, checkIn.getPregnancyStatus());
@@ -162,7 +162,7 @@ public class OpdCheckInRepository extends BaseRepository implements OpdCheckInDa
         org.smartregister.opd.pojo.OpdCheckIn checkIn = new org.smartregister.opd.pojo.OpdCheckIn();
 
         checkIn.setId(cursor.getInt(cursor.getColumnIndex(OpdCheckIn.ID)));
-        checkIn.setEventId(cursor.getString(cursor.getColumnIndex(OpdCheckIn.EVENT_ID)));
+        checkIn.setFormSubmissionId(cursor.getString(cursor.getColumnIndex(OpdCheckIn.FORM_SUBMISSION_ID)));
         checkIn.setVisitId(cursor.getString(cursor.getColumnIndex(OpdCheckIn.VISIT_ID)));
         checkIn.setBaseEntityId(cursor.getString(cursor.getColumnIndex(OpdCheckIn.BASE_ENTITY_ID)));
         checkIn.setPregnancyStatus(cursor.getString(cursor.getColumnIndex(OpdCheckIn.PREGNANCY_STATUS)));

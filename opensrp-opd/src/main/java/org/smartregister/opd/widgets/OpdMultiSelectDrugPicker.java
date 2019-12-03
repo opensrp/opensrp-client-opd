@@ -19,7 +19,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.opd.R;
 import org.smartregister.opd.utils.OpdConstants;
-
 import timber.log.Timber;
 
 public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements TextWatcher {
@@ -38,9 +37,9 @@ public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements 
         opd_btn_save_drug = view.findViewById(R.id.opd_btn_save_drug);
 
         TextView txtSelectedItemInMultiSelectList = view.findViewById(R.id.txtSelectedItemInMultiSelectList);
-        txtSelectedItemInMultiSelectList.setText(multiSelectItem.getText());
-        final EditText edtTreatmentDuration = view.findViewById(R.id.edtTreatmentDosage);
-        final EditText edtTreatmentDosage = view.findViewById(R.id.edtTreatmentDuration);
+        txtSelectedItemInMultiSelectList.setText(multiSelectItem.getKey());
+        final EditText edtTreatmentDuration = view.findViewById(R.id.edtTreatmentDuration);
+        final EditText edtTreatmentDosage = view.findViewById(R.id.edtTreatmentDosage);
         edtTreatmentDosage.addTextChangedListener(this);
         edtTreatmentDuration.addTextChangedListener(this);
         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.FullScreenDialogStyle);

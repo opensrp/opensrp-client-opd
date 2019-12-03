@@ -4,10 +4,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.Html;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.widget.TextView;
+
+import com.vijay.jsonwizard.constants.JsonFormConstants;
+import com.vijay.jsonwizard.domain.Form;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.jeasy.rules.api.Facts;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -18,6 +24,7 @@ import org.smartregister.domain.db.Obs;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.pojo.CompositeObs;
 import org.smartregister.opd.pojo.OpdMetadata;
+import org.smartregister.util.FormUtils;
 import org.smartregister.util.JsonFormUtils;
 
 import java.text.DateFormat;
@@ -25,6 +32,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -37,13 +45,14 @@ import timber.log.Timber;
 public class OpdUtils extends org.smartregister.util.Utils {
 
     private static final String OTHER_SUFFIX = ", other]";
+    private static FormUtils formUtils;
 
     public static float convertDpToPixel(float dp, @NonNull Context context) {
         return dp * ((float) context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
     }
 
     @NonNull
-    public static String fillTemplate(@NonNull String stringValue, @NonNull Facts facts) {
+    public static String fillTemplate(boolean isHtml, @NonNull String stringValue, @NonNull Facts facts) {
         String stringValueResult = stringValue;
         while (stringValueResult.contains("{")) {
             String key = stringValueResult.substring(stringValueResult.indexOf("{") + 1, stringValueResult.indexOf("}"));
@@ -52,7 +61,24 @@ public class OpdUtils extends org.smartregister.util.Utils {
         }
 
         //Remove unnecessary commas by cleaning the returned string
-        return cleanValueResult(stringValueResult);
+        return isHtml ? stringValueResult : cleanValueResult(stringValueResult);
+    }
+
+    public static String fillTemplate(@NonNull String stringValue, @NonNull Facts facts) {
+        return fillTemplate(false, stringValue, facts);
+    }
+
+    public static boolean isTemplate(@NonNull String stringValue) {
+        return stringValue.contains("{") && stringValue.contains("}");
+    }
+
+    public static void setTextAsHtml(@NonNull TextView textView, @NonNull String html) {
+        textView.setAllCaps(false);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            textView.setText(Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY));
+        } else {
+            textView.setText(Html.fromHtml(html));
+        }
     }
 
     @NonNull
@@ -69,7 +95,7 @@ public class OpdUtils extends org.smartregister.util.Utils {
             }
         }
 
-        return ContactJsonFormUtils.keyToValueConverter(value);
+        return keyToValueConverter(value);
     }
 
     @NonNull
@@ -133,6 +159,7 @@ public class OpdUtils extends org.smartregister.util.Utils {
         return date;
     }
 
+    @NonNull
     public static String generateNIds(int n) {
         StringBuilder strIds = new StringBuilder();
         for (int i = 0; i < n; i++) {
@@ -156,6 +183,82 @@ public class OpdUtils extends org.smartregister.util.Utils {
             }
         }
         return age;
+    }
+
+    @NonNull
+    public static Intent buildFormActivityIntent(JSONObject jsonForm, HashMap<String, String> parcelableData, Context context) {
+        Intent intent = new Intent(context, OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata().getOpdFormActivity());
+        intent.putExtra(OpdConstants.JSON_FORM_EXTRA.JSON, jsonForm.toString());
+        Form form = new Form();
+        form.setWizard(false);
+        form.setName("");
+        String encounterType = jsonForm.optString(OpdJsonFormUtils.ENCOUNTER_TYPE);
+        if (encounterType.equals(OpdConstants.EventType.DIAGNOSIS_AND_TREAT)) {
+            form.setName(OpdConstants.EventType.DIAGNOSIS_AND_TREAT);
+            form.setWizard(true);
+        }
+        form.setHideSaveLabel(true);
+        form.setPreviousLabel("");
+        form.setNextLabel("");
+        form.setHideNextButton(false);
+        form.setHidePreviousButton(false);
+        intent.putExtra(JsonFormConstants.JSON_FORM_KEY.FORM, form);
+
+        if (parcelableData != null) {
+            for (String intentKey : parcelableData.keySet()) {
+                intent.putExtra(intentKey, parcelableData.get(intentKey));
+            }
+        }
+        return intent;
+    }
+
+    @Nullable
+    public static JSONObject getJsonFormToJsonObject(String formName){
+        if (getFormUtils() == null) {
+            return null;
+        }
+
+        return getFormUtils().getFormJson(formName);
+    }
+
+
+    @Nullable
+    private static FormUtils getFormUtils() {
+        if (formUtils == null) {
+            try {
+                formUtils = FormUtils.getInstance(OpdLibrary.getInstance().context().applicationContext());
+            } catch (Exception e) {
+                Timber.e(e);
+            }
+        }
+        return formUtils;
+    }
+
+
+    @NonNull
+    public static String keyToValueConverter(String keys) {
+        if (!TextUtils.isEmpty(keys)) {
+            String cleanKey;
+
+            //If this contains html then don't capitalize it because it fails and the output is in lowercase
+            if (keys.contains("<") && keys.contains(">")) {
+                cleanKey = keys;
+            } else {
+                cleanKey = WordUtils.capitalizeFully(cleanValue(keys), ',');
+            }
+
+            return cleanKey.replaceAll("_", " ");
+        } else {
+            return "";
+        }
+    }
+
+    public static String cleanValue(String raw) {
+        if (raw.length() > 0 && raw.charAt(0) == '[') {
+            return raw.substring(1, raw.length() - 1);
+        } else {
+            return raw;
+        }
     }
 
     public static int buildRepeatingGroupTests(JSONObject step1JsonObject) throws JSONException {

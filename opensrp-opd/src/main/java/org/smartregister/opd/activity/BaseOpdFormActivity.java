@@ -140,27 +140,31 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
     @Override
     public void onBackPressed() {
         if (enableOnCloseDialog) {
-            AlertDialog dialog = new AlertDialog.Builder(this, R.style.AppThemeAlertDialog).setTitle(confirmCloseTitle)
-                    .setMessage(getString(R.string.save_form_fill_session))
-                    .setNegativeButton(R.string.yes, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            saveFormFillSession();
-                            BaseOpdFormActivity.this.finish();
-                        }
-                    }).setPositiveButton(R.string.no, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Timber.d("No button on dialog in %s", JsonFormActivity.class.getCanonicalName());
-                        }
-                    }).setNeutralButton(getString(R.string.end_session), new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            BaseOpdFormActivity.this.finish();
-                        }
-                    }).create();
+            if (form.optString(OpdJsonFormUtils.ENCOUNTER_TYPE).equals(OpdConstants.EventType.DIAGNOSIS_AND_TREAT)) {
+                AlertDialog dialog = new AlertDialog.Builder(this, R.style.AppThemeAlertDialog).setTitle(confirmCloseTitle)
+                        .setMessage(getString(R.string.save_form_fill_session))
+                        .setNegativeButton(R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                saveFormFillSession();
+                                BaseOpdFormActivity.this.finish();
+                            }
+                        }).setPositiveButton(R.string.no, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Timber.d("No button on dialog in %s", JsonFormActivity.class.getCanonicalName());
+                            }
+                        }).setNeutralButton(getString(R.string.end_session), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                BaseOpdFormActivity.this.finish();
+                            }
+                        }).create();
 
-            dialog.show();
+                dialog.show();
+            } else {
+                super.onBackPressed();
+            }
 
         } else {
             BaseOpdFormActivity.this.finish();

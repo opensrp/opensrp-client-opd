@@ -14,6 +14,7 @@ import org.smartregister.opd.utils.OpdDbConstants.Column.OpdVisit;
 import org.smartregister.repository.BaseRepository;
 import org.smartregister.repository.Repository;
 
+import java.text.ParseException;
 import java.util.Date;
 
 import timber.log.Timber;
@@ -73,7 +74,13 @@ public class OpdVisitRepository extends BaseRepository implements OpdVisitDao {
         org.smartregister.opd.pojo.OpdVisit visit = new org.smartregister.opd.pojo.OpdVisit();
 
         visit.setId(cursor.getString(cursor.getColumnIndex(OpdVisit.ID)));
-        visit.setVisitDate(new Date(cursor.getLong(cursor.getColumnIndex(OpdVisit.VISIT_DATE))));
+
+        try {
+            visit.setVisitDate(dateFormat.parse(cursor.getString(cursor.getColumnIndex(OpdVisit.VISIT_DATE))));
+        } catch (ParseException ex) {
+            Timber.e(ex);
+        }
+
         visit.setProviderId(cursor.getString(cursor.getColumnIndex(OpdVisit.PROVIDER_ID)));
         visit.setLocationId(cursor.getString(cursor.getColumnIndex(OpdVisit.LOCATION_ID)));
         visit.setBaseEntityId(cursor.getString(cursor.getColumnIndex(OpdVisit.BASE_ENTITY_ID)));

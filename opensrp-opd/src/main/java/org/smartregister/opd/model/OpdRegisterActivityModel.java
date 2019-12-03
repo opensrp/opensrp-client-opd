@@ -7,26 +7,21 @@ import org.json.JSONObject;
 import org.smartregister.configurableviews.ConfigurableViewsLibrary;
 import org.smartregister.domain.tag.FormTag;
 import org.smartregister.location.helper.LocationHelper;
-import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
 import org.smartregister.opd.pojo.OpdEventClient;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
-import org.smartregister.util.FormUtils;
+import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.util.Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import timber.log.Timber;
-
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-13
  */
 
 public class OpdRegisterActivityModel implements OpdRegisterActivityContract.Model {
-
-    private FormUtils formUtils;
 
     @Override
     public void registerViewConfigurations(List<String> viewIdentifiers) {
@@ -76,16 +71,11 @@ public class OpdRegisterActivityModel implements OpdRegisterActivityContract.Mod
     @Override
     public JSONObject getFormAsJson(String formName, String entityId,
                              String currentLocationId, @Nullable HashMap<String, String> injectedValues) throws JSONException {
-        if (getFormUtils() == null) {
-            return null;
+        JSONObject form = OpdUtils.getJsonFormToJsonObject(formName);
+        if (form != null) {
+            return OpdJsonFormUtils.getFormAsJson(form, formName, entityId, currentLocationId, injectedValues);
         }
-
-        JSONObject form = getFormUtils().getFormJson(formName);
-        if (form == null) {
-            return null;
-        }
-
-        return OpdJsonFormUtils.getFormAsJson(form, formName, entityId, currentLocationId, injectedValues);
+        return null;
     }
 
     @Override
@@ -93,15 +83,4 @@ public class OpdRegisterActivityModel implements OpdRegisterActivityContract.Mod
         return Utils.getUserInitials();
     }
 
-    @Nullable
-    public FormUtils getFormUtils() {
-        if (formUtils == null) {
-            try {
-                formUtils = FormUtils.getInstance(OpdLibrary.getInstance().context().applicationContext());
-            } catch (Exception e) {
-                Timber.e(e);
-            }
-        }
-        return formUtils;
-    }
 }

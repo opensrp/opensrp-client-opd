@@ -9,7 +9,7 @@ import android.support.annotation.Nullable;
 public class OpdCheckIn {
 
     private int id;
-    private String eventId;
+    private String formSubmissionId;
     private String visitId;
     private String baseEntityId;
     private String pregnancyStatus;
@@ -32,12 +32,12 @@ public class OpdCheckIn {
         this.id = id;
     }
 
-    public String getEventId() {
-        return eventId;
+    public String getFormSubmissionId() {
+        return formSubmissionId;
     }
 
-    public void setEventId(String eventId) {
-        this.eventId = eventId;
+    public void setFormSubmissionId(String formSubmissionId) {
+        this.formSubmissionId = formSubmissionId;
     }
 
     public String getVisitId() {

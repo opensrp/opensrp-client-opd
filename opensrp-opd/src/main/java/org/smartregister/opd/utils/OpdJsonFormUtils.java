@@ -54,6 +54,10 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
     public static final String CURRENT_OPENSRP_ID = "current_opensrp_id";
     public static final String OPENSRP_ID = "OPENSRP_ID";
     public static final String ZEIR_ID = "zeir_id";
+    public static final String CURRENT_ZEIR_ID = "current_zeir_id";
+    public static final String READ_ONLY = "read_only";
+    public static final String HOME_ADDRESS = "home_address";
+    public static final String PERSON_IDENTIFIER = "person_identifier";
 
     public static JSONObject getFormAsJson(@NonNull JSONObject form, @NonNull String formName, @NonNull String id, @NonNull String currentLocationId) throws JSONException {
         return getFormAsJson(form, formName, id, currentLocationId, null);
@@ -115,7 +119,7 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
         return form;
     }
 
-    private static void addRegLocHierarchyQuestions(@NonNull JSONObject form, @NonNull String widgetKey, @NonNull LocationHierarchy locationHierarchy) {
+    protected static void addRegLocHierarchyQuestions(@NonNull JSONObject form, @NonNull String widgetKey, @NonNull LocationHierarchy locationHierarchy) {
         try {
             JSONArray questions = form.getJSONObject(JsonFormConstants.STEP1).getJSONArray(JsonFormConstants.FIELDS);
 

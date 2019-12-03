@@ -143,15 +143,15 @@
             android:layout_height="70dp"
             android:layout_gravity="center"
             android:adjustViewBounds="true"
-            android:background="@color/transparent"
             android:gravity="center"
             android:hapticFeedbackEnabled="true"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            android:text="CHECK IN"
+            android:text="@string/check_in"
             android:textAllCaps="true"
+            style="@style/Widget.AppCompat.Button.Borderless"
             android:textAppearance="?android:textAppearanceSmall"
-            android:textSize="15dp"
+            android:textSize="15sp"
             android:typeface="normal" />
 
     </LinearLayout>

@@ -59,25 +59,38 @@ public class OpdDiagnosisAndTreatmentFormRepository extends BaseRepository imple
     @Override
     public OpdDiagnosisAndTreatmentForm findOne(@NonNull OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm) {
         SQLiteDatabase sqLiteDatabase = getReadableDatabase();
-        Cursor cursor = sqLiteDatabase.query(OpdDbConstants.Table.OPD_DIAGNOSIS_AND_TREATMENT_FORM, columns, OpdDbConstants.Column.OpdDiagnosisAndTreatmentForm.BASE_ENTITY_ID + " = ? ",
-                new String[]{opdDiagnosisAndTreatmentForm.getBaseEntityId()}, null, null, null);
+        Cursor cursor = sqLiteDatabase.query(OpdDbConstants.Table.OPD_DIAGNOSIS_AND_TREATMENT_FORM
+                , columns
+                , OpdDbConstants.Column.OpdDiagnosisAndTreatmentForm.BASE_ENTITY_ID + " = ? "
+                , new String[]{opdDiagnosisAndTreatmentForm.getBaseEntityId()}
+                , null
+                , null
+                , null);
+
         if (cursor.getCount() == 0) {
             return null;
         }
+
         OpdDiagnosisAndTreatmentForm diagnosisAndTreatmentForm = null;
         if (cursor.moveToNext()) {
-            diagnosisAndTreatmentForm = new OpdDiagnosisAndTreatmentForm(cursor.getInt(0), cursor.getString(1),
-                    cursor.getString(2), cursor.getString(3));
+            diagnosisAndTreatmentForm = new OpdDiagnosisAndTreatmentForm(
+                    cursor.getInt(0),
+                    cursor.getString(1),
+                    cursor.getString(2),
+                    cursor.getString(3));
             cursor.close();
         }
+
         return diagnosisAndTreatmentForm;
     }
 
     @Override
     public boolean delete(@NonNull OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm) {
         SQLiteDatabase sqLiteDatabase = getReadableDatabase();
-        int rows = sqLiteDatabase.delete(OpdDbConstants.Table.OPD_DIAGNOSIS_AND_TREATMENT_FORM, OpdDbConstants.Column.OpdDiagnosisAndTreatmentForm.BASE_ENTITY_ID + " = ? ",
-                new String[]{opdDiagnosisAndTreatmentForm.getBaseEntityId()});
+        int rows = sqLiteDatabase.delete(OpdDbConstants.Table.OPD_DIAGNOSIS_AND_TREATMENT_FORM
+                , OpdDbConstants.Column.OpdDiagnosisAndTreatmentForm.BASE_ENTITY_ID + " = ? "
+                , new String[]{opdDiagnosisAndTreatmentForm.getBaseEntityId()});
+
         return rows > 0;
     }
 

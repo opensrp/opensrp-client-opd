@@ -11,20 +11,11 @@ public class YamlConfigWrapper {
     private String group;
     private String subGroup;
     private YamlConfigItem yamlConfigItem;
-    private String testResults;
 
     public YamlConfigWrapper(@Nullable String group, @Nullable String subGroup, @Nullable YamlConfigItem yamlConfigItem) {
         this.group = group;
         this.subGroup = subGroup;
         this.yamlConfigItem = yamlConfigItem;
-    }
-
-    public YamlConfigWrapper(@Nullable String group, @Nullable String subGroup, @Nullable YamlConfigItem yamlConfigItem,
-                             @Nullable String testResults) {
-        this.group = group;
-        this.subGroup = subGroup;
-        this.yamlConfigItem = yamlConfigItem;
-        this.testResults = testResults;
     }
 
     @Nullable
@@ -52,14 +43,5 @@ public class YamlConfigWrapper {
 
     public void setGroup(@Nullable String group) {
         this.group = group;
-    }
-
-    @Nullable
-    public String getTestResults() {
-        return testResults;
-    }
-
-    public void setTestResults(@Nullable String testResults) {
-        this.testResults = testResults;
     }
 }

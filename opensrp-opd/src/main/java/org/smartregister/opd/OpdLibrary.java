@@ -3,6 +3,7 @@ package org.smartregister.opd;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 
@@ -19,7 +20,9 @@ import org.smartregister.opd.domain.YamlConfig;
 import org.smartregister.opd.domain.YamlConfigItem;
 import org.smartregister.opd.helper.OpdRulesEngineHelper;
 import org.smartregister.opd.pojo.OpdCheckIn;
+import org.smartregister.opd.pojo.OpdDetails;
 import org.smartregister.opd.pojo.OpdDiagnosisAndTreatmentForm;
+import org.smartregister.opd.pojo.OpdVisit;
 import org.smartregister.opd.repository.OpdCheckInRepository;
 import org.smartregister.opd.repository.OpdDetailsRepository;
 import org.smartregister.opd.repository.OpdDiagnosisAndTreatmentFormRepository;
@@ -28,6 +31,7 @@ import org.smartregister.opd.repository.OpdServiceDetailRepository;
 import org.smartregister.opd.repository.OpdTestConductedRepository;
 import org.smartregister.opd.repository.OpdTreatmentRepository;
 import org.smartregister.opd.repository.OpdVisitRepository;
+import org.smartregister.opd.repository.OpdVisitSummaryRepository;
 import org.smartregister.opd.utils.FilePath;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;
@@ -36,8 +40,10 @@ import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.repository.Repository;
 import org.smartregister.repository.UniqueIdRepository;
+import org.smartregister.sync.ClientProcessorForJava;
 import org.smartregister.sync.helper.ECSyncHelper;
 import org.smartregister.util.JsonFormUtils;
+import org.smartregister.view.activity.DrishtiApplication;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
@@ -46,6 +52,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -75,6 +82,8 @@ public class OpdLibrary {
     private OpdDiagnosisRepository opdDiagnosisRepository;
     private OpdTreatmentRepository opdTreatmentRepository;
     private OpdTestConductedRepository opdTestConductedRepository;
+    private OpdVisitSummaryRepository opdVisitSummaryRepository;
+
     private Compressor compressor;
     private int applicationVersion;
     private int databaseVersion;
@@ -192,6 +201,14 @@ public class OpdLibrary {
     }
 
     @NonNull
+    public OpdVisitSummaryRepository getOpdVisitSummaryRepository() {
+        if (opdVisitSummaryRepository == null) {
+            opdVisitSummaryRepository = new OpdVisitSummaryRepository(getRepository());
+        }
+        return opdVisitSummaryRepository;
+    }
+
+    @NonNull
     public Repository getRepository() {
         return repository;
     }
@@ -219,6 +236,11 @@ public class OpdLibrary {
         return compressor;
     }
 
+    @NonNull
+    public ClientProcessorForJava getClientProcessorForJava() {
+        return DrishtiApplication.getInstance().getClientProcessor();
+    }
+
 
     public int getDatabaseVersion() {
         return databaseVersion;
@@ -231,7 +253,7 @@ public class OpdLibrary {
     private void initializeYamlConfigs() {
         Constructor constructor = new Constructor(YamlConfig.class);
         TypeDescription customTypeDescription = new TypeDescription(YamlConfig.class);
-        customTypeDescription.addPropertyParameters(YamlConfigItem.FIELD_CONTACT_SUMMARY_ITEMS, YamlConfigItem.class);
+        customTypeDescription.addPropertyParameters(YamlConfigItem.GENERIC_YAML_ITEMS, YamlConfigItem.class);
         constructor.addTypeDescription(customTypeDescription);
         yaml = new Yaml(constructor);
     }
@@ -266,13 +288,11 @@ public class OpdLibrary {
         Event opdCheckinEvent = OpdJsonFormUtils.createEvent(fieldsArray, jsonFormObject.getJSONObject(METADATA)
                 , formTag, baseEntityId, eventType, entityTable);
 
-        // Generate the eventId and add it
-        opdCheckinEvent.setEventId(JsonFormUtils.generateRandomUUIDString());
-
         AllSharedPreferences allSharedPreferences = OpdUtils.getAllSharedPreferences();
         String providerId = allSharedPreferences.fetchRegisteredANM();
         opdCheckinEvent.setProviderId(providerId);
         opdCheckinEvent.setLocationId(OpdJsonFormUtils.locationId(allSharedPreferences));
+        opdCheckinEvent.setFormSubmissionId(opdCheckinEvent.getFormSubmissionId());
 
         opdCheckinEvent.setTeam(allSharedPreferences.fetchDefaultTeam(providerId));
         opdCheckinEvent.setTeamId(allSharedPreferences.fetchDefaultTeamId(providerId));
@@ -378,6 +398,7 @@ public class OpdLibrary {
         }
     }
 
+
     private JSONArray addOpenMrsEntityId(String diagnosisType, JSONArray jsonArray) {
         try {
             for (int i = 0; i < jsonArray.length(); i++) {
@@ -404,9 +425,81 @@ public class OpdLibrary {
     }
 
     public String opdLookUpQuery() {
-        String lookUpQueryForChild = "select id as _id, relationalid, first_name, last_name, gender, dob, base_entity_id, null as national_id from ec_child where [condition] ";
-        String lookUpQueryForMother = "select id as _id, relationalid, first_name, last_name, gender, dob, base_entity_id, nrc_number as national_id from ec_mother where [condition] ";
-        String lookUpQueryForOpdClient = "select id as _id, relationalid, first_name, last_name, gender, dob, base_entity_id, null as national_id from ec_client where [condition] ";
+        String lookUpQueryForChild = "select id as _id, %s, %s, %s, %s, %s, %s, zeir_id as %s, null as national_id from ec_child where [condition] ";
+        lookUpQueryForChild = String.format(lookUpQueryForChild, OpdConstants.KEY.RELATIONALID, OpdConstants.KEY.FIRST_NAME,
+                OpdConstants.KEY.LAST_NAME, OpdConstants.KEY.GENDER, OpdConstants.KEY.DOB, OpdConstants.KEY.BASE_ENTITY_ID, OpdDbConstants.KEY.OPENSRP_ID);
+        String lookUpQueryForMother = "select id as _id, %s, %s, %s, %s, %s, %s, register_id as %s, nrc_number as national_id from ec_mother where [condition] ";
+        lookUpQueryForMother = String.format(lookUpQueryForMother, OpdConstants.KEY.RELATIONALID, OpdConstants.KEY.FIRST_NAME,
+                OpdConstants.KEY.LAST_NAME, OpdConstants.KEY.GENDER, OpdConstants.KEY.DOB, OpdConstants.KEY.BASE_ENTITY_ID, OpdDbConstants.KEY.OPENSRP_ID);
+        String lookUpQueryForOpdClient = "select id as _id, %s, %s, %s, %s, %s, %s, %s, national_id from ec_client where [condition] ";
+        lookUpQueryForOpdClient = String.format(lookUpQueryForOpdClient, OpdConstants.KEY.RELATIONALID, OpdConstants.KEY.FIRST_NAME,
+                OpdConstants.KEY.LAST_NAME, OpdConstants.KEY.GENDER, OpdConstants.KEY.DOB, OpdConstants.KEY.BASE_ENTITY_ID, OpdDbConstants.KEY.OPENSRP_ID);
         return lookUpQueryForChild + " union all " + lookUpQueryForMother + " union all " + lookUpQueryForOpdClient;
+    }
+
+    /**
+     * This method enables us to configure how-long ago we should consider a valid check-in so that
+     * we enable the next step which is DIAGNOSE & TREAT. This method returns the latest date that a check-in
+     * should be so that it can be considered for moving to DIAGNOSE & TREAT
+     *
+     * @return Date
+     */
+    @NonNull
+    public Date getLatestValidCheckInDate() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_MONTH, -1);
+
+        return calendar.getTime();
+    }
+
+    public boolean isPatientInTreatedState(@NonNull String strVisitEndDate) {
+        Date visitEndDate = OpdUtils.convertStringToDate(OpdConstants.DateFormat.YYYY_MM_DD_HH_MM_SS, strVisitEndDate);
+        if (visitEndDate != null) {
+            return isPatientInTreatedState(visitEndDate);
+        }
+
+        return false;
+    }
+
+    public boolean isPatientInTreatedState(@NonNull Date visitEndDate) {
+        // Get the midnight of that day when the visit happened
+        Calendar date = Calendar.getInstance();
+        date.setTime(visitEndDate);
+        // reset hour, minutes, seconds and millis
+        date.set(Calendar.HOUR_OF_DAY, 0);
+        date.set(Calendar.MINUTE, 0);
+        date.set(Calendar.SECOND, 0);
+        date.set(Calendar.MILLISECOND, 0);
+
+        // next day
+        date.add(Calendar.DAY_OF_MONTH, 1);
+        return getDateNow().before(date.getTime());
+    }
+
+    @VisibleForTesting
+    @NonNull
+    protected Date getDateNow() {
+        return new Date();
+    }
+
+    /**
+     * This checks if the patient can perform a Check-In evaluated based on their latest visit details & opd details. This however does not consider the TREATED status
+     * which appears after a visit is completed within the same day. If you need to consider the TREATED status, you should first call {@link #isPatientInTreatedState(Date)}
+     * and then call this method if the result is false.
+     *
+     * @param visit
+     * @param opdDetails
+     * @return
+     */
+    public boolean canPatientCheckInInsteadOfDiagnoseAndTreat(@Nullable OpdVisit visit, @Nullable OpdDetails opdDetails) {
+        Date latestValidCheckInDate = OpdLibrary.getInstance().getLatestValidCheckInDate();
+
+        // If we are past the 24 hours or so, then the status should be check-in
+        // If your opd
+        return visit == null || visit.getVisitDate().before(latestValidCheckInDate) || (opdDetails != null && opdDetails.getCurrentVisitEndDate() != null);
+    }
+
+    public boolean isClientCurrentlyCheckedIn(@Nullable OpdVisit opdVisit, @Nullable OpdDetails opdDetails) {
+        return !canPatientCheckInInsteadOfDiagnoseAndTreat(opdVisit, opdDetails);
     }
 }
