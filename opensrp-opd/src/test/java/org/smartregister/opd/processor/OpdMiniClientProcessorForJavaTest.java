@@ -130,7 +130,7 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
         PowerMockito.when(opdLibrary.getOpdTreatmentRepository()).thenReturn(opdTreatmentRepository);
         Obs obs = new Obs();
         obs.setFormSubmissionField(OpdConstants.JSON_FORM_KEY.MEDICINE);
-       obs.setValue("");
+        obs.setValue("");
 
         ArrayList<Object> humanReadableValues = new ArrayList<>();
         humanReadableValues.add("Bacteria Killer");
@@ -236,7 +236,7 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
         HashSet<String> eventTypes = opdMiniClientProcessorForJava.getEventTypes();
 
         Assert.assertTrue(eventTypes.size() >= 6);
-        for (String eventType: eventTypes) {
+        for (String eventType : eventTypes) {
             Assert.assertTrue(eventType.startsWith("OPD"));
         }
     }
