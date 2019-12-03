@@ -31,11 +31,11 @@ import org.smartregister.domain.db.Obs;
 import org.smartregister.opd.BaseTest;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.exception.CheckInEventProcessException;
-import org.smartregister.opd.pojos.OpdDiagnosis;
-import org.smartregister.opd.pojos.OpdServiceDetail;
-import org.smartregister.opd.pojos.OpdTestConducted;
-import org.smartregister.opd.pojos.OpdTreatment;
-import org.smartregister.opd.pojos.OpdVisit;
+import org.smartregister.opd.pojo.OpdDiagnosis;
+import org.smartregister.opd.pojo.OpdServiceDetail;
+import org.smartregister.opd.pojo.OpdTestConducted;
+import org.smartregister.opd.pojo.OpdTreatment;
+import org.smartregister.opd.pojo.OpdVisit;
 import org.smartregister.opd.repository.OpdDiagnosisRepository;
 import org.smartregister.opd.repository.OpdServiceDetailRepository;
 import org.smartregister.opd.repository.OpdTestConductedRepository;
@@ -205,15 +205,17 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
         PowerMockito.when(opdLibrary.getOpdTestConductedRepository()).thenReturn(opdTestConductedRepository);
         Obs obs = new Obs();
         obs.setFormSubmissionField(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER);
-        obs.setValue("diagnostic test result");
+        obs.setValue("positive");
+        obs.addToHumanReadableValuesList("");
         obs.setFieldDataType("text");
         obs.setFieldCode(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER);
         event.addObs(obs);
 
         Obs obs1 = new Obs();
         obs1.setFormSubmissionField(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST);
-        obs1.setValue("diagnostic test");
+        obs1.setValue("malaria");
         obs1.setFieldDataType("text");
+        obs1.addToHumanReadableValuesList("");
         obs1.setFieldCode(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST);
         event.addObs(obs1);
         event.addDetails(OpdConstants.JSON_FORM_KEY.ID, "id");
@@ -221,8 +223,8 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
         Whitebox.invokeMethod(opdMiniClientProcessorForJava, "processTestConducted", event);
 
         Mockito.verify(opdTestConductedRepository, Mockito.times(1)).saveOrUpdate(opdTestConductedArgumentCaptor.capture());
-        Assert.assertEquals("diagnostic test result", opdTestConductedArgumentCaptor.getValue().getResult());
-        Assert.assertEquals("diagnostic test", opdTestConductedArgumentCaptor.getValue().getTest());
+        Assert.assertEquals("positive", opdTestConductedArgumentCaptor.getValue().getResult());
+        Assert.assertEquals("malaria", opdTestConductedArgumentCaptor.getValue().getTest());
         Assert.assertEquals("visitId", opdTestConductedArgumentCaptor.getValue().getVisitId());
         Assert.assertNotNull(opdTestConductedArgumentCaptor.getValue().getCreatedAt());
         Assert.assertNotNull(opdTestConductedArgumentCaptor.getValue().getUpdatedAt());
