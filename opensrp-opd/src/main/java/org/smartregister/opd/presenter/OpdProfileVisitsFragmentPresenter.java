@@ -7,6 +7,7 @@ import android.support.annotation.StringRes;
 import android.support.v4.util.Pair;
 import android.text.TextUtils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jeasy.rules.api.Facts;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
@@ -57,7 +58,7 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
         }
 
         // Activity destroyed set interactor to null
-        if (! isChangingConfiguration) {
+        if (!isChangingConfiguration) {
             mProfileInteractor = null;
         }
     }
@@ -101,13 +102,13 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
             profileView.showPageCountText(String.format(pageCounterTemplate, (currentPageNo + 1), totalPages));
 
             profileView.showPreviousPageBtn(currentPageNo > 0);
-            profileView.showNextPageBtn(currentPageNo < (totalPages -1));
+            profileView.showNextPageBtn(currentPageNo < (totalPages - 1));
         }
     }
 
     @Override
     public void populateWrapperDataAndFacts(@NonNull List<OpdVisitSummary> opdVisitSummaries, @NonNull ArrayList<Pair<YamlConfigWrapper, Facts>> items) {
-        for (OpdVisitSummary opdVisitSummary: opdVisitSummaries) {
+        for (OpdVisitSummary opdVisitSummary : opdVisitSummaries) {
             Facts facts = generateOpdVisitSummaryFact(opdVisitSummary);
             Iterable<Object> ruleObjects = null;
 
@@ -185,8 +186,8 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
             OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.VISIT_DATE, OpdUtils.convertDate(opdVisitSummary.getVisitDate(), OpdConstants.DateFormat.d_MMM_yyyy));
         }
 
-        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.TEST_NAME, opdVisitSummary.getTestName());
-        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.TEST_RESULT, opdVisitSummary.getTestResult());
+        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.TEST_NAME, "Test Conducted");
+
         OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.DIAGNOSIS, opdVisitSummary.getDiagnosis());
         OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.DIAGNOSIS_TYPE, opdVisitSummary.getDiagnosisType());
 
@@ -199,10 +200,42 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
         String medicationText = generateMedicationText(treatments);
         OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.TREATMENT, medicationText);
 
+        // Put the test text
+        HashMap<String, OpdVisitSummaryResultModel.Test> test = opdVisitSummary.getTests();
+        String testText = generateTestText(test);
+        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.TEST_RESULT, testText);
+
         // Add translate-able labels
         setLabelsInFacts(facts);
 
         return facts;
+    }
+
+    @NonNull
+    public String generateTestText(@NonNull HashMap<String, OpdVisitSummaryResultModel.Test> tests) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (OpdVisitSummaryResultModel.Test test : tests.values()) {
+            if (test != null && test.getName() != null) {
+                String testName = StringUtils.capitalize(test.getName());
+                if (stringBuilder.length() > 1) {
+                    stringBuilder.append("<br/>");
+                }
+
+                String medicationTemplate = getString(R.string.single_medicine_visit_preview_summary);
+
+                if (!TextUtils.isEmpty(testName)) {
+                    if(StringUtils.isNotBlank(medicationTemplate)) {
+                        stringBuilder.append(String.format(medicationTemplate, testName));
+                    }
+
+                    String testResult = test.getResult();
+                    if (!TextUtils.isEmpty(testResult)) {
+                        stringBuilder.append(testResult.toLowerCase());
+                    }
+                }
+            }
+        }
+        return stringBuilder.toString();
     }
 
     @Override

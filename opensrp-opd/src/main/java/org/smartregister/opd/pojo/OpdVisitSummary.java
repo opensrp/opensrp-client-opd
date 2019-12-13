@@ -13,6 +13,8 @@ public class OpdVisitSummary extends OpdVisitSummaryResultModel {
 
     private HashSet<String> diseases = new HashSet<>();
     private HashMap<String, Treatment> treatments = new HashMap<>();
+    private HashMap<String, Test> tests = new HashMap<>();
+
 
     public HashSet<String> getDiseases() {
         return diseases;
@@ -43,4 +45,18 @@ public class OpdVisitSummary extends OpdVisitSummaryResultModel {
         treatments.put(treatment.getMedicine(), treatment);
     }
 
+    @Override
+    public void setTest(Test test) {
+        super.setTest(test);
+
+        addTest(test);
+    }
+
+    public HashMap<String, Test> getTests() {
+        return tests;
+    }
+
+    public void addTest(@NonNull Test test) {
+        tests.put(test.getName(), test);
+    }
 }
