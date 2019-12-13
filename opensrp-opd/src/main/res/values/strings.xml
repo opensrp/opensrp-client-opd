@@ -49,6 +49,7 @@
     <string name="opd_dosage_duration_text">Dose: %s, Duration: %s</string>
     <string name="opd">OPD</string>
     <string name="opd_checked_in">OPD: CHECKED IN</string>
+    <string name="opd_str_page_info">Page {0} of {1}</string>
 
     <string name="diagnose_and_treat"><![CDATA[DIAGNOSE & TREAT]]></string>
     <string name="check_in">CHECK IN</string>
