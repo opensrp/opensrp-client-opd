@@ -143,7 +143,7 @@ public class OpdSampleApplication extends org.smartregister.view.activity.Drisht
 
     private void sampleUniqueIds() {
         List<String> ids = generateIds(20);
-        OpdLibrary.getInstance().getUniqueIdRepository().bulkInserOpenmrsIds(ids);
+        OpdLibrary.getInstance().getUniqueIdRepository().bulkInsertOpenmrsIds(ids);
     }
 
     private List<String> generateIds(int size) {
