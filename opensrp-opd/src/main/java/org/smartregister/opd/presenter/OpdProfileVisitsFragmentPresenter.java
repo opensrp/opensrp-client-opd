@@ -186,7 +186,7 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
             OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.VISIT_DATE, OpdUtils.convertDate(opdVisitSummary.getVisitDate(), OpdConstants.DateFormat.d_MMM_yyyy));
         }
 
-        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.TEST_NAME, "Test Conducted");
+        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.TEST_NAME, OpdConstants.TEST_CONDUCTED);
 
         OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.DIAGNOSIS, opdVisitSummary.getDiagnosis());
         OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.DIAGNOSIS_TYPE, opdVisitSummary.getDiagnosisType());
@@ -203,6 +203,7 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
         // Put the test text
         HashMap<String, OpdVisitSummaryResultModel.Test> test = opdVisitSummary.getTests();
         String testText = generateTestText(test);
+
         OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.TEST_RESULT, testText);
 
         // Add translate-able labels
@@ -221,7 +222,7 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
                     stringBuilder.append("<br/>");
                 }
 
-                String medicationTemplate = getString(R.string.single_medicine_visit_preview_summary);
+                String medicationTemplate = getString(R.string.single_test_visit_preview_summary);
 
                 if (!TextUtils.isEmpty(testName)) {
                     if(StringUtils.isNotBlank(medicationTemplate)) {
