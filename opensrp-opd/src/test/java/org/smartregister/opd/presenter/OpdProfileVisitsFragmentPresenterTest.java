@@ -3,6 +3,7 @@ package org.smartregister.opd.presenter;
 import android.support.v4.util.Pair;
 
 import org.jeasy.rules.api.Facts;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -11,11 +12,14 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.opd.BaseTest;
+import org.smartregister.opd.R;
 import org.smartregister.opd.contract.OpdProfileVisitsFragmentContract;
 import org.smartregister.opd.domain.YamlConfigWrapper;
 import org.smartregister.opd.pojo.OpdVisitSummary;
+import org.smartregister.opd.pojo.OpdVisitSummaryResultModel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -164,5 +168,28 @@ public class OpdProfileVisitsFragmentPresenterTest extends BaseTest {
         int stringId = 82983;
         presenter.getString(stringId);
         Mockito.verify(view, Mockito.times(1)).getString(Mockito.eq(stringId));
+    }
+
+    @Test
+    public void generateTestText() {
+        HashMap<String, OpdVisitSummaryResultModel.Test> tests = new HashMap<>();
+        OpdVisitSummaryResultModel.Test test = new OpdVisitSummaryResultModel.Test();
+        test.setName("Hepatitis B");
+        test.setResult("Negative");
+
+        OpdVisitSummaryResultModel.Test test2 = new OpdVisitSummaryResultModel.Test();
+        test2.setName("Hepatitis C");
+        test2.setResult("Negative");
+
+        tests.put("Hepatitis B", test);
+        tests.put("Hepatitis C", test2);
+        OpdProfileVisitsFragmentContract.View view = Mockito.mock(OpdProfileVisitsFragmentContract.View.class);
+        Mockito.when(view.getString(R.string.single_test_visit_preview_summary))
+                .thenReturn("<b><font color=\\'black\\'>%s</font><br/></b>");
+        OpdProfileVisitsFragmentPresenter profileVisitsFragmentPresenter = new OpdProfileVisitsFragmentPresenter(view);
+
+        String result = profileVisitsFragmentPresenter.generateTestText(tests);
+        String expected = "<b><font color=\\'black\\'>Hepatitis C</font><br/></b>negative<br/><b><font color=\\'black\\'>Hepatitis B</font><br/></b>negative";
+        Assert.assertEquals(expected, result);
     }
 }
