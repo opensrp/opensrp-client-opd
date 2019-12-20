@@ -31,11 +31,13 @@ import org.smartregister.domain.db.Obs;
 import org.smartregister.opd.BaseTest;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.exception.CheckInEventProcessException;
+import org.smartregister.opd.pojo.OpdDetails;
 import org.smartregister.opd.pojo.OpdDiagnosis;
 import org.smartregister.opd.pojo.OpdServiceDetail;
 import org.smartregister.opd.pojo.OpdTestConducted;
 import org.smartregister.opd.pojo.OpdTreatment;
 import org.smartregister.opd.pojo.OpdVisit;
+import org.smartregister.opd.repository.OpdDetailsRepository;
 import org.smartregister.opd.repository.OpdDiagnosisRepository;
 import org.smartregister.opd.repository.OpdServiceDetailRepository;
 import org.smartregister.opd.repository.OpdTestConductedRepository;
@@ -69,6 +71,9 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
     @Mock
     private OpdDiagnosisRepository opdDiagnosisRepository;
 
+    @Mock
+    private OpdDetailsRepository opdDetailsRepository;
+
     @Captor
     private ArgumentCaptor<OpdServiceDetail> opdServiceDetailArgumentCaptor;
 
@@ -77,6 +82,9 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
 
     @Captor
     private ArgumentCaptor<OpdDiagnosis> opdDiagnosisArgumentCaptor;
+
+    @Captor
+    private ArgumentCaptor<OpdDetails> opdDetailsArgumentCaptor;
 
     @Captor
     private ArgumentCaptor<OpdTestConducted> opdTestConductedArgumentCaptor;
@@ -130,22 +138,17 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
         PowerMockito.when(opdLibrary.getOpdTreatmentRepository()).thenReturn(opdTreatmentRepository);
         Obs obs = new Obs();
         obs.setFormSubmissionField(OpdConstants.JSON_FORM_KEY.MEDICINE);
-        obs.setValue("");
+        obs.setValue("[{\"key\":\"Bacteria Killer\",\"property\":{\"meta\":{\"dosage\":\"er\",\"duration\":\"er\"}}}]");
 
-        ArrayList<Object> humanReadableValues = new ArrayList<>();
-        humanReadableValues.add("Bacteria Killer");
-
-        obs.setHumanReadableValues(humanReadableValues);
         obs.setFieldDataType("text");
         obs.setFieldCode(OpdConstants.JSON_FORM_KEY.MEDICINE);
         event.addObs(obs);
         event.addDetails(OpdConstants.JSON_FORM_KEY.ID, "id");
-        event.addDetails(OpdConstants.KEY.VALUE, "[{\"key\":\"BB009900\",\"text\":\"Bacteria Killer\",\"openmrs_entity\":\"\",\"openmrs_entity_id\":\"\",\"openmrs_entity_parent\":\"\",\"property\":{\"pack_size\":\"BB009900\",\"product_code\":\"BB009900\",\"dispensing_unit\":\"dispensingUnit:Each\",\"meta\":{\"duration\":\"10 days\",\"dosage\":\"2x2\",\"info\":\"Dose: 10 days, Duration: 2x2\"}}}]");
 
         Whitebox.invokeMethod(opdMiniClientProcessorForJava, "processTreatment", event);
         Mockito.verify(opdTreatmentRepository, Mockito.times(1)).saveOrUpdate(opdTreatmentArgumentCaptor.capture());
-        Assert.assertEquals("10 days", opdTreatmentArgumentCaptor.getValue().getDuration());
-        Assert.assertEquals("2x2", opdTreatmentArgumentCaptor.getValue().getDosage());
+        Assert.assertEquals("er", opdTreatmentArgumentCaptor.getValue().getDuration());
+        Assert.assertEquals("er", opdTreatmentArgumentCaptor.getValue().getDosage());
         Assert.assertEquals("Bacteria Killer", opdTreatmentArgumentCaptor.getValue().getMedicine());
         Assert.assertNotNull(opdTreatmentArgumentCaptor.getValue().getCreatedAt());
         Assert.assertNotNull(opdTreatmentArgumentCaptor.getValue().getUpdatedAt());
@@ -158,24 +161,17 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
         PowerMockito.when(OpdLibrary.getInstance()).thenReturn(opdLibrary);
         PowerMockito.when(opdLibrary.getOpdDiagnosisRepository()).thenReturn(opdDiagnosisRepository);
 
-        String bacterial_meningitis = "Bacterial Meningitis";
-
         Obs obs = new Obs();
         obs.setFormSubmissionField(OpdConstants.JSON_FORM_KEY.DISEASE_CODE);
-        obs.setValue("");
+        obs.setValue("[{\"key\":\"Bacterial Meningitis\",\"property\":{\"presumed-id\":\"er\",\"confirmed-id\":\"er\"}}]");
         obs.setFieldDataType("text");
-
-        ArrayList<String> humanReadableValues = new ArrayList<>();
-        humanReadableValues.add(bacterial_meningitis);
-        obs.addToHumanReadableValuesList(humanReadableValues);
-
+        obs.setFieldCode(OpdConstants.JSON_FORM_KEY.DISEASE_CODE);
         event.addObs(obs);
         event.addDetails(OpdConstants.JSON_FORM_KEY.ID, "id");
-        event.addDetails(OpdConstants.KEY.VALUE, "[{\"key\":\"code_17d\",\"text\":\"Bacterial Meningitis\",\"openmrs_entity\":\"\",\"openmrs_entity_id\":\"\",\"openmrs_entity_parent\":\"\",\"property\":{\"presumed-id\":\"\",\"code\":\"code_17d\",\"confirmed-id\":\"\"}}]");
 
         Obs obs1 = new Obs();
         obs1.setFormSubmissionField(OpdConstants.JSON_FORM_KEY.DIAGNOSIS);
-        obs1.setValue("Patient has Bacterial Meningitis");
+        obs1.setValue("diagnosis");
         obs1.setFieldDataType("text");
         obs1.setFieldCode(OpdConstants.JSON_FORM_KEY.DIAGNOSIS);
         event.addObs(obs1);
@@ -189,8 +185,8 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
 
         Whitebox.invokeMethod(opdMiniClientProcessorForJava, "processDiagnosis", event);
         Mockito.verify(opdDiagnosisRepository, Mockito.times(1)).saveOrUpdate(opdDiagnosisArgumentCaptor.capture());
-        Assert.assertEquals("Patient has Bacterial Meningitis", opdDiagnosisArgumentCaptor.getValue().getDiagnosis());
-        Assert.assertEquals(bacterial_meningitis, opdDiagnosisArgumentCaptor.getValue().getDisease());
+        Assert.assertEquals("diagnosis", opdDiagnosisArgumentCaptor.getValue().getDiagnosis());
+        Assert.assertEquals("Bacterial Meningitis", opdDiagnosisArgumentCaptor.getValue().getDisease());
         Assert.assertEquals("Confirmed", opdDiagnosisArgumentCaptor.getValue().getType());
         Assert.assertNotNull(opdDiagnosisArgumentCaptor.getValue().getUpdatedAt());
         Assert.assertNotNull(opdDiagnosisArgumentCaptor.getValue().getCreatedAt());
@@ -205,17 +201,15 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
         PowerMockito.when(opdLibrary.getOpdTestConductedRepository()).thenReturn(opdTestConductedRepository);
         Obs obs = new Obs();
         obs.setFormSubmissionField(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER);
-        obs.setValue("positive");
-        obs.addToHumanReadableValuesList("");
+        obs.setValue("diagnostic test result");
         obs.setFieldDataType("text");
         obs.setFieldCode(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER);
         event.addObs(obs);
 
         Obs obs1 = new Obs();
         obs1.setFormSubmissionField(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST);
-        obs1.setValue("malaria");
+        obs1.setValue("diagnostic test");
         obs1.setFieldDataType("text");
-        obs1.addToHumanReadableValuesList("");
         obs1.setFieldCode(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST);
         event.addObs(obs1);
         event.addDetails(OpdConstants.JSON_FORM_KEY.ID, "id");
@@ -223,13 +217,14 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
         Whitebox.invokeMethod(opdMiniClientProcessorForJava, "processTestConducted", event);
 
         Mockito.verify(opdTestConductedRepository, Mockito.times(1)).saveOrUpdate(opdTestConductedArgumentCaptor.capture());
-        Assert.assertEquals("positive", opdTestConductedArgumentCaptor.getValue().getResult());
-        Assert.assertEquals("malaria", opdTestConductedArgumentCaptor.getValue().getTest());
+        Assert.assertEquals("diagnostic test result", opdTestConductedArgumentCaptor.getValue().getResult());
+        Assert.assertEquals("diagnostic test", opdTestConductedArgumentCaptor.getValue().getTest());
         Assert.assertEquals("visitId", opdTestConductedArgumentCaptor.getValue().getVisitId());
         Assert.assertNotNull(opdTestConductedArgumentCaptor.getValue().getCreatedAt());
         Assert.assertNotNull(opdTestConductedArgumentCaptor.getValue().getUpdatedAt());
         Assert.assertNotNull(opdTestConductedArgumentCaptor.getValue().getId());
     }
+
 
     @Test
     public void getEventTypesShouldReturnAtLeast6EventTypesAllStartingWithOpd() {
@@ -337,5 +332,30 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
         Mockito.doReturn(false).when(opdVisitRepository).addVisit(Mockito.any(OpdVisit.class));
 
         opdMiniClientProcessorForJava.processCheckIn(event, client);
+    }
+
+    @Test
+    public void processOpdCloseVisitEvent() throws Exception {
+        PowerMockito.mockStatic(OpdLibrary.class);
+        OpdDetails opdDetails = new OpdDetails("id", "id");
+        PowerMockito.when(opdDetailsRepository.findOne(Mockito.any(OpdDetails.class))).thenReturn(opdDetails);
+        PowerMockito.when(opdLibrary.getOpdDetailsRepository()).thenReturn(opdDetailsRepository);
+        PowerMockito.when(OpdLibrary.getInstance()).thenReturn(opdLibrary);
+
+
+        event.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_ID, "id");
+        event.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_END_DATE, "id");
+
+        Whitebox.invokeMethod(opdMiniClientProcessorForJava, "processOpdCloseVisitEvent", event);
+
+        Mockito.verify(opdDetailsRepository, Mockito.times(1))
+                .saveOrUpdate(opdDetailsArgumentCaptor.capture());
+        Assert.assertEquals("id", opdDetailsArgumentCaptor.getValue().getBaseEntityId());
+        Assert.assertEquals("id", opdDetailsArgumentCaptor.getValue().getCurrentVisitId());
+    }
+
+    @Test
+    public void getEventTypes(){
+        Assert.assertNotNull(opdMiniClientProcessorForJava.getEventTypes());
     }
 }
