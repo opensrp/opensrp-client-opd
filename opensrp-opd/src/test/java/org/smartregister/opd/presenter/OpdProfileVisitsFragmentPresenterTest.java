@@ -3,7 +3,6 @@ package org.smartregister.opd.presenter;
 import android.support.v4.util.Pair;
 
 import org.jeasy.rules.api.Facts;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -190,6 +189,6 @@ public class OpdProfileVisitsFragmentPresenterTest extends BaseTest {
 
         String result = profileVisitsFragmentPresenter.generateTestText(tests);
         String expected = "<b><font color=\\'black\\'>Hepatitis C</font><br/></b>negative<br/><b><font color=\\'black\\'>Hepatitis B</font><br/></b>negative";
-        Assert.assertEquals(expected, result);
+        assertEquals(expected, result);
     }
 }
