@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
 
-import com.vijay.jsonwizard.activities.JsonFormActivity;
 import com.vijay.jsonwizard.activities.JsonWizardFormActivity;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 
@@ -135,13 +134,15 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
     }
 
     /**
-     * Conditionaly display the confirmation dialog
+     * Conditionally display the confirmation dialog
      */
     @Override
     public void onBackPressed() {
         if (enableOnCloseDialog) {
             if (form.optString(OpdJsonFormUtils.ENCOUNTER_TYPE).equals(OpdConstants.EventType.DIAGNOSIS_AND_TREAT)) {
-                AlertDialog dialog = new AlertDialog.Builder(this, R.style.AppThemeAlertDialog).setTitle(confirmCloseTitle)
+                AlertDialog dialog = new AlertDialog.Builder(this, R.style.AppThemeAlertDialog)
+                        .setTitle(getString(R.string.opd_exit_form))
+                        .setCancelable(true)
                         .setMessage(getString(R.string.save_form_fill_session))
                         .setNegativeButton(R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
@@ -152,12 +153,14 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
                         }).setPositiveButton(R.string.no, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Timber.d("No button on dialog in %s", JsonFormActivity.class.getCanonicalName());
+                                //clear
+                                clearSavedSession();
+                                BaseOpdFormActivity.this.finish();
                             }
-                        }).setNeutralButton(getString(R.string.end_session), new DialogInterface.OnClickListener() {
+                        }).setNeutralButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                BaseOpdFormActivity.this.finish();
+                                dialog.dismiss();
                             }
                         }).create();
 
@@ -171,17 +174,18 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
         }
     }
 
+    private void clearSavedSession() {
+        final OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm = new OpdDiagnosisAndTreatmentForm(OpdUtils.getIntentValue(getIntent(), OpdConstants.IntentKey.BASE_ENTITY_ID));
+        final OpdDiagnosisAndTreatmentFormDao opdDiagnosisAndTreatmentFormDao = OpdLibrary.getInstance().getOpdDiagnosisAndTreatmentFormRepository();
+        new AppExecutors().diskIO().execute(() -> opdDiagnosisAndTreatmentFormDao.delete(opdDiagnosisAndTreatmentForm));
+    }
+
     private void saveFormFillSession() {
         JSONObject jsonObject = getmJSONObject();
         final OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm = new OpdDiagnosisAndTreatmentForm(0, OpdUtils.getIntentValue(getIntent(), OpdConstants.IntentKey.BASE_ENTITY_ID),
                 jsonObject.toString(), Utils.convertDateFormat(new DateTime()));
         final OpdDiagnosisAndTreatmentFormDao opdDiagnosisAndTreatmentFormDao = OpdLibrary.getInstance().getOpdDiagnosisAndTreatmentFormRepository();
-        new AppExecutors().diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                opdDiagnosisAndTreatmentFormDao.saveOrUpdate(opdDiagnosisAndTreatmentForm);
-            }
-        });
+        new AppExecutors().diskIO().execute(() -> opdDiagnosisAndTreatmentFormDao.saveOrUpdate(opdDiagnosisAndTreatmentForm));
     }
 
     @NonNull
