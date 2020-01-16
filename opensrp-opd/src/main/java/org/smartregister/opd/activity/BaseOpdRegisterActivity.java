@@ -12,6 +12,7 @@ import android.view.View;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.domain.Form;
 
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.smartregister.AllConstants;
 import org.smartregister.opd.OpdLibrary;
@@ -122,7 +123,6 @@ public abstract class BaseOpdRegisterActivity extends BaseRegisterActivity imple
         OpdMetadata opdMetadata = OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata();
         if (opdMetadata != null) {
             Intent intent = new Intent(this, opdMetadata.getOpdFormActivity());
-            intent.putExtra(OpdConstants.JSON_FORM_EXTRA.JSON, jsonForm.toString());
             Form form = new Form();
             form.setWizard(false);
             form.setName("");
@@ -134,22 +134,37 @@ public abstract class BaseOpdRegisterActivity extends BaseRegisterActivity imple
                 form.setWizard(true);
             }
 
+            if (encounterType.equals(OpdConstants.EventType.CHECK_IN)) {
+                if (parcelableData != null) {
+                    String baseEntityId = parcelableData.get(OpdConstants.IntentKey.BASE_ENTITY_ID);
+                    if (StringUtils.isNotBlank(baseEntityId)) {
+                        injectRelevanceFields(jsonForm, baseEntityId);
+                    }
+                }
+            }
+
             form.setHideSaveLabel(true);
             form.setPreviousLabel("");
             form.setNextLabel("");
             form.setHideNextButton(false);
             form.setHidePreviousButton(false);
 
+            intent.putExtra(OpdConstants.JSON_FORM_EXTRA.JSON, jsonForm.toString());
             intent.putExtra(JsonFormConstants.JSON_FORM_KEY.FORM, form);
             if (parcelableData != null) {
                 for (String intentKey : parcelableData.keySet()) {
                     intent.putExtra(intentKey, parcelableData.get(intentKey));
                 }
             }
-
             startActivityForResult(intent, OpdJsonFormUtils.REQUEST_CODE_GET_JSON);
+
         } else {
             Timber.e(new Exception(), "FormActivity cannot be started because OpdMetadata is NULL");
         }
     }
+
+    private void injectRelevanceFields(@NonNull JSONObject jsonForm, @NonNull String baseEntityId) {
+        OpdUtils.injectRelevanceFields(jsonForm, baseEntityId);
+    }
+
 }

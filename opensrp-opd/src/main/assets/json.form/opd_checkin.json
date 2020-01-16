@@ -80,9 +80,10 @@
           "Unknown"
         ],
         "relevance": {
-          "step1:patient_gender": {
-            "type": "string",
-            "ex": "equalTo(., \"Female\")"
+          "rules-engine": {
+            "ex-rules" : {
+              "rules-file": "opd/opd_checkin_relevance_rules.yml"
+            }
           }
         }
       },

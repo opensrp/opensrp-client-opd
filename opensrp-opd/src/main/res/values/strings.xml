@@ -58,6 +58,7 @@
     <string name="disease_code">Disease Code</string>
     <string name="treatment">Treatment</string>
     <string name="single_medicine_visit_preview_summary"><![CDATA[<b><font color=\'black\'>%s</font><br/></b>]]></string>
+    <string name="single_test_visit_preview_summary"><![CDATA[<b><font color=\'black\'>%s</font><br/></b>]]></string>
     <string name="medication_dose">Dose: %s</string>
     <string name="medication_duration">Duration: %s</string>
     <string name="dose_or_duration_html"><![CDATA[<font color=\'#7f7f7f\'>%s</font>]]></string>

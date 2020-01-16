@@ -186,7 +186,7 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
             OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.VISIT_DATE, OpdUtils.convertDate(opdVisitSummary.getVisitDate(), OpdConstants.DateFormat.d_MMM_yyyy));
         }
 
-        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.TEST_NAME, "Test Conducted");
+        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.TEST_NAME, OpdConstants.StepTitle.TEST_CONDUCTED);
 
         OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.DIAGNOSIS, opdVisitSummary.getDiagnosis());
         OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.DIAGNOSIS_TYPE, opdVisitSummary.getDiagnosisType());
@@ -203,6 +203,7 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
         // Put the test text
         HashMap<String, OpdVisitSummaryResultModel.Test> test = opdVisitSummary.getTests();
         String testText = generateTestText(test);
+
         OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.TEST_RESULT, testText);
 
         // Add translate-able labels
@@ -215,21 +216,21 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
     public String generateTestText(@NonNull HashMap<String, OpdVisitSummaryResultModel.Test> tests) {
         StringBuilder stringBuilder = new StringBuilder();
         for (OpdVisitSummaryResultModel.Test test : tests.values()) {
-            if (test != null && test.getName() != null) {
-                String testName = StringUtils.capitalize(test.getName());
+            if (test != null && StringUtils.isNotBlank(test.getName())) {
+                String testName = test.getName();
                 if (stringBuilder.length() > 1) {
                     stringBuilder.append("<br/>");
                 }
 
-                String medicationTemplate = getString(R.string.single_medicine_visit_preview_summary);
+                String medicationTemplate = getString(R.string.single_test_visit_preview_summary);
 
-                if (!TextUtils.isEmpty(testName)) {
+                if (StringUtils.isNotBlank(testName)) {
                     if(StringUtils.isNotBlank(medicationTemplate)) {
                         stringBuilder.append(String.format(medicationTemplate, testName));
                     }
 
                     String testResult = test.getResult();
-                    if (!TextUtils.isEmpty(testResult)) {
+                    if (StringUtils.isNotBlank(testResult)) {
                         stringBuilder.append(testResult.toLowerCase());
                     }
                 }
