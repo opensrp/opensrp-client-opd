@@ -19,7 +19,7 @@ import org.smartregister.opd.adapter.OpdProfileVisitsAdapter;
 import org.smartregister.opd.contract.OpdProfileVisitsFragmentContract;
 import org.smartregister.opd.domain.YamlConfigWrapper;
 import org.smartregister.opd.listener.OnSendActionToFragment;
-import org.smartregister.opd.pojos.OpdVisitSummary;
+import org.smartregister.opd.pojo.OpdVisitSummary;
 import org.smartregister.opd.presenter.OpdProfileVisitsFragmentPresenter;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.view.fragment.BaseProfileFragment;

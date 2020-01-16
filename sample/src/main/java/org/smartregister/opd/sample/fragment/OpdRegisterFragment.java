@@ -7,7 +7,7 @@ import com.google.gson.Gson;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.fragment.BaseOpdRegisterFragment;
-import org.smartregister.opd.pojos.OpdMetadata;
+import org.smartregister.opd.pojo.OpdMetadata;
 import org.smartregister.opd.sample.activity.OpdRegisterActivity;
 
 import timber.log.Timber;

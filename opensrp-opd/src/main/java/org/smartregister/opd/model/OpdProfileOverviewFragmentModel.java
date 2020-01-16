@@ -4,9 +4,9 @@ import android.support.annotation.NonNull;
 
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.contract.OpdProfileOverviewFragmentContract;
-import org.smartregister.opd.pojos.OpdCheckIn;
-import org.smartregister.opd.pojos.OpdDetails;
-import org.smartregister.opd.pojos.OpdVisit;
+import org.smartregister.opd.pojo.OpdCheckIn;
+import org.smartregister.opd.pojo.OpdDetails;
+import org.smartregister.opd.pojo.OpdVisit;
 import org.smartregister.opd.utils.AppExecutors;
 
 /**

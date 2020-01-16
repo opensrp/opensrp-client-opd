@@ -27,13 +27,14 @@ import org.smartregister.domain.db.Obs;
 import org.smartregister.domain.jsonmapping.ClientClassification;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.exception.CheckInEventProcessException;
-import org.smartregister.opd.pojos.OpdCheckIn;
-import org.smartregister.opd.pojos.OpdDetails;
-import org.smartregister.opd.pojos.OpdDiagnosis;
-import org.smartregister.opd.pojos.OpdServiceDetail;
-import org.smartregister.opd.pojos.OpdTestConducted;
-import org.smartregister.opd.pojos.OpdTreatment;
-import org.smartregister.opd.pojos.OpdVisit;
+import org.smartregister.opd.pojo.CompositeObs;
+import org.smartregister.opd.pojo.OpdCheckIn;
+import org.smartregister.opd.pojo.OpdDetails;
+import org.smartregister.opd.pojo.OpdDiagnosis;
+import org.smartregister.opd.pojo.OpdServiceDetail;
+import org.smartregister.opd.pojo.OpdTestConducted;
+import org.smartregister.opd.pojo.OpdTreatment;
+import org.smartregister.opd.pojo.OpdVisit;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.opd.utils.OpdUtils;
@@ -42,6 +43,7 @@ import org.smartregister.util.Utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -302,6 +304,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
     }
 
     private void processTestConducted(@NonNull Event event) {
+
         Map<String, String> mapDetails = event.getDetails();
 
         String id = mapDetails.get(OpdConstants.JSON_FORM_KEY.ID);
@@ -309,68 +312,49 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
             return;
         }
         String[] valueIds = id.split(",");
+        List<CompositeObs> compositeObsList = OpdUtils.getAllObsObject(event);
+        List<String> resultKeys = Arrays.asList(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER, OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_GLUCOSE,
+                OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPECIFY, OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER_BLOOD_TYPE);
+        List<String> testKeys = Arrays.asList(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_OTHER, OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST);
+        String[] resultTestArr = new String[valueIds.length];
+        String[] resultTestResultArr = new String[valueIds.length];
+        int arrayIndexKeys = 0;
+        int arrayIndexTests = 0;
 
-        HashMap<String, String> keyValues = new HashMap<>();
-        generateKeyValuesFromEvent(event, keyValues);
-
-        String diagnosticTest = extractDiagnosticTest(keyValues);
-        String diagnosticResult = extractDiagnosticResult(keyValues);
-
-        if (!TextUtils.isEmpty(diagnosticResult) && !TextUtils.isEmpty(diagnosticTest)) {
-            OpdTestConducted opdTestConducted = new OpdTestConducted();
-            opdTestConducted.setResult(diagnosticResult);
-            opdTestConducted.setTest(diagnosticTest);
-            opdTestConducted.setVisitId(mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID));
-            opdTestConducted.setBaseEntityId(event.getBaseEntityId());
-            opdTestConducted.setId(valueIds[0]);
-            opdTestConducted.setCreatedAt(Utils.convertDateFormat(new DateTime()));
-            opdTestConducted.setUpdatedAt(Utils.convertDateFormat(new DateTime()));
-
-            boolean result = OpdLibrary.getInstance().getOpdTestConductedRepository().saveOrUpdate(opdTestConducted);
-
-            if (result) {
-                Timber.i("Opd processTestConducted for %s saved", event.getBaseEntityId());
-                return;
+        for (CompositeObs compositeObs : compositeObsList) {
+            if (resultKeys.contains(compositeObs.getFormSubmissionFieldKey())) {
+                resultTestResultArr[arrayIndexKeys] = compositeObs.getValue();
+                arrayIndexKeys++;
+                //
+            } else if (testKeys.contains(compositeObs.getFormSubmissionFieldKey())) {
+                //
+                resultTestArr[arrayIndexTests] = compositeObs.getValue();
+                arrayIndexTests++;
             }
-
-            Timber.e("Opd processTestConducted for %s not saved", event.getBaseEntityId());
-        }
-    }
-
-    @Nullable
-    private String extractDiagnosticResult(@NonNull HashMap<String, String> keyValues) {
-        String diagnosticResult = null;
-        if (keyValues.containsKey(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER)) {
-            diagnosticResult = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER);
         }
 
-        if (keyValues.containsKey(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPECIFY)) {
-            diagnosticResult = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPECIFY);
+        for (int i = 0; i < valueIds.length; i++) {
+
+            if (!TextUtils.isEmpty(resultTestArr[i]) && !TextUtils.isEmpty(resultTestResultArr[i])) {
+
+                OpdTestConducted opdTestConducted = new OpdTestConducted();
+                opdTestConducted.setResult(resultTestResultArr[i]);
+                opdTestConducted.setTest(resultTestArr[i]);
+                opdTestConducted.setVisitId(mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID));
+                opdTestConducted.setBaseEntityId(event.getBaseEntityId());
+                opdTestConducted.setId(valueIds[i]);
+                opdTestConducted.setCreatedAt(Utils.convertDateFormat(new DateTime()));
+                opdTestConducted.setUpdatedAt(Utils.convertDateFormat(new DateTime()));
+
+                boolean result = OpdLibrary.getInstance().getOpdTestConductedRepository().saveOrUpdate(opdTestConducted);
+
+                if (result) {
+                    Timber.i("Opd processTestConducted for %s saved", event.getBaseEntityId());
+                    continue;
+                }
+                Timber.e("Opd processTestConducted for %s not saved", event.getBaseEntityId());
+            }
         }
-
-        if (keyValues.containsKey(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER_BLOOD_TYPE)) {
-            diagnosticResult = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER_BLOOD_TYPE);
-        }
-
-        if (keyValues.containsKey(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_GLUCOSE)) {
-            diagnosticResult = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_GLUCOSE);
-        }
-
-        return diagnosticResult;
-    }
-
-    @Nullable
-    private String extractDiagnosticTest(@NonNull HashMap<String, String> keyValues) {
-        String diagnosticTest = null;
-        if (keyValues.containsKey(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_OTHER)) {
-            diagnosticTest = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_OTHER);
-        }
-
-        if (keyValues.containsKey(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST)) {
-            diagnosticTest = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST);
-        }
-
-        return diagnosticTest;
     }
 
     protected void processCheckIn(@NonNull Event event, @NonNull Client client) throws CheckInEventProcessException {

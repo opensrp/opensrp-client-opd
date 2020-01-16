@@ -8,7 +8,7 @@ import org.smartregister.commonregistry.CommonFtsObject;
 import org.smartregister.location.helper.LocationHelper;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.configuration.OpdConfiguration;
-import org.smartregister.opd.pojos.OpdMetadata;
+import org.smartregister.opd.pojo.OpdMetadata;
 import org.smartregister.opd.sample.BuildConfig;
 import org.smartregister.opd.sample.activity.OpdFormActivity;
 import org.smartregister.opd.sample.configuration.OpdRegisterQueryProvider;
@@ -143,7 +143,7 @@ public class OpdSampleApplication extends org.smartregister.view.activity.Drisht
 
     private void sampleUniqueIds() {
         List<String> ids = generateIds(20);
-        OpdLibrary.getInstance().getUniqueIdRepository().bulkInserOpenmrsIds(ids);
+        OpdLibrary.getInstance().getUniqueIdRepository().bulkInsertOpenmrsIds(ids);
     }
 
     private List<String> generateIds(int size) {

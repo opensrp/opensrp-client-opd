@@ -1,4 +1,4 @@
-package org.smartregister.opd.pojos;
+package org.smartregister.opd.pojo;
 
 import java.util.Date;
 
@@ -7,8 +7,7 @@ import java.util.Date;
  */
 public class OpdVisitSummaryResultModel {
 
-    private String testName;
-    private String testResult;
+    private OpdVisitSummary.Test test;
     private String diagnosis;
     private String diseaseCode;
     private OpdVisitSummary.Treatment treatment;
@@ -18,21 +17,12 @@ public class OpdVisitSummaryResultModel {
     private String disease;
     private String diagnosisType;
 
-
-    public String getTestName() {
-        return testName;
+    public Test getTest() {
+        return test;
     }
 
-    public void setTestName(String testName) {
-        this.testName = testName;
-    }
-
-    public String getTestResult() {
-        return testResult;
-    }
-
-    public void setTestResult(String testResult) {
-        this.testResult = testResult;
+    public void setTest(Test test) {
+        this.test = test;
     }
 
     public String getDiagnosis() {
@@ -127,6 +117,27 @@ public class OpdVisitSummaryResultModel {
 
         public void setDuration(String duration) {
             this.duration = duration;
+        }
+    }
+
+    public static class Test {
+        private String name;
+        private String result;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getResult() {
+            return result;
+        }
+
+        public void setResult(String result) {
+            this.result = result;
         }
     }
 }

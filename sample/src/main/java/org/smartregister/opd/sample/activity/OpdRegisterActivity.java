@@ -17,7 +17,7 @@ import org.smartregister.opd.activity.BaseOpdRegisterActivity;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
 import org.smartregister.opd.fragment.BaseOpdRegisterFragment;
 import org.smartregister.opd.model.OpdRegisterActivityModel;
-import org.smartregister.opd.pojos.RegisterParams;
+import org.smartregister.opd.pojo.RegisterParams;
 import org.smartregister.opd.presenter.BaseOpdRegisterActivityPresenter;
 import org.smartregister.opd.sample.fragment.OpdRegisterFragment;
 import org.smartregister.opd.sample.presenter.OpdRegisterActivityPresenter;

@@ -6,7 +6,8 @@ import net.sqlcipher.Cursor;
 import net.sqlcipher.database.SQLiteDatabase;
 
 import org.apache.commons.lang3.StringUtils;
-import org.smartregister.opd.pojos.OpdVisitSummary;
+import org.smartregister.opd.pojo.OpdVisitSummary;
+import org.smartregister.opd.pojo.OpdVisitSummaryResultModel;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.opd.utils.OpdUtils;
@@ -57,7 +58,7 @@ public class OpdVisitSummaryRepository extends BaseRepository {
                     , OpdDbConstants.Table.OPD_TREATMENT, OpdDbConstants.Column.OpdTreatment.DURATION
                     , OpdDbConstants.Table.OPD_VISIT
                     , OpdDbConstants.Table.OPD_DIAGNOSIS
-                    , OpdDbConstants. Table.OPD_VISIT, OpdDbConstants.Column.OpdVisit.ID
+                    , OpdDbConstants.Table.OPD_VISIT, OpdDbConstants.Column.OpdVisit.ID
                     , OpdDbConstants.Table.OPD_DIAGNOSIS, OpdDbConstants.Column.OpdDiagnosis.VISIT_ID
                     , OpdDbConstants.Table.OPD_TEST_CONDUCTED
                     , OpdDbConstants.Table.OPD_VISIT, OpdDbConstants.Column.OpdVisit.ID
@@ -92,6 +93,12 @@ public class OpdVisitSummaryRepository extends BaseRepository {
                             OpdVisitSummary.Treatment treatment = visitSummaryResult.getTreatment();
                             if (treatment != null && treatment.getMedicine() != null && !existingOpdVisitSummary.getTreatments().containsKey(treatment.getMedicine())) {
                                 existingOpdVisitSummary.addTreatment(treatment);
+                            }
+
+                            // Add any extra Tests
+                            OpdVisitSummary.Test test = visitSummaryResult.getTest();
+                            if (test != null && StringUtils.isNotBlank(test.getName()) && !existingOpdVisitSummary.getTests().containsKey(test.getName())) {
+                                existingOpdVisitSummary.addTest(test);
                             }
                         } else {
                             opdVisitSummaries.put(dateString, visitSummaryResult);
@@ -130,7 +137,7 @@ public class OpdVisitSummaryRepository extends BaseRepository {
                 if (mCursor != null) {
                     while (mCursor.moveToNext()) {
                         int recordCount = mCursor.getInt(0);
-                        pageCount = (int) Math.ceil(recordCount/10d);
+                        pageCount = (int) Math.ceil(recordCount / 10d);
                     }
                 }
             }
@@ -187,9 +194,6 @@ public class OpdVisitSummaryRepository extends BaseRepository {
     @NonNull
     public OpdVisitSummary getVisitSummaryResult(@NonNull Cursor cursor) {
         OpdVisitSummary opdVisitModel = new OpdVisitSummary();
-
-        opdVisitModel.setTestName(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTestConducted.TEST)));
-        opdVisitModel.setTestResult(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTestConducted.RESULT)));
         opdVisitModel.setDiagnosis(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdDiagnosis.DIAGNOSIS)));
         opdVisitModel.setDiagnosisType(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdDiagnosis.TYPE)));
         opdVisitModel.setDiseaseCode(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdDiagnosis.CODE)));
@@ -203,6 +207,16 @@ public class OpdVisitSummaryRepository extends BaseRepository {
             treatment.setDosage(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTreatment.DOSAGE)));
             treatment.setDuration(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTreatment.DURATION)));
             opdVisitModel.setTreatment(treatment);
+        }
+
+        String test = cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTestConducted.TEST));
+        String testResult = cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTestConducted.RESULT));
+
+        if (StringUtils.isNotBlank(test) || StringUtils.isNotBlank(testResult)) {
+            OpdVisitSummary.Test testObj = new OpdVisitSummaryResultModel.Test();
+            testObj.setName(test);
+            testObj.setResult(testResult);
+            opdVisitModel.setTest(testObj);
         }
 
         opdVisitModel.setVisitDate(OpdUtils.convertStringToDate(OpdConstants.DateFormat.YYYY_MM_DD_HH_MM_SS, cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdVisit.VISIT_DATE))));

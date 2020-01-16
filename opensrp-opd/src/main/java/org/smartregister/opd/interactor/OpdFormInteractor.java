@@ -7,7 +7,6 @@ import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.widgets.OpdBarcodeFactory;
 import org.smartregister.opd.widgets.OpdEditTextFactory;
 import org.smartregister.opd.widgets.OpdMultiSelectDrugPicker;
-import org.smartregister.opd.widgets.OpdMultiSelectList;
 
 public class OpdFormInteractor extends JsonFormInteractor {
 
@@ -23,6 +22,5 @@ public class OpdFormInteractor extends JsonFormInteractor {
         map.put(JsonFormConstants.EDIT_TEXT, new OpdEditTextFactory());
         map.put(JsonFormConstants.BARCODE, new OpdBarcodeFactory());
         map.put(OpdConstants.JsonFormWidget.MULTI_SELECT_DRUG_PICKER, new OpdMultiSelectDrugPicker());
-        map.put(JsonFormConstants.MULTI_SELECT_LIST, new OpdMultiSelectList());
     }
 }

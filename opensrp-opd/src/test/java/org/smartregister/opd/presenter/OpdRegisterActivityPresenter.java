@@ -3,7 +3,7 @@ package org.smartregister.opd.presenter;
 import android.support.annotation.NonNull;
 
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
-import org.smartregister.opd.pojos.RegisterParams;
+import org.smartregister.opd.pojo.RegisterParams;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-10-24

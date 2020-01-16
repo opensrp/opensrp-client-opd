@@ -57,7 +57,7 @@ public class OpdTestConductedRepository extends BaseRepository implements OpdTes
 
 
     @Override
-    public boolean saveOrUpdate(@NonNull org.smartregister.opd.pojos.OpdTestConducted opdTestConducted) {
+    public boolean saveOrUpdate(@NonNull org.smartregister.opd.pojo.OpdTestConducted opdTestConducted) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(OpdDbConstants.Column.OpdTestConducted.ID, opdTestConducted.getId());
         contentValues.put(OpdDbConstants.Column.OpdTestConducted.BASE_ENTITY_ID, opdTestConducted.getBaseEntityId());
@@ -72,17 +72,17 @@ public class OpdTestConductedRepository extends BaseRepository implements OpdTes
     }
 
     @Override
-    public org.smartregister.opd.pojos.OpdTestConducted findOne(org.smartregister.opd.pojos.OpdTestConducted opdTestConducted) {
+    public org.smartregister.opd.pojo.OpdTestConducted findOne(org.smartregister.opd.pojo.OpdTestConducted opdTestConducted) {
         throw new NotImplementedException("Not Implemented");
     }
 
     @Override
-    public boolean delete(org.smartregister.opd.pojos.OpdTestConducted opdTestConducted) {
+    public boolean delete(org.smartregister.opd.pojo.OpdTestConducted opdTestConducted) {
         throw new NotImplementedException("Not Implemented");
     }
 
     @Override
-    public List<org.smartregister.opd.pojos.OpdTestConducted> findAll() {
+    public List<org.smartregister.opd.pojo.OpdTestConducted> findAll() {
         throw new NotImplementedException("Not Implemented");
     }
 }

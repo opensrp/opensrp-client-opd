@@ -13,7 +13,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.robolectric.RobolectricTestRunner;
-import org.smartregister.opd.pojos.OpdCheckIn;
+import org.smartregister.opd.pojo.OpdCheckIn;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.repository.Repository;
 

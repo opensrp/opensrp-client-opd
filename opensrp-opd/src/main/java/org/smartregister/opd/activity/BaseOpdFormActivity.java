@@ -18,7 +18,7 @@ import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
 import org.smartregister.opd.dao.OpdDiagnosisAndTreatmentFormDao;
 import org.smartregister.opd.fragment.BaseOpdFormFragment;
-import org.smartregister.opd.pojos.OpdDiagnosisAndTreatmentForm;
+import org.smartregister.opd.pojo.OpdDiagnosisAndTreatmentForm;
 import org.smartregister.opd.utils.AppExecutors;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdJsonFormUtils;

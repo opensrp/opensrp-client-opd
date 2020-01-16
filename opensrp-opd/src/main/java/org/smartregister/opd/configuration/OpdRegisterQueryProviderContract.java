@@ -3,8 +3,8 @@ package org.smartregister.opd.configuration;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.smartregister.opd.pojos.InnerJoinObject;
-import org.smartregister.opd.pojos.QueryTable;
+import org.smartregister.opd.pojo.InnerJoinObject;
+import org.smartregister.opd.pojo.QueryTable;
 import org.smartregister.opd.utils.OpdRegisterQueryBuilder;
 
 /**
