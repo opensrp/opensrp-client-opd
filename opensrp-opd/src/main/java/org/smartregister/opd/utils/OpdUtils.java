@@ -16,11 +16,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.jeasy.rules.api.Facts;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.pojos.OpdMetadata;
+import org.smartregister.repository.DetailsRepository;
 import org.smartregister.util.FormUtils;
 import org.smartregister.util.JsonFormUtils;
+import org.smartregister.util.Utils;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -30,6 +33,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import timber.log.Timber;
 
@@ -208,7 +212,7 @@ public class OpdUtils extends org.smartregister.util.Utils {
     }
 
     @Nullable
-    public static JSONObject getJsonFormToJsonObject(String formName){
+    public static JSONObject getJsonFormToJsonObject(String formName) {
         if (getFormUtils() == null) {
             return null;
         }
@@ -256,4 +260,34 @@ public class OpdUtils extends org.smartregister.util.Utils {
         }
     }
 
+    public static void injectRelevanceFields(@NonNull JSONObject jsonForm, @NonNull String baseEntityId) {
+        DetailsRepository detailsRepository = OpdLibrary.getInstance().context().detailsRepository();
+        Map<String, String> map = detailsRepository.getAllDetailsForClient(baseEntityId);
+        try {
+
+            JSONObject genderJsonObject = new JSONObject();
+            genderJsonObject.put(JsonFormConstants.KEY, OpdConstants.JSON_FORM_KEY.GENDER);
+            genderJsonObject.put(JsonFormConstants.VALUE, map.get(OpdDbConstants.Column.Client.GENDER));
+            genderJsonObject.put(JsonFormConstants.TYPE, JsonFormConstants.LABEL);
+            genderJsonObject.put(JsonFormConstants.HIDDEN, "true");
+
+
+            String strDob = map.get(map.get(OpdDbConstants.Column.Client.DOB));
+            String age = "";
+            if (StringUtils.isNotBlank(strDob)) {
+                age = String.valueOf(Utils.getAgeFromDate(strDob));
+            }
+
+            JSONObject dobJsonObject = new JSONObject();
+            dobJsonObject.put(JsonFormConstants.KEY, OpdConstants.JSON_FORM_KEY.AGE);
+            dobJsonObject.put(JsonFormConstants.VALUE, age);
+            dobJsonObject.put(JsonFormConstants.TYPE, JsonFormConstants.LABEL);
+            dobJsonObject.put(JsonFormConstants.HIDDEN, "true");
+
+            jsonForm.getJSONObject(JsonFormConstants.FIRST_STEP_NAME).getJSONArray(JsonFormConstants.FIELDS).put(genderJsonObject).put(dobJsonObject);
+
+        } catch (JSONException e) {
+            Timber.e(e);
+        }
+    }
 }
