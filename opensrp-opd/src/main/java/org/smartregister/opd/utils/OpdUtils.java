@@ -338,7 +338,8 @@ public class OpdUtils extends org.smartregister.util.Utils {
             genderJsonObject.put(JsonFormConstants.HIDDEN, "true");
 
 
-            String strDob = map.get(map.get(OpdDbConstants.Column.Client.DOB));
+            String strDob = map.get(OpdDbConstants.Column.Client.DOB);
+
             String age = "";
             if (StringUtils.isNotBlank(strDob)) {
                 age = String.valueOf(Utils.getAgeFromDate(strDob));

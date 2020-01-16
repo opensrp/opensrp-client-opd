@@ -9,6 +9,6 @@ actions:
 name: step1_pregnancy_status
 description: opd_client_pregnancy_status
 priority: 1
-condition: "(step1_gender.equalsIgnoreCase('Female') || step1_gender == 'F') && step1_age > 10"
+condition: "(step1_gender.equalsIgnoreCase('Female') || step1_gender.equalsIgnoreCase('F')) && (step1_age > 10 || step1_age.isEmpty())"
 actions:
   - "isRelevant = true"
