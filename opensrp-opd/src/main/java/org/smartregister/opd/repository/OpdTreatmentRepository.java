@@ -37,23 +37,6 @@ public class OpdTreatmentRepository extends BaseRepository implements OpdTreatme
             + "_" + OpdDbConstants.Column.OpdTreatment.VISIT_ID + "_index ON " + OpdDbConstants.Table.OPD_TREATMENT +
             "(" + OpdDbConstants.Column.OpdTreatment.VISIT_ID + " COLLATE NOCASE);";
 
-//    private String[] columns = new String[]{
-//            OpdDbConstants.Column.OpdTreatment.ID,
-//            OpdDbConstants.Column.OpdTreatment.BASE_ENTITY_ID,
-//            OpdDbConstants.Column.OpdTreatment.MEDICINE,
-//            OpdDbConstants.Column.OpdTreatment.DOSAGE,
-//            OpdDbConstants.Column.OpdTreatment.DURATION,
-//            OpdDbConstants.Column.OpdTreatment.NOTE,
-//            OpdDbConstants.Column.OpdTreatment.VISIT_ID,
-//            OpdDbConstants.Column.OpdTreatment.UPDATED_AT,
-//            OpdDbConstants.Column.OpdTreatment.CREATED_AT
-//    };
-
-    public OpdTreatmentRepository(@NonNull Repository repository) {
-        super(repository);
-    }
-
-
     public static void createTable(@NonNull SQLiteDatabase database) {
         database.execSQL(CREATE_TABLE_SQL);
         database.execSQL(INDEX_BASE_ENTITY_ID);

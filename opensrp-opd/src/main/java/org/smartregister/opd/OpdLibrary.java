@@ -128,7 +128,7 @@ public class OpdLibrary {
     @NonNull
     public UniqueIdRepository getUniqueIdRepository() {
         if (uniqueIdRepository == null) {
-            uniqueIdRepository = new UniqueIdRepository(getRepository());
+            uniqueIdRepository = new UniqueIdRepository();
         }
         return uniqueIdRepository;
     }
@@ -136,7 +136,7 @@ public class OpdLibrary {
     @NonNull
     public OpdCheckInRepository getCheckInRepository() {
         if (checkInRepository == null) {
-            checkInRepository = new OpdCheckInRepository(getRepository());
+            checkInRepository = new OpdCheckInRepository();
         }
 
         return checkInRepository;
@@ -145,7 +145,7 @@ public class OpdLibrary {
     @NonNull
     public OpdVisitRepository getVisitRepository() {
         if (visitRepository == null) {
-            visitRepository = new OpdVisitRepository(getRepository());
+            visitRepository = new OpdVisitRepository();
         }
 
         return visitRepository;
@@ -154,7 +154,7 @@ public class OpdLibrary {
     @NonNull
     public OpdDetailsRepository getOpdDetailsRepository() {
         if (opdDetailsRepository == null) {
-            opdDetailsRepository = new OpdDetailsRepository(getRepository());
+            opdDetailsRepository = new OpdDetailsRepository();
         }
         return opdDetailsRepository;
     }
@@ -162,7 +162,7 @@ public class OpdLibrary {
     @NonNull
     public OpdDiagnosisAndTreatmentFormRepository getOpdDiagnosisAndTreatmentFormRepository() {
         if (opdDiagnosisAndTreatmentFormRepository == null) {
-            opdDiagnosisAndTreatmentFormRepository = new OpdDiagnosisAndTreatmentFormRepository(getRepository());
+            opdDiagnosisAndTreatmentFormRepository = new OpdDiagnosisAndTreatmentFormRepository();
         }
         return opdDiagnosisAndTreatmentFormRepository;
     }
@@ -170,7 +170,7 @@ public class OpdLibrary {
     @NonNull
     public OpdDiagnosisRepository getOpdDiagnosisRepository() {
         if (opdDiagnosisRepository == null) {
-            opdDiagnosisRepository = new OpdDiagnosisRepository(getRepository());
+            opdDiagnosisRepository = new OpdDiagnosisRepository();
         }
         return opdDiagnosisRepository;
     }
@@ -178,7 +178,7 @@ public class OpdLibrary {
     @NonNull
     public OpdTestConductedRepository getOpdTestConductedRepository() {
         if (opdTestConductedRepository == null) {
-            opdTestConductedRepository = new OpdTestConductedRepository(getRepository());
+            opdTestConductedRepository = new OpdTestConductedRepository();
         }
         return opdTestConductedRepository;
     }
@@ -186,7 +186,7 @@ public class OpdLibrary {
     @NonNull
     public OpdTreatmentRepository getOpdTreatmentRepository() {
         if (opdTreatmentRepository == null) {
-            opdTreatmentRepository = new OpdTreatmentRepository(getRepository());
+            opdTreatmentRepository = new OpdTreatmentRepository();
         }
         return opdTreatmentRepository;
     }
@@ -194,7 +194,7 @@ public class OpdLibrary {
     @NonNull
     public OpdServiceDetailRepository getOpdServiceDetailRepository() {
         if (opdServiceDetailRepository == null) {
-            opdServiceDetailRepository = new OpdServiceDetailRepository(getRepository());
+            opdServiceDetailRepository = new OpdServiceDetailRepository();
         }
         return opdServiceDetailRepository;
     }
@@ -202,7 +202,7 @@ public class OpdLibrary {
     @NonNull
     public OpdVisitSummaryRepository getOpdVisitSummaryRepository() {
         if (opdVisitSummaryRepository == null) {
-            opdVisitSummaryRepository = new OpdVisitSummaryRepository(getRepository());
+            opdVisitSummaryRepository = new OpdVisitSummaryRepository();
         }
         return opdVisitSummaryRepository;
     }

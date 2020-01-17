@@ -33,22 +33,6 @@ public class OpdTestConductedRepository extends BaseRepository implements OpdTes
             + "_" + OpdDbConstants.Column.OpdTestConducted.VISIT_ID + "_index ON " + OpdDbConstants.Table.OPD_TEST_CONDUCTED +
             "(" + OpdDbConstants.Column.OpdTestConducted.VISIT_ID + " COLLATE NOCASE);";
 
-//    private String[] columns = new String[]{
-//            OpdDbConstants.Column.OpdTestConducted.ID,
-//            OpdDbConstants.Column.OpdTestConducted.BASE_ENTITY_ID,
-//            OpdDbConstants.Column.OpdTestConducted.TEST,
-//            OpdDbConstants.Column.OpdTestConducted.RESULT,
-//            OpdDbConstants.Column.OpdTestConducted.VISIT_ID,
-//            OpdDbConstants.Column.OpdTestConducted.UPDATED_AT,
-//            OpdDbConstants.Column.OpdTestConducted.CREATED_AT
-//    };
-
-
-    public OpdTestConductedRepository(@NonNull Repository repository) {
-        super(repository);
-    }
-
-
     public static void createTable(@NonNull SQLiteDatabase database) {
         database.execSQL(CREATE_TABLE_SQL);
         database.execSQL(INDEX_BASE_ENTITY_ID);

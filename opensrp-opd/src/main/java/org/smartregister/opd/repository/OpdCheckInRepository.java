@@ -13,7 +13,6 @@ import org.smartregister.opd.dao.OpdCheckInDao;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.opd.utils.OpdDbConstants.Column.OpdCheckIn;
 import org.smartregister.repository.BaseRepository;
-import org.smartregister.repository.Repository;
 
 import timber.log.Timber;
 
@@ -62,10 +61,6 @@ public class OpdCheckInRepository extends BaseRepository implements OpdCheckInDa
             , OpdCheckIn.UPDATED_AT
     };
 
-    public OpdCheckInRepository(Repository repository) {
-        super(repository);
-    }
-
     public static void createTable(@NonNull SQLiteDatabase database) {
         database.execSQL(CREATE_TABLE_SQL);
         database.execSQL(INDEX_BASE_ENTITY_ID);
@@ -103,7 +98,7 @@ public class OpdCheckInRepository extends BaseRepository implements OpdCheckInDa
         Cursor mCursor = null;
         org.smartregister.opd.pojo.OpdCheckIn checkIn = null;
         try {
-            SQLiteDatabase db = getWritableDatabase();
+            SQLiteDatabase db = getReadableDatabase();
 
             if (StringUtils.isNotBlank(clientBaseEntityId)) {
                 mCursor = db.query(OpdDbConstants.Table.OPD_CHECK_IN, columns, OpdCheckIn.BASE_ENTITY_ID + " = ?"
@@ -135,7 +130,7 @@ public class OpdCheckInRepository extends BaseRepository implements OpdCheckInDa
         Cursor mCursor = null;
         org.smartregister.opd.pojo.OpdCheckIn checkIn = null;
         try {
-            SQLiteDatabase db = getWritableDatabase();
+            SQLiteDatabase db = getReadableDatabase();
             mCursor = db.query(OpdDbConstants.Table.OPD_CHECK_IN, columns, OpdCheckIn.VISIT_ID + " = ?"
                     , new String[]{visitId}
                     , null
@@ -156,6 +151,7 @@ public class OpdCheckInRepository extends BaseRepository implements OpdCheckInDa
 
         return checkIn;
     }
+
 
     @NonNull
     protected org.smartregister.opd.pojo.OpdCheckIn getCheckInResult(@NonNull Cursor cursor) {

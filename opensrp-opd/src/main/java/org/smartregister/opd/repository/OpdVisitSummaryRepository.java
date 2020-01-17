@@ -28,10 +28,6 @@ import timber.log.Timber;
 
 public class OpdVisitSummaryRepository extends BaseRepository {
 
-    public OpdVisitSummaryRepository(Repository repository) {
-        super(repository);
-    }
-
     @NonNull
     public List<OpdVisitSummary> getOpdVisitSummaries(@NonNull String baseEntityId, int pageNo) {
         LinkedHashMap<String, OpdVisitSummary> opdVisitSummaries = new LinkedHashMap<>();

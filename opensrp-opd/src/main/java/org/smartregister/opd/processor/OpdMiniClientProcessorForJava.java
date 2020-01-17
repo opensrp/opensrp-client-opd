@@ -44,6 +44,7 @@ import org.smartregister.util.Utils;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -206,7 +207,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         String[] valueIds = id.split(",");
 
         JSONArray valueJsonArray = null;
-        if(mapDetails.containsKey(OpdConstants.KEY.VALUE)) {
+        if (mapDetails.containsKey(OpdConstants.KEY.VALUE)) {
             String strValue = mapDetails.get(OpdConstants.KEY.VALUE);
             if (!StringUtils.isBlank(strValue)) {
                 valueJsonArray = new JSONArray(strValue);
@@ -225,7 +226,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                 opdTreatment.setCreatedAt(Utils.convertDateFormat(new DateTime()));
                 opdTreatment.setUpdatedAt(Utils.convertDateFormat(new DateTime()));
 
-                if(valueJsonArray != null) {
+                if (valueJsonArray != null) {
                     JSONObject valueJsonObject = valueJsonArray.optJSONObject(i);
 
                     JSONObject propertyJsonObject = valueJsonObject.optJSONObject(JsonFormConstants.MultiSelectUtils.PROPERTY);
@@ -259,7 +260,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         String[] valueIds = id.split(",");
 
         JSONArray valuesJsonArray = null;
-        if(mapDetails.containsKey(OpdConstants.KEY.VALUE)) {
+        if (mapDetails.containsKey(OpdConstants.KEY.VALUE)) {
             String strValue = mapDetails.get(OpdConstants.KEY.VALUE);
             if (!StringUtils.isBlank(strValue)) {
                 valuesJsonArray = new JSONArray(strValue);
@@ -283,7 +284,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                 opdDiagnosis.setVisitId(visitId);
                 opdDiagnosis.setId(valueIds[i]);
 
-                if(valuesJsonArray != null) {
+                if (valuesJsonArray != null) {
                     JSONObject valueJsonObject = valuesJsonArray.optJSONObject(i);
                     JSONObject propertyJsonObject = valueJsonObject.optJSONObject(JsonFormConstants.MultiSelectUtils.PROPERTY);
                     opdDiagnosis.setIcd10Code(propertyJsonObject.optString(OpdConstants.JSON_FORM_KEY.ICD10));
@@ -312,24 +313,31 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
             return;
         }
         String[] valueIds = id.split(",");
+
+        if (valueIds.length < 1) {
+            return;
+        }
         List<CompositeObs> compositeObsList = OpdUtils.getAllObsObject(event);
         List<String> resultKeys = Arrays.asList(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER, OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_GLUCOSE,
-                OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPECIFY, OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER_BLOOD_TYPE);
-        List<String> testKeys = Arrays.asList(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_OTHER, OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST);
+                OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPECIFY, OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER_BLOOD_TYPE, OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_OTHER);
+        List<String> testKeys = Collections.singletonList(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST);
         String[] resultTestArr = new String[valueIds.length];
         String[] resultTestResultArr = new String[valueIds.length];
         int arrayIndexKeys = 0;
         int arrayIndexTests = 0;
 
         for (CompositeObs compositeObs : compositeObsList) {
-            if (resultKeys.contains(compositeObs.getFormSubmissionFieldKey())) {
+            if (testKeys.contains(compositeObs.getFormSubmissionFieldKey())) {
+                String obsValue = compositeObs.getValue();
+                if (OpdConstants.TYPE_OF_TEXT_LABEL.equals(obsValue)) {
+                    continue;
+                }
+                resultTestArr[arrayIndexTests] = obsValue;
+                arrayIndexTests++;
+            } else if (resultKeys.contains(compositeObs.getFormSubmissionFieldKey())) {
                 resultTestResultArr[arrayIndexKeys] = compositeObs.getValue();
                 arrayIndexKeys++;
                 //
-            } else if (testKeys.contains(compositeObs.getFormSubmissionFieldKey())) {
-                //
-                resultTestArr[arrayIndexTests] = compositeObs.getValue();
-                arrayIndexTests++;
             }
         }
 
