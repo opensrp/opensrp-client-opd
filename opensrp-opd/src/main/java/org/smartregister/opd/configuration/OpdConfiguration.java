@@ -3,7 +3,7 @@ package org.smartregister.opd.configuration;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.smartregister.opd.pojos.OpdMetadata;
+import org.smartregister.opd.pojo.OpdMetadata;
 
 /**
  * This is the object used to configure any configurations added to OPD. We mostly use objects that are

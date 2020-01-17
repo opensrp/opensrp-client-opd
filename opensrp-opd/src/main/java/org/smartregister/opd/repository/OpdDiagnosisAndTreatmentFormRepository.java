@@ -9,7 +9,7 @@ import net.sqlcipher.database.SQLiteDatabase;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.smartregister.opd.dao.OpdDiagnosisAndTreatmentFormDao;
-import org.smartregister.opd.pojos.OpdDiagnosisAndTreatmentForm;
+import org.smartregister.opd.pojo.OpdDiagnosisAndTreatmentForm;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.repository.BaseRepository;
 import org.smartregister.repository.Repository;
@@ -34,10 +34,6 @@ public class OpdDiagnosisAndTreatmentFormRepository extends BaseRepository imple
             OpdDbConstants.Column.OpdDiagnosisAndTreatmentForm.BASE_ENTITY_ID,
             OpdDbConstants.Column.OpdDiagnosisAndTreatmentForm.FORM,
             OpdDbConstants.Column.OpdDiagnosisAndTreatmentForm.CREATED_AT};
-
-    public OpdDiagnosisAndTreatmentFormRepository(@NonNull Repository repository) {
-        super(repository);
-    }
 
     public static void createTable(@NonNull SQLiteDatabase database) {
         database.execSQL(CREATE_TABLE_SQL);

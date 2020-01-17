@@ -33,22 +33,6 @@ public class OpdTestConductedRepository extends BaseRepository implements OpdTes
             + "_" + OpdDbConstants.Column.OpdTestConducted.VISIT_ID + "_index ON " + OpdDbConstants.Table.OPD_TEST_CONDUCTED +
             "(" + OpdDbConstants.Column.OpdTestConducted.VISIT_ID + " COLLATE NOCASE);";
 
-//    private String[] columns = new String[]{
-//            OpdDbConstants.Column.OpdTestConducted.ID,
-//            OpdDbConstants.Column.OpdTestConducted.BASE_ENTITY_ID,
-//            OpdDbConstants.Column.OpdTestConducted.TEST,
-//            OpdDbConstants.Column.OpdTestConducted.RESULT,
-//            OpdDbConstants.Column.OpdTestConducted.VISIT_ID,
-//            OpdDbConstants.Column.OpdTestConducted.UPDATED_AT,
-//            OpdDbConstants.Column.OpdTestConducted.CREATED_AT
-//    };
-
-
-    public OpdTestConductedRepository(@NonNull Repository repository) {
-        super(repository);
-    }
-
-
     public static void createTable(@NonNull SQLiteDatabase database) {
         database.execSQL(CREATE_TABLE_SQL);
         database.execSQL(INDEX_BASE_ENTITY_ID);
@@ -57,7 +41,7 @@ public class OpdTestConductedRepository extends BaseRepository implements OpdTes
 
 
     @Override
-    public boolean saveOrUpdate(@NonNull org.smartregister.opd.pojos.OpdTestConducted opdTestConducted) {
+    public boolean saveOrUpdate(@NonNull org.smartregister.opd.pojo.OpdTestConducted opdTestConducted) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(OpdDbConstants.Column.OpdTestConducted.ID, opdTestConducted.getId());
         contentValues.put(OpdDbConstants.Column.OpdTestConducted.BASE_ENTITY_ID, opdTestConducted.getBaseEntityId());
@@ -72,17 +56,17 @@ public class OpdTestConductedRepository extends BaseRepository implements OpdTes
     }
 
     @Override
-    public org.smartregister.opd.pojos.OpdTestConducted findOne(org.smartregister.opd.pojos.OpdTestConducted opdTestConducted) {
+    public org.smartregister.opd.pojo.OpdTestConducted findOne(org.smartregister.opd.pojo.OpdTestConducted opdTestConducted) {
         throw new NotImplementedException("Not Implemented");
     }
 
     @Override
-    public boolean delete(org.smartregister.opd.pojos.OpdTestConducted opdTestConducted) {
+    public boolean delete(org.smartregister.opd.pojo.OpdTestConducted opdTestConducted) {
         throw new NotImplementedException("Not Implemented");
     }
 
     @Override
-    public List<org.smartregister.opd.pojos.OpdTestConducted> findAll() {
+    public List<org.smartregister.opd.pojo.OpdTestConducted> findAll() {
         throw new NotImplementedException("Not Implemented");
     }
 }

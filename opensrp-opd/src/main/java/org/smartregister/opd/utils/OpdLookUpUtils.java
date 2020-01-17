@@ -12,7 +12,7 @@ import org.smartregister.commonregistry.CommonPersonObject;
 import org.smartregister.commonregistry.CommonRepository;
 import org.smartregister.event.Listener;
 import org.smartregister.opd.OpdLibrary;
-import org.smartregister.opd.pojos.OpdMetadata;
+import org.smartregister.opd.pojo.OpdMetadata;
 
 import java.util.ArrayList;
 import java.util.List;

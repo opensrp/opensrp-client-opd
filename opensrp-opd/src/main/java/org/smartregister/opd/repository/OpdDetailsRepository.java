@@ -43,16 +43,12 @@ public class OpdDetailsRepository extends BaseRepository implements OpdDetailsDa
             + OpdDetails.CURRENT_VISIT_ID + " VARCHAR NOT NULL, "
             + OpdDetails.CREATED_AT + " DATETIME NOT NULL DEFAULT (DATETIME('now')), UNIQUE(" + OpdDetails.BASE_ENTITY_ID + ") ON CONFLICT REPLACE)";
 
-    public OpdDetailsRepository(@NonNull Repository repository) {
-        super(repository);
-    }
-
     public static void createTable(@NonNull SQLiteDatabase database) {
         database.execSQL(CREATE_TABLE_SQL);
     }
 
     @NonNull
-    public ContentValues createValuesFor(@NonNull org.smartregister.opd.pojos.OpdDetails opdDetails) {
+    public ContentValues createValuesFor(@NonNull org.smartregister.opd.pojo.OpdDetails opdDetails) {
         ContentValues contentValues = new ContentValues();
 
         if (opdDetails.getId() != 0) {
@@ -75,7 +71,7 @@ public class OpdDetailsRepository extends BaseRepository implements OpdDetailsDa
     }
 
     @Override
-    public boolean saveOrUpdate(@NonNull org.smartregister.opd.pojos.OpdDetails opdDetails) {
+    public boolean saveOrUpdate(@NonNull org.smartregister.opd.pojo.OpdDetails opdDetails) {
         ContentValues contentValues = createValuesFor(opdDetails);
 
         SQLiteDatabase database = getWritableDatabase();
@@ -86,18 +82,14 @@ public class OpdDetailsRepository extends BaseRepository implements OpdDetailsDa
 
     @Nullable
     @Override
-    public org.smartregister.opd.pojos.OpdDetails findOne(@NonNull org.smartregister.opd.pojos.OpdDetails opdDetails) {
-        org.smartregister.opd.pojos.OpdDetails details = null;
+    public org.smartregister.opd.pojo.OpdDetails findOne(@NonNull org.smartregister.opd.pojo.OpdDetails opdDetails) {
+        org.smartregister.opd.pojo.OpdDetails details = null;
         if (opdDetails.getCurrentVisitId() != null && opdDetails.getBaseEntityId() != null) {
             SQLiteDatabase sqLiteDatabase = getReadableDatabase();
             Cursor cursor = sqLiteDatabase.query(OpdDbConstants.Table.OPD_DETAILS, columns, OpdDetails.BASE_ENTITY_ID + "=? and " + OpdDetails.CURRENT_VISIT_ID + "=?",
                     new String[]{opdDetails.getBaseEntityId(), opdDetails.getCurrentVisitId()}, null, null, null, "1");
-            if (cursor.getCount() == 0) {
-                return null;
-            }
-
             if (cursor.moveToNext()) {
-                details = new org.smartregister.opd.pojos.OpdDetails();
+                details = new org.smartregister.opd.pojo.OpdDetails();
                 details.setId(cursor.getInt(0));
                 details.setBaseEntityId(cursor.getString(1));
                 details.setPendingDiagnoseAndTreat((cursor.getInt(2) == 1));
@@ -112,20 +104,20 @@ public class OpdDetailsRepository extends BaseRepository implements OpdDetailsDa
                 details.setCreatedAt(OpdUtils
                         .convertStringToDate(OpdConstants.DateFormat.YYYY_MM_DD_HH_MM_SS,
                                 cursor.getString(6)));
-                cursor.close();
             }
+            cursor.close();
 
         }
         return details;
     }
 
     @Override
-    public boolean delete(org.smartregister.opd.pojos.OpdDetails opdDetails) {
+    public boolean delete(org.smartregister.opd.pojo.OpdDetails opdDetails) {
         throw new NotImplementedException("Not Implemented");
     }
 
     @Override
-    public List<org.smartregister.opd.pojos.OpdDetails> findAll() {
+    public List<org.smartregister.opd.pojo.OpdDetails> findAll() {
         throw new NotImplementedException("Not Implemented");
     }
 }

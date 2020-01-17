@@ -2,8 +2,8 @@ package org.smartregister.opd.widgets;
 
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.domain.MultiSelectItem;
+import com.vijay.jsonwizard.interfaces.MultiSelectListRepository;
 import com.vijay.jsonwizard.utils.MultiSelectListUtils;
-import com.vijay.jsonwizard.widgets.MultiSelectListFactory;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,11 +17,11 @@ import java.util.List;
 
 import timber.log.Timber;
 
-public class OpdMultiSelectList extends MultiSelectListFactory {
+public class OpdMedicineMultiSelectListRepository implements MultiSelectListRepository {
 
     @Override
     public List<MultiSelectItem> fetchData() {
-        Setting setting = OpdLibrary.getInstance().context().allSettings().getSetting(OpdConstants.SettingsConfig.OPD_DISEASE_CODES);
+        Setting setting = OpdLibrary.getInstance().context().allSettings().getSetting(OpdConstants.SettingsConfig.OPD_MEDICINE);
         try {
             JSONObject jsonValObject = setting != null ? new JSONObject(setting.getValue()) : null;
             if (jsonValObject != null) {

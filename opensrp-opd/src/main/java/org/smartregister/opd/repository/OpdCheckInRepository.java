@@ -13,7 +13,6 @@ import org.smartregister.opd.dao.OpdCheckInDao;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.opd.utils.OpdDbConstants.Column.OpdCheckIn;
 import org.smartregister.repository.BaseRepository;
-import org.smartregister.repository.Repository;
 
 import timber.log.Timber;
 
@@ -62,10 +61,6 @@ public class OpdCheckInRepository extends BaseRepository implements OpdCheckInDa
             , OpdCheckIn.UPDATED_AT
     };
 
-    public OpdCheckInRepository(Repository repository) {
-        super(repository);
-    }
-
     public static void createTable(@NonNull SQLiteDatabase database) {
         database.execSQL(CREATE_TABLE_SQL);
         database.execSQL(INDEX_BASE_ENTITY_ID);
@@ -73,7 +68,7 @@ public class OpdCheckInRepository extends BaseRepository implements OpdCheckInDa
         database.execSQL(INDEX_EVENT_ID);
     }
 
-    public ContentValues createValuesFor(@NonNull org.smartregister.opd.pojos.OpdCheckIn checkIn) {
+    public ContentValues createValuesFor(@NonNull org.smartregister.opd.pojo.OpdCheckIn checkIn) {
         ContentValues contentValues = new ContentValues();
 
         if (checkIn.getId() != 0) {
@@ -99,11 +94,11 @@ public class OpdCheckInRepository extends BaseRepository implements OpdCheckInDa
 
     @Nullable
     @Override
-    public org.smartregister.opd.pojos.OpdCheckIn getLatestCheckIn(@NonNull String clientBaseEntityId) {
+    public org.smartregister.opd.pojo.OpdCheckIn getLatestCheckIn(@NonNull String clientBaseEntityId) {
         Cursor mCursor = null;
-        org.smartregister.opd.pojos.OpdCheckIn checkIn = null;
+        org.smartregister.opd.pojo.OpdCheckIn checkIn = null;
         try {
-            SQLiteDatabase db = getWritableDatabase();
+            SQLiteDatabase db = getReadableDatabase();
 
             if (StringUtils.isNotBlank(clientBaseEntityId)) {
                 mCursor = db.query(OpdDbConstants.Table.OPD_CHECK_IN, columns, OpdCheckIn.BASE_ENTITY_ID + " = ?"
@@ -131,11 +126,11 @@ public class OpdCheckInRepository extends BaseRepository implements OpdCheckInDa
 
     @Nullable
     @Override
-    public org.smartregister.opd.pojos.OpdCheckIn getCheckInByVisit(@NonNull String visitId) {
+    public org.smartregister.opd.pojo.OpdCheckIn getCheckInByVisit(@NonNull String visitId) {
         Cursor mCursor = null;
-        org.smartregister.opd.pojos.OpdCheckIn checkIn = null;
+        org.smartregister.opd.pojo.OpdCheckIn checkIn = null;
         try {
-            SQLiteDatabase db = getWritableDatabase();
+            SQLiteDatabase db = getReadableDatabase();
             mCursor = db.query(OpdDbConstants.Table.OPD_CHECK_IN, columns, OpdCheckIn.VISIT_ID + " = ?"
                     , new String[]{visitId}
                     , null
@@ -157,9 +152,10 @@ public class OpdCheckInRepository extends BaseRepository implements OpdCheckInDa
         return checkIn;
     }
 
+
     @NonNull
-    protected org.smartregister.opd.pojos.OpdCheckIn getCheckInResult(@NonNull Cursor cursor) {
-        org.smartregister.opd.pojos.OpdCheckIn checkIn = new org.smartregister.opd.pojos.OpdCheckIn();
+    protected org.smartregister.opd.pojo.OpdCheckIn getCheckInResult(@NonNull Cursor cursor) {
+        org.smartregister.opd.pojo.OpdCheckIn checkIn = new org.smartregister.opd.pojo.OpdCheckIn();
 
         checkIn.setId(cursor.getInt(cursor.getColumnIndex(OpdCheckIn.ID)));
         checkIn.setFormSubmissionId(cursor.getString(cursor.getColumnIndex(OpdCheckIn.FORM_SUBMISSION_ID)));
@@ -180,7 +176,7 @@ public class OpdCheckInRepository extends BaseRepository implements OpdCheckInDa
     }
 
     @Override
-    public boolean addCheckIn(@NonNull org.smartregister.opd.pojos.OpdCheckIn checkIn) throws SQLiteException {
+    public boolean addCheckIn(@NonNull org.smartregister.opd.pojo.OpdCheckIn checkIn) throws SQLiteException {
         ContentValues contentValues = createValuesFor(checkIn);
 
         //TODO: Check for duplicates

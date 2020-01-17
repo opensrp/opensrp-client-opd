@@ -23,8 +23,8 @@ import org.smartregister.domain.tag.FormTag;
 import org.smartregister.location.helper.LocationHelper;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.enums.LocationHierarchy;
-import org.smartregister.opd.pojos.OpdEventClient;
-import org.smartregister.opd.pojos.OpdMetadata;
+import org.smartregister.opd.pojo.OpdEventClient;
+import org.smartregister.opd.pojo.OpdMetadata;
 import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.repository.ImageRepository;
 import org.smartregister.repository.UniqueIdRepository;
@@ -388,14 +388,16 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
     }
 
     public static void mergeAndSaveClient(@NonNull Client baseClient) throws Exception {
-        JSONObject updatedClientJson = new JSONObject(org.smartregister.util.JsonFormUtils.gson.toJson(baseClient));
-        JSONObject originalClientJsonObject =
-                OpdLibrary.getInstance().getEcSyncHelper().getClient(baseClient.getBaseEntityId());
-        JSONObject mergedJson = org.smartregister.util.JsonFormUtils.merge(originalClientJsonObject, updatedClientJson);
-        OpdLibrary.getInstance().getEcSyncHelper().addClient(baseClient.getBaseEntityId(), mergedJson);
+        JSONObject updatedClientJson = new JSONObject(JsonFormUtils.gson.toJson(baseClient));
+        JSONObject originalClientJsonObject = OpdLibrary.getInstance().getEcSyncHelper().getClient(baseClient.getBaseEntityId());
+        if(originalClientJsonObject != null) {
+            JSONObject mergedJson = JsonFormUtils.merge(originalClientJsonObject, updatedClientJson);
+            OpdLibrary.getInstance().getEcSyncHelper()
+                    .addClient(baseClient.getBaseEntityId(), mergedJson);
+        }
     }
 
-    public static void saveImage(@NonNull String providerId, @NonNull String entityId, @NonNull String imageLocation) {
+    public static void saveImage(@NonNull String providerId, @NonNull String entityId, @Nullable String imageLocation) {
         if (StringUtils.isBlank(imageLocation)) {
             return;
         }
@@ -407,40 +409,29 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
 
         Bitmap compressedImageFile = OpdLibrary.getInstance().getCompressor().compressToBitmap(file);
         saveStaticImageToDisk(compressedImageFile, providerId, entityId);
-
     }
 
-    private static void saveStaticImageToDisk(Bitmap image, String providerId, String entityId) {
+    private static void saveStaticImageToDisk(@Nullable Bitmap image, @Nullable String providerId, @Nullable String entityId) {
         if (image == null || StringUtils.isBlank(providerId) || StringUtils.isBlank(entityId)) {
             return;
         }
         OutputStream os = null;
         try {
-
-            if (entityId != null && !entityId.isEmpty()) {
-                final String absoluteFileName = DrishtiApplication.getAppDir() + File.separator + entityId + ".JPEG";
-
-                File outputFile = new File(absoluteFileName);
-                os = new FileOutputStream(outputFile);
-                Bitmap.CompressFormat compressFormat = Bitmap.CompressFormat.JPEG;
-                if (compressFormat != null) {
-                    image.compress(compressFormat, 100, os);
-                } else {
-                    throw new IllegalArgumentException(
-                            "Failed to save static image, could not retrieve image compression format from name " +
-                                    absoluteFileName);
-                }
-                // insert into the db
-                ProfileImage profileImage = new ProfileImage();
-                profileImage.setImageid(UUID.randomUUID().toString());
-                profileImage.setAnmId(providerId);
-                profileImage.setEntityID(entityId);
-                profileImage.setFilepath(absoluteFileName);
-                profileImage.setFilecategory("profilepic");
-                profileImage.setSyncStatus(ImageRepository.TYPE_Unsynced);
-                ImageRepository imageRepo = OpdUtils.context().imageRepository();
-                imageRepo.add(profileImage);
-            }
+            String absoluteFileName = DrishtiApplication.getAppDir() + File.separator + entityId + ".JPEG";
+            File outputFile = new File(absoluteFileName);
+            os = new FileOutputStream(outputFile);
+            Bitmap.CompressFormat compressFormat = Bitmap.CompressFormat.JPEG;
+            image.compress(compressFormat, 100, os);
+            // insert into the db
+            ProfileImage profileImage = new ProfileImage();
+            profileImage.setImageid(UUID.randomUUID().toString());
+            profileImage.setAnmId(providerId);
+            profileImage.setEntityID(entityId);
+            profileImage.setFilepath(absoluteFileName);
+            profileImage.setFilecategory("profilepic");
+            profileImage.setSyncStatus(ImageRepository.TYPE_Unsynced);
+            ImageRepository imageRepo = OpdUtils.context().imageRepository();
+            imageRepo.add(profileImage);
 
         } catch (FileNotFoundException e) {
             Timber.e(e, "OpdJsonFormUtils --> Failed to save static image to disk");

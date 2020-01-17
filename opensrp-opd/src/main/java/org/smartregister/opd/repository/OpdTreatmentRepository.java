@@ -7,7 +7,7 @@ import net.sqlcipher.database.SQLiteDatabase;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.smartregister.opd.dao.OpdTreatmentDao;
-import org.smartregister.opd.pojos.OpdTreatment;
+import org.smartregister.opd.pojo.OpdTreatment;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.repository.BaseRepository;
 import org.smartregister.repository.Repository;
@@ -36,23 +36,6 @@ public class OpdTreatmentRepository extends BaseRepository implements OpdTreatme
     private static final String INDEX_VISIT_ID = "CREATE INDEX " + OpdDbConstants.Table.OPD_TREATMENT
             + "_" + OpdDbConstants.Column.OpdTreatment.VISIT_ID + "_index ON " + OpdDbConstants.Table.OPD_TREATMENT +
             "(" + OpdDbConstants.Column.OpdTreatment.VISIT_ID + " COLLATE NOCASE);";
-
-//    private String[] columns = new String[]{
-//            OpdDbConstants.Column.OpdTreatment.ID,
-//            OpdDbConstants.Column.OpdTreatment.BASE_ENTITY_ID,
-//            OpdDbConstants.Column.OpdTreatment.MEDICINE,
-//            OpdDbConstants.Column.OpdTreatment.DOSAGE,
-//            OpdDbConstants.Column.OpdTreatment.DURATION,
-//            OpdDbConstants.Column.OpdTreatment.NOTE,
-//            OpdDbConstants.Column.OpdTreatment.VISIT_ID,
-//            OpdDbConstants.Column.OpdTreatment.UPDATED_AT,
-//            OpdDbConstants.Column.OpdTreatment.CREATED_AT
-//    };
-
-    public OpdTreatmentRepository(@NonNull Repository repository) {
-        super(repository);
-    }
-
 
     public static void createTable(@NonNull SQLiteDatabase database) {
         database.execSQL(CREATE_TABLE_SQL);

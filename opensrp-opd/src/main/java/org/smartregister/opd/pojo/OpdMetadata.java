@@ -1,4 +1,4 @@
-package org.smartregister.opd.pojos;
+package org.smartregister.opd.pojo;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;

@@ -14,7 +14,7 @@ import org.json.JSONObject;
 import org.smartregister.domain.Photo;
 import org.smartregister.location.helper.LocationHelper;
 import org.smartregister.opd.enums.LocationHierarchy;
-import org.smartregister.opd.pojos.OpdMetadata;
+import org.smartregister.opd.pojo.OpdMetadata;
 import org.smartregister.util.AssetHandler;
 import org.smartregister.util.FormUtils;
 import org.smartregister.util.ImageUtils;

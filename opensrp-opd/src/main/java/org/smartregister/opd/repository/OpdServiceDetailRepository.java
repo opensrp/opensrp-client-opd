@@ -7,7 +7,7 @@ import net.sqlcipher.database.SQLiteDatabase;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.smartregister.opd.dao.OpdServiceDetailDao;
-import org.smartregister.opd.pojos.OpdServiceDetail;
+import org.smartregister.opd.pojo.OpdServiceDetail;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.repository.BaseRepository;
 import org.smartregister.repository.Repository;
@@ -33,21 +33,6 @@ public class OpdServiceDetailRepository extends BaseRepository implements OpdSer
     private static final String INDEX_VISIT_ID = "CREATE INDEX " + OpdDbConstants.Table.OPD_SERVICE_DETAIL
             + "_" + OpdDbConstants.Column.OpdServiceDetail.VISIT_ID + "_index ON " + OpdDbConstants.Table.OPD_SERVICE_DETAIL +
             "(" + OpdDbConstants.Column.OpdServiceDetail.VISIT_ID + " COLLATE NOCASE);";
-
-//    private String[] columns = new String[]{
-//            OpdDbConstants.Column.OpdServiceDetail.ID,
-//            OpdDbConstants.Column.OpdServiceDetail.BASE_ENTITY_ID,
-//            OpdDbConstants.Column.OpdServiceDetail.FEE,
-//            OpdDbConstants.Column.OpdServiceDetail.DETAILS,
-//            OpdDbConstants.Column.OpdServiceDetail.VISIT_ID,
-//            OpdDbConstants.Column.OpdServiceDetail.UPDATED_AT,
-//            OpdDbConstants.Column.OpdServiceDetail.CREATED_AT
-//    };
-
-
-    public OpdServiceDetailRepository(@NonNull Repository repository) {
-        super(repository);
-    }
 
     public static void createTable(@NonNull SQLiteDatabase database) {
         database.execSQL(CREATE_TABLE_SQL);

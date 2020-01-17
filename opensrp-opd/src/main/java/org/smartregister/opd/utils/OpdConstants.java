@@ -7,6 +7,14 @@ public class OpdConstants extends AllConstants {
     public static final String SEX = "Sex";
     public static final String CLIENT_TYPE = "client";
     public static final String CONFIG = "opd_register";
+    public static final String TYPE_OF_TEXT_LABEL = "The type of test conducted";
+
+    public interface StepTitle {
+        String TEST_CONDUCTED = "Test Conducted";
+        String DIAGNOSIS = "Diagnosis";
+        String TREATMENT = "Treatment";
+        String SERVICE_FEE = "Service Fee";
+    }
 
     public interface IntentKey {
         String BASE_ENTITY_ID = "base-entity-id";
@@ -145,6 +153,7 @@ public class OpdConstants extends AllConstants {
 
         public static final String DIAGNOSTIC_TEST_RESULT_GLUCOSE = "diagnostic_test_result_glucose";
         public static final String DIAGNOSTIC_TEST_RESULT_SPINNER_BLOOD_TYPE = "diagnostic_test_result_spinner_blood_type";
+        public static String TESTS_REPEATING_GROUP = "tests_repeating_group";
     }
 
     public static class JsonFormNameUtils {

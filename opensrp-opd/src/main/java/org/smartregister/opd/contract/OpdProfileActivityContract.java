@@ -10,9 +10,9 @@ import org.json.JSONObject;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.domain.tag.FormTag;
 import org.smartregister.opd.listener.OnSendActionToFragment;
-import org.smartregister.opd.pojos.OpdDiagnosisAndTreatmentForm;
-import org.smartregister.opd.pojos.OpdEventClient;
-import org.smartregister.opd.pojos.RegisterParams;
+import org.smartregister.opd.pojo.OpdDiagnosisAndTreatmentForm;
+import org.smartregister.opd.pojo.OpdEventClient;
+import org.smartregister.opd.pojo.RegisterParams;
 import org.smartregister.view.contract.BaseProfileContract;
 
 import java.util.HashMap;
