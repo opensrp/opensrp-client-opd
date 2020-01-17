@@ -53,7 +53,7 @@ public class OpdCheckInRepositoryTest {
         opdCheckIn.setId(1);
         opdCheckIn.setFormSubmissionId("event-id");
 
-        OpdCheckInRepository opdCheckInRepository = new OpdCheckInRepository(Mockito.mock(Repository.class));
+        OpdCheckInRepository opdCheckInRepository = new OpdCheckInRepository();
 
         ContentValues contentValues = opdCheckInRepository.createValuesFor(opdCheckIn);
 
@@ -118,7 +118,7 @@ public class OpdCheckInRepositoryTest {
                         , Mockito.eq("created_at DESC")
                         , Mockito.eq("1"));
 
-        OpdCheckInRepository opdCheckInRepository = new OpdCheckInRepository(repository);
+        OpdCheckInRepository opdCheckInRepository = new OpdCheckInRepository();
         OpdCheckIn checkIn = opdCheckInRepository.getLatestCheckIn("my-id");
 
         Mockito.verify(database, Mockito.times(1))
@@ -181,7 +181,7 @@ public class OpdCheckInRepositoryTest {
                         , Mockito.eq("created_at DESC")
                         , Mockito.eq("1"));
 
-        OpdCheckInRepository opdCheckInRepository = new OpdCheckInRepository(repository);
+        OpdCheckInRepository opdCheckInRepository = new OpdCheckInRepository();
         OpdCheckIn checkIn = opdCheckInRepository.getCheckInByVisit("dsldk");
 
         Mockito.verify(database, Mockito.times(1))
@@ -237,7 +237,7 @@ public class OpdCheckInRepositoryTest {
 
         matrixCursor.moveToNext();
 
-        OpdCheckInRepository opdCheckInRepository = new OpdCheckInRepository(Mockito.mock(Repository.class));
+        OpdCheckInRepository opdCheckInRepository = new OpdCheckInRepository();
         OpdCheckIn checkIn = opdCheckInRepository.getCheckInResult(matrixCursor);
 
         assertEquals(1, checkIn.getId());

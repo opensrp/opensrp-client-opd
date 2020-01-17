@@ -62,10 +62,6 @@ public class OpdCheckInRepository extends BaseRepository implements OpdCheckInDa
             , OpdCheckIn.UPDATED_AT
     };
 
-    public OpdCheckInRepository(Repository repository) {
-        super(repository);
-    }
-
     public static void createTable(@NonNull SQLiteDatabase database) {
         database.execSQL(CREATE_TABLE_SQL);
         database.execSQL(INDEX_BASE_ENTITY_ID);
