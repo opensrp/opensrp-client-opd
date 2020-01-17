@@ -45,10 +45,6 @@ public class OpdVisitRepository extends BaseRepository implements OpdVisitDao {
             , OpdVisit.BASE_ENTITY_ID
             , OpdVisit.CREATED_AT};
 
-    public OpdVisitRepository(Repository repository) {
-        super(repository);
-    }
-
     public static void createTable(@NonNull SQLiteDatabase database) {
         database.execSQL(CREATE_TABLE_SQL);
         database.execSQL(INDEX_BASE_ENTITY_ID);
