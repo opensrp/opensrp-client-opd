@@ -35,10 +35,6 @@ public class OpdDiagnosisAndTreatmentFormRepository extends BaseRepository imple
             OpdDbConstants.Column.OpdDiagnosisAndTreatmentForm.FORM,
             OpdDbConstants.Column.OpdDiagnosisAndTreatmentForm.CREATED_AT};
 
-    public OpdDiagnosisAndTreatmentFormRepository(@NonNull Repository repository) {
-        super(repository);
-    }
-
     public static void createTable(@NonNull SQLiteDatabase database) {
         database.execSQL(CREATE_TABLE_SQL);
         database.execSQL(INDEX_BASE_ENTITY_ID);

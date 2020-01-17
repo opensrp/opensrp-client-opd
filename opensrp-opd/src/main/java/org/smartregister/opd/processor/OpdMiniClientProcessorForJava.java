@@ -329,7 +329,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         for (CompositeObs compositeObs : compositeObsList) {
             if (testKeys.contains(compositeObs.getFormSubmissionFieldKey())) {
                 String obsValue = compositeObs.getValue();
-                if ("The type of test conducted".equals(obsValue)) {
+                if (OpdConstants.TYPE_OF_TEXT_LABEL.equals(obsValue)) {
                     continue;
                 }
                 resultTestArr[arrayIndexTests] = obsValue;

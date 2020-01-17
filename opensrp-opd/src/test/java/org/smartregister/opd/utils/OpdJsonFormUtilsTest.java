@@ -379,7 +379,7 @@ public class OpdJsonFormUtilsTest {
         jsonArrayFields.put(jsonObjectDob);
 
         String expected = "[{\"options\":[{\"value\":\"true\"}],\"key\":\"dob_unknown\"},{\"value\":\"34\",\"key\":\"age_entered\"}," +
-                "{\"value\":\"01-01-1985\",\"key\":\"dob_entered\"},{\"openmrs_entity\":\"person\"," +
+                "{\"value\":\"01-01-1986\",\"key\":\"dob_entered\"},{\"openmrs_entity\":\"person\"," +
                 "\"openmrs_entity_id\":\"birthdate_estimated\",\"value\":1,\"key\":\"birthdate_estimated\"}]";
 
         OpdJsonFormUtils.dobUnknownUpdateFromAge(jsonArrayFields);

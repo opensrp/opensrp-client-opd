@@ -3,6 +3,8 @@ package org.smartregister.opd.processor;
 
 import android.content.Context;
 
+import com.vijay.jsonwizard.constants.JsonFormConstants;
+
 import net.sqlcipher.database.SQLiteDatabase;
 
 import org.joda.time.DateTime;
@@ -103,7 +105,7 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", null);
         ReflectionHelpers.setStaticField(CoreLibrary.class, "instance", null);
     }
@@ -138,12 +140,14 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
         PowerMockito.when(opdLibrary.getOpdTreatmentRepository()).thenReturn(opdTreatmentRepository);
         Obs obs = new Obs();
         obs.setFormSubmissionField(OpdConstants.JSON_FORM_KEY.MEDICINE);
-        obs.setValue("[{\"key\":\"Bacteria Killer\",\"property\":{\"meta\":{\"dosage\":\"er\",\"duration\":\"er\"}}}]");
+        obs.setValue("[]");
 
         obs.setFieldDataType("text");
         obs.setFieldCode(OpdConstants.JSON_FORM_KEY.MEDICINE);
         event.addObs(obs);
         event.addDetails(OpdConstants.JSON_FORM_KEY.ID, "id");
+        event.addDetails(JsonFormConstants.VALUE, "[{\"key\":\"Bacteria Killer\",\"text\":\"Bacteria Killer\",\"property\":{\"meta\":{\"dosage\":\"er\",\"duration\":\"er\"}}}]");
+
 
         Whitebox.invokeMethod(opdMiniClientProcessorForJava, "processTreatment", event);
         Mockito.verify(opdTreatmentRepository, Mockito.times(1)).saveOrUpdate(opdTreatmentArgumentCaptor.capture());
@@ -163,16 +167,19 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
 
         Obs obs = new Obs();
         obs.setFormSubmissionField(OpdConstants.JSON_FORM_KEY.DISEASE_CODE);
-        obs.setValue("[{\"key\":\"Bacterial Meningitis\",\"property\":{\"presumed-id\":\"er\",\"confirmed-id\":\"er\"}}]");
         obs.setFieldDataType("text");
+        obs.setValue("");
         obs.setFieldCode(OpdConstants.JSON_FORM_KEY.DISEASE_CODE);
+        obs.setHumanReadableValue("Bacterial Meningitis");
         event.addObs(obs);
         event.addDetails(OpdConstants.JSON_FORM_KEY.ID, "id");
+        event.addDetails(JsonFormConstants.VALUE, "[{\"key\":\"Bacterial Meningitis\",\"text\":\"Bacterial Meningitis\",\"property\":{\"presumed-id\":\"er\",\"confirmed-id\":\"er\"}}]");
 
         Obs obs1 = new Obs();
         obs1.setFormSubmissionField(OpdConstants.JSON_FORM_KEY.DIAGNOSIS);
         obs1.setValue("diagnosis");
         obs1.setFieldDataType("text");
+        obs1.setHumanReadableValue("");
         obs1.setFieldCode(OpdConstants.JSON_FORM_KEY.DIAGNOSIS);
         event.addObs(obs1);
 
@@ -201,24 +208,28 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
         PowerMockito.when(opdLibrary.getOpdTestConductedRepository()).thenReturn(opdTestConductedRepository);
         Obs obs = new Obs();
         obs.setFormSubmissionField(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER);
-        obs.setValue("diagnostic test result");
+        obs.setValue("Positive");
         obs.setFieldDataType("text");
+        obs.setHumanReadableValue("");
         obs.setFieldCode(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER);
-        event.addObs(obs);
 
         Obs obs1 = new Obs();
         obs1.setFormSubmissionField(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST);
-        obs1.setValue("diagnostic test");
+        obs1.setValue("Hepatitis C");
         obs1.setFieldDataType("text");
+        obs1.setHumanReadableValue("");
         obs1.setFieldCode(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST);
         event.addObs(obs1);
+        event.addObs(obs);
+        event.addDetails("visitId", "visitId");
+
         event.addDetails(OpdConstants.JSON_FORM_KEY.ID, "id");
 
         Whitebox.invokeMethod(opdMiniClientProcessorForJava, "processTestConducted", event);
 
         Mockito.verify(opdTestConductedRepository, Mockito.times(1)).saveOrUpdate(opdTestConductedArgumentCaptor.capture());
-        Assert.assertEquals("diagnostic test result", opdTestConductedArgumentCaptor.getValue().getResult());
-        Assert.assertEquals("diagnostic test", opdTestConductedArgumentCaptor.getValue().getTest());
+        Assert.assertEquals("Positive", opdTestConductedArgumentCaptor.getValue().getResult());
+        Assert.assertEquals("Hepatitis C", opdTestConductedArgumentCaptor.getValue().getTest());
         Assert.assertEquals("visitId", opdTestConductedArgumentCaptor.getValue().getVisitId());
         Assert.assertNotNull(opdTestConductedArgumentCaptor.getValue().getCreatedAt());
         Assert.assertNotNull(opdTestConductedArgumentCaptor.getValue().getUpdatedAt());
@@ -355,7 +366,7 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
     }
 
     @Test
-    public void getEventTypes(){
+    public void getEventTypes() {
         Assert.assertNotNull(opdMiniClientProcessorForJava.getEventTypes());
     }
 }
