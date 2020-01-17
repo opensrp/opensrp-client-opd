@@ -15,7 +15,7 @@ import org.mockito.junit.MockitoRule;
 import org.robolectric.RobolectricTestRunner;
 import org.smartregister.opd.pojo.OpdCheckIn;
 import org.smartregister.opd.utils.OpdDbConstants;
-import org.smartregister.repository.Repository;
+import org.smartregister.repository.BaseRepository;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -73,9 +73,7 @@ public class OpdCheckInRepositoryTest {
 
     @Test
     public void getLatestCheckInShouldQueryDbAndReturnNonNullResult() {
-        Repository repository = Mockito.mock(Repository.class);
         SQLiteDatabase database = Mockito.mock(SQLiteDatabase.class);
-        Mockito.doReturn(database).when(repository).getWritableDatabase();
 
         MatrixCursor matrixCursor = new MatrixCursor(new String[]{OpdDbConstants.Column.OpdCheckIn.ID
                 , OpdDbConstants.Column.OpdCheckIn.FORM_SUBMISSION_ID
@@ -118,7 +116,10 @@ public class OpdCheckInRepositoryTest {
                         , Mockito.eq("created_at DESC")
                         , Mockito.eq("1"));
 
-        OpdCheckInRepository opdCheckInRepository = new OpdCheckInRepository();
+        OpdCheckInRepository opdCheckInRepository = Mockito.spy(new OpdCheckInRepository());
+
+        Mockito.doReturn(database).when((BaseRepository) opdCheckInRepository).getReadableDatabase();
+
         OpdCheckIn checkIn = opdCheckInRepository.getLatestCheckIn("my-id");
 
         Mockito.verify(database, Mockito.times(1))
@@ -136,9 +137,7 @@ public class OpdCheckInRepositoryTest {
 
     @Test
     public void getCheckInByVisitShouldQueryDbAndReturnNonNullResult() {
-        Repository repository = Mockito.mock(Repository.class);
         SQLiteDatabase database = Mockito.mock(SQLiteDatabase.class);
-        Mockito.doReturn(database).when(repository).getWritableDatabase();
 
         MatrixCursor matrixCursor = new MatrixCursor(new String[]{OpdDbConstants.Column.OpdCheckIn.ID
                 , OpdDbConstants.Column.OpdCheckIn.FORM_SUBMISSION_ID
@@ -181,7 +180,10 @@ public class OpdCheckInRepositoryTest {
                         , Mockito.eq("created_at DESC")
                         , Mockito.eq("1"));
 
-        OpdCheckInRepository opdCheckInRepository = new OpdCheckInRepository();
+        OpdCheckInRepository opdCheckInRepository = Mockito.spy(new OpdCheckInRepository());
+
+        Mockito.doReturn(database).when((BaseRepository) opdCheckInRepository).getReadableDatabase();
+
         OpdCheckIn checkIn = opdCheckInRepository.getCheckInByVisit("dsldk");
 
         Mockito.verify(database, Mockito.times(1))
