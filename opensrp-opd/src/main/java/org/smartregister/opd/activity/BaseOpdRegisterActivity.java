@@ -134,13 +134,12 @@ public abstract class BaseOpdRegisterActivity extends BaseRegisterActivity imple
                 form.setWizard(true);
             }
 
-            if (encounterType.equals(OpdConstants.EventType.CHECK_IN)) {
-                if (parcelableData != null) {
-                    String baseEntityId = parcelableData.get(OpdConstants.IntentKey.BASE_ENTITY_ID);
-                    if (StringUtils.isNotBlank(baseEntityId)) {
-                        injectRelevanceFields(jsonForm, baseEntityId);
-                    }
+            if (encounterType.equals(OpdConstants.EventType.CHECK_IN) && (parcelableData != null)) {
+                String baseEntityId = parcelableData.get(OpdConstants.IntentKey.BASE_ENTITY_ID);
+                if (StringUtils.isNotBlank(baseEntityId)) {
+                    injectRelevanceFields(jsonForm, baseEntityId);
                 }
+
             }
 
             form.setHideSaveLabel(true);
