@@ -40,10 +40,10 @@ public class OpdReverseJsonFormUtils {
                 Timber.d("Original Form %s", form);
                 if (form != null) {
                     OpdJsonFormUtils.addRegLocHierarchyQuestions(form, OpdConstants.JSON_FORM_KEY.ADDRESS_WIDGET_KEY, LocationHierarchy.ENTIRE_TREE);
-                    form.put(OpdConstants.JSON_FORM_KEY.ENTITY_ID, detailsMap.get(OpdConstants.KEY.BASE_ENTITY_ID));
+                    form.put(OpdConstants.JSON_FORM_KEY.ENTITY_ID, detailsMap.get(OpdConstants.KEY.ID));
 
                     form.put(OpdConstants.JSON_FORM_KEY.ENCOUNTER_TYPE, opdMetadata.getUpdateEventType());
-                    form.put(OpdJsonFormUtils.CURRENT_ZEIR_ID, Utils.getValue(detailsMap, OpdConstants.KEY.OPENSRP_ID, true).replace("-", ""));
+                    form.put(OpdJsonFormUtils.CURRENT_ZEIR_ID, Utils.getValue(detailsMap, OpdJsonFormUtils.OPENSRP_ID, true).replace("-", ""));
 
                     form.getJSONObject(OpdJsonFormUtils.STEP1).put(OpdConstants.JSON_FORM_KEY.FORM_TITLE, OpdConstants.JSON_FORM_KEY.OPD_EDIT_FORM_TITLE);
 
@@ -86,7 +86,7 @@ public class OpdReverseJsonFormUtils {
             reverseDobEntered(opdDetails, jsonObject);
         } else if (jsonObject.getString(OpdJsonFormUtils.OPENMRS_ENTITY).equalsIgnoreCase(OpdJsonFormUtils.PERSON_IDENTIFIER)) {
             if (jsonObject.getString(OpdJsonFormUtils.KEY).equalsIgnoreCase(OpdJsonFormUtils.OPENSRP_ID)) {
-                jsonObject.put(OpdJsonFormUtils.VALUE, opdDetails.get(OpdConstants.KEY.OPENSRP_ID));
+                jsonObject.put(OpdJsonFormUtils.VALUE, opdDetails.get(OpdJsonFormUtils.OPENSRP_ID));
             } else {
                 jsonObject.put(OpdJsonFormUtils.VALUE, Utils.getValue(opdDetails, jsonObject.getString(OpdJsonFormUtils.OPENMRS_ENTITY_ID)
                         .toLowerCase(), false).replace("-", ""));

@@ -253,7 +253,7 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
     @Override
     public void onUpdateRegistrationBtnCLicked(@NonNull String baseEntityId) {
         if (getProfileView() != null) {
-            Utils.startAsyncTask(new FetchRegistrationDataTask(new WeakReference<Context>(getProfileView().getContext()), new FetchRegistrationDataTask.OnTaskComplete() {
+            Utils.startAsyncTask(new FetchRegistrationDataTask(new WeakReference<OpdProfileActivityContract.View>(getProfileView()), new FetchRegistrationDataTask.OnTaskComplete() {
                 @Override
                 public void onSuccess(@Nullable String jsonForm) {
                     OpdMetadata metadata = OpdUtils.metadata();
