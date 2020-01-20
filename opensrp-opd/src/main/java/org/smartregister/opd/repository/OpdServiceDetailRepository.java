@@ -34,21 +34,6 @@ public class OpdServiceDetailRepository extends BaseRepository implements OpdSer
             + "_" + OpdDbConstants.Column.OpdServiceDetail.VISIT_ID + "_index ON " + OpdDbConstants.Table.OPD_SERVICE_DETAIL +
             "(" + OpdDbConstants.Column.OpdServiceDetail.VISIT_ID + " COLLATE NOCASE);";
 
-//    private String[] columns = new String[]{
-//            OpdDbConstants.Column.OpdServiceDetail.ID,
-//            OpdDbConstants.Column.OpdServiceDetail.BASE_ENTITY_ID,
-//            OpdDbConstants.Column.OpdServiceDetail.FEE,
-//            OpdDbConstants.Column.OpdServiceDetail.DETAILS,
-//            OpdDbConstants.Column.OpdServiceDetail.VISIT_ID,
-//            OpdDbConstants.Column.OpdServiceDetail.UPDATED_AT,
-//            OpdDbConstants.Column.OpdServiceDetail.CREATED_AT
-//    };
-
-
-    public OpdServiceDetailRepository(@NonNull Repository repository) {
-        super(repository);
-    }
-
     public static void createTable(@NonNull SQLiteDatabase database) {
         database.execSQL(CREATE_TABLE_SQL);
         database.execSQL(INDEX_BASE_ENTITY_ID);

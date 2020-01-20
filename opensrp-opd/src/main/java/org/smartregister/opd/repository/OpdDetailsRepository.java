@@ -43,10 +43,6 @@ public class OpdDetailsRepository extends BaseRepository implements OpdDetailsDa
             + OpdDetails.CURRENT_VISIT_ID + " VARCHAR NOT NULL, "
             + OpdDetails.CREATED_AT + " DATETIME NOT NULL DEFAULT (DATETIME('now')), UNIQUE(" + OpdDetails.BASE_ENTITY_ID + ") ON CONFLICT REPLACE)";
 
-    public OpdDetailsRepository(@NonNull Repository repository) {
-        super(repository);
-    }
-
     public static void createTable(@NonNull SQLiteDatabase database) {
         database.execSQL(CREATE_TABLE_SQL);
     }
