@@ -10,7 +10,6 @@ import org.jeasy.rules.api.Facts;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -212,19 +211,19 @@ public class OpdUtilsTest {
         jsonForm.put(JsonFormConstants.FIRST_STEP_NAME, step1JsonForm);
 
         OpdUtils.injectRelevanceFields(jsonForm, map);
-        Assert.assertEquals(2, jsonForm.getJSONObject(JsonFormConstants.FIRST_STEP_NAME).getJSONArray(JsonFormConstants.FIELDS).length());
+        assertEquals(2, jsonForm.getJSONObject(JsonFormConstants.FIRST_STEP_NAME).getJSONArray(JsonFormConstants.FIELDS).length());
 
         JSONObject genderObject = jsonForm.getJSONObject(JsonFormConstants.FIRST_STEP_NAME).getJSONArray(JsonFormConstants.FIELDS).getJSONObject(0);
-        Assert.assertEquals(OpdConstants.JSON_FORM_KEY.GENDER, genderObject.getString(JsonFormConstants.KEY));
-        Assert.assertEquals(map.get(OpdDbConstants.Column.Client.GENDER), genderObject.getString(JsonFormConstants.VALUE));
-        Assert.assertEquals(JsonFormConstants.LABEL, genderObject.getString(JsonFormConstants.TYPE));
-        Assert.assertEquals("true", genderObject.getString(JsonFormConstants.HIDDEN));
+        assertEquals(OpdConstants.JSON_FORM_KEY.GENDER, genderObject.getString(JsonFormConstants.KEY));
+        assertEquals(map.get(OpdDbConstants.Column.Client.GENDER), genderObject.getString(JsonFormConstants.VALUE));
+        assertEquals(JsonFormConstants.LABEL, genderObject.getString(JsonFormConstants.TYPE));
+        assertEquals("true", genderObject.getString(JsonFormConstants.HIDDEN));
 
         JSONObject dobObject = jsonForm.getJSONObject(JsonFormConstants.FIRST_STEP_NAME).getJSONArray(JsonFormConstants.FIELDS).getJSONObject(1);
-        Assert.assertEquals(OpdConstants.JSON_FORM_KEY.AGE, dobObject.getString(JsonFormConstants.KEY));
-        Assert.assertEquals(String.valueOf(Utils.getAgeFromDate(map.get(OpdDbConstants.Column.Client.DOB))), dobObject.getString(JsonFormConstants.VALUE));
-        Assert.assertEquals(JsonFormConstants.LABEL, dobObject.getString(JsonFormConstants.TYPE));
-        Assert.assertEquals("true", dobObject.getString(JsonFormConstants.HIDDEN));
+        assertEquals(OpdConstants.JSON_FORM_KEY.AGE, dobObject.getString(JsonFormConstants.KEY));
+        assertEquals(String.valueOf(Utils.getAgeFromDate(map.get(OpdDbConstants.Column.Client.DOB))), dobObject.getString(JsonFormConstants.VALUE));
+        assertEquals(JsonFormConstants.LABEL, dobObject.getString(JsonFormConstants.TYPE));
+        assertEquals("true", dobObject.getString(JsonFormConstants.HIDDEN));
 
     }
 }
