@@ -25,10 +25,12 @@ import org.smartregister.opd.presenter.BaseOpdRegisterActivityPresenter;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.opd.utils.OpdUtils;
+import org.smartregister.repository.DetailsRepository;
 import org.smartregister.view.activity.BaseRegisterActivity;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import timber.log.Timber;
 
@@ -163,7 +165,9 @@ public abstract class BaseOpdRegisterActivity extends BaseRegisterActivity imple
     }
 
     private void injectRelevanceFields(@NonNull JSONObject jsonForm, @NonNull String baseEntityId) {
-        OpdUtils.injectRelevanceFields(jsonForm, baseEntityId);
+        DetailsRepository detailsRepository = OpdLibrary.getInstance().context().detailsRepository();
+        Map<String, String> detailsMap = detailsRepository.getAllDetailsForClient(baseEntityId);
+        OpdUtils.injectRelevanceFields(jsonForm, detailsMap);
     }
 
 }

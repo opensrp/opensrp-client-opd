@@ -7,8 +7,10 @@ import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.domain.Form;
 
 import org.jeasy.rules.api.Facts;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -27,10 +29,12 @@ import org.smartregister.opd.activity.BaseOpdFormActivity;
 import org.smartregister.opd.configuration.OpdConfiguration;
 import org.smartregister.opd.pojo.CompositeObs;
 import org.smartregister.opd.pojo.OpdMetadata;
+import org.smartregister.util.Utils;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -196,4 +200,31 @@ public class OpdUtilsTest {
 
     }
 
+    @Test
+    public void injectRelevanceFields() throws JSONException {
+        Map<String, String> map = new HashMap<>();
+        map.put(OpdDbConstants.Column.Client.GENDER, "F");
+        map.put(OpdDbConstants.Column.Client.DOB, "2009-09-12T03:00:00.000+03:00");
+        JSONObject jsonForm = new JSONObject();
+        JSONObject step1JsonForm = new JSONObject();
+        JSONArray step1Fields = new JSONArray();
+        step1JsonForm.put(JsonFormConstants.FIELDS, step1Fields);
+        jsonForm.put(JsonFormConstants.FIRST_STEP_NAME, step1JsonForm);
+
+        OpdUtils.injectRelevanceFields(jsonForm, map);
+        Assert.assertEquals(2, jsonForm.getJSONObject(JsonFormConstants.FIRST_STEP_NAME).getJSONArray(JsonFormConstants.FIELDS).length());
+
+        JSONObject genderObject = jsonForm.getJSONObject(JsonFormConstants.FIRST_STEP_NAME).getJSONArray(JsonFormConstants.FIELDS).getJSONObject(0);
+        Assert.assertEquals(OpdConstants.JSON_FORM_KEY.GENDER, genderObject.getString(JsonFormConstants.KEY));
+        Assert.assertEquals(map.get(OpdDbConstants.Column.Client.GENDER), genderObject.getString(JsonFormConstants.VALUE));
+        Assert.assertEquals(JsonFormConstants.LABEL, genderObject.getString(JsonFormConstants.TYPE));
+        Assert.assertEquals("true", genderObject.getString(JsonFormConstants.HIDDEN));
+
+        JSONObject dobObject = jsonForm.getJSONObject(JsonFormConstants.FIRST_STEP_NAME).getJSONArray(JsonFormConstants.FIELDS).getJSONObject(1);
+        Assert.assertEquals(OpdConstants.JSON_FORM_KEY.AGE, dobObject.getString(JsonFormConstants.KEY));
+        Assert.assertEquals(String.valueOf(Utils.getAgeFromDate(map.get(OpdDbConstants.Column.Client.DOB))), dobObject.getString(JsonFormConstants.VALUE));
+        Assert.assertEquals(JsonFormConstants.LABEL, dobObject.getString(JsonFormConstants.TYPE));
+        Assert.assertEquals("true", dobObject.getString(JsonFormConstants.HIDDEN));
+
+    }
 }

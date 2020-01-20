@@ -54,15 +54,6 @@
     "title": "OPD Check-In",
     "fields": [
       {
-        "key": "patient_gender",
-        "openmrs_entity_parent": "",
-        "openmrs_entity": "",
-        "openmrs_entity_id": "",
-        "type": "label",
-        "read_only": true,
-        "hidden": true
-      },
-      {
         "key": "pregnancy_status",
         "openmrs_entity_parent": "",
         "openmrs_entity": "concept",

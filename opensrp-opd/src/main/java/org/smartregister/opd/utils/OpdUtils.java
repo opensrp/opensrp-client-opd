@@ -24,7 +24,6 @@ import org.smartregister.domain.db.Obs;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.pojo.CompositeObs;
 import org.smartregister.opd.pojo.OpdMetadata;
-import org.smartregister.repository.DetailsRepository;
 import org.smartregister.util.FormUtils;
 import org.smartregister.util.JsonFormUtils;
 import org.smartregister.util.Utils;
@@ -286,7 +285,7 @@ public class OpdUtils extends org.smartregister.util.Utils {
                 fieldKey = fieldKey.substring(0, fieldKey.lastIndexOf("_"));
                 if (keysArrayList.contains(fieldKey) && StringUtils.isNotBlank(fieldValue)) {
                     valueField.put(JsonFormConstants.KEY, fieldKey);
-                    repeatedGroupNum ++;
+                    repeatedGroupNum++;
                 }
             }
         }
@@ -306,7 +305,7 @@ public class OpdUtils extends org.smartregister.util.Utils {
             String value = "";
             if (values.size() > 0) {
                 String obsValue = (String) values.get(0);
-                if(StringUtils.isNotBlank(obsValue)){
+                if (StringUtils.isNotBlank(obsValue)) {
                     value = obsValue;
                 }
             }
@@ -314,7 +313,7 @@ public class OpdUtils extends org.smartregister.util.Utils {
             List<Object> humanReadableValues = observation.getHumanReadableValues();
             if (humanReadableValues.size() > 0) {
                 String humanReadableValue = (String) humanReadableValues.get(0);
-                if(StringUtils.isNotBlank(humanReadableValue)){
+                if (StringUtils.isNotBlank(humanReadableValue)) {
                     value = humanReadableValue;
                 }
             }
@@ -326,20 +325,16 @@ public class OpdUtils extends org.smartregister.util.Utils {
         return compositeObsArrayList;
     }
 
-    public static void injectRelevanceFields(@NonNull JSONObject jsonForm, @NonNull String baseEntityId) {
-        DetailsRepository detailsRepository = OpdLibrary.getInstance().context().detailsRepository();
-        Map<String, String> map = detailsRepository.getAllDetailsForClient(baseEntityId);
+    public static void injectRelevanceFields(@NonNull JSONObject jsonForm, @NonNull Map<String, String> clientDetailsMap) {
         try {
 
             JSONObject genderJsonObject = new JSONObject();
             genderJsonObject.put(JsonFormConstants.KEY, OpdConstants.JSON_FORM_KEY.GENDER);
-            genderJsonObject.put(JsonFormConstants.VALUE, map.get(OpdDbConstants.Column.Client.GENDER));
+            genderJsonObject.put(JsonFormConstants.VALUE, clientDetailsMap.get(OpdDbConstants.Column.Client.GENDER));
             genderJsonObject.put(JsonFormConstants.TYPE, JsonFormConstants.LABEL);
             genderJsonObject.put(JsonFormConstants.HIDDEN, "true");
 
-
-            String strDob = map.get(OpdDbConstants.Column.Client.DOB);
-
+            String strDob = clientDetailsMap.get(OpdDbConstants.Column.Client.DOB);
             String age = "";
             if (StringUtils.isNotBlank(strDob)) {
                 age = String.valueOf(Utils.getAgeFromDate(strDob));
