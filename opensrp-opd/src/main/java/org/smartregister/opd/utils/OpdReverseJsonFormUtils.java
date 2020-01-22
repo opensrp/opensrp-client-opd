@@ -11,9 +11,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.smartregister.AllConstants;
 import org.smartregister.domain.Photo;
 import org.smartregister.location.helper.LocationHelper;
-import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.enums.LocationHierarchy;
 import org.smartregister.opd.pojo.OpdMetadata;
 import org.smartregister.util.AssetHandler;
@@ -48,11 +48,7 @@ public class OpdReverseJsonFormUtils {
                     form.getJSONObject(OpdJsonFormUtils.STEP1).put(OpdConstants.JSON_FORM_KEY.FORM_TITLE, OpdConstants.JSON_FORM_KEY.OPD_EDIT_FORM_TITLE);
 
                     JSONObject metadata = form.getJSONObject(OpdJsonFormUtils.METADATA);
-//                    metadata.put(OpdJsonFormUtils.ENCOUNTER_LOCATION, OpdUtils.getAllSharedPreferences().fetchCurrentLocality());
-                    metadata.put(OpdJsonFormUtils.ENCOUNTER_LOCATION, OpdLibrary.getInstance()
-                            .context()
-                            .allSharedPreferences()
-                            .fetchUserLocalityId(OpdLibrary.getInstance().context().allSharedPreferences().fetchRegisteredANM()));
+                    metadata.put(OpdJsonFormUtils.ENCOUNTER_LOCATION, OpdUtils.context().allSharedPreferences().getPreference(AllConstants.CURRENT_LOCATION_ID));
 
                     JSONObject stepOne = form.getJSONObject(OpdJsonFormUtils.STEP1);
                     JSONArray jsonArray = stepOne.getJSONArray(OpdJsonFormUtils.FIELDS);
@@ -149,7 +145,8 @@ public class OpdReverseJsonFormUtils {
             }
         }
 
-        String facilityHierarchyString = AssetHandler.javaToJsonString(entityHierarchy, new TypeToken<List<String>>() {}.getType());
+        String facilityHierarchyString = AssetHandler.javaToJsonString(entityHierarchy, new TypeToken<List<String>>() {
+        }.getType());
         if (StringUtils.isNotBlank(facilityHierarchyString)) {
             jsonObject.put(OpdJsonFormUtils.VALUE, facilityHierarchyString);
         }
