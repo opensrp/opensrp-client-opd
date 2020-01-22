@@ -11,7 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.smartregister.AllConstants;
 import org.smartregister.domain.Photo;
 import org.smartregister.location.helper.LocationHelper;
 import org.smartregister.opd.enums.LocationHierarchy;
@@ -43,12 +42,12 @@ public class OpdReverseJsonFormUtils {
                     form.put(OpdConstants.JSON_FORM_KEY.ENTITY_ID, detailsMap.get(OpdConstants.KEY.BASE_ENTITY_ID));
 
                     form.put(OpdConstants.JSON_FORM_KEY.ENCOUNTER_TYPE, opdMetadata.getUpdateEventType());
-                    form.put(OpdJsonFormUtils.CURRENT_ZEIR_ID, Utils.getValue(detailsMap, OpdConstants.KEY.OPENSRP_ID, true).replace("-", ""));
+                    form.put(OpdJsonFormUtils.CURRENT_ZEIR_ID, Utils.getValue(detailsMap, OpdJsonFormUtils.OPENSRP_ID, true).replace("-", ""));
 
                     form.getJSONObject(OpdJsonFormUtils.STEP1).put(OpdConstants.JSON_FORM_KEY.FORM_TITLE, OpdConstants.JSON_FORM_KEY.OPD_EDIT_FORM_TITLE);
 
                     JSONObject metadata = form.getJSONObject(OpdJsonFormUtils.METADATA);
-                    metadata.put(OpdJsonFormUtils.ENCOUNTER_LOCATION, OpdUtils.context().allSharedPreferences().getPreference(AllConstants.CURRENT_LOCATION_ID));
+                    metadata.put(OpdJsonFormUtils.ENCOUNTER_LOCATION, OpdUtils.getAllSharedPreferences().fetchCurrentLocality());
 
                     JSONObject stepOne = form.getJSONObject(OpdJsonFormUtils.STEP1);
                     JSONArray jsonArray = stepOne.getJSONArray(OpdJsonFormUtils.FIELDS);
@@ -82,7 +81,7 @@ public class OpdReverseJsonFormUtils {
             reverseDobEntered(opdDetails, jsonObject);
         } else if (jsonObject.getString(OpdJsonFormUtils.OPENMRS_ENTITY).equalsIgnoreCase(OpdJsonFormUtils.PERSON_IDENTIFIER)) {
             if (jsonObject.getString(OpdJsonFormUtils.KEY).equalsIgnoreCase(OpdJsonFormUtils.OPENSRP_ID)) {
-                jsonObject.put(OpdJsonFormUtils.VALUE, opdDetails.get(OpdConstants.KEY.OPENSRP_ID));
+                jsonObject.put(OpdJsonFormUtils.VALUE, opdDetails.get(OpdJsonFormUtils.OPENSRP_ID));
             } else {
                 jsonObject.put(OpdJsonFormUtils.VALUE, Utils.getValue(opdDetails, jsonObject.getString(OpdJsonFormUtils.OPENMRS_ENTITY_ID)
                         .toLowerCase(), false).replace("-", ""));
