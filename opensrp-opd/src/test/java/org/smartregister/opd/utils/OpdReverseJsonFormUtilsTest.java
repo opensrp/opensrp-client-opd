@@ -53,7 +53,7 @@ public class OpdReverseJsonFormUtilsTest {
     private OpdConfiguration opdConfiguration;
 
     @Test
-    public void prepareJsonEditOpdRegistrationForm() throws JSONException {
+    public void testPrepareJsonEditOpdRegFormShouldPrefillJsonFormCorrectly() throws JSONException {
         PowerMockito.mockStatic(OpdLibrary.class);
         PowerMockito.mockStatic(LocationHelper.class);
         PowerMockito.mockStatic(CoreLibrary.class);
