@@ -191,6 +191,7 @@ public class OpdConstants extends AllConstants {
         public static final String RELATIONALID = "relationalid";
         public static final String NATIONAL_ID = "national_id";
         public static final String GENDER = "gender";
+        public static final String ID = "id";
     }
 
     public static class ENTITY {
