@@ -215,7 +215,7 @@ public class OpdUtils extends org.smartregister.util.Utils {
     }
 
     @Nullable
-    public static JSONObject getJsonFormToJsonObject(String formName) {
+    public static JSONObject getJsonFormToJsonObject(@NonNull String formName) {
         if (getFormUtils() == null) {
             return null;
         }
