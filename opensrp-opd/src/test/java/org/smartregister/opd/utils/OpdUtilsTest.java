@@ -200,30 +200,33 @@ public class OpdUtilsTest {
     }
 
     @Test
-    public void injectRelevanceFields() throws JSONException {
+    public void testInjectRelevanceFieldsShouldFillFieldsWithCorrectValue() throws JSONException {
         Map<String, String> map = new HashMap<>();
         map.put(OpdDbConstants.Column.Client.GENDER, "F");
         map.put(OpdDbConstants.Column.Client.DOB, "2009-09-12T03:00:00.000+03:00");
         JSONObject jsonForm = new JSONObject();
         JSONObject step1JsonForm = new JSONObject();
         JSONArray step1Fields = new JSONArray();
+
+        JSONObject jsonGenderObj = new JSONObject();
+        jsonGenderObj.put(JsonFormConstants.KEY, OpdConstants.JSON_FORM_KEY.GENDER);
+
+        JSONObject jsonAgeObj = new JSONObject();
+        jsonAgeObj.put(JsonFormConstants.KEY, OpdConstants.JSON_FORM_KEY.AGE);
+
+        step1Fields.put(jsonGenderObj).put(jsonAgeObj);
+
         step1JsonForm.put(JsonFormConstants.FIELDS, step1Fields);
         jsonForm.put(JsonFormConstants.FIRST_STEP_NAME, step1JsonForm);
 
-        OpdUtils.injectRelevanceFields(jsonForm, map);
-        assertEquals(2, jsonForm.getJSONObject(JsonFormConstants.FIRST_STEP_NAME).getJSONArray(JsonFormConstants.FIELDS).length());
+        OpdUtils.injectValuesForRelevanceFields(jsonForm, map);
+        assertEquals(2, step1Fields.length());
 
-        JSONObject genderObject = jsonForm.getJSONObject(JsonFormConstants.FIRST_STEP_NAME).getJSONArray(JsonFormConstants.FIELDS).getJSONObject(0);
-        assertEquals(OpdConstants.JSON_FORM_KEY.GENDER, genderObject.getString(JsonFormConstants.KEY));
+        JSONObject genderObject = OpdJsonFormUtils.getFieldJSONObject(step1Fields, OpdConstants.JSON_FORM_KEY.GENDER);
         assertEquals(map.get(OpdDbConstants.Column.Client.GENDER), genderObject.getString(JsonFormConstants.VALUE));
-        assertEquals(JsonFormConstants.LABEL, genderObject.getString(JsonFormConstants.TYPE));
-        assertEquals("true", genderObject.getString(JsonFormConstants.HIDDEN));
 
-        JSONObject dobObject = jsonForm.getJSONObject(JsonFormConstants.FIRST_STEP_NAME).getJSONArray(JsonFormConstants.FIELDS).getJSONObject(1);
-        assertEquals(OpdConstants.JSON_FORM_KEY.AGE, dobObject.getString(JsonFormConstants.KEY));
+        JSONObject dobObject = OpdJsonFormUtils.getFieldJSONObject(step1Fields, OpdConstants.JSON_FORM_KEY.AGE);
         assertEquals(String.valueOf(Utils.getAgeFromDate(map.get(OpdDbConstants.Column.Client.DOB))), dobObject.getString(JsonFormConstants.VALUE));
-        assertEquals(JsonFormConstants.LABEL, dobObject.getString(JsonFormConstants.TYPE));
-        assertEquals("true", dobObject.getString(JsonFormConstants.HIDDEN));
 
     }
 }

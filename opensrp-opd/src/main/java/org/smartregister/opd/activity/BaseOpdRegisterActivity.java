@@ -139,7 +139,7 @@ public abstract class BaseOpdRegisterActivity extends BaseRegisterActivity imple
             if (encounterType.equals(OpdConstants.EventType.CHECK_IN) && (parcelableData != null)) {
                 String baseEntityId = parcelableData.get(OpdConstants.IntentKey.BASE_ENTITY_ID);
                 if (StringUtils.isNotBlank(baseEntityId)) {
-                    injectRelevanceFields(jsonForm, baseEntityId);
+                    injectValuesForFields(jsonForm, baseEntityId);
                 }
 
             }
@@ -164,10 +164,10 @@ public abstract class BaseOpdRegisterActivity extends BaseRegisterActivity imple
         }
     }
 
-    private void injectRelevanceFields(@NonNull JSONObject jsonForm, @NonNull String baseEntityId) {
+    private void injectValuesForFields(@NonNull JSONObject jsonForm, @NonNull String baseEntityId) {
         DetailsRepository detailsRepository = OpdLibrary.getInstance().context().detailsRepository();
         Map<String, String> detailsMap = detailsRepository.getAllDetailsForClient(baseEntityId);
-        OpdUtils.injectRelevanceFields(jsonForm, detailsMap);
+        OpdUtils.injectValuesForRelevanceFields(jsonForm, detailsMap);
     }
 
 }
