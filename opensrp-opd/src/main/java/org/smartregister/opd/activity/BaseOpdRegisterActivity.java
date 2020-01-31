@@ -12,7 +12,6 @@ import android.view.View;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.domain.Form;
 
-import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.smartregister.AllConstants;
 import org.smartregister.opd.OpdLibrary;
@@ -25,12 +24,10 @@ import org.smartregister.opd.presenter.BaseOpdRegisterActivityPresenter;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.opd.utils.OpdUtils;
-import org.smartregister.repository.DetailsRepository;
 import org.smartregister.view.activity.BaseRegisterActivity;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import timber.log.Timber;
 
@@ -136,14 +133,6 @@ public abstract class BaseOpdRegisterActivity extends BaseRegisterActivity imple
                 form.setWizard(true);
             }
 
-            if (encounterType.equals(OpdConstants.EventType.CHECK_IN) && (parcelableData != null)) {
-                String baseEntityId = parcelableData.get(OpdConstants.IntentKey.BASE_ENTITY_ID);
-                if (StringUtils.isNotBlank(baseEntityId)) {
-                    injectValuesForFields(jsonForm, baseEntityId);
-                }
-
-            }
-
             form.setHideSaveLabel(true);
             form.setPreviousLabel("");
             form.setNextLabel("");
@@ -163,11 +152,4 @@ public abstract class BaseOpdRegisterActivity extends BaseRegisterActivity imple
             Timber.e(new Exception(), "FormActivity cannot be started because OpdMetadata is NULL");
         }
     }
-
-    private void injectValuesForFields(@NonNull JSONObject jsonForm, @NonNull String baseEntityId) {
-        DetailsRepository detailsRepository = OpdLibrary.getInstance().context().detailsRepository();
-        Map<String, String> detailsMap = detailsRepository.getAllDetailsForClient(baseEntityId);
-        OpdUtils.injectValuesForRelevanceFields(jsonForm, detailsMap);
-    }
-
 }

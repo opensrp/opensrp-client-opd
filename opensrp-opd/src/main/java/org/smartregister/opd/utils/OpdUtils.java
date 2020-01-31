@@ -26,7 +26,6 @@ import org.smartregister.opd.pojo.CompositeObs;
 import org.smartregister.opd.pojo.OpdMetadata;
 import org.smartregister.util.FormUtils;
 import org.smartregister.util.JsonFormUtils;
-import org.smartregister.util.Utils;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -36,7 +35,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import timber.log.Timber;
 
@@ -323,26 +321,5 @@ public class OpdUtils extends org.smartregister.util.Utils {
         }
 
         return compositeObsArrayList;
-    }
-
-    public static void injectValuesForRelevanceFields(@NonNull JSONObject jsonForm, @NonNull Map<String, String> clientDetailsMap) {
-        try {
-            JSONArray jsonArray = jsonForm.getJSONObject(JsonFormConstants.FIRST_STEP_NAME).getJSONArray(JsonFormConstants.FIELDS);
-
-            OpdJsonFormUtils.getFieldJSONObject(jsonArray, OpdConstants.JSON_FORM_KEY.GENDER)
-                    .put(JsonFormConstants.VALUE, clientDetailsMap.get(OpdDbConstants.Column.Client.GENDER));
-
-            String strDob = clientDetailsMap.get(OpdDbConstants.Column.Client.DOB);
-            String age = "";
-            if (StringUtils.isNotBlank(strDob)) {
-                age = String.valueOf(Utils.getAgeFromDate(strDob));
-            }
-
-            OpdJsonFormUtils.getFieldJSONObject(jsonArray, OpdConstants.JSON_FORM_KEY.AGE)
-                    .put(JsonFormConstants.VALUE, age);
-
-        } catch (JSONException e) {
-            Timber.e(e);
-        }
     }
 }
