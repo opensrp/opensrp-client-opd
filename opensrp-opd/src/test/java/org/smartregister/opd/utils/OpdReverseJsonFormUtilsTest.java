@@ -426,8 +426,8 @@ public class OpdReverseJsonFormUtilsTest {
         Mockito.when(formUtils.getFormJson(OpdConstants.JSON_FORM_KEY.NAME)).thenReturn(opdRegistrationFormJsonObject);
         String jsonForm = OpdReverseJsonFormUtils.prepareJsonEditOpdRegistrationForm(detailsMap, Arrays.asList(OpdJsonFormUtils.OPENSRP_ID, OpdConstants.JSON_FORM_KEY.BHT_ID), formUtils);
         JSONObject jsonObject = new JSONObject(jsonForm);
-        Assert.assertEquals(jsonObject.optString(OpdJsonFormUtils.CURRENT_ZEIR_ID), detailsMap.get(OpdJsonFormUtils.OPENSRP_ID));
-        Assert.assertEquals(jsonObject.optString(OpdJsonFormUtils.ENTITY_ID), detailsMap.get(OpdConstants.KEY.ID));
+        Assert.assertEquals(detailsMap.get(OpdJsonFormUtils.OPENSRP_ID), jsonObject.optString(OpdJsonFormUtils.CURRENT_ZEIR_ID));
+        Assert.assertEquals(detailsMap.get(OpdConstants.KEY.ID), jsonObject.optString(OpdJsonFormUtils.ENTITY_ID));
 
         JSONObject step1JsonObject = jsonObject.optJSONObject(JsonFormConstants.STEP1);
 

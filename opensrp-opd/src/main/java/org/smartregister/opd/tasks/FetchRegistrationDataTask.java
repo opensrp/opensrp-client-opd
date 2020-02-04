@@ -25,6 +25,7 @@ public class FetchRegistrationDataTask extends AsyncTask<String, Void, String> {
 
     public FetchRegistrationDataTask(@NonNull WeakReference<OpdProfileActivityContract.View> viewWeakReference, @NonNull OnTaskComplete onTaskComplete) {
         this.viewWeakReference = viewWeakReference;
+
         this.onTaskComplete = onTaskComplete;
     }
 
@@ -32,11 +33,17 @@ public class FetchRegistrationDataTask extends AsyncTask<String, Void, String> {
     protected String doInBackground(String... params) {
         Map<String, String> detailsMap = CoreLibrary.getInstance().context().detailsRepository().getAllDetailsForClient(params[0]);
 
-        detailsMap.put(OpdJsonFormUtils.OPENSRP_ID, viewWeakReference.get().getClient().getDetails().get(OpdDbConstants.KEY.REGISTER_ID));
+        OpdProfileActivityContract.View view = viewWeakReference.get();
+
+        if (view == null || view.getClient() == null || view.getClient().getDetails() == null || view.getClient().getDetails().get(OpdDbConstants.KEY.REGISTER_ID) == null) {
+            return null;
+        }
+
+        detailsMap.put(OpdJsonFormUtils.OPENSRP_ID, view.getClient().getDetails().get(OpdDbConstants.KEY.REGISTER_ID));
 
         FormUtils formUtils = null;
         try {
-            formUtils = new FormUtils(viewWeakReference.get().getContext());
+            formUtils = new FormUtils(view.getContext());
             return OpdReverseJsonFormUtils.prepareJsonEditOpdRegistrationForm(detailsMap, Arrays.asList(OpdJsonFormUtils.OPENSRP_ID, OpdConstants.JSON_FORM_KEY.BHT_ID), formUtils);
         } catch (Exception e) {
             Timber.e(e);
