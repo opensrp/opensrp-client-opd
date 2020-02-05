@@ -286,7 +286,7 @@ public class OpdUtils extends org.smartregister.util.Utils {
                 fieldKey = fieldKey.substring(0, fieldKey.lastIndexOf("_"));
                 if (keysArrayList.contains(fieldKey) && StringUtils.isNotBlank(fieldValue)) {
                     valueField.put(JsonFormConstants.KEY, fieldKey);
-                    repeatedGroupNum ++;
+                    repeatedGroupNum++;
                 }
             }
         }
@@ -306,7 +306,7 @@ public class OpdUtils extends org.smartregister.util.Utils {
             String value = "";
             if (values.size() > 0) {
                 String obsValue = (String) values.get(0);
-                if(StringUtils.isNotBlank(obsValue)){
+                if (StringUtils.isNotBlank(obsValue)) {
                     value = obsValue;
                 }
             }
@@ -314,7 +314,7 @@ public class OpdUtils extends org.smartregister.util.Utils {
             List<Object> humanReadableValues = observation.getHumanReadableValues();
             if (humanReadableValues.size() > 0) {
                 String humanReadableValue = (String) humanReadableValues.get(0);
-                if(StringUtils.isNotBlank(humanReadableValue)){
+                if (StringUtils.isNotBlank(humanReadableValue)) {
                     value = humanReadableValue;
                 }
             }
@@ -356,4 +356,12 @@ public class OpdUtils extends org.smartregister.util.Utils {
             Timber.e(e);
         }
     }
+
+    public static String opdLookUpQuery() {
+        String lookUpQueryForOpdClient = "select id as _id, %s, %s, %s, %s, %s, %s, %s, national_id from ec_client where [condition] ";
+        lookUpQueryForOpdClient = String.format(lookUpQueryForOpdClient, OpdConstants.KEY.RELATIONALID, OpdConstants.KEY.FIRST_NAME,
+                OpdConstants.KEY.LAST_NAME, OpdConstants.KEY.GENDER, OpdConstants.KEY.DOB, OpdConstants.KEY.BASE_ENTITY_ID, OpdDbConstants.KEY.OPENSRP_ID);
+        return lookUpQueryForOpdClient;
+    }
+
 }
