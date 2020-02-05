@@ -53,6 +53,54 @@ public class OpdReverseJsonFormUtilsTest {
     private OpdConfiguration opdConfiguration;
 
     @Test
+    public void testPrepareJsonEditOpdRegFormShouldReturnNullWhenOpdMetadataIsNull() {
+        PowerMockito.mockStatic(OpdLibrary.class);
+        PowerMockito.mockStatic(LocationHelper.class);
+        PowerMockito.mockStatic(CoreLibrary.class);
+        PowerMockito.mockStatic(ImageUtils.class);
+        PowerMockito.when(CoreLibrary.getInstance()).thenReturn(coreLibrary);
+        PowerMockito.when(coreLibrary.context()).thenReturn(opensrpContext);
+        PowerMockito.when(opensrpContext.allSharedPreferences()).thenReturn(allSharedPreferences);
+        PowerMockito.when(allSharedPreferences.fetchCurrentLocality()).thenReturn("lombwe");
+        PowerMockito.when(ImageUtils.profilePhotoByClientID("base-entity-id", OpdImageUtils.getProfileImageResourceIdentifier())).thenReturn(Mockito.mock(Photo.class));
+        PowerMockito.when(LocationHelper.getInstance()).thenReturn(locationHelper);
+        PowerMockito.when(OpdLibrary.getInstance()).thenReturn(opdLibrary);
+        PowerMockito.when(opdLibrary.getOpdConfiguration()).thenReturn(opdConfiguration);
+        PowerMockito.when(opdConfiguration.getOpdMetadata()).thenReturn(null);
+
+        FormUtils formUtils = Mockito.mock(FormUtils.class);
+        String jsonForm = OpdReverseJsonFormUtils.prepareJsonEditOpdRegistrationForm(new HashMap<>(), Arrays.asList(OpdJsonFormUtils.OPENSRP_ID, OpdConstants.JSON_FORM_KEY.BHT_ID), formUtils);
+        Assert.assertNull(jsonForm);
+    }
+
+    @Test
+    public void testPrepareJsonEditOpdRegFormShouldReturnNullWhenFormIsNull() {
+        PowerMockito.mockStatic(OpdLibrary.class);
+        PowerMockito.mockStatic(LocationHelper.class);
+        PowerMockito.mockStatic(CoreLibrary.class);
+        PowerMockito.mockStatic(ImageUtils.class);
+        PowerMockito.when(CoreLibrary.getInstance()).thenReturn(coreLibrary);
+        PowerMockito.when(coreLibrary.context()).thenReturn(opensrpContext);
+        PowerMockito.when(opensrpContext.allSharedPreferences()).thenReturn(allSharedPreferences);
+        PowerMockito.when(allSharedPreferences.fetchCurrentLocality()).thenReturn("lombwe");
+        PowerMockito.when(ImageUtils.profilePhotoByClientID("base-entity-id", OpdImageUtils.getProfileImageResourceIdentifier())).thenReturn(Mockito.mock(Photo.class));
+        PowerMockito.when(LocationHelper.getInstance()).thenReturn(locationHelper);
+        PowerMockito.when(OpdLibrary.getInstance()).thenReturn(opdLibrary);
+        PowerMockito.when(opdLibrary.getOpdConfiguration()).thenReturn(opdConfiguration);
+        OpdMetadata opdMetadata = new OpdMetadata(OpdConstants.JSON_FORM_KEY.NAME, OpdDbConstants.KEY.TABLE,
+                OpdConstants.EventType.OPD_REGISTRATION, OpdConstants.EventType.UPDATE_OPD_REGISTRATION,
+                OpdConstants.CONFIG, BaseOpdFormActivity.class, BaseOpdProfileActivity.class, true);
+
+        PowerMockito.when(opdConfiguration.getOpdMetadata()).thenReturn(opdMetadata);
+
+        FormUtils formUtils = Mockito.mock(FormUtils.class);
+
+        Mockito.when(formUtils.getFormJson(OpdConstants.JSON_FORM_KEY.NAME)).thenReturn(null);
+        String jsonForm = OpdReverseJsonFormUtils.prepareJsonEditOpdRegistrationForm(new HashMap<>(), Arrays.asList(OpdJsonFormUtils.OPENSRP_ID, OpdConstants.JSON_FORM_KEY.BHT_ID), formUtils);
+        Assert.assertNull(jsonForm);
+    }
+
+    @Test
     public void testPrepareJsonEditOpdRegFormShouldPrefillJsonFormCorrectly() throws JSONException {
         PowerMockito.mockStatic(OpdLibrary.class);
         PowerMockito.mockStatic(LocationHelper.class);
