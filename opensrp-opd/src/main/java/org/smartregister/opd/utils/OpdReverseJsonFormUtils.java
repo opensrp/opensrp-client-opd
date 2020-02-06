@@ -1,6 +1,5 @@
 package org.smartregister.opd.utils;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -30,24 +29,25 @@ import timber.log.Timber;
 public class OpdReverseJsonFormUtils {
 
     @Nullable
-    public static String prepareJsonEditOpdRegistrationForm(@NonNull Map<String, String> detailsMap, @NonNull List<String> nonEditableFields, @NonNull Context context) {
+    public static String prepareJsonEditOpdRegistrationForm(@NonNull Map<String, String> detailsMap, @NonNull List<String> nonEditableFields, @NonNull FormUtils formUtils) {
         try {
             OpdMetadata opdMetadata = OpdUtils.metadata();
 
             if (opdMetadata != null) {
-                JSONObject form = new FormUtils(context).getFormJson(opdMetadata.getOpdRegistrationFormName());
+                JSONObject form = formUtils.getFormJson(opdMetadata.getOpdRegistrationFormName());
                 Timber.d("Original Form %s", form);
                 if (form != null) {
                     OpdJsonFormUtils.addRegLocHierarchyQuestions(form, OpdConstants.JSON_FORM_KEY.ADDRESS_WIDGET_KEY, LocationHierarchy.ENTIRE_TREE);
-                    form.put(OpdConstants.JSON_FORM_KEY.ENTITY_ID, detailsMap.get(OpdConstants.KEY.BASE_ENTITY_ID));
+                    form.put(OpdConstants.JSON_FORM_KEY.ENTITY_ID, detailsMap.get(OpdConstants.KEY.ID));
 
                     form.put(OpdConstants.JSON_FORM_KEY.ENCOUNTER_TYPE, opdMetadata.getUpdateEventType());
-                    form.put(OpdJsonFormUtils.CURRENT_ZEIR_ID, Utils.getValue(detailsMap, OpdConstants.KEY.OPENSRP_ID, true).replace("-", ""));
+                    form.put(OpdJsonFormUtils.CURRENT_ZEIR_ID, Utils.getValue(detailsMap, OpdJsonFormUtils.OPENSRP_ID, true).replace("-", ""));
 
                     form.getJSONObject(OpdJsonFormUtils.STEP1).put(OpdConstants.JSON_FORM_KEY.FORM_TITLE, OpdConstants.JSON_FORM_KEY.OPD_EDIT_FORM_TITLE);
 
                     JSONObject metadata = form.getJSONObject(OpdJsonFormUtils.METADATA);
                     metadata.put(OpdJsonFormUtils.ENCOUNTER_LOCATION, OpdUtils.getAllSharedPreferences().fetchCurrentLocality());
+
                     JSONObject stepOne = form.getJSONObject(OpdJsonFormUtils.STEP1);
                     JSONArray jsonArray = stepOne.getJSONArray(OpdJsonFormUtils.FIELDS);
 
@@ -71,7 +71,7 @@ public class OpdReverseJsonFormUtils {
 
     private static void setFormFieldValues(@NonNull Map<String, String> opdDetails, @NonNull List<String> nonEditableFields, @NonNull JSONObject jsonObject) throws JSONException {
         if (jsonObject.getString(OpdJsonFormUtils.KEY).equalsIgnoreCase(OpdConstants.KEY.PHOTO)) {
-            reversePhoto(opdDetails.get(OpdConstants.KEY.BASE_ENTITY_ID), jsonObject);
+            reversePhoto(opdDetails.get(OpdConstants.KEY.ID), jsonObject);
         } else if (jsonObject.getString(OpdJsonFormUtils.KEY).equalsIgnoreCase(OpdConstants.JSON_FORM_KEY.DOB_UNKNOWN)) {
             reverseDobUnknown(opdDetails, jsonObject);
         } else if (jsonObject.getString(OpdJsonFormUtils.KEY).equalsIgnoreCase(OpdConstants.JSON_FORM_KEY.AGE_ENTERED)) {
@@ -80,7 +80,7 @@ public class OpdReverseJsonFormUtils {
             reverseDobEntered(opdDetails, jsonObject);
         } else if (jsonObject.getString(OpdJsonFormUtils.OPENMRS_ENTITY).equalsIgnoreCase(OpdJsonFormUtils.PERSON_IDENTIFIER)) {
             if (jsonObject.getString(OpdJsonFormUtils.KEY).equalsIgnoreCase(OpdJsonFormUtils.OPENSRP_ID)) {
-                jsonObject.put(OpdJsonFormUtils.VALUE, opdDetails.get(OpdConstants.KEY.OPENSRP_ID));
+                jsonObject.put(OpdJsonFormUtils.VALUE, opdDetails.get(OpdJsonFormUtils.OPENSRP_ID));
             } else {
                 jsonObject.put(OpdJsonFormUtils.VALUE, Utils.getValue(opdDetails, jsonObject.getString(OpdJsonFormUtils.OPENMRS_ENTITY_ID)
                         .toLowerCase(), false).replace("-", ""));
@@ -143,7 +143,8 @@ public class OpdReverseJsonFormUtils {
             }
         }
 
-        String facilityHierarchyString = AssetHandler.javaToJsonString(entityHierarchy, new TypeToken<List<String>>() {}.getType());
+        String facilityHierarchyString = AssetHandler.javaToJsonString(entityHierarchy, new TypeToken<List<String>>() {
+        }.getType());
         if (StringUtils.isNotBlank(facilityHierarchyString)) {
             jsonObject.put(OpdJsonFormUtils.VALUE, facilityHierarchyString);
         }
