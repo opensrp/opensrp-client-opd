@@ -398,17 +398,18 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
     }
 
     public static void saveImage(@NonNull String providerId, @NonNull String entityId, @Nullable String imageLocation) {
-        if (StringUtils.isBlank(imageLocation)) {
-            return;
-        }
-
-        File file = new File(imageLocation);
-        if (!file.exists()) {
-            return;
-        }
-
-        Bitmap compressedImageFile = null;
         try {
+            if (StringUtils.isBlank(imageLocation)) {
+                return;
+            }
+
+            File file = new File(imageLocation);
+            if (!file.exists()) {
+                return;
+            }
+
+            Bitmap compressedImageFile = null;
+
             compressedImageFile = OpdLibrary.getInstance().getCompressor().compressToBitmap(file);
             saveStaticImageToDisk(compressedImageFile, providerId, entityId);
         } catch (IOException e) {
