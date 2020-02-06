@@ -411,7 +411,7 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
         try {
             compressedImageFile = OpdLibrary.getInstance().getCompressor().compressToBitmap(file);
             saveStaticImageToDisk(compressedImageFile, providerId, entityId);
-        } catch (Exception e) {
+        } catch (IOException e) {
             Timber.e(e);
         }
 
