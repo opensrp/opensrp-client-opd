@@ -268,7 +268,7 @@ public class OpdUtils extends org.smartregister.util.Utils {
         ArrayList<String> keysArrayList = new ArrayList<>();
         JSONArray fields = step1JsonObject.optJSONArray(OpdJsonFormUtils.FIELDS);
         JSONObject jsonObject = JsonFormUtils.getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.TESTS_REPEATING_GROUP);
-        if(jsonObject !=null) {
+        if (jsonObject != null) {
             JSONArray jsonArray = jsonObject.optJSONArray(JsonFormConstants.VALUE);
             int repeatedGroupNum = 0;
 
@@ -287,6 +287,7 @@ public class OpdUtils extends org.smartregister.util.Utils {
                     fieldKey = fieldKey.substring(0, fieldKey.lastIndexOf("_"));
                     if (keysArrayList.contains(fieldKey) && StringUtils.isNotBlank(fieldValue)) {
                         valueField.put(JsonFormConstants.KEY, fieldKey);
+                        valueField.put(OpdConstants.KEY.RELATION_KEY, fieldKey.substring(fieldKey.lastIndexOf("_")));
                         repeatedGroupNum++;
                     }
                 }
