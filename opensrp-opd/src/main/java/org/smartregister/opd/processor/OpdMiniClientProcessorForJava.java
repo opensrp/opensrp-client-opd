@@ -471,11 +471,14 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
     }
 
     private void updateLastInteractedWith(@NonNull Event event, @NonNull String visitId) throws CheckInEventProcessException {
-        String tableName = event.getEntityType();
+
+        String tableName = OpdDbConstants.Table.EC_CLIENT;
+
         String lastInteractedWithDate = String.valueOf(new Date().getTime());
 
         ContentValues contentValues = new ContentValues();
-        contentValues.put("last_interacted_with", lastInteractedWithDate);
+
+        contentValues.put(OpdConstants.JSON_FORM_KEY.LAST_INTERACTED_WITH, lastInteractedWithDate);
 
         int recordsUpdated = OpdLibrary.getInstance().getRepository().getWritableDatabase()
                 .update(tableName, contentValues, "base_entity_id = ?", new String[]{event.getBaseEntityId()});
@@ -492,17 +495,13 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         CommonRepository commonrepository = CoreLibrary.getInstance().context().commonrepository(tableName);
 
         ContentValues contentValues1 = new ContentValues();
-        contentValues1.put("last_interacted_with", lastInteractedWithDate);
+        contentValues1.put(OpdConstants.JSON_FORM_KEY.LAST_INTERACTED_WITH, lastInteractedWithDate);
 
         boolean isUpdated = false;
-        String fieldName = "base_entity_id";
-        if ("ec_child".equals(tableName)) {
-            fieldName = "object_id";
-        }
 
         if (commonrepository.isFts()) {
             recordsUpdated = OpdLibrary.getInstance().getRepository().getWritableDatabase()
-                    .update(CommonFtsObject.searchTableName(tableName), contentValues, fieldName + " = ?", new String[]{event.getBaseEntityId()});
+                    .update(CommonFtsObject.searchTableName(tableName), contentValues, "object_id = ?", new String[]{event.getBaseEntityId()});
             isUpdated = recordsUpdated > 0;
         }
 

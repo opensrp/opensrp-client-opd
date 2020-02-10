@@ -330,7 +330,6 @@ public class OpdLibrary {
                 if (OpdConstants.StepTitle.TEST_CONDUCTED.equals(title)) {
                     int repeatedGroupNum = OpdUtils.buildRepeatingGroupTests(step);
                     valueIds = OpdUtils.generateNIds(repeatedGroupNum);
-
                 } else if (OpdConstants.StepTitle.DIAGNOSIS.equals(title)) {
                     jsonObject = JsonFormUtils.getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.DISEASE_CODE);
                     JSONObject jsonDiagnosisType = JsonFormUtils.getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.DIAGNOSIS_TYPE);
@@ -357,16 +356,18 @@ public class OpdLibrary {
                 } else {
                     valueIds = OpdUtils.generateNIds(1);
                 }
-                Event baseEvent = JsonFormUtils.createEvent(fields, jsonFormObject.getJSONObject(METADATA),
-                        formTag, entityId, getDiagnosisAndTreatmentEventArray()[j], getDiagnosisAndTreatmentTableArray()[j]);
-                OpdJsonFormUtils.tagSyncMetadata(baseEvent);
-                baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_ID, visitId);
-                baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.ID, valueIds);
-                if (valueJsonArray != null) {
-                    baseEvent.addDetails(OpdConstants.KEY.VALUE, valueJsonArray.toString());
-                }
+                if (StringUtils.isNotBlank(valueIds)) {
+                    Event baseEvent = JsonFormUtils.createEvent(fields, jsonFormObject.getJSONObject(METADATA),
+                            formTag, entityId, getDiagnosisAndTreatmentEventArray()[j], getDiagnosisAndTreatmentTableArray()[j]);
+                    OpdJsonFormUtils.tagSyncMetadata(baseEvent);
+                    baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_ID, visitId);
+                    baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.ID, valueIds);
+                    if (valueJsonArray != null) {
+                        baseEvent.addDetails(OpdConstants.KEY.VALUE, valueJsonArray.toString());
+                    }
 
-                eventList.add(baseEvent);
+                    eventList.add(baseEvent);
+                }
             }
             //remove any saved sessions
             OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm = new OpdDiagnosisAndTreatmentForm(entityId);

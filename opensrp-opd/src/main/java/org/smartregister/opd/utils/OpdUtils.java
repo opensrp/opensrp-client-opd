@@ -268,31 +268,34 @@ public class OpdUtils extends org.smartregister.util.Utils {
         ArrayList<String> keysArrayList = new ArrayList<>();
         JSONArray fields = step1JsonObject.optJSONArray(OpdJsonFormUtils.FIELDS);
         JSONObject jsonObject = JsonFormUtils.getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.TESTS_REPEATING_GROUP);
-        JSONArray jsonArray = jsonObject.optJSONArray(JsonFormConstants.VALUE);
-        int repeatedGroupNum = 0;
+        if(jsonObject !=null) {
+            JSONArray jsonArray = jsonObject.optJSONArray(JsonFormConstants.VALUE);
+            int repeatedGroupNum = 0;
 
-        for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject valueField = jsonArray.optJSONObject(i);
-            String fieldKey = valueField.optString(JsonFormConstants.KEY);
-            keysArrayList.add(fieldKey);
-        }
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject valueField = jsonArray.optJSONObject(i);
+                String fieldKey = valueField.optString(JsonFormConstants.KEY);
+                keysArrayList.add(fieldKey);
+            }
 
-        for (int k = 0; k < fields.length(); k++) {
-            JSONObject valueField = fields.optJSONObject(k);
-            String fieldKey = valueField.optString(JsonFormConstants.KEY);
-            String fieldValue = valueField.optString(JsonFormConstants.VALUE);
+            for (int k = 0; k < fields.length(); k++) {
+                JSONObject valueField = fields.optJSONObject(k);
+                String fieldKey = valueField.optString(JsonFormConstants.KEY);
+                String fieldValue = valueField.optString(JsonFormConstants.VALUE);
 
-            if (fieldKey.contains("_")) {
-                fieldKey = fieldKey.substring(0, fieldKey.lastIndexOf("_"));
-                if (keysArrayList.contains(fieldKey) && StringUtils.isNotBlank(fieldValue)) {
-                    valueField.put(JsonFormConstants.KEY, fieldKey);
-                    repeatedGroupNum++;
+                if (fieldKey.contains("_")) {
+                    fieldKey = fieldKey.substring(0, fieldKey.lastIndexOf("_"));
+                    if (keysArrayList.contains(fieldKey) && StringUtils.isNotBlank(fieldValue)) {
+                        valueField.put(JsonFormConstants.KEY, fieldKey);
+                        repeatedGroupNum++;
+                    }
                 }
             }
+            //divide by 2 to count number of test&&result pair
+            repeatedGroupNum = repeatedGroupNum / 2;
+            return repeatedGroupNum;
         }
-        //divide by 2 to count number of test&&result pair
-        repeatedGroupNum = repeatedGroupNum / 2;
-        return repeatedGroupNum;
+        return 0;
     }
 
     public static List<CompositeObs> getAllObsObject(@NonNull Event event) {
