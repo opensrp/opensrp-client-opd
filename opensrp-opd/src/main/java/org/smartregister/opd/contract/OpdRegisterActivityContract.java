@@ -40,6 +40,7 @@ public interface OpdRegisterActivityContract {
 
         void saveVisitOrDiagnosisForm(@NonNull String eventType, @Nullable Intent data);
 
+        HashMap<String, String> getInjectedFields(@NonNull String formName, @NonNull String caseId);
 
         void startForm(String formName, String entityId, String metaData, String locationId, @Nullable HashMap<String, String> injectedFieldValues, @Nullable String entityTable);
 

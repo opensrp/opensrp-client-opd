@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.apache.commons.lang3.tuple.Triple;
-import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.domain.FetchStatus;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
 import org.smartregister.opd.pojo.OpdEventClient;
@@ -15,7 +14,6 @@ import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.opd.utils.OpdUtils;
 
 import java.lang.ref.WeakReference;
-import java.util.HashMap;
 import java.util.List;
 
 import timber.log.Timber;
@@ -109,10 +107,5 @@ public class OpdRegisterActivityPresenter extends BaseOpdRegisterActivityPresent
 
     public void setModel(OpdRegisterActivityContract.Model model) {
         this.model = model;
-    }
-
-    @Override
-    public HashMap<String, String> getInjectedFields(@NonNull String formName, @NonNull CommonPersonObjectClient commonPersonObjectClient) {
-        return getInjectedFields(formName, commonPersonObjectClient.getCaseId());
     }
 }

@@ -16,7 +16,6 @@ import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.domain.tag.FormTag;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
-import org.smartregister.opd.contract.OpdFormContract;
 import org.smartregister.opd.contract.OpdProfileActivityContract;
 import org.smartregister.opd.interactor.OpdProfileInteractor;
 import org.smartregister.opd.listener.OpdEventActionCallBack;
@@ -46,7 +45,7 @@ import timber.log.Timber;
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-27
  */
-public class OpdProfileActivityPresenter implements OpdProfileActivityContract.Presenter, OpdProfileActivityContract.InteractorCallBack, OpdEventActionCallBack, OpdFormContract {
+public class OpdProfileActivityPresenter implements OpdProfileActivityContract.Presenter, OpdProfileActivityContract.InteractorCallBack, OpdEventActionCallBack {
 
     private WeakReference<OpdProfileActivityContract.View> mProfileView;
     private OpdProfileActivityContract.Interactor mProfileInteractor;
@@ -155,28 +154,15 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
     public void startForm(@NonNull String formName, @NonNull CommonPersonObjectClient commonPersonObjectClient) {
         Map<String, String> clientMap = commonPersonObjectClient.getColumnmaps();
         String entityTable = clientMap.get(OpdConstants.IntentKey.ENTITY_TABLE);
-        startForm(formName, commonPersonObjectClient.getCaseId(), entityTable, commonPersonObjectClient);
+        HashMap<String, String> injectedValues = getInjectedFields(formName, commonPersonObjectClient.getCaseId());
+        startFormActivity(formName, commonPersonObjectClient.getCaseId(), entityTable, injectedValues);
     }
 
-    @Override
-    public void startForm(@NonNull String formName, @NonNull String caseId, @NonNull String entityTable, @Nullable CommonPersonObjectClient commonPersonObjectClient) {
-        HashMap<String, String> injectedValues = new HashMap<>();
-        if (commonPersonObjectClient != null) {
-            injectedValues = getInjectedFields(formName, commonPersonObjectClient);
-        }
-        startFormActivity(formName, caseId, entityTable, injectedValues);
-    }
 
     @Override
     public HashMap<String, String> getInjectedFields(@NonNull String formName, @NonNull String caseId) {
         return OpdUtils.getInjectableFields(formName, caseId);
     }
-
-    @Override
-    public HashMap<String, String> getInjectedFields(@NonNull String formName, @NonNull CommonPersonObjectClient commonPersonObjectClient) {
-        return getInjectedFields(formName, commonPersonObjectClient.getCaseId());
-    }
-
 
     public void startFormActivity(@NonNull String formName, @NonNull String caseId, @NonNull String entityTable, @Nullable HashMap<String, String> injectedValues) {
         if (mProfileView != null) {
