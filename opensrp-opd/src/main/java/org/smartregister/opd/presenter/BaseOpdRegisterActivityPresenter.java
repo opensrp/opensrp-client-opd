@@ -17,13 +17,11 @@ import org.smartregister.opd.interactor.BaseOpdRegisterActivityInteractor;
 import org.smartregister.opd.pojo.OpdDiagnosisAndTreatmentForm;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdUtils;
-import org.smartregister.repository.DetailsRepository;
 
 import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import timber.log.Timber;
 
@@ -135,8 +133,8 @@ public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterAct
     }
 
     @Override
-    public HashMap<String, String> getInjectedFields(@NonNull String formName, @NonNull Map<String, String> detailsMap) {
-        return OpdUtils.getInjectableFields(formName, detailsMap);
+    public HashMap<String, String> getInjectedFields(@NonNull String formName, @NonNull String entityId) {
+        return OpdUtils.getInjectableFields(formName, entityId);
     }
 
     @Override
@@ -149,10 +147,7 @@ public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterAct
         }
         form = null;
         try {
-            DetailsRepository detailsRepository = OpdLibrary.getInstance().context().detailsRepository();
-            Map<String, String> detailsMap = detailsRepository.getAllDetailsForClient(entityId);
-
-            form = model.getFormAsJson(formName, entityId, locationId, getInjectedFields(formName, detailsMap));
+            form = model.getFormAsJson(formName, entityId, locationId, getInjectedFields(formName, entityId));
             if (formName.equals(OpdConstants.Form.OPD_DIAGNOSIS_AND_TREAT)) {
                 interactor.fetchSavedDiagnosisAndTreatmentForm(entityId, entityTable, this);
                 return;

@@ -24,6 +24,7 @@ import org.smartregister.domain.db.Obs;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.pojo.CompositeObs;
 import org.smartregister.opd.pojo.OpdMetadata;
+import org.smartregister.repository.DetailsRepository;
 import org.smartregister.util.FormUtils;
 import org.smartregister.util.JsonFormUtils;
 import org.smartregister.util.Utils;
@@ -325,7 +326,9 @@ public class OpdUtils extends org.smartregister.util.Utils {
         return compositeObsArrayList;
     }
 
-    public static HashMap<String, String> getInjectableFields(@NonNull String formName, @NonNull Map<String, String> detailsMap) {
+    public static HashMap<String, String> getInjectableFields(@NonNull String formName, @NonNull String caseId) {
+        DetailsRepository detailsRepository = OpdLibrary.getInstance().context().detailsRepository();
+        Map<String, String> detailsMap = detailsRepository.getAllDetailsForClient(caseId);
         HashMap<String, String> injectedValues = new HashMap<>();
         if (formName.equals(OpdConstants.Form.OPD_CHECK_IN)) {
             injectedValues.put(OpdConstants.ClientMapKey.GENDER, detailsMap.get(OpdConstants.ClientMapKey.GENDER));

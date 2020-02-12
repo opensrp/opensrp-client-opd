@@ -154,14 +154,14 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
     public void startForm(@NonNull String formName, @NonNull CommonPersonObjectClient commonPersonObjectClient) {
         Map<String, String> clientMap = commonPersonObjectClient.getColumnmaps();
         String entityTable = clientMap.get(OpdConstants.IntentKey.ENTITY_TABLE);
-        HashMap<String, String> injectedValues = getInjectedFields(formName, commonPersonObjectClient.getColumnmaps());
+        HashMap<String, String> injectedValues = getInjectedFields(formName, commonPersonObjectClient.getCaseId());
         startFormActivity(formName, commonPersonObjectClient.getCaseId(), entityTable, injectedValues);
     }
 
 
     @Override
-    public HashMap<String, String> getInjectedFields(@NonNull String formName, @NonNull Map<String, String> detailsMap) {
-        return OpdUtils.getInjectableFields(formName, detailsMap);
+    public HashMap<String, String> getInjectedFields(@NonNull String formName, @NonNull String entityId) {
+        return OpdUtils.getInjectableFields(formName, entityId);
     }
 
     public void startFormActivity(@NonNull String formName, @NonNull String caseId, @NonNull String entityTable, @Nullable HashMap<String, String> injectedValues) {
