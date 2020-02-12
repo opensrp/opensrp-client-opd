@@ -148,6 +148,8 @@ public class OpdProfileActivityPresenterTest extends BaseTest {
         client.setColumnmaps(details);
 
         Mockito.doNothing().when(presenter).startFormActivity(Mockito.eq(formName), Mockito.eq(caseId), Mockito.eq(entityTable), Mockito.any(HashMap.class));
+        //getInjectedFields(@NonNull String formName, @NonNull String entityId)
+        Mockito.doReturn(new HashMap<>()).when(presenter).getInjectedFields(Mockito.anyString(), Mockito.anyString());
         presenter.startForm(formName, client);
         Mockito.verify(presenter, Mockito.times(1)).startFormActivity(Mockito.eq(formName), Mockito.eq(caseId), Mockito.eq(entityTable), hashMapArgumentCaptor.capture());
 
