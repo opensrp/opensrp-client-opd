@@ -40,7 +40,7 @@ public interface OpdProfileActivityContract {
 
         void saveUpdateRegistrationForm(@NonNull String jsonString, @NonNull RegisterParams registerParams);
 
-        HashMap<String, String> getInjectedFields(@NonNull String formName, @NonNull String caseId);
+        HashMap<String, String> getInjectedFields(@NonNull String formName, @NonNull Map<String, String> detailsMap);
 
         @Nullable
         OpdEventClient processRegistration(@NonNull String jsonString, @NonNull FormTag formTag);

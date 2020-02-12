@@ -16,6 +16,7 @@ import org.smartregister.view.contract.BaseRegisterContract;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-13
@@ -40,7 +41,7 @@ public interface OpdRegisterActivityContract {
 
         void saveVisitOrDiagnosisForm(@NonNull String eventType, @Nullable Intent data);
 
-        HashMap<String, String> getInjectedFields(@NonNull String formName, @NonNull String caseId);
+        HashMap<String, String> getInjectedFields(@NonNull String formName, @NonNull Map<String, String> detailsMap);
 
         void startForm(String formName, String entityId, String metaData, String locationId, @Nullable HashMap<String, String> injectedFieldValues, @Nullable String entityTable);
 

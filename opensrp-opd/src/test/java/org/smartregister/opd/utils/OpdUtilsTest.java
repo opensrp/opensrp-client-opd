@@ -31,6 +31,7 @@ import org.smartregister.opd.pojo.OpdMetadata;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -55,6 +56,7 @@ public class OpdUtilsTest {
 
     @Mock
     private OpdMetadata opdMetadata;
+
 
     @Before
     public void setUp() {
@@ -194,5 +196,16 @@ public class OpdUtilsTest {
         assertEquals("malaria", compositeObsList.get(1).getValue());
         assertEquals(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST, compositeObsList.get(1).getFormSubmissionFieldKey());
 
+    }
+
+    @Test
+    public void testGetInjectableFieldsShould() {
+        String formName = OpdConstants.Form.OPD_CHECK_IN;
+        Map<String, String> detailsMap = new HashMap<>();
+        detailsMap.put(OpdConstants.ClientMapKey.GENDER, "Female");
+        detailsMap.put(OpdDbConstants.Column.Client.DOB, "");
+        HashMap<String, String> hashMap = OpdUtils.getInjectableFields(formName, detailsMap);
+        assertEquals(hashMap.get(OpdConstants.JSON_FORM_KEY.AGE), "");
+        assertEquals(hashMap.get(OpdConstants.ClientMapKey.GENDER), "Female");
     }
 }

@@ -326,9 +326,7 @@ public class OpdUtils extends org.smartregister.util.Utils {
         return compositeObsArrayList;
     }
 
-    public static HashMap<String, String> getInjectableFields(@NonNull String formName, @NonNull String caseId) {
-        DetailsRepository detailsRepository = OpdLibrary.getInstance().context().detailsRepository();
-        Map<String, String> detailsMap = detailsRepository.getAllDetailsForClient(caseId);
+    public static HashMap<String, String> getInjectableFields(@NonNull String formName, @NonNull  Map<String, String> detailsMap) {
         HashMap<String, String> injectedValues = new HashMap<>();
         if (formName.equals(OpdConstants.Form.OPD_CHECK_IN)) {
             injectedValues.put(OpdConstants.ClientMapKey.GENDER, detailsMap.get(OpdConstants.ClientMapKey.GENDER));
@@ -339,7 +337,6 @@ public class OpdUtils extends org.smartregister.util.Utils {
             }
             injectedValues.put(OpdConstants.JSON_FORM_KEY.AGE, age);
         }
-
         return injectedValues;
     }
 }
