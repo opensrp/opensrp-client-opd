@@ -160,7 +160,10 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
 
     @Override
     public void startForm(@NonNull String formName, @NonNull String caseId, @NonNull String entityTable, @Nullable CommonPersonObjectClient commonPersonObjectClient) {
-        HashMap<String, String> injectedValues = getInjectedFields(formName, commonPersonObjectClient);
+        HashMap<String, String> injectedValues = new HashMap<>();
+        if (commonPersonObjectClient != null) {
+            injectedValues = getInjectedFields(formName, commonPersonObjectClient);
+        }
         startFormActivity(formName, caseId, entityTable, injectedValues);
     }
 
