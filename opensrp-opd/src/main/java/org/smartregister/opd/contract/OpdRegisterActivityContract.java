@@ -16,7 +16,6 @@ import org.smartregister.view.contract.BaseRegisterContract;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-13
