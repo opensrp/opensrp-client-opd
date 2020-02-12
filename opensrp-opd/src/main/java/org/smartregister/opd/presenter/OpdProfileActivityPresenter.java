@@ -272,23 +272,20 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
     @Override
     public void onUpdateRegistrationBtnCLicked(@NonNull String baseEntityId) {
         if (getProfileView() != null) {
-            Utils.startAsyncTask(new FetchRegistrationDataTask(new WeakReference<Context>(getProfileView().getContext()), new FetchRegistrationDataTask.OnTaskComplete() {
-                @Override
-                public void onSuccess(@Nullable String jsonForm) {
-                    OpdMetadata metadata = OpdUtils.metadata();
+            Utils.startAsyncTask(new FetchRegistrationDataTask(new WeakReference<>(getProfileView()), jsonForm -> {
+                OpdMetadata metadata = OpdUtils.metadata();
 
-                    OpdProfileActivityContract.View profileView = getProfileView();
-                    if (profileView != null && metadata != null && jsonForm != null) {
-                        Context context = profileView.getContext();
-                        Intent intent = new Intent(context, metadata.getOpdFormActivity());
-                        Form formParam = new Form();
-                        formParam.setWizard(false);
-                        formParam.setHideSaveLabel(true);
-                        formParam.setNextLabel("");
-                        intent.putExtra(JsonFormConstants.JSON_FORM_KEY.FORM, formParam);
-                        intent.putExtra(JsonFormConstants.JSON_FORM_KEY.JSON, jsonForm);
-                        profileView.startActivityForResult(intent, OpdJsonFormUtils.REQUEST_CODE_GET_JSON);
-                    }
+                OpdProfileActivityContract.View profileView = getProfileView();
+                if (profileView != null && metadata != null && jsonForm != null) {
+                    Context context = profileView.getContext();
+                    Intent intent = new Intent(context, metadata.getOpdFormActivity());
+                    Form formParam = new Form();
+                    formParam.setWizard(false);
+                    formParam.setHideSaveLabel(true);
+                    formParam.setNextLabel("");
+                    intent.putExtra(JsonFormConstants.JSON_FORM_KEY.FORM, formParam);
+                    intent.putExtra(JsonFormConstants.JSON_FORM_KEY.JSON, jsonForm);
+                    profileView.startActivityForResult(intent, OpdJsonFormUtils.REQUEST_CODE_GET_JSON);
                 }
             }), new String[]{baseEntityId});
         }

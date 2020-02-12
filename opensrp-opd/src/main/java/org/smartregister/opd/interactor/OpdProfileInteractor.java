@@ -104,8 +104,8 @@ public class OpdProfileInteractor implements OpdProfileActivityContract.Interact
 
         if (cursor != null && cursor.moveToFirst()) {
             CommonPersonObject commonPersonObject = commonRepository.getCommonPersonObjectFromCursor(cursor);
-            String name = commonPersonObject.getColumnmaps().get(OpdDbConstants.KEY.FIRST_NAME)
-                    + " " + commonPersonObject.getColumnmaps().get(OpdDbConstants.KEY.LAST_NAME);
+            String name = commonPersonObject.getDetails().get(OpdDbConstants.KEY.FIRST_NAME)
+                    + " " + commonPersonObject.getDetails().get(OpdDbConstants.KEY.LAST_NAME);
             CommonPersonObjectClient client = new CommonPersonObjectClient(commonPersonObject.getCaseId(),
                     commonPersonObject.getDetails(), name);
             client.setColumnmaps(commonPersonObject.getDetails());
