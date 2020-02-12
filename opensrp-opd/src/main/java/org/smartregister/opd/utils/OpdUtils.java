@@ -331,7 +331,7 @@ public class OpdUtils extends org.smartregister.util.Utils {
         Map<String, String> detailsMap = detailsRepository.getAllDetailsForClient(caseId);
         HashMap<String, String> injectedValues = new HashMap<>();
         if (formName.equals(OpdConstants.Form.OPD_CHECK_IN)) {
-            injectedValues.put(OpdConstants.JsonFormField.PATIENT_GENDER, detailsMap.get(OpdConstants.ClientMapKey.GENDER));
+            injectedValues.put(OpdConstants.ClientMapKey.GENDER, detailsMap.get(OpdConstants.ClientMapKey.GENDER));
             String strDob = detailsMap.get(OpdDbConstants.Column.Client.DOB);
             String age = "";
             if (StringUtils.isNotBlank(strDob)) {
