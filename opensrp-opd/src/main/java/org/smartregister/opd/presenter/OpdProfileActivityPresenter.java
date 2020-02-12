@@ -16,6 +16,7 @@ import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.domain.tag.FormTag;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
+import org.smartregister.opd.contract.OpdFormContract;
 import org.smartregister.opd.contract.OpdProfileActivityContract;
 import org.smartregister.opd.interactor.OpdProfileInteractor;
 import org.smartregister.opd.listener.OpdEventActionCallBack;
@@ -45,7 +46,7 @@ import timber.log.Timber;
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-27
  */
-public class OpdProfileActivityPresenter implements OpdProfileActivityContract.Presenter, OpdProfileActivityContract.InteractorCallBack, OpdEventActionCallBack {
+public class OpdProfileActivityPresenter implements OpdProfileActivityContract.Presenter, OpdProfileActivityContract.InteractorCallBack, OpdEventActionCallBack, OpdFormContract {
 
     private WeakReference<OpdProfileActivityContract.View> mProfileView;
     private OpdProfileActivityContract.Interactor mProfileInteractor;
@@ -130,7 +131,7 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
         OpdProfileActivityContract.View profileView = getProfileView();
         if (profileView != null) {
             profileView.setProfileName(client.get(OpdDbConstants.KEY.FIRST_NAME) + " " + client.get(OpdDbConstants.KEY.LAST_NAME));
-                String translatedYearInitial = profileView.getString(R.string.abbrv_years);
+            String translatedYearInitial = profileView.getString(R.string.abbrv_years);
             String dobString = client.get(OpdConstants.KEY.DOB);
 
             if (dobString != null) {
@@ -153,18 +154,33 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
     @Override
     public void startForm(@NonNull String formName, @NonNull CommonPersonObjectClient commonPersonObjectClient) {
         Map<String, String> clientMap = commonPersonObjectClient.getColumnmaps();
-        HashMap<String, String> injectedValues = new HashMap<>();
-        injectedValues.put(OpdConstants.JsonFormField.PATIENT_GENDER, clientMap.get(OpdConstants.ClientMapKey.GENDER));
         String entityTable = clientMap.get(OpdConstants.IntentKey.ENTITY_TABLE);
-
-        startFormActivity(formName, commonPersonObjectClient.getCaseId(), entityTable, injectedValues);
+        startForm(formName, commonPersonObjectClient.getCaseId(), entityTable, commonPersonObjectClient);
     }
+
+    @Override
+    public void startForm(@NonNull String formName, @NonNull String caseId, @NonNull String entityTable, @Nullable CommonPersonObjectClient commonPersonObjectClient) {
+        HashMap<String, String> injectedValues = getInjectedFields(formName, commonPersonObjectClient);
+        startFormActivity(formName, caseId, entityTable, injectedValues);
+    }
+
+    @Override
+    public HashMap<String, String> getInjectedFields(@NonNull String formName, @NonNull String caseId) {
+        return OpdUtils.getInjectableFields(formName, caseId);
+    }
+
+    @Override
+    public HashMap<String, String> getInjectedFields(@NonNull String formName, @NonNull CommonPersonObjectClient commonPersonObjectClient) {
+        return getInjectedFields(formName, commonPersonObjectClient.getCaseId());
+    }
+
 
     public void startFormActivity(@NonNull String formName, @NonNull String caseId, @NonNull String entityTable, @Nullable HashMap<String, String> injectedValues) {
         if (mProfileView != null) {
             form = null;
             try {
                 String locationId = OpdUtils.context().allSharedPreferences().getPreference(AllConstants.CURRENT_LOCATION_ID);
+
                 form = model.getFormAsJson(formName, caseId, locationId, injectedValues);
 
                 // Fetch saved form & continue editing
@@ -274,4 +290,5 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
             }), new String[]{baseEntityId});
         }
     }
+
 }

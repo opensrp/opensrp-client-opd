@@ -9,13 +9,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Triple;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.smartregister.AllConstants;
 import org.smartregister.clientandeventmodel.Event;
+import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.domain.FetchStatus;
 import org.smartregister.opd.OpdLibrary;
+import org.smartregister.opd.contract.OpdFormContract;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
 import org.smartregister.opd.interactor.BaseOpdRegisterActivityInteractor;
 import org.smartregister.opd.pojo.OpdDiagnosisAndTreatmentForm;
 import org.smartregister.opd.utils.OpdConstants;
+import org.smartregister.opd.utils.OpdUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.Collections;
@@ -28,7 +32,7 @@ import timber.log.Timber;
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-13
  */
 
-public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterActivityContract.Presenter, OpdRegisterActivityContract.InteractorCallBack {
+public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterActivityContract.Presenter, OpdRegisterActivityContract.InteractorCallBack, OpdFormContract {
 
     protected WeakReference<OpdRegisterActivityContract.View> viewReference;
     protected OpdRegisterActivityContract.Interactor interactor;
@@ -132,28 +136,36 @@ public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterAct
     }
 
     @Override
-    public void startForm(@NonNull String formName, @NonNull String entityId, String metaData
-            , @NonNull String locationId, @Nullable HashMap<String, String> injectedFieldValues, @Nullable String entityTable) {
-        if (StringUtils.isBlank(entityId)) {
-            Triple<String, String, String> triple = Triple.of(formName, metaData, locationId);
+    public void startForm(@NonNull String formName, @NonNull String caseId, @NonNull String entityTable, @Nullable CommonPersonObjectClient commonPersonObjectClient) {
+        if (StringUtils.isBlank(caseId)) {
+            Triple<String, String, String> triple = Triple.of(formName, null, null);
             interactor.getNextUniqueId(triple, this);
             return;
         }
-
         form = null;
         try {
-            form = model.getFormAsJson(formName, entityId, locationId, injectedFieldValues);
+            String locationId = OpdUtils.context().allSharedPreferences().getPreference(AllConstants.CURRENT_LOCATION_ID);
+            form = model.getFormAsJson(formName, caseId, locationId, getInjectedFields(formName, caseId));
             if (formName.equals(OpdConstants.Form.OPD_DIAGNOSIS_AND_TREAT)) {
-                interactor.fetchSavedDiagnosisAndTreatmentForm(entityId, entityTable, this);
+                interactor.fetchSavedDiagnosisAndTreatmentForm(caseId, entityTable, this);
                 return;
             }
 
         } catch (JSONException e) {
             Timber.e(e);
         }
+        startFormActivity(caseId, entityTable, form);
+    }
 
-        // The form will be started for forms that are not OPD Diagnosis And Treatment Forms
-        startFormActivity(entityId, entityTable, form);
+    @Override
+    public HashMap<String, String> getInjectedFields(@NonNull String formName, @NonNull String caseId) {
+        return OpdUtils.getInjectableFields(formName, caseId);
+    }
+
+    @Override
+    public void startForm(@NonNull String formName, @NonNull String entityId, String metaData
+            , @NonNull String locationId, @Nullable HashMap<String, String> injectedFieldValues, @Nullable String entityTable) {
+        startForm(formName, entityId, entityTable, null);
     }
 
     @Override
