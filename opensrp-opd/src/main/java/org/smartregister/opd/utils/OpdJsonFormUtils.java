@@ -390,7 +390,7 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
     public static void mergeAndSaveClient(@NonNull Client baseClient) throws Exception {
         JSONObject updatedClientJson = new JSONObject(JsonFormUtils.gson.toJson(baseClient));
         JSONObject originalClientJsonObject = OpdLibrary.getInstance().getEcSyncHelper().getClient(baseClient.getBaseEntityId());
-        if(originalClientJsonObject != null) {
+        if (originalClientJsonObject != null) {
             JSONObject mergedJson = JsonFormUtils.merge(originalClientJsonObject, updatedClientJson);
             OpdLibrary.getInstance().getEcSyncHelper()
                     .addClient(baseClient.getBaseEntityId(), mergedJson);
@@ -398,21 +398,22 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
     }
 
     public static void saveImage(@NonNull String providerId, @NonNull String entityId, @Nullable String imageLocation) {
-        if (StringUtils.isBlank(imageLocation)) {
-            return;
-        }
-
-        File file = new File(imageLocation);
-        if (!file.exists()) {
-            return;
-        }
-
-        Bitmap compressedImageFile = null;
         try {
+            if (StringUtils.isBlank(imageLocation)) {
+                return;
+            }
+
+            File file = new File(imageLocation);
+            if (!file.exists()) {
+                return;
+            }
+
+            Bitmap compressedImageFile = null;
+
             compressedImageFile = OpdLibrary.getInstance().getCompressor().compressToBitmap(file);
             saveStaticImageToDisk(compressedImageFile, providerId, entityId);
         } catch (IOException e) {
-            e.printStackTrace();
+            Timber.e(e);
         }
 
     }

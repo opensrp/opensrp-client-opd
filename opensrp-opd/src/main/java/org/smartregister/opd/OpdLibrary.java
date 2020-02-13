@@ -229,7 +229,7 @@ public class OpdLibrary {
     @NonNull
     public Compressor getCompressor() {
         if (compressor == null) {
-            compressor = new Compressor(this.context().applicationContext());;
+            compressor = new Compressor(context().applicationContext());
         }
 
         return compressor;
