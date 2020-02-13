@@ -330,7 +330,6 @@ public class OpdLibrary {
                 if (OpdConstants.StepTitle.TEST_CONDUCTED.equals(title)) {
                     int repeatedGroupNum = OpdUtils.buildRepeatingGroupTests(step);
                     valueIds = OpdUtils.generateNIds(repeatedGroupNum);
-
                 } else if (OpdConstants.StepTitle.DIAGNOSIS.equals(title)) {
                     jsonObject = JsonFormUtils.getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.DISEASE_CODE);
                     JSONObject jsonDiagnosisType = JsonFormUtils.getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.DIAGNOSIS_TYPE);
@@ -357,16 +356,18 @@ public class OpdLibrary {
                 } else {
                     valueIds = OpdUtils.generateNIds(1);
                 }
-                Event baseEvent = JsonFormUtils.createEvent(fields, jsonFormObject.getJSONObject(METADATA),
-                        formTag, entityId, getDiagnosisAndTreatmentEventArray()[j], getDiagnosisAndTreatmentTableArray()[j]);
-                OpdJsonFormUtils.tagSyncMetadata(baseEvent);
-                baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_ID, visitId);
-                baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.ID, valueIds);
-                if (valueJsonArray != null) {
-                    baseEvent.addDetails(OpdConstants.KEY.VALUE, valueJsonArray.toString());
-                }
+                if (StringUtils.isNotBlank(valueIds)) {
+                    Event baseEvent = JsonFormUtils.createEvent(fields, jsonFormObject.getJSONObject(METADATA),
+                            formTag, entityId, getDiagnosisAndTreatmentEventArray()[j], getDiagnosisAndTreatmentTableArray()[j]);
+                    OpdJsonFormUtils.tagSyncMetadata(baseEvent);
+                    baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_ID, visitId);
+                    baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.ID, valueIds);
+                    if (valueJsonArray != null) {
+                        baseEvent.addDetails(OpdConstants.KEY.VALUE, valueJsonArray.toString());
+                    }
 
-                eventList.add(baseEvent);
+                    eventList.add(baseEvent);
+                }
             }
             //remove any saved sessions
             OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm = new OpdDiagnosisAndTreatmentForm(entityId);
@@ -412,17 +413,8 @@ public class OpdLibrary {
                 OpdDbConstants.Table.OPD_TREATMENT, OpdDbConstants.Table.OPD_SERVICE_DETAIL};
     }
 
-    public String opdLookUpQuery() {
-        String lookUpQueryForChild = "select id as _id, %s, %s, %s, %s, %s, %s, zeir_id as %s, null as national_id from ec_child where [condition] ";
-        lookUpQueryForChild = String.format(lookUpQueryForChild, OpdConstants.KEY.RELATIONALID, OpdConstants.KEY.FIRST_NAME,
-                OpdConstants.KEY.LAST_NAME, OpdConstants.KEY.GENDER, OpdConstants.KEY.DOB, OpdConstants.KEY.BASE_ENTITY_ID, OpdDbConstants.KEY.OPENSRP_ID);
-        String lookUpQueryForMother = "select id as _id, %s, %s, %s, %s, %s, %s, register_id as %s, nrc_number as national_id from ec_mother where [condition] ";
-        lookUpQueryForMother = String.format(lookUpQueryForMother, OpdConstants.KEY.RELATIONALID, OpdConstants.KEY.FIRST_NAME,
-                OpdConstants.KEY.LAST_NAME, OpdConstants.KEY.GENDER, OpdConstants.KEY.DOB, OpdConstants.KEY.BASE_ENTITY_ID, OpdDbConstants.KEY.OPENSRP_ID);
-        String lookUpQueryForOpdClient = "select id as _id, %s, %s, %s, %s, %s, %s, %s, national_id from ec_client where [condition] ";
-        lookUpQueryForOpdClient = String.format(lookUpQueryForOpdClient, OpdConstants.KEY.RELATIONALID, OpdConstants.KEY.FIRST_NAME,
-                OpdConstants.KEY.LAST_NAME, OpdConstants.KEY.GENDER, OpdConstants.KEY.DOB, OpdConstants.KEY.BASE_ENTITY_ID, OpdDbConstants.KEY.OPENSRP_ID);
-        return lookUpQueryForChild + " union all " + lookUpQueryForMother + " union all " + lookUpQueryForOpdClient;
+    public String getLookUpQuery() {
+        return OpdUtils.opdLookUpQuery();
     }
 
     /**
