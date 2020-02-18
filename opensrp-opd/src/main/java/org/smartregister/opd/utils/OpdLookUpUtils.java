@@ -89,7 +89,7 @@ public class OpdLookUpUtils {
     protected static String lookUpQuery(@NonNull Map<String, String> entityMap) {
         String mainCondition = getMainConditionString(entityMap);
         if (!TextUtils.isEmpty(mainCondition)) {
-            return OpdLibrary.getInstance().opdLookUpQuery().replace("[condition]", mainCondition) + ";";
+            return OpdLibrary.getInstance().getLookUpQuery().replace("[condition]", mainCondition) + ";";
         }
         return null;
     }

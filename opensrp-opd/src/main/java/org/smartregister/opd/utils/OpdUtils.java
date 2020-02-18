@@ -24,8 +24,10 @@ import org.smartregister.domain.db.Obs;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.pojo.CompositeObs;
 import org.smartregister.opd.pojo.OpdMetadata;
+import org.smartregister.repository.DetailsRepository;
 import org.smartregister.util.FormUtils;
 import org.smartregister.util.JsonFormUtils;
+import org.smartregister.util.Utils;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -35,6 +37,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import timber.log.Timber;
 
@@ -213,7 +216,7 @@ public class OpdUtils extends org.smartregister.util.Utils {
     }
 
     @Nullable
-    public static JSONObject getJsonFormToJsonObject(String formName){
+    public static JSONObject getJsonFormToJsonObject(String formName) {
         if (getFormUtils() == null) {
             return null;
         }
@@ -265,31 +268,34 @@ public class OpdUtils extends org.smartregister.util.Utils {
         ArrayList<String> keysArrayList = new ArrayList<>();
         JSONArray fields = step1JsonObject.optJSONArray(OpdJsonFormUtils.FIELDS);
         JSONObject jsonObject = JsonFormUtils.getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.TESTS_REPEATING_GROUP);
-        JSONArray jsonArray = jsonObject.optJSONArray(JsonFormConstants.VALUE);
-        int repeatedGroupNum = 0;
+        if(jsonObject !=null) {
+            JSONArray jsonArray = jsonObject.optJSONArray(JsonFormConstants.VALUE);
+            int repeatedGroupNum = 0;
 
-        for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject valueField = jsonArray.optJSONObject(i);
-            String fieldKey = valueField.optString(JsonFormConstants.KEY);
-            keysArrayList.add(fieldKey);
-        }
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject valueField = jsonArray.optJSONObject(i);
+                String fieldKey = valueField.optString(JsonFormConstants.KEY);
+                keysArrayList.add(fieldKey);
+            }
 
-        for (int k = 0; k < fields.length(); k++) {
-            JSONObject valueField = fields.optJSONObject(k);
-            String fieldKey = valueField.optString(JsonFormConstants.KEY);
-            String fieldValue = valueField.optString(JsonFormConstants.VALUE);
+            for (int k = 0; k < fields.length(); k++) {
+                JSONObject valueField = fields.optJSONObject(k);
+                String fieldKey = valueField.optString(JsonFormConstants.KEY);
+                String fieldValue = valueField.optString(JsonFormConstants.VALUE);
 
-            if (fieldKey.contains("_")) {
-                fieldKey = fieldKey.substring(0, fieldKey.lastIndexOf("_"));
-                if (keysArrayList.contains(fieldKey) && StringUtils.isNotBlank(fieldValue)) {
-                    valueField.put(JsonFormConstants.KEY, fieldKey);
-                    repeatedGroupNum ++;
+                if (fieldKey.contains("_")) {
+                    fieldKey = fieldKey.substring(0, fieldKey.lastIndexOf("_"));
+                    if (keysArrayList.contains(fieldKey) && StringUtils.isNotBlank(fieldValue)) {
+                        valueField.put(JsonFormConstants.KEY, fieldKey);
+                        repeatedGroupNum++;
+                    }
                 }
             }
+            //divide by 2 to count number of test&&result pair
+            repeatedGroupNum = repeatedGroupNum / 2;
+            return repeatedGroupNum;
         }
-        //divide by 2 to count number of test&&result pair
-        repeatedGroupNum = repeatedGroupNum / 2;
-        return repeatedGroupNum;
+        return 0;
     }
 
     public static List<CompositeObs> getAllObsObject(@NonNull Event event) {
@@ -303,7 +309,7 @@ public class OpdUtils extends org.smartregister.util.Utils {
             String value = "";
             if (values.size() > 0) {
                 String obsValue = (String) values.get(0);
-                if(StringUtils.isNotBlank(obsValue)){
+                if (StringUtils.isNotBlank(obsValue)) {
                     value = obsValue;
                 }
             }
@@ -311,7 +317,7 @@ public class OpdUtils extends org.smartregister.util.Utils {
             List<Object> humanReadableValues = observation.getHumanReadableValues();
             if (humanReadableValues.size() > 0) {
                 String humanReadableValue = (String) humanReadableValues.get(0);
-                if(StringUtils.isNotBlank(humanReadableValue)){
+                if (StringUtils.isNotBlank(humanReadableValue)) {
                     value = humanReadableValue;
                 }
             }
@@ -321,6 +327,44 @@ public class OpdUtils extends org.smartregister.util.Utils {
         }
 
         return compositeObsArrayList;
+    }
+
+    public static void injectRelevanceFields(@NonNull JSONObject jsonForm, @NonNull String baseEntityId) {
+        DetailsRepository detailsRepository = OpdLibrary.getInstance().context().detailsRepository();
+        Map<String, String> map = detailsRepository.getAllDetailsForClient(baseEntityId);
+        try {
+
+            JSONObject genderJsonObject = new JSONObject();
+            genderJsonObject.put(JsonFormConstants.KEY, OpdConstants.JSON_FORM_KEY.GENDER);
+            genderJsonObject.put(JsonFormConstants.VALUE, map.get(OpdDbConstants.Column.Client.GENDER));
+            genderJsonObject.put(JsonFormConstants.TYPE, JsonFormConstants.LABEL);
+            genderJsonObject.put(JsonFormConstants.HIDDEN, "true");
+
+
+            String strDob = map.get(map.get(OpdDbConstants.Column.Client.DOB));
+            String age = "";
+            if (StringUtils.isNotBlank(strDob)) {
+                age = String.valueOf(Utils.getAgeFromDate(strDob));
+            }
+
+            JSONObject dobJsonObject = new JSONObject();
+            dobJsonObject.put(JsonFormConstants.KEY, OpdConstants.JSON_FORM_KEY.AGE);
+            dobJsonObject.put(JsonFormConstants.VALUE, age);
+            dobJsonObject.put(JsonFormConstants.TYPE, JsonFormConstants.LABEL);
+            dobJsonObject.put(JsonFormConstants.HIDDEN, "true");
+
+            jsonForm.getJSONObject(JsonFormConstants.FIRST_STEP_NAME).getJSONArray(JsonFormConstants.FIELDS).put(genderJsonObject).put(dobJsonObject);
+
+        } catch (JSONException e) {
+            Timber.e(e);
+        }
+    }
+
+    public static String opdLookUpQuery() {
+        String lookUpQueryForOpdClient = "select id as _id, %s, %s, %s, %s, %s, %s, %s, national_id from ec_client where [condition] ";
+        lookUpQueryForOpdClient = String.format(lookUpQueryForOpdClient, OpdConstants.KEY.RELATIONALID, OpdConstants.KEY.FIRST_NAME,
+                OpdConstants.KEY.LAST_NAME, OpdConstants.KEY.GENDER, OpdConstants.KEY.DOB, OpdConstants.KEY.BASE_ENTITY_ID, OpdDbConstants.KEY.OPENSRP_ID);
+        return lookUpQueryForOpdClient;
     }
 
 }
