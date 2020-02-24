@@ -27,10 +27,12 @@ import org.smartregister.opd.activity.BaseOpdFormActivity;
 import org.smartregister.opd.configuration.OpdConfiguration;
 import org.smartregister.opd.pojo.CompositeObs;
 import org.smartregister.opd.pojo.OpdMetadata;
+import org.smartregister.repository.DetailsRepository;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -55,6 +57,7 @@ public class OpdUtilsTest {
 
     @Mock
     private OpdMetadata opdMetadata;
+
 
     @Before
     public void setUp() {
@@ -196,4 +199,24 @@ public class OpdUtilsTest {
 
     }
 
+    @Test
+    public void testGetInjectableFieldsShouldPopulateMapCorrectly() {
+        String baseEntityId = "234-234";
+        ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", opdLibrary);
+        org.smartregister.Context context = Mockito.mock(org.smartregister.Context.class);
+        Mockito.when(opdLibrary.context()).thenReturn(context);
+        DetailsRepository detailsRepository = Mockito.mock(DetailsRepository.class);
+        Mockito.when(context.detailsRepository()).thenReturn(detailsRepository);
+        Map<String, String> detailsMap = new HashMap<>();
+        detailsMap.put(OpdConstants.ClientMapKey.GENDER, "Female");
+        detailsMap.put(OpdDbConstants.Column.Client.DOB, "");
+        Mockito.when(detailsRepository.getAllDetailsForClient(baseEntityId)).thenReturn(detailsMap);
+        String formName = OpdConstants.Form.OPD_CHECK_IN;
+        HashMap<String, String> hashMap = OpdUtils.getInjectableFields(formName, baseEntityId);
+        assertEquals(hashMap.get(OpdConstants.JSON_FORM_KEY.AGE), "");
+        assertEquals(hashMap.get(OpdConstants.ClientMapKey.GENDER), "Female");
+
+        ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", null);
+
+    }
 }

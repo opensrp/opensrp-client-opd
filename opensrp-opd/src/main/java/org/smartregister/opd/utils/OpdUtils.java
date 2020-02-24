@@ -24,8 +24,10 @@ import org.smartregister.domain.db.Obs;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.pojo.CompositeObs;
 import org.smartregister.opd.pojo.OpdMetadata;
+import org.smartregister.repository.DetailsRepository;
 import org.smartregister.util.FormUtils;
 import org.smartregister.util.JsonFormUtils;
+import org.smartregister.util.Utils;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -35,6 +37,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import timber.log.Timber;
 
@@ -213,7 +216,7 @@ public class OpdUtils extends org.smartregister.util.Utils {
     }
 
     @Nullable
-    public static JSONObject getJsonFormToJsonObject(String formName){
+    public static JSONObject getJsonFormToJsonObject(@NonNull String formName) {
         if (getFormUtils() == null) {
             return null;
         }
@@ -283,7 +286,7 @@ public class OpdUtils extends org.smartregister.util.Utils {
                 fieldKey = fieldKey.substring(0, fieldKey.lastIndexOf("_"));
                 if (keysArrayList.contains(fieldKey) && StringUtils.isNotBlank(fieldValue)) {
                     valueField.put(JsonFormConstants.KEY, fieldKey);
-                    repeatedGroupNum ++;
+                    repeatedGroupNum++;
                 }
             }
         }
@@ -303,7 +306,7 @@ public class OpdUtils extends org.smartregister.util.Utils {
             String value = "";
             if (values.size() > 0) {
                 String obsValue = (String) values.get(0);
-                if(StringUtils.isNotBlank(obsValue)){
+                if (StringUtils.isNotBlank(obsValue)) {
                     value = obsValue;
                 }
             }
@@ -311,7 +314,7 @@ public class OpdUtils extends org.smartregister.util.Utils {
             List<Object> humanReadableValues = observation.getHumanReadableValues();
             if (humanReadableValues.size() > 0) {
                 String humanReadableValue = (String) humanReadableValues.get(0);
-                if(StringUtils.isNotBlank(humanReadableValue)){
+                if (StringUtils.isNotBlank(humanReadableValue)) {
                     value = humanReadableValue;
                 }
             }
@@ -323,4 +326,19 @@ public class OpdUtils extends org.smartregister.util.Utils {
         return compositeObsArrayList;
     }
 
+    public static HashMap<String, String> getInjectableFields(@NonNull String formName, @NonNull String caseId) {
+        DetailsRepository detailsRepository = OpdLibrary.getInstance().context().detailsRepository();
+        Map<String, String> detailsMap = detailsRepository.getAllDetailsForClient(caseId);
+        HashMap<String, String> injectedValues = new HashMap<>();
+        if (formName.equals(OpdConstants.Form.OPD_CHECK_IN)) {
+            injectedValues.put(OpdConstants.ClientMapKey.GENDER, detailsMap.get(OpdConstants.ClientMapKey.GENDER));
+            String strDob = detailsMap.get(OpdDbConstants.Column.Client.DOB);
+            String age = "";
+            if (StringUtils.isNotBlank(strDob)) {
+                age = String.valueOf(Utils.getAgeFromDate(strDob));
+            }
+            injectedValues.put(OpdConstants.JSON_FORM_KEY.AGE, age);
+        }
+        return injectedValues;
+    }
 }

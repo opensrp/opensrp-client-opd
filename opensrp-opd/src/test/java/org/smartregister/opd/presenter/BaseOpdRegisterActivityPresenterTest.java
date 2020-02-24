@@ -12,9 +12,11 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.robolectric.util.ReflectionHelpers;
+import org.smartregister.Context;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
 import org.smartregister.opd.repository.OpdDiagnosisAndTreatmentFormRepository;
+import org.smartregister.repository.DetailsRepository;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -33,6 +35,12 @@ public class BaseOpdRegisterActivityPresenterTest {
     @Mock
     private OpdDiagnosisAndTreatmentFormRepository opdDiagnosisAndTreatmentFormRepository;
 
+    @Mock
+    private Context context;
+
+    @Mock
+    private DetailsRepository detailsRepository;
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -43,11 +51,18 @@ public class BaseOpdRegisterActivityPresenterTest {
         PowerMockito.mockStatic(OpdLibrary.class);
         PowerMockito.when(OpdLibrary.getInstance()).thenReturn(opdLibrary);
         PowerMockito.when(opdLibrary.getOpdDiagnosisAndTreatmentFormRepository()).thenReturn(opdDiagnosisAndTreatmentFormRepository);
+        PowerMockito.when(opdLibrary.context()).thenReturn(context);
+        PowerMockito.when(context.detailsRepository()).thenReturn(detailsRepository);
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("gender", "female");
+        hashMap.put("dob", "");
+        PowerMockito.when(detailsRepository.getAllDetailsForClient("90923-dsfds")).thenReturn(hashMap);
 
         OpdRegisterActivityContract.View view = Mockito.mock(OpdRegisterActivityContract.View.class);
         OpdRegisterActivityContract.Model model = Mockito.mock(OpdRegisterActivityContract.Model.class);
 
         BaseOpdRegisterActivityPresenter baseOpdRegisterActivityPresenter = new OpdRegisterActivityPresenter(view, model);
+
 
         Mockito.doReturn(new JSONObject()).when(model).getFormAsJson(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.nullable(HashMap.class));
 
