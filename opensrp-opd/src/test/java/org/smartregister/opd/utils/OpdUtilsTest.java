@@ -200,7 +200,7 @@ public class OpdUtilsTest {
     }
 
     @Test
-    public void testGetInjectableFieldsShould() {
+    public void testGetInjectableFieldsShouldPopulateMapCorrectly() {
         String baseEntityId = "234-234";
         ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", opdLibrary);
         org.smartregister.Context context = Mockito.mock(org.smartregister.Context.class);
