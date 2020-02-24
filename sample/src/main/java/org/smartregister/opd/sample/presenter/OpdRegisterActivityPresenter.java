@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Triple;
 import org.smartregister.domain.FetchStatus;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
-import org.smartregister.opd.pojo.OpdDiagnosisAndTreatmentForm;
 import org.smartregister.opd.pojo.OpdEventClient;
 import org.smartregister.opd.pojo.RegisterParams;
 import org.smartregister.opd.presenter.BaseOpdRegisterActivityPresenter;

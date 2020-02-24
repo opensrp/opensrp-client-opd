@@ -12,7 +12,6 @@ import android.view.View;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.domain.Form;
 
-import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.smartregister.AllConstants;
 import org.smartregister.opd.OpdLibrary;
@@ -134,15 +133,6 @@ public abstract class BaseOpdRegisterActivity extends BaseRegisterActivity imple
                 form.setWizard(true);
             }
 
-            if (encounterType.equals(OpdConstants.EventType.CHECK_IN)) {
-                if (parcelableData != null) {
-                    String baseEntityId = parcelableData.get(OpdConstants.IntentKey.BASE_ENTITY_ID);
-                    if (StringUtils.isNotBlank(baseEntityId)) {
-                        injectRelevanceFields(jsonForm, baseEntityId);
-                    }
-                }
-            }
-
             form.setHideSaveLabel(true);
             form.setPreviousLabel("");
             form.setNextLabel("");
@@ -162,9 +152,4 @@ public abstract class BaseOpdRegisterActivity extends BaseRegisterActivity imple
             Timber.e(new Exception(), "FormActivity cannot be started because OpdMetadata is NULL");
         }
     }
-
-    private void injectRelevanceFields(@NonNull JSONObject jsonForm, @NonNull String baseEntityId) {
-        OpdUtils.injectRelevanceFields(jsonForm, baseEntityId);
-    }
-
 }

@@ -16,6 +16,7 @@ import org.smartregister.opd.contract.OpdRegisterActivityContract;
 import org.smartregister.opd.interactor.BaseOpdRegisterActivityInteractor;
 import org.smartregister.opd.pojo.OpdDiagnosisAndTreatmentForm;
 import org.smartregister.opd.utils.OpdConstants;
+import org.smartregister.opd.utils.OpdUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.Collections;
@@ -132,6 +133,11 @@ public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterAct
     }
 
     @Override
+    public HashMap<String, String> getInjectedFields(@NonNull String formName, @NonNull String entityId) {
+        return OpdUtils.getInjectableFields(formName, entityId);
+    }
+
+    @Override
     public void startForm(@NonNull String formName, @NonNull String entityId, String metaData
             , @NonNull String locationId, @Nullable HashMap<String, String> injectedFieldValues, @Nullable String entityTable) {
         if (StringUtils.isBlank(entityId)) {
@@ -139,10 +145,9 @@ public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterAct
             interactor.getNextUniqueId(triple, this);
             return;
         }
-
         form = null;
         try {
-            form = model.getFormAsJson(formName, entityId, locationId, injectedFieldValues);
+            form = model.getFormAsJson(formName, entityId, locationId, getInjectedFields(formName, entityId));
             if (formName.equals(OpdConstants.Form.OPD_DIAGNOSIS_AND_TREAT)) {
                 interactor.fetchSavedDiagnosisAndTreatmentForm(entityId, entityTable, this);
                 return;
@@ -151,8 +156,6 @@ public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterAct
         } catch (JSONException e) {
             Timber.e(e);
         }
-
-        // The form will be started for forms that are not OPD Diagnosis And Treatment Forms
         startFormActivity(entityId, entityTable, form);
     }
 
