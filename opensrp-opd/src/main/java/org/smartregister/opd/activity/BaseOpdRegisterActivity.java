@@ -122,7 +122,6 @@ public abstract class BaseOpdRegisterActivity extends BaseRegisterActivity imple
         OpdMetadata opdMetadata = OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata();
         if (opdMetadata != null) {
             Intent intent = new Intent(this, opdMetadata.getOpdFormActivity());
-            intent.putExtra(OpdConstants.JSON_FORM_EXTRA.JSON, jsonForm.toString());
             Form form = new Form();
             form.setWizard(false);
             form.setName("");
@@ -140,14 +139,15 @@ public abstract class BaseOpdRegisterActivity extends BaseRegisterActivity imple
             form.setHideNextButton(false);
             form.setHidePreviousButton(false);
 
+            intent.putExtra(OpdConstants.JSON_FORM_EXTRA.JSON, jsonForm.toString());
             intent.putExtra(JsonFormConstants.JSON_FORM_KEY.FORM, form);
             if (parcelableData != null) {
                 for (String intentKey : parcelableData.keySet()) {
                     intent.putExtra(intentKey, parcelableData.get(intentKey));
                 }
             }
-
             startActivityForResult(intent, OpdJsonFormUtils.REQUEST_CODE_GET_JSON);
+
         } else {
             Timber.e(new Exception(), "FormActivity cannot be started because OpdMetadata is NULL");
         }

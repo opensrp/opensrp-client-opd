@@ -54,12 +54,19 @@
     "title": "OPD Check-In",
     "fields": [
       {
-        "key": "patient_gender",
+        "key": "gender",
         "openmrs_entity_parent": "",
         "openmrs_entity": "",
         "openmrs_entity_id": "",
         "type": "label",
-        "read_only": true,
+        "hidden": true
+      },
+      {
+        "key": "age",
+        "openmrs_entity_parent": "",
+        "openmrs_entity": "",
+        "openmrs_entity_id": "",
+        "type": "label",
         "hidden": true
       },
       {
@@ -80,9 +87,10 @@
           "Unknown"
         ],
         "relevance": {
-          "step1:patient_gender": {
-            "type": "string",
-            "ex": "equalTo(., \"Female\")"
+          "rules-engine": {
+            "ex-rules" : {
+              "rules-file": "opd/opd_checkin_relevance_rules.yml"
+            }
           }
         }
       },
@@ -247,7 +255,6 @@
           }
         }
       },
-
       {
         "key": "appointment_done_inless_time",
         "openmrs_entity_parent": "",

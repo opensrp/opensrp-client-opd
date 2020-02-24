@@ -130,7 +130,7 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
         OpdProfileActivityContract.View profileView = getProfileView();
         if (profileView != null) {
             profileView.setProfileName(client.get(OpdDbConstants.KEY.FIRST_NAME) + " " + client.get(OpdDbConstants.KEY.LAST_NAME));
-                String translatedYearInitial = profileView.getString(R.string.abbrv_years);
+            String translatedYearInitial = profileView.getString(R.string.abbrv_years);
             String dobString = client.get(OpdConstants.KEY.DOB);
 
             if (dobString != null) {
@@ -153,11 +153,15 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
     @Override
     public void startForm(@NonNull String formName, @NonNull CommonPersonObjectClient commonPersonObjectClient) {
         Map<String, String> clientMap = commonPersonObjectClient.getColumnmaps();
-        HashMap<String, String> injectedValues = new HashMap<>();
-        injectedValues.put(OpdConstants.JsonFormField.PATIENT_GENDER, clientMap.get(OpdConstants.ClientMapKey.GENDER));
         String entityTable = clientMap.get(OpdConstants.IntentKey.ENTITY_TABLE);
-
+        HashMap<String, String> injectedValues = getInjectedFields(formName, commonPersonObjectClient.getCaseId());
         startFormActivity(formName, commonPersonObjectClient.getCaseId(), entityTable, injectedValues);
+    }
+
+
+    @Override
+    public HashMap<String, String> getInjectedFields(@NonNull String formName, @NonNull String entityId) {
+        return OpdUtils.getInjectableFields(formName, entityId);
     }
 
     public void startFormActivity(@NonNull String formName, @NonNull String caseId, @NonNull String entityTable, @Nullable HashMap<String, String> injectedValues) {
@@ -165,6 +169,7 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
             form = null;
             try {
                 String locationId = OpdUtils.context().allSharedPreferences().getPreference(AllConstants.CURRENT_LOCATION_ID);
+
                 form = model.getFormAsJson(formName, caseId, locationId, injectedValues);
 
                 // Fetch saved form & continue editing
@@ -253,25 +258,23 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
     @Override
     public void onUpdateRegistrationBtnCLicked(@NonNull String baseEntityId) {
         if (getProfileView() != null) {
-            Utils.startAsyncTask(new FetchRegistrationDataTask(new WeakReference<Context>(getProfileView().getContext()), new FetchRegistrationDataTask.OnTaskComplete() {
-                @Override
-                public void onSuccess(@Nullable String jsonForm) {
-                    OpdMetadata metadata = OpdUtils.metadata();
+            Utils.startAsyncTask(new FetchRegistrationDataTask(new WeakReference<>(getProfileView()), jsonForm -> {
+                OpdMetadata metadata = OpdUtils.metadata();
 
-                    OpdProfileActivityContract.View profileView = getProfileView();
-                    if (profileView != null && metadata != null && jsonForm != null) {
-                        Context context = profileView.getContext();
-                        Intent intent = new Intent(context, metadata.getOpdFormActivity());
-                        Form formParam = new Form();
-                        formParam.setWizard(false);
-                        formParam.setHideSaveLabel(true);
-                        formParam.setNextLabel("");
-                        intent.putExtra(JsonFormConstants.JSON_FORM_KEY.FORM, formParam);
-                        intent.putExtra(JsonFormConstants.JSON_FORM_KEY.JSON, jsonForm);
-                        profileView.startActivityForResult(intent, OpdJsonFormUtils.REQUEST_CODE_GET_JSON);
-                    }
+                OpdProfileActivityContract.View profileView = getProfileView();
+                if (profileView != null && metadata != null && jsonForm != null) {
+                    Context context = profileView.getContext();
+                    Intent intent = new Intent(context, metadata.getOpdFormActivity());
+                    Form formParam = new Form();
+                    formParam.setWizard(false);
+                    formParam.setHideSaveLabel(true);
+                    formParam.setNextLabel("");
+                    intent.putExtra(JsonFormConstants.JSON_FORM_KEY.FORM, formParam);
+                    intent.putExtra(JsonFormConstants.JSON_FORM_KEY.JSON, jsonForm);
+                    profileView.startActivityForResult(intent, OpdJsonFormUtils.REQUEST_CODE_GET_JSON);
                 }
             }), new String[]{baseEntityId});
         }
     }
+
 }
