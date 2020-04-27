@@ -5,6 +5,7 @@ public class OpdTestConducted {
     private String baseEntityId;
     private String test;
     private String result;
+    private String details;
     private String createdAt;
     private String updatedAt;
     private String visitId;
@@ -63,5 +64,13 @@ public class OpdTestConducted {
 
     public void setVisitId(String visitId) {
         this.visitId = visitId;
+    }
+
+    public String getDetails() {
+        return details;
+    }
+
+    public void setDetails(String details) {
+        this.details = details;
     }
 }

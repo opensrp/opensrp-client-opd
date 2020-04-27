@@ -146,6 +146,7 @@ public interface OpdDbConstants {
             String CREATED_AT = "created_at";
             String UPDATED_AT = "updated_at";
             String VISIT_ID = "visit_id";
+            String DETAILS = "details";
         }
     }
 

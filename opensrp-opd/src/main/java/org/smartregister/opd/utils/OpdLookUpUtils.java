@@ -11,7 +11,6 @@ import org.smartregister.Context;
 import org.smartregister.commonregistry.CommonPersonObject;
 import org.smartregister.commonregistry.CommonRepository;
 import org.smartregister.event.Listener;
-import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.pojo.OpdMetadata;
 
 import java.util.ArrayList;
@@ -89,7 +88,7 @@ public class OpdLookUpUtils {
     protected static String lookUpQuery(@NonNull Map<String, String> entityMap) {
         String mainCondition = getMainConditionString(entityMap);
         if (!TextUtils.isEmpty(mainCondition)) {
-            return OpdLibrary.getInstance().opdLookUpQuery().replace("[condition]", mainCondition) + ";";
+            return OpdUtils.metadata().getLookUpQueryForOpdClient().replace("[condition]", mainCondition) + ";";
         }
         return null;
     }

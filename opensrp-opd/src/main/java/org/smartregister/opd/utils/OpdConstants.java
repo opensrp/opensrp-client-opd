@@ -8,6 +8,8 @@ public class OpdConstants extends AllConstants {
     public static final String CLIENT_TYPE = "client";
     public static final String CONFIG = "opd_register";
     public static final String TYPE_OF_TEXT_LABEL = "The type of test conducted";
+    public static final String DIAGNOSTIC_TEST_RESULT = "diagnostic_test_result";
+    public static final String REPEATING_GROUP_MAP = "repeatingGroupMap";
 
     public interface StepTitle {
         String TEST_CONDUCTED = "Test Conducted";

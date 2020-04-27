@@ -4,8 +4,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.smartregister.opd.utils.DefaultOpdLocationUtils;
+import org.smartregister.opd.utils.OpdConstants;
+import org.smartregister.opd.utils.OpdDbConstants;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class OpdMetadata {
 
@@ -29,6 +32,11 @@ public class OpdMetadata {
 
     private ArrayList<String> healthFacilityLevels;
 
+    private HashMap<String, String> diagnosisAndTreatmentEncounterTypeTableMap;
+
+    private String lookUpQueryForOpdClient = String.format("select id as _id, %s, %s, %s, %s, %s, %s, %s, national_id from ec_client where [condition] ", OpdConstants.KEY.RELATIONALID, OpdConstants.KEY.FIRST_NAME,
+            OpdConstants.KEY.LAST_NAME, OpdConstants.KEY.GENDER, OpdConstants.KEY.DOB, OpdConstants.KEY.BASE_ENTITY_ID, OpdDbConstants.KEY.OPENSRP_ID);
+
     public OpdMetadata(@NonNull String opdRegistrationFormName, @NonNull String tableName, @NonNull String registerEventType, @NonNull String updateEventType,
                        @NonNull String config, @NonNull Class opdFormActivity, @Nullable Class profileActivity, boolean formWizardValidateRequiredFieldsBefore) {
         this.opdRegistrationFormName = opdRegistrationFormName;
@@ -39,6 +47,19 @@ public class OpdMetadata {
         this.opdFormActivity = opdFormActivity;
         this.profileActivity = profileActivity;
         this.formWizardValidateRequiredFieldsBefore = formWizardValidateRequiredFieldsBefore;
+        initDiagnosisAndTreatmentEncounterTypeTableMap();
+    }
+
+    protected void initDiagnosisAndTreatmentEncounterTypeTableMap() {
+        diagnosisAndTreatmentEncounterTypeTableMap = new HashMap<>();
+        diagnosisAndTreatmentEncounterTypeTableMap.put(OpdConstants.EventType.TEST_CONDUCTED, OpdDbConstants.Table.OPD_TEST_CONDUCTED);
+        diagnosisAndTreatmentEncounterTypeTableMap.put(OpdConstants.EventType.DIAGNOSIS, OpdDbConstants.Table.OPD_DIAGNOSIS);
+        diagnosisAndTreatmentEncounterTypeTableMap.put(OpdConstants.EventType.TREATMENT, OpdDbConstants.Table.OPD_TREATMENT);
+        diagnosisAndTreatmentEncounterTypeTableMap.put(OpdConstants.EventType.SERVICE_DETAIL, OpdDbConstants.Table.OPD_SERVICE_DETAIL);
+    }
+
+    public HashMap<String, String> getDiagnosisAndTreatmentEncounterTypeTableMap() {
+        return diagnosisAndTreatmentEncounterTypeTableMap;
     }
 
     public String getOpdRegistrationFormName() {
@@ -129,5 +150,9 @@ public class OpdMetadata {
 
     public void setHealthFacilityLevels(ArrayList<String> healthFacilityLevels) {
         this.healthFacilityLevels = healthFacilityLevels;
+    }
+
+    public String getLookUpQueryForOpdClient() {
+        return lookUpQueryForOpdClient;
     }
 }

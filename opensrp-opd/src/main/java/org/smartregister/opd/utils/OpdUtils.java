@@ -19,10 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.smartregister.domain.db.Event;
-import org.smartregister.domain.db.Obs;
 import org.smartregister.opd.OpdLibrary;
-import org.smartregister.opd.pojo.CompositeObs;
 import org.smartregister.opd.pojo.OpdMetadata;
 import org.smartregister.repository.DetailsRepository;
 import org.smartregister.util.FormUtils;
@@ -264,66 +261,37 @@ public class OpdUtils extends org.smartregister.util.Utils {
         }
     }
 
-    public static int buildRepeatingGroupTests(@NonNull JSONObject step1JsonObject) throws JSONException {
+    public static HashMap<String, HashMap<String, String>> buildRepeatingGroupTests(@NonNull JSONObject stepJsonObject) throws JSONException {
         ArrayList<String> keysArrayList = new ArrayList<>();
-        JSONArray fields = step1JsonObject.optJSONArray(OpdJsonFormUtils.FIELDS);
+        JSONArray fields = stepJsonObject.optJSONArray(OpdJsonFormUtils.FIELDS);
         JSONObject jsonObject = JsonFormUtils.getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.TESTS_REPEATING_GROUP);
-        JSONArray jsonArray = jsonObject.optJSONArray(JsonFormConstants.VALUE);
-        int repeatedGroupNum = 0;
+        HashMap<String, HashMap<String, String>> repeatingGroupMap = new HashMap<>();
+        if (jsonObject != null) {
+            JSONArray jsonArray = jsonObject.optJSONArray(JsonFormConstants.VALUE);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject valueField = jsonArray.optJSONObject(i);
+                String fieldKey = valueField.optString(JsonFormConstants.KEY);
+                keysArrayList.add(fieldKey);
+            }
 
-        for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject valueField = jsonArray.optJSONObject(i);
-            String fieldKey = valueField.optString(JsonFormConstants.KEY);
-            keysArrayList.add(fieldKey);
-        }
+            for (int k = 0; k < fields.length(); k++) {
+                JSONObject valueField = fields.optJSONObject(k);
+                String fieldKey = valueField.optString(JsonFormConstants.KEY);
+                String fieldValue = valueField.optString(JsonFormConstants.VALUE);
 
-        for (int k = 0; k < fields.length(); k++) {
-            JSONObject valueField = fields.optJSONObject(k);
-            String fieldKey = valueField.optString(JsonFormConstants.KEY);
-            String fieldValue = valueField.optString(JsonFormConstants.VALUE);
-
-            if (fieldKey.contains("_")) {
-                fieldKey = fieldKey.substring(0, fieldKey.lastIndexOf("_"));
-                if (keysArrayList.contains(fieldKey) && StringUtils.isNotBlank(fieldValue)) {
-                    valueField.put(JsonFormConstants.KEY, fieldKey);
-                    repeatedGroupNum++;
+                if (fieldKey.contains("_")) {
+                    fieldKey = fieldKey.substring(0, fieldKey.lastIndexOf("_"));
+                    if (keysArrayList.contains(fieldKey) && StringUtils.isNotBlank(fieldValue) && !fieldValue.equals(OpdConstants.TYPE_OF_TEXT_LABEL)) {
+                        String fieldKeyId = valueField.optString(JsonFormConstants.KEY).substring(fieldKey.length() + 1);
+                        valueField.put(JsonFormConstants.KEY, fieldKey);
+                        HashMap<String, String> hashMap = repeatingGroupMap.get(fieldKeyId) == null ? new HashMap<>() : repeatingGroupMap.get(fieldKeyId);
+                        hashMap.put(fieldKey, fieldValue);
+                        repeatingGroupMap.put(fieldKeyId, hashMap);
+                    }
                 }
             }
         }
-        //divide by 2 to count number of test&&result pair
-        repeatedGroupNum = repeatedGroupNum / 2;
-        return repeatedGroupNum;
-    }
-
-    public static List<CompositeObs> getAllObsObject(@NonNull Event event) {
-        List<Obs> obs = event.getObs();
-        List<CompositeObs> compositeObsArrayList = new ArrayList<>();
-        for (Obs observation : obs) {
-            CompositeObs compositeObs = new CompositeObs();
-            String key = observation.getFormSubmissionField();
-            compositeObs.setFormSubmissionFieldKey(key);
-            List<Object> values = observation.getValues();
-            String value = "";
-            if (values.size() > 0) {
-                String obsValue = (String) values.get(0);
-                if (StringUtils.isNotBlank(obsValue)) {
-                    value = obsValue;
-                }
-            }
-
-            List<Object> humanReadableValues = observation.getHumanReadableValues();
-            if (humanReadableValues.size() > 0) {
-                String humanReadableValue = (String) humanReadableValues.get(0);
-                if (StringUtils.isNotBlank(humanReadableValue)) {
-                    value = humanReadableValue;
-                }
-            }
-
-            compositeObs.setValue(value);
-            compositeObsArrayList.add(compositeObs);
-        }
-
-        return compositeObsArrayList;
+        return repeatingGroupMap;
     }
 
     public static HashMap<String, String> getInjectableFields(@NonNull String formName, @NonNull String caseId) {

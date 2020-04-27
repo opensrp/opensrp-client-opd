@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 
 import net.sqlcipher.database.SQLiteException;
@@ -17,7 +18,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.CoreLibrary;
-import org.smartregister.anc.library.sync.MiniClientProcessorForJava;
 import org.smartregister.commonregistry.CommonFtsObject;
 import org.smartregister.commonregistry.CommonRepository;
 import org.smartregister.domain.db.Client;
@@ -27,7 +27,6 @@ import org.smartregister.domain.db.Obs;
 import org.smartregister.domain.jsonmapping.ClientClassification;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.exception.CheckInEventProcessException;
-import org.smartregister.opd.pojo.CompositeObs;
 import org.smartregister.opd.pojo.OpdCheckIn;
 import org.smartregister.opd.pojo.OpdDetails;
 import org.smartregister.opd.pojo.OpdDiagnosis;
@@ -39,12 +38,12 @@ import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.sync.ClientProcessorForJava;
+import org.smartregister.sync.MiniClientProcessorForJava;
 import org.smartregister.util.Utils;
 
+import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -53,6 +52,8 @@ import java.util.Locale;
 import java.util.Map;
 
 import timber.log.Timber;
+
+import static org.smartregister.util.JsonFormUtils.gson;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-10-01
@@ -317,40 +318,34 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         if (valueIds.length < 1) {
             return;
         }
-        List<CompositeObs> compositeObsList = OpdUtils.getAllObsObject(event);
-        List<String> resultKeys = Arrays.asList(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER, OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_GLUCOSE,
-                OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPECIFY, OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER_BLOOD_TYPE, OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_OTHER);
-        List<String> testKeys = Collections.singletonList(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST);
-        String[] resultTestArr = new String[valueIds.length];
-        String[] resultTestResultArr = new String[valueIds.length];
-        int arrayIndexKeys = 0;
-        int arrayIndexTests = 0;
 
-        for (CompositeObs compositeObs : compositeObsList) {
-            if (testKeys.contains(compositeObs.getFormSubmissionFieldKey())) {
-                String obsValue = compositeObs.getValue();
-                if (OpdConstants.TYPE_OF_TEXT_LABEL.equals(obsValue)) {
+        String strRepeatingGroupMap = mapDetails.get(OpdConstants.REPEATING_GROUP_MAP);
+        if (StringUtils.isNotBlank(strRepeatingGroupMap)) {
+            Type type = new TypeToken<HashMap<String, HashMap<String, String>>>() {
+            }.getType();
+            HashMap<String, HashMap<String, String>> repeatingGroupMap = gson.fromJson(strRepeatingGroupMap, type);
+            int index = -1;
+            for (Map.Entry<String, HashMap<String, String>> testsMapEntry : repeatingGroupMap.entrySet()) {
+                HashMap<String, String> stringStringHashMap = testsMapEntry.getValue();
+                OpdTestConducted opdTestConducted = new OpdTestConducted();
+
+                for (Map.Entry<String, String> testMapEntry : stringStringHashMap.entrySet()) {
+                    if (testMapEntry.getKey().startsWith(OpdConstants.DIAGNOSTIC_TEST_RESULT)) {
+                        opdTestConducted.setResult(testMapEntry.getValue());
+                        continue;
+                    }
+
+                    if (testMapEntry.getKey().startsWith(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST)) {
+                        opdTestConducted.setTest(testMapEntry.getValue());
+                    }
+                }
+                if (opdTestConducted.getTest().equals(OpdConstants.TYPE_OF_TEXT_LABEL)) {
                     continue;
                 }
-                resultTestArr[arrayIndexTests] = obsValue;
-                arrayIndexTests++;
-            } else if (resultKeys.contains(compositeObs.getFormSubmissionFieldKey())) {
-                resultTestResultArr[arrayIndexKeys] = compositeObs.getValue();
-                arrayIndexKeys++;
-                //
-            }
-        }
-
-        for (int i = 0; i < valueIds.length; i++) {
-
-            if (!TextUtils.isEmpty(resultTestArr[i]) && !TextUtils.isEmpty(resultTestResultArr[i])) {
-
-                OpdTestConducted opdTestConducted = new OpdTestConducted();
-                opdTestConducted.setResult(resultTestResultArr[i]);
-                opdTestConducted.setTest(resultTestArr[i]);
+                opdTestConducted.setDetails(gson.toJson(stringStringHashMap));
                 opdTestConducted.setVisitId(mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID));
                 opdTestConducted.setBaseEntityId(event.getBaseEntityId());
-                opdTestConducted.setId(valueIds[i]);
+                opdTestConducted.setId(valueIds[++index]);
                 opdTestConducted.setCreatedAt(Utils.convertDateFormat(new DateTime()));
                 opdTestConducted.setUpdatedAt(Utils.convertDateFormat(new DateTime()));
 
@@ -363,9 +358,11 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                 Timber.e("Opd processTestConducted for %s not saved", event.getBaseEntityId());
             }
         }
+
     }
 
-    protected void processCheckIn(@NonNull Event event, @NonNull Client client) throws CheckInEventProcessException {
+    protected void processCheckIn(@NonNull Event event, @NonNull Client client) throws
+            CheckInEventProcessException {
         HashMap<String, String> keyValues = new HashMap<>();
 
         // Todo: This might not work as expected when openmrs_entity_ids are added
@@ -429,7 +426,8 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         }
     }
 
-    private boolean saveVisit(@NonNull String baseEntityId, @NonNull String locationId, @NonNull String providerId, @NonNull String visitId, @NonNull Date visitDate) {
+    private boolean saveVisit(@NonNull String baseEntityId, @NonNull String
+            locationId, @NonNull String providerId, @NonNull String visitId, @NonNull Date visitDate) {
         OpdVisit visit = new OpdVisit();
 
         visit.setId(visitId);
@@ -442,7 +440,8 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         return OpdLibrary.getInstance().getVisitRepository().addVisit(visit);
     }
 
-    private void generateKeyValuesFromEvent(@NonNull Event event, HashMap<String, String> keyValues) {
+    private void generateKeyValuesFromEvent(@NonNull Event
+                                                    event, HashMap<String, String> keyValues) {
         List<Obs> obs = event.getObs();
 
         for (Obs observation : obs) {
@@ -470,8 +469,10 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         }
     }
 
-    private void updateLastInteractedWith(@NonNull Event event, @NonNull String visitId) throws CheckInEventProcessException {
-        String tableName = event.getEntityType();
+    private void updateLastInteractedWith(@NonNull Event event, @NonNull String visitId) throws
+            CheckInEventProcessException {
+        String tableName = OpdUtils.metadata().getTableName();
+
         String lastInteractedWithDate = String.valueOf(new Date().getTime());
 
         ContentValues contentValues = new ContentValues();
@@ -495,14 +496,10 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         contentValues1.put("last_interacted_with", lastInteractedWithDate);
 
         boolean isUpdated = false;
-        String fieldName = "base_entity_id";
-        if ("ec_child".equals(tableName)) {
-            fieldName = "object_id";
-        }
 
         if (commonrepository.isFts()) {
             recordsUpdated = OpdLibrary.getInstance().getRepository().getWritableDatabase()
-                    .update(CommonFtsObject.searchTableName(tableName), contentValues, fieldName + " = ?", new String[]{event.getBaseEntityId()});
+                    .update(CommonFtsObject.searchTableName(tableName), contentValues, CommonFtsObject.idColumn + " = ?", new String[]{event.getBaseEntityId()});
             isUpdated = recordsUpdated > 0;
         }
 
@@ -529,7 +526,8 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
     }
 
     @NonNull
-    private OpdDetails generateOpdDetailsFromCheckInEvent(@NonNull Event event, String visitId, Date visitDate) {
+    private OpdDetails generateOpdDetailsFromCheckInEvent(@NonNull Event event, String
+            visitId, Date visitDate) {
         OpdDetails opdDetails = new OpdDetails();
         opdDetails.setBaseEntityId(event.getBaseEntityId());
         opdDetails.setCurrentVisitId(visitId);
@@ -548,7 +546,9 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
     }
 
     @NonNull
-    private OpdCheckIn generateCheckInRecordFromCheckInEvent(@NonNull Event event, @NonNull Client client, HashMap<String, String> keyValues, String visitId, Date visitDate) {
+    private OpdCheckIn generateCheckInRecordFromCheckInEvent(@NonNull Event
+                                                                     event, @NonNull Client client, HashMap<String, String> keyValues, String visitId, Date
+                                                                     visitDate) {
         OpdCheckIn checkIn = new OpdCheckIn();
         checkIn.setVisitId(visitId);
         checkIn.setPregnancyStatus(keyValues.get(OpdConstants.JsonFormField.PREGNANCY_STATUS));

@@ -2,6 +2,7 @@ package org.smartregister.opd.presenter;
 
 import org.smartregister.configurableviews.model.Field;
 import org.smartregister.opd.contract.OpdRegisterFragmentContract;
+import org.smartregister.opd.utils.OpdUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -74,7 +75,7 @@ public class OpdRegisterFragmentPresenter implements OpdRegisterFragmentContract
 
         String mainSelect = model.mainSelect(innerJoinObjects, new QueryTable[]{womanQueryTable});*/
 
-        getView().initializeQueryParams("ec_child", null, null);
+        getView().initializeQueryParams(OpdUtils.metadata().getTableName(), null, null);
         getView().initializeAdapter();
 
         getView().countExecute();

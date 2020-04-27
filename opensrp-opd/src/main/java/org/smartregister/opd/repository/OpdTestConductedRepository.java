@@ -9,7 +9,6 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.smartregister.opd.dao.OpdTestConductedDao;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.repository.BaseRepository;
-import org.smartregister.repository.Repository;
 
 import java.util.List;
 
@@ -20,6 +19,7 @@ public class OpdTestConductedRepository extends BaseRepository implements OpdTes
             + OpdDbConstants.Column.OpdTestConducted.BASE_ENTITY_ID + " VARCHAR NOT NULL, "
             + OpdDbConstants.Column.OpdTestConducted.TEST + " VARCHAR NOT NULL, "
             + OpdDbConstants.Column.OpdTestConducted.RESULT + " VARCHAR NOT NULL, "
+            + OpdDbConstants.Column.OpdTestConducted.DETAILS + " VARCHAR NOT NULL, "
             + OpdDbConstants.Column.OpdTestConducted.VISIT_ID + " VARCHAR NOT NULL, "
             + OpdDbConstants.Column.OpdTestConducted.UPDATED_AT + " INTEGER NOT NULL, "
             + OpdDbConstants.Column.OpdTestConducted.CREATED_AT + " INTEGER NOT NULL ," +
@@ -47,6 +47,7 @@ public class OpdTestConductedRepository extends BaseRepository implements OpdTes
         contentValues.put(OpdDbConstants.Column.OpdTestConducted.BASE_ENTITY_ID, opdTestConducted.getBaseEntityId());
         contentValues.put(OpdDbConstants.Column.OpdTestConducted.TEST, opdTestConducted.getTest());
         contentValues.put(OpdDbConstants.Column.OpdTestConducted.RESULT, opdTestConducted.getResult());
+        contentValues.put(OpdDbConstants.Column.OpdTestConducted.DETAILS, opdTestConducted.getDetails());
         contentValues.put(OpdDbConstants.Column.OpdTestConducted.VISIT_ID, opdTestConducted.getVisitId());
         contentValues.put(OpdDbConstants.Column.OpdTestConducted.CREATED_AT, opdTestConducted.getCreatedAt());
         contentValues.put(OpdDbConstants.Column.OpdTestConducted.UPDATED_AT, opdTestConducted.getUpdatedAt());
