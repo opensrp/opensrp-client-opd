@@ -326,13 +326,16 @@ public class OpdLibrary {
                 JSONObject step = jsonFormObject.optJSONObject(JsonFormConstants.STEP.concat(String.valueOf(j + 1)));
                 String title = step.optString(JsonFormConstants.STEP_TITLE);
                 String stepEncounterType = step.optString(JsonFormConstants.ENCOUNTER_TYPE);
+                String bindType = step.optString(OpdConstants.BIND_TYPE);
+
+
                 JSONArray fields = step.getJSONArray(OpdJsonFormUtils.FIELDS);
-                String valueIds;
+                String valueIds = null;
                 JSONObject jsonObject;
                 JSONArray valueJsonArray = null;
 
                 Event baseEvent = JsonFormUtils.createEvent(fields, jsonFormObject.getJSONObject(METADATA),
-                        formTag, entityId, stepEncounterType, getDiagnosisAndTreatmentTable(stepEncounterType));
+                        formTag, entityId, stepEncounterType, bindType);
 
                 if (OpdConstants.StepTitle.TEST_CONDUCTED.equals(title)) {
                     HashMap<String, HashMap<String, String>> buildRepeatingGroupTests = OpdUtils.buildRepeatingGroupTests(step);
@@ -365,20 +368,18 @@ public class OpdLibrary {
                         valueJsonArray = new JSONArray(value);
                         valueIds = OpdUtils.generateNIds(valueJsonArray.length());
                     }
-                } else {
-                    valueIds = OpdUtils.generateNIds(1);
                 }
-
+                OpdJsonFormUtils.tagSyncMetadata(baseEvent);
+                baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_ID, visitId);
                 if (StringUtils.isNotBlank(valueIds)) {
-                    OpdJsonFormUtils.tagSyncMetadata(baseEvent);
-                    baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_ID, visitId);
                     baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.ID, valueIds);
-                    if (valueJsonArray != null) {
-                        baseEvent.addDetails(OpdConstants.KEY.VALUE, valueJsonArray.toString());
-                    }
-
-                    eventList.add(baseEvent);
                 }
+                if (valueJsonArray != null) {
+                    baseEvent.addDetails(OpdConstants.KEY.VALUE, valueJsonArray.toString());
+                }
+
+                eventList.add(baseEvent);
+
             }
             //remove any saved sessions
             OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm = new OpdDiagnosisAndTreatmentForm(entityId);
@@ -412,10 +413,6 @@ public class OpdLibrary {
             Timber.e(e);
         }
         return jsonArray;
-    }
-
-    protected String getDiagnosisAndTreatmentTable(String stepEncounterType) {
-        return OpdUtils.metadata().getDiagnosisAndTreatmentEncounterTypeTableMap().get(stepEncounterType);
     }
 
     /**

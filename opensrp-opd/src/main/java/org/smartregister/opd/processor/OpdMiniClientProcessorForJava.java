@@ -89,6 +89,9 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
             eventTypes.add(OpdConstants.EventType.SERVICE_DETAIL);
             eventTypes.add(OpdConstants.EventType.TREATMENT);
             eventTypes.add(OpdConstants.EventType.CLOSE_OPD_VISIT);
+            eventTypes.add(OpdConstants.EventType.OUTCOME);
+            eventTypes.add(OpdConstants.EventType.MEDICAL_CONDITIONS_AND_HIV_DETAILS);
+            eventTypes.add(OpdConstants.EventType.PREGNANCY_STATUS);
         }
 
         return eventTypes;
@@ -131,16 +134,22 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
             } catch (Exception ex) {
                 Timber.e(ex);
             }
-        } else if (event.getEventType().equals(OpdConstants.EventType.SERVICE_DETAIL)) {
-            try {
-                processServiceDetail(event);
-                CoreLibrary.getInstance().context().getEventClientRepository().markEventAsProcessed(eventClient.getEvent().getFormSubmissionId());
-            } catch (Exception ex) {
-                Timber.e(ex);
-            }
         } else if (event.getEventType().equals(OpdConstants.EventType.CLOSE_OPD_VISIT)) {
             try {
                 processOpdCloseVisitEvent(event);
+                CoreLibrary.getInstance().context().getEventClientRepository().markEventAsProcessed(eventClient.getEvent().getFormSubmissionId());
+            } catch (Exception e) {
+                Timber.e(e);
+            }
+        } else if (event.getEventType().equals(OpdConstants.EventType.OUTCOME)
+                || event.getEventType().equals(OpdConstants.EventType.PREGNANCY_STATUS)
+                || event.getEventType().equals(OpdConstants.EventType.MEDICAL_CONDITIONS_AND_HIV_DETAILS)
+                || event.getEventType().equals(OpdConstants.EventType.SERVICE_DETAIL)) {
+            try {
+                if (eventClient.getClient() != null) {
+                    processEvent(event, eventClient.getClient(), clientClassification);
+                    CoreLibrary.getInstance().context().getEventClientRepository().markEventAsProcessed(eventClient.getEvent().getFormSubmissionId());
+                }
             } catch (Exception e) {
                 Timber.e(e);
             }
@@ -166,36 +175,6 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
             }
         } else {
             Timber.e("Opd Details for %s not found, event details is null", event.getBaseEntityId());
-        }
-    }
-
-    private void processServiceDetail(@NonNull Event event) {
-        Map<String, String> mapDetails = event.getDetails();
-        String id = mapDetails.get(OpdConstants.JSON_FORM_KEY.ID);
-        if (id == null) {
-            return;
-        }
-        String[] valueIds = id.split(",");
-        HashMap<String, String> keyValues = new HashMap<>();
-        generateKeyValuesFromEvent(event, keyValues);
-
-        String serviceFee = keyValues.get(OpdConstants.JSON_FORM_KEY.SERVICE_FEE);
-
-        if (!TextUtils.isEmpty(serviceFee)) {
-            OpdServiceDetail opdServiceDetail = new OpdServiceDetail();
-            opdServiceDetail.setId(valueIds[0]);
-            opdServiceDetail.setBaseEntityId(event.getBaseEntityId());
-            opdServiceDetail.setFee(serviceFee);
-            opdServiceDetail.setCreatedAt(Utils.convertDateFormat(new DateTime()));
-            opdServiceDetail.setUpdatedAt(Utils.convertDateFormat(new DateTime()));
-            opdServiceDetail.setVisitId(mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID));
-            opdServiceDetail.setDetails(mapDetails.toString());
-            boolean result = OpdLibrary.getInstance().getOpdServiceDetailRepository().saveOrUpdate(opdServiceDetail);
-            if (result) {
-                Timber.d("Opd processServiceDetail for %s saved", event.getBaseEntityId());
-                return;
-            }
-            Timber.e("Opd processServiceDetail for %s not saved", event.getBaseEntityId());
         }
     }
 

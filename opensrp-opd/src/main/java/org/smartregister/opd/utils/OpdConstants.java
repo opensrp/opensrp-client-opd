@@ -10,6 +10,7 @@ public class OpdConstants extends AllConstants {
     public static final String TYPE_OF_TEXT_LABEL = "The type of test conducted";
     public static final String DIAGNOSTIC_TEST_RESULT = "diagnostic_test_result";
     public static final String REPEATING_GROUP_MAP = "repeatingGroupMap";
+    public static final String BIND_TYPE = "bind_type";
 
     public interface StepTitle {
         String TEST_CONDUCTED = "Test Conducted";
@@ -218,6 +219,9 @@ public class OpdConstants extends AllConstants {
         public static final String TEST_CONDUCTED = "OPD Test Conducted";
         public static final String SERVICE_DETAIL = "OPD Service Detail";
         public static final String VISIT = "OPD Visit";
+        public static final String PREGNANCY_STATUS = "OPD Pregnancy Status";
+        public static final String MEDICAL_CONDITIONS_AND_HIV_DETAILS = "OPD Medical Conditions And HIV Details";
+        public static final String OUTCOME = "OPD Outcome";
         public static final String CLOSE_OPD_VISIT = "OPD Close Visit";
     }
 

@@ -69,17 +69,22 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
 
         // Inject the field values
         if (injectedFieldValues != null && injectedFieldValues.size() > 0) {
-            JSONObject stepOne = form.getJSONObject(OpdJsonFormUtils.STEP1);
-            JSONArray jsonArray = stepOne.getJSONArray(OpdJsonFormUtils.FIELDS);
-
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                String fieldKey = jsonObject.getString(OpdJsonFormUtils.KEY);
-
-                String fieldValue = injectedFieldValues.get(fieldKey);
-
-                if (!TextUtils.isEmpty(fieldValue)) {
-                    jsonObject.put(OpdJsonFormUtils.VALUE, fieldValue);
+            if (form.has(JsonFormConstants.COUNT)) {
+                int stepCount = Integer.parseInt(form.optString(JsonFormConstants.COUNT));
+                for (int index = 0; index < stepCount; index++) {
+                    String stepName = JsonFormConstants.STEP + (index + 1);
+                    JSONObject step = form.optJSONObject(stepName);
+                    if (step != null) {
+                        JSONArray stepFields = step.optJSONArray(JsonFormConstants.FIELDS);
+                        for (int k = 0; k < stepFields.length(); k++) {
+                            JSONObject jsonObject = stepFields.optJSONObject(k);
+                            String fieldKey = jsonObject.optString(OpdJsonFormUtils.KEY);
+                            String fieldValue = injectedFieldValues.get(fieldKey);
+                            if (!TextUtils.isEmpty(fieldValue)) {
+                                jsonObject.put(OpdJsonFormUtils.VALUE, fieldValue);
+                            }
+                        }
+                    }
                 }
             }
         }

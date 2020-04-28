@@ -20,6 +20,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.opd.OpdLibrary;
+import org.smartregister.opd.pojo.OpdCheckIn;
 import org.smartregister.opd.pojo.OpdMetadata;
 import org.smartregister.repository.DetailsRepository;
 import org.smartregister.util.FormUtils;
@@ -298,7 +299,7 @@ public class OpdUtils extends org.smartregister.util.Utils {
         DetailsRepository detailsRepository = OpdLibrary.getInstance().context().detailsRepository();
         Map<String, String> detailsMap = detailsRepository.getAllDetailsForClient(caseId);
         HashMap<String, String> injectedValues = new HashMap<>();
-        if (formName.equals(OpdConstants.Form.OPD_CHECK_IN)) {
+        if (formName.equals(OpdConstants.Form.OPD_DIAGNOSIS_AND_TREAT)) {
             injectedValues.put(OpdConstants.ClientMapKey.GENDER, detailsMap.get(OpdConstants.ClientMapKey.GENDER));
             String strDob = detailsMap.get(OpdDbConstants.Column.Client.DOB);
             String age = "";
@@ -306,6 +307,10 @@ public class OpdUtils extends org.smartregister.util.Utils {
                 age = String.valueOf(Utils.getAgeFromDate(strDob));
             }
             injectedValues.put(OpdConstants.JSON_FORM_KEY.AGE, age);
+            OpdCheckIn opdCheckIn = OpdLibrary.getInstance().getCheckInRepository().getLatestCheckIn(caseId);
+            if (opdCheckIn != null) {
+                injectedValues.put("visit_id", opdCheckIn.getVisitId());
+            }
         }
         return injectedValues;
     }
