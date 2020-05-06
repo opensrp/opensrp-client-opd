@@ -46,7 +46,7 @@
     <string name="duration">Duration</string>
     <string name="add_treatment_medicine">Add treatments/medicine</string>
     <string name="drug_picker_dialog_save">SAVE</string>
-    <string name="opd_dosage_duration_text">Dose: %s, Duration: %s</string>
+    <string name="opd_drug_instructions_text">Dose: %s, Duration: %s, Frequency: %s</string>
     <string name="opd">OPD</string>
     <string name="opd_checked_in">OPD: CHECKED IN</string>
     <string name="opd_str_page_info">Page {0} of {1}</string>
@@ -61,6 +61,7 @@
     <string name="single_test_visit_preview_summary"><![CDATA[<b><font color=\'black\'>%s</font><br/></b>]]></string>
     <string name="medication_dose">Dose: %s</string>
     <string name="medication_duration">Duration: %s</string>
+    <string name="medication_frequency">Frequency: %s</string>
     <string name="dose_or_duration_html"><![CDATA[<font color=\'#7f7f7f\'>%s</font>]]></string>
     <string name="next_page"><![CDATA[NEXT >>]]></string>
     <string name="current_page_of_total_pages">Page %d of %d</string>
@@ -71,5 +72,6 @@
     <string name="edit_opd_registration_failure_message">You cannot edit this patient using the OPD Registration. Click on the Register Switcher</string>
     <string name="opd_exit_form">Exit OPD Form</string>
     <string name="cancel">Cancel</string>
+    <string name="frequency">Frequency</string>
 
 </resources>

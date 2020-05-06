@@ -2,20 +2,25 @@ package org.smartregister.opd.repository;
 
 import android.support.annotation.NonNull;
 
+import com.vijay.jsonwizard.constants.JsonFormConstants;
+
 import net.sqlcipher.Cursor;
 import net.sqlcipher.database.SQLiteDatabase;
 
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.smartregister.opd.pojo.OpdVisitSummary;
 import org.smartregister.opd.pojo.OpdVisitSummaryResultModel;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.repository.BaseRepository;
-import org.smartregister.repository.Repository;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -28,6 +33,21 @@ import timber.log.Timber;
 
 public class OpdVisitSummaryRepository extends BaseRepository {
 
+
+    public String[] visitSummaryColumns() {
+        return new String[]{
+                OpdDbConstants.Table.OPD_VISIT + "." + OpdDbConstants.Column.OpdVisit.VISIT_DATE,
+                OpdDbConstants.Table.OPD_DIAGNOSIS + "." + OpdDbConstants.Column.OpdDiagnosis.DISEASE,
+                OpdDbConstants.Table.OPD_DIAGNOSIS + "." + OpdDbConstants.Column.OpdDiagnosis.DIAGNOSIS,
+                OpdDbConstants.Table.OPD_DIAGNOSIS + "." + OpdDbConstants.Column.OpdDiagnosis.DIAGNOSIS_TYPE,
+                OpdDbConstants.Table.OPD_DIAGNOSIS + "." + OpdDbConstants.Column.OpdDiagnosis.DIAGNOSIS_SAME,
+                OpdDbConstants.Table.OPD_TEST + "." + "test_obj",
+                OpdDbConstants.Table.OPD_TREATMENT + "." + OpdDbConstants.Column.OpdTreatment.TREATMENT_TYPE,
+                OpdDbConstants.Table.OPD_TREATMENT + "." + OpdDbConstants.Column.OpdTreatment.TREATMENT_TYPE_SPECIFY,
+                OpdDbConstants.Table.OPD_TREATMENT + "." + OpdDbConstants.Column.OpdTreatment.MEDICINE,
+                OpdDbConstants.Table.OPD_TREATMENT + "." + OpdDbConstants.Column.OpdTreatment.SPECIAL_INSTRUCTIONS};
+    }
+
     @NonNull
     public List<OpdVisitSummary> getOpdVisitSummaries(@NonNull String baseEntityId, int pageNo) {
         LinkedHashMap<String, OpdVisitSummary> opdVisitSummaries = new LinkedHashMap<>();
@@ -37,37 +57,18 @@ public class OpdVisitSummaryRepository extends BaseRepository {
             SQLiteDatabase db = getReadableDatabase();
 
             String[] visitIds = getVisitIds(baseEntityId, pageNo);
+            String joinedIds = "'" + StringUtils.join(visitIds, "','") + "'";
 
-            String query = String.format("SELECT %s.%s, %s.%s, %s.%s, %s.%s, %s.%s, %s.%s, %s.%s, %s.%s, %s.%s, %s.%s FROM %s " +
-                            "INNER JOIN %s ON %s.%s = %s.%s " +
-                            "LEFT JOIN %s ON %s.%s = %s.%s " +
-                            "LEFT JOIN %s ON %s.%s = %s.%s WHERE %s.%s = '%s' AND %s.%s IN (%s) ORDER BY %s.%s DESC"
-                    , OpdDbConstants.Table.OPD_VISIT, OpdDbConstants.Column.OpdVisit.VISIT_DATE
-                    , OpdDbConstants.Table.OPD_TEST_CONDUCTED, OpdDbConstants.Column.OpdTestConducted.TEST
-                    , OpdDbConstants.Table.OPD_TEST_CONDUCTED, OpdDbConstants.Column.OpdTestConducted.RESULT
-                    , OpdDbConstants.Table.OPD_DIAGNOSIS, OpdDbConstants.Column.OpdDiagnosis.DIAGNOSIS
-                    , OpdDbConstants.Table.OPD_DIAGNOSIS, OpdDbConstants.Column.OpdDiagnosis.TYPE
-                    , OpdDbConstants.Table.OPD_DIAGNOSIS, OpdDbConstants.Column.OpdDiagnosis.CODE
-                    , OpdDbConstants.Table.OPD_DIAGNOSIS, OpdDbConstants.Column.OpdDiagnosis.DISEASE
-                    , OpdDbConstants.Table.OPD_TREATMENT, OpdDbConstants.Column.OpdTreatment.MEDICINE
-                    , OpdDbConstants.Table.OPD_TREATMENT, OpdDbConstants.Column.OpdTreatment.DOSAGE
-                    , OpdDbConstants.Table.OPD_TREATMENT, OpdDbConstants.Column.OpdTreatment.DURATION
-                    , OpdDbConstants.Table.OPD_VISIT
-                    , OpdDbConstants.Table.OPD_DIAGNOSIS
-                    , OpdDbConstants.Table.OPD_VISIT, OpdDbConstants.Column.OpdVisit.ID
-                    , OpdDbConstants.Table.OPD_DIAGNOSIS, OpdDbConstants.Column.OpdDiagnosis.VISIT_ID
-                    , OpdDbConstants.Table.OPD_TEST_CONDUCTED
-                    , OpdDbConstants.Table.OPD_VISIT, OpdDbConstants.Column.OpdVisit.ID
-                    , OpdDbConstants.Table.OPD_TEST_CONDUCTED, OpdDbConstants.Column.OpdTestConducted.VISIT_ID
-                    , OpdDbConstants.Table.OPD_TREATMENT
-                    , OpdDbConstants.Table.OPD_VISIT, OpdDbConstants.Column.OpdVisit.ID
-                    , OpdDbConstants.Table.OPD_TREATMENT, OpdDbConstants.Column.OpdTreatment.VISIT_ID
-                    , OpdDbConstants.Table.OPD_VISIT, OpdDbConstants.Column.OpdVisit.BASE_ENTITY_ID
-                    , baseEntityId
-                    , OpdDbConstants.Table.OPD_VISIT, OpdDbConstants.Column.OpdVisit.ID
-                    , "'" + StringUtils.join(visitIds, "','") + "'"
-                    , OpdDbConstants.Table.OPD_VISIT, OpdDbConstants.Column.OpdVisit.VISIT_DATE
-            );
+            String query = "SELECT " + StringUtils.join(visitSummaryColumns(), ",") + " FROM " + OpdDbConstants.Table.OPD_VISIT +
+                    " INNER JOIN " + OpdDbConstants.Table.OPD_DIAGNOSIS + " ON "
+                    + OpdDbConstants.Table.OPD_DIAGNOSIS + "." + OpdDbConstants.Column.OpdDiagnosis.VISIT_ID + " = " + OpdDbConstants.Table.OPD_VISIT + "." + OpdDbConstants.Column.OpdVisit.ID +
+                    " LEFT JOIN " + OpdDbConstants.Table.OPD_TEST + " ON "
+                    + OpdDbConstants.Table.OPD_VISIT + "." + OpdDbConstants.Column.OpdVisit.ID + " = " + OpdDbConstants.Table.OPD_TEST + "." + OpdDbConstants.Column.OpdTestConducted.VISIT_ID +
+                    " LEFT JOIN " + OpdDbConstants.Table.OPD_TREATMENT + " ON "
+                    + OpdDbConstants.Table.OPD_TREATMENT + "." + OpdDbConstants.Column.OpdTreatment.VISIT_ID + " = " + OpdDbConstants.Table.OPD_VISIT + "." + OpdDbConstants.Column.OpdVisit.ID +
+                    " WHERE " + OpdDbConstants.Table.OPD_VISIT + "." + OpdDbConstants.Column.OpdVisit.BASE_ENTITY_ID + " = '" + baseEntityId + "'"
+                    + " AND " + OpdDbConstants.Table.OPD_VISIT + "." + OpdDbConstants.Column.OpdVisit.ID + " IN (" + joinedIds + ") " +
+                    " ORDER BY " + OpdDbConstants.Table.OPD_VISIT + "." + OpdDbConstants.Column.OpdVisit.VISIT_DATE + " DESC";
 
             if (StringUtils.isNotBlank(baseEntityId)) {
                 mCursor = db.rawQuery(query, null);
@@ -76,29 +77,8 @@ public class OpdVisitSummaryRepository extends BaseRepository {
                     while (mCursor.moveToNext()) {
                         OpdVisitSummary visitSummaryResult = getVisitSummaryResult(mCursor);
                         String dateString = (new SimpleDateFormat(OpdConstants.DateFormat.YYYY_MM_DD_HH_MM_SS, Locale.ENGLISH)).format(visitSummaryResult.getVisitDate());
+                        opdVisitSummaries.put(dateString, visitSummaryResult);
 
-                        OpdVisitSummary existingOpdVisitSummary = opdVisitSummaries.get(dateString);
-                        if (existingOpdVisitSummary != null) {
-                            // Add any extra disease codes
-                            String disease = visitSummaryResult.getDisease();
-                            if (disease != null && !existingOpdVisitSummary.getDisease().contains(disease)) {
-                                existingOpdVisitSummary.addDisease(disease);
-                            }
-
-                            // Add any extra treatments/medicines
-                            OpdVisitSummary.Treatment treatment = visitSummaryResult.getTreatment();
-                            if (treatment != null && treatment.getMedicine() != null && !existingOpdVisitSummary.getTreatments().containsKey(treatment.getMedicine())) {
-                                existingOpdVisitSummary.addTreatment(treatment);
-                            }
-
-                            // Add any extra Tests
-                            OpdVisitSummary.Test test = visitSummaryResult.getTest();
-                            if (test != null && StringUtils.isNotBlank(test.getName()) && !existingOpdVisitSummary.getTests().containsKey(test.getName())) {
-                                existingOpdVisitSummary.addTest(test);
-                            }
-                        } else {
-                            opdVisitSummaries.put(dateString, visitSummaryResult);
-                        }
                     }
                 }
             }
@@ -113,6 +93,7 @@ public class OpdVisitSummaryRepository extends BaseRepository {
 
         return new ArrayList<>(opdVisitSummaries.values());
     }
+
 
     public int getVisitPageCount(@NonNull String baseEntityId) {
         Cursor mCursor = null;
@@ -191,32 +172,65 @@ public class OpdVisitSummaryRepository extends BaseRepository {
     public OpdVisitSummary getVisitSummaryResult(@NonNull Cursor cursor) {
         OpdVisitSummary opdVisitModel = new OpdVisitSummary();
         opdVisitModel.setDiagnosis(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdDiagnosis.DIAGNOSIS)));
-        opdVisitModel.setDiagnosisType(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdDiagnosis.TYPE)));
-        opdVisitModel.setDiseaseCode(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdDiagnosis.CODE)));
-        opdVisitModel.setDisease(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdDiagnosis.DISEASE)));
+        opdVisitModel.setDiagnosisType(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdDiagnosis.DIAGNOSIS_TYPE)));
+        String disease = cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdDiagnosis.DISEASE));
+        try {
+            JSONArray jsonArray = new JSONArray(new JSONArray(disease).optString(0));
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.optJSONObject(i);
+                if (jsonObject != null) {
+                    opdVisitModel.addDisease(jsonObject.optString(JsonFormConstants.TEXT));
+                }
+            }
+        } catch (JSONException e) {
+            Timber.e(e);
+        }
 
         String medicine = cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTreatment.MEDICINE));
 
-        if (medicine != null) {
-            OpdVisitSummary.Treatment treatment = new OpdVisitSummary.Treatment();
-            treatment.setMedicine(medicine);
-            treatment.setDosage(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTreatment.DOSAGE)));
-            treatment.setDuration(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTreatment.DURATION)));
-            opdVisitModel.setTreatment(treatment);
+        try {
+            JSONArray jsonArray = new JSONArray(new JSONArray(medicine).optString(0));
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.optJSONObject(i);
+                if (jsonObject != null) {
+                    OpdVisitSummary.Treatment treatment = new OpdVisitSummary.Treatment();
+                    treatment.setMedicine(jsonObject.optString(JsonFormConstants.TEXT));
+                    JSONObject propertyJsonObj = jsonObject.optJSONObject("property").optJSONObject("meta");
+                    treatment.setDosage(propertyJsonObj.optString("dosage"));
+                    treatment.setDuration(propertyJsonObj.optString("duration"));
+                    treatment.setFrequency(propertyJsonObj.optString("frequency"));
+                    opdVisitModel.setTreatment(treatment);
+                }
+            }
+        } catch (JSONException e) {
+            Timber.e(e);
         }
 
-        String test = cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTestConducted.TEST));
-        String testResult = cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTestConducted.RESULT));
-
-        if (StringUtils.isNotBlank(test) || StringUtils.isNotBlank(testResult)) {
-            OpdVisitSummary.Test testObj = new OpdVisitSummaryResultModel.Test();
-            testObj.setName(test);
-            testObj.setResult(testResult);
-            opdVisitModel.setTest(testObj);
+        try {
+            JSONObject jsonObject = new JSONObject(cursor.getString(cursor.getColumnIndex("test_obj")));
+            Iterator<String> jsonRepeatingGroupIdIterator = jsonObject.keys();
+            while (jsonRepeatingGroupIdIterator.hasNext()) {
+                OpdVisitSummary.Test test = new OpdVisitSummaryResultModel.Test();
+                JSONObject jsonObjectRepeatingGroupObj = jsonObject.optJSONObject(jsonRepeatingGroupIdIterator.next());
+                Iterator<String> testStringIterator = jsonObjectRepeatingGroupObj.keys();
+                StringBuilder testObj = new StringBuilder();
+                while (testStringIterator.hasNext()) {
+                    String resultKey = testStringIterator.next();
+                    if (OpdConstants.DIAGNOSTIC_TEST.equals(resultKey)) {
+                        test.setName(jsonObjectRepeatingGroupObj.optString(resultKey));
+                    }
+                    if (resultKey.startsWith(OpdConstants.DIAGNOSTIC_TEST_RESULT)) {
+                        testObj.append(OpdUtils.createTestName(resultKey)).append(" ").append(jsonObjectRepeatingGroupObj.optString(resultKey)).append("\n");
+                    }
+                }
+                test.setResult(testObj.toString());
+                opdVisitModel.setTest(test);
+            }
+        } catch (JSONException e) {
+            Timber.e(e);
         }
 
         opdVisitModel.setVisitDate(OpdUtils.convertStringToDate(OpdConstants.DateFormat.YYYY_MM_DD_HH_MM_SS, cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdVisit.VISIT_DATE))));
-
         return opdVisitModel;
     }
 

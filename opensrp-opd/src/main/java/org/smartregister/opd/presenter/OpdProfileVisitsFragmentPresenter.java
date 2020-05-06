@@ -225,11 +225,11 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
                 String medicationTemplate = getString(R.string.single_test_visit_preview_summary);
 
                 if (StringUtils.isNotBlank(testName)) {
-                    if(StringUtils.isNotBlank(medicationTemplate)) {
+                    if (StringUtils.isNotBlank(medicationTemplate)) {
                         stringBuilder.append(String.format(medicationTemplate, testName));
                     }
 
-                    String testResult = test.getResult();
+                    String testResult = test.getResult().replace("\n", "<br/>");
                     if (StringUtils.isNotBlank(testResult)) {
                         stringBuilder.append(testResult.toLowerCase());
                     }
@@ -257,15 +257,15 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
                     stringBuilder.append(String.format(medicationTemplate
                             , medicine));
 
-                    StringBuilder doseAndDurationText = new StringBuilder();
+                    StringBuilder doseDurationAndFrequencyText = new StringBuilder();
                     String dosage = treatment.getDosage();
                     if (!TextUtils.isEmpty(dosage)) {
                         String medicationDoseTemplate = getString(R.string.medication_dose);
                         if (medicationDoseTemplate != null) {
-                            doseAndDurationText.append(String.format(medicationDoseTemplate, dosage));
+                            doseDurationAndFrequencyText.append(String.format(medicationDoseTemplate, dosage));
 
                             if (!TextUtils.isEmpty(treatment.getDuration())) {
-                                doseAndDurationText.append(". ");
+                                doseDurationAndFrequencyText.append(". ");
                             }
                         }
                     }
@@ -274,12 +274,23 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
                     if (!TextUtils.isEmpty(duration)) {
                         String medicationDurationTemplate = getString(R.string.medication_duration);
                         if (medicationDurationTemplate != null) {
-                            doseAndDurationText.append(String.format(medicationDurationTemplate, duration));
+                            doseDurationAndFrequencyText.append(String.format(medicationDurationTemplate, duration));
                         }
                     }
 
-                    if (doseAndDurationText.length() > 0 && doseOrDurationHtml != null) {
-                        stringBuilder.append(String.format(doseOrDurationHtml, doseAndDurationText.toString()));
+                    String frequency = treatment.getFrequency();
+                    if (!TextUtils.isEmpty(duration)) {
+                        String medicationDurationTemplate = getString(R.string.medication_frequency);
+                        if (medicationDurationTemplate != null) {
+                            if (!TextUtils.isEmpty(treatment.getDuration()) || !TextUtils.isEmpty(treatment.getDosage())) {
+                                doseDurationAndFrequencyText.append(" ");
+                            }
+                            doseDurationAndFrequencyText.append(String.format(medicationDurationTemplate, frequency));
+                        }
+                    }
+
+                    if (doseDurationAndFrequencyText.length() > 0 && doseOrDurationHtml != null) {
+                        stringBuilder.append(String.format(doseOrDurationHtml, doseDurationAndFrequencyText.toString()));
                     }
                 }
             }

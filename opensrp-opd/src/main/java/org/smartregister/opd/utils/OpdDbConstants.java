@@ -37,19 +37,10 @@ public interface OpdDbConstants {
 
         interface OpdCheckIn {
             String ID = "_id";
-            String FORM_SUBMISSION_ID = "form_submission_id";
             String VISIT_ID = "visit_id";
             String BASE_ENTITY_ID = "base_entity_id";
-            String PREGNANCY_STATUS = "pregnancy_status";
-            String HAS_HIV_TEST_PREVIOUSLY = "has_hiv_test_previously";
-            String HIV_RESULTS_PREVIOUSLY = "hiv_results_previously";
-            String IS_TAKING_ART = "is_taking_art";
-            String CURRENT_HIV_RESULT = "current_hiv_result";
             String VISIT_TYPE = "visit_type";
-            String APPOINTMENT_SCHEDULED_PREVIOUSLY = "appointment_scheduled_previously";
-            String APPOINTMENT_DUE_DATE = "appointment_due_date";
             String CREATED_AT = "created_at";
-            String UPDATED_AT = "updated_at";
         }
 
         interface OpdMultiSelectOptions {
@@ -112,6 +103,8 @@ public interface OpdDbConstants {
             String CREATED_AT = "created_at";
             String UPDATED_AT = "updated_at";
             String VISIT_ID = "visit_id";
+            String DIAGNOSIS_TYPE = "diagnosis_type";
+            String DIAGNOSIS_SAME = "diagnosis_same";
         }
 
         interface OpdTreatment {
@@ -126,6 +119,10 @@ public interface OpdDbConstants {
             String UPDATED_AT = "updated_at";
             String VISIT_ID = "visit_id";
             String PROPERTY = "property";
+            String FREQUENCY = "frequency";
+            String SPECIAL_INSTRUCTIONS = "special_instructions";
+            String TREATMENT_TYPE_SPECIFY = "treatment_type_specify";
+            String TREATMENT_TYPE = "treatment_type";
         }
 
         interface OpdServiceDetail {
@@ -141,7 +138,8 @@ public interface OpdDbConstants {
         interface OpdTestConducted {
             String ID = "id";
             String BASE_ENTITY_ID = "base_entity_id";
-            String TEST = "test";
+            String TEST_TYPE = "test_type";
+            String TEST_NAME = "test_name";
             String RESULT = "result";
             String CREATED_AT = "created_at";
             String UPDATED_AT = "updated_at";
@@ -158,9 +156,13 @@ public interface OpdDbConstants {
         String OPD_DETAILS = "opd_details";
         String OPD_DIAGNOSIS_AND_TREATMENT_FORM = "opd_diagnosis_and_treatment_form";
         String OPD_DIAGNOSIS = "opd_diagnosis";
+        String OPD_DIAGNOSIS_DETAIL = "opd_diagnosis_detail";
+        String OPD_TREATMENT_DETAIL = "opd_treatment_detail";
         String OPD_TREATMENT = "opd_treatment";
+        String OPD_TREATMENT_AND_MANAGEMENT = "opd_treatment";
         String OPD_SERVICE_DETAIL = "opd_service_detail";
         String OPD_TEST_CONDUCTED = "opd_test_conducted";
+        String OPD_TEST = "opd_test";
         String OPD_MULTI_SELECT_LIST_OPTION = "opd_multi_select_list_option";
 
     }

@@ -9,6 +9,7 @@ public class OpdConstants extends AllConstants {
     public static final String CONFIG = "opd_register";
     public static final String TYPE_OF_TEXT_LABEL = "The type of test conducted";
     public static final String DIAGNOSTIC_TEST_RESULT = "diagnostic_test_result";
+    public static final String DIAGNOSTIC_TEST = "diagnostic_test";
     public static final String REPEATING_GROUP_MAP = "repeatingGroupMap";
     public static final String BIND_TYPE = "bind_type";
 
@@ -156,6 +157,7 @@ public class OpdConstants extends AllConstants {
 
         public static final String DIAGNOSTIC_TEST_RESULT_GLUCOSE = "diagnostic_test_result_glucose";
         public static final String DIAGNOSTIC_TEST_RESULT_SPINNER_BLOOD_TYPE = "diagnostic_test_result_spinner_blood_type";
+        public static final String FREQUENCY = "frequency";
         public static String TESTS_REPEATING_GROUP = "tests_repeating_group";
     }
 

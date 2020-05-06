@@ -15,15 +15,13 @@ import java.util.List;
 public class OpdTestConductedRepository extends BaseRepository implements OpdTestConductedDao {
 
     private static final String CREATE_TABLE_SQL = "CREATE TABLE " + OpdDbConstants.Table.OPD_TEST_CONDUCTED + "("
-            + OpdDbConstants.Column.OpdTestConducted.ID + " VARCHAR NOT NULL,"
             + OpdDbConstants.Column.OpdTestConducted.BASE_ENTITY_ID + " VARCHAR NOT NULL, "
-            + OpdDbConstants.Column.OpdTestConducted.TEST + " VARCHAR NOT NULL, "
+            + OpdDbConstants.Column.OpdTestConducted.TEST_TYPE + " VARCHAR NOT NULL, "
+            + OpdDbConstants.Column.OpdTestConducted.TEST_NAME + " VARCHAR NOT NULL, "
             + OpdDbConstants.Column.OpdTestConducted.RESULT + " VARCHAR NOT NULL, "
-            + OpdDbConstants.Column.OpdTestConducted.DETAILS + " VARCHAR NOT NULL, "
-            + OpdDbConstants.Column.OpdTestConducted.VISIT_ID + " VARCHAR NOT NULL, "
-            + OpdDbConstants.Column.OpdTestConducted.UPDATED_AT + " INTEGER NOT NULL, "
-            + OpdDbConstants.Column.OpdTestConducted.CREATED_AT + " INTEGER NOT NULL ," +
-            "UNIQUE(" + OpdDbConstants.Column.OpdTestConducted.ID + ") ON CONFLICT REPLACE)";
+            + OpdDbConstants.Column.OpdTestConducted.DETAILS + " VARCHAR NULL, "
+            + OpdDbConstants.Column.OpdTestConducted.VISIT_ID + " VARCHAR NOT NULL, "+
+            "UNIQUE(" + OpdDbConstants.Column.OpdTestConducted.TEST_TYPE + "," + OpdDbConstants.Column.OpdTestConducted.TEST_NAME + "," + OpdDbConstants.Column.OpdTestConducted.VISIT_ID + ") ON CONFLICT REPLACE)";
 
     private static final String INDEX_BASE_ENTITY_ID = "CREATE INDEX " + OpdDbConstants.Table.OPD_TEST_CONDUCTED
             + "_" + OpdDbConstants.Column.OpdTestConducted.BASE_ENTITY_ID + "_index ON " + OpdDbConstants.Table.OPD_TEST_CONDUCTED +
@@ -43,14 +41,12 @@ public class OpdTestConductedRepository extends BaseRepository implements OpdTes
     @Override
     public boolean saveOrUpdate(@NonNull org.smartregister.opd.pojo.OpdTestConducted opdTestConducted) {
         ContentValues contentValues = new ContentValues();
-        contentValues.put(OpdDbConstants.Column.OpdTestConducted.ID, opdTestConducted.getId());
         contentValues.put(OpdDbConstants.Column.OpdTestConducted.BASE_ENTITY_ID, opdTestConducted.getBaseEntityId());
-        contentValues.put(OpdDbConstants.Column.OpdTestConducted.TEST, opdTestConducted.getTest());
+        contentValues.put(OpdDbConstants.Column.OpdTestConducted.TEST_TYPE, opdTestConducted.getTestType());
+        contentValues.put(OpdDbConstants.Column.OpdTestConducted.TEST_NAME, opdTestConducted.getTestName());
         contentValues.put(OpdDbConstants.Column.OpdTestConducted.RESULT, opdTestConducted.getResult());
         contentValues.put(OpdDbConstants.Column.OpdTestConducted.DETAILS, opdTestConducted.getDetails());
         contentValues.put(OpdDbConstants.Column.OpdTestConducted.VISIT_ID, opdTestConducted.getVisitId());
-        contentValues.put(OpdDbConstants.Column.OpdTestConducted.CREATED_AT, opdTestConducted.getCreatedAt());
-        contentValues.put(OpdDbConstants.Column.OpdTestConducted.UPDATED_AT, opdTestConducted.getUpdatedAt());
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();
         long rows = sqLiteDatabase.insert(OpdDbConstants.Table.OPD_TEST_CONDUCTED, null, contentValues);
         return rows != -1;

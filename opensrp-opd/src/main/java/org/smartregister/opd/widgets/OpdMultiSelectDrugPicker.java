@@ -19,6 +19,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.opd.R;
 import org.smartregister.opd.utils.OpdConstants;
+
 import timber.log.Timber;
 
 public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements TextWatcher {
@@ -32,16 +33,21 @@ public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements 
 
     private void createAdditionalDetailsDialog(@NonNull final MultiSelectItem multiSelectItem) {
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.dosage_and_duration_layout, null);
+        View view = inflater.inflate(R.layout.opd_drug_instructions_layout, null);
         ImageView imgClose = view.findViewById(R.id.multiSelectListCloseDialog);
         opd_btn_save_drug = view.findViewById(R.id.opd_btn_save_drug);
 
         TextView txtSelectedItemInMultiSelectList = view.findViewById(R.id.txtSelectedItemInMultiSelectList);
         txtSelectedItemInMultiSelectList.setText(multiSelectItem.getText());
+
         final EditText edtTreatmentDuration = view.findViewById(R.id.edtTreatmentDuration);
         final EditText edtTreatmentDosage = view.findViewById(R.id.edtTreatmentDosage);
+        final EditText edtTreatmentFrequency = view.findViewById(R.id.edtTreatmentFrequency);
+
         edtTreatmentDosage.addTextChangedListener(this);
         edtTreatmentDuration.addTextChangedListener(this);
+        edtTreatmentFrequency.addTextChangedListener(this);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.FullScreenDialogStyle);
         builder.setView(view);
         builder.setCancelable(true);
@@ -59,6 +65,7 @@ public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements 
             public void onClick(View v) {
                 Editable editableTreatmentDuration = edtTreatmentDuration.getText();
                 Editable editableTreatmentDosage = edtTreatmentDosage.getText();
+                Editable editableTreatmentFrequency = edtTreatmentFrequency.getText();
 
                 String duration = "";
                 if (editableTreatmentDuration != null) {
@@ -70,7 +77,13 @@ public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements 
                     dosage = editableTreatmentDosage.toString();
                 }
 
-                writeAdditionalDetails(duration, dosage, multiSelectItem);
+                String frequency = "";
+                if (editableTreatmentFrequency != null) {
+                    frequency = editableTreatmentFrequency.toString();
+                }
+
+
+                writeAdditionalDetails(duration, dosage, frequency, multiSelectItem);
 
                 writeToForm();
 
@@ -81,9 +94,9 @@ public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements 
         });
     }
 
-    private void writeAdditionalDetails(@NonNull String duration, @NonNull String dosage, @NonNull MultiSelectItem multiSelectItem) {
+    protected void writeAdditionalDetails(@NonNull String duration, @NonNull String dosage, @NonNull String frequency, @NonNull MultiSelectItem multiSelectItem) {
         String multiSelectValue = multiSelectItem.getValue();
-        String msg = String.format(context.getString(R.string.opd_dosage_duration_text), dosage, duration);
+        String msg = String.format(context.getString(R.string.opd_drug_instructions_text), dosage, duration, frequency);
         JSONObject jsonObject = new JSONObject();
 
         try {
@@ -91,6 +104,7 @@ public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements 
             JSONObject jsonAdditionalObject = new JSONObject();
             jsonAdditionalObject.put(OpdConstants.JSON_FORM_KEY.DURATION, duration);
             jsonAdditionalObject.put(OpdConstants.JSON_FORM_KEY.DOSAGE, dosage);
+            jsonAdditionalObject.put(OpdConstants.JSON_FORM_KEY.FREQUENCY, frequency);
             jsonAdditionalObject.put(JsonFormConstants.MultiSelectUtils.INFO, msg);
             jsonObject.put(JsonFormConstants.MultiSelectUtils.META, jsonAdditionalObject);
         } catch (JSONException e) {

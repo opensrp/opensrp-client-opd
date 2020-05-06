@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.jeasy.rules.api.Facts;
-import org.smartregister.AllConstants;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
@@ -13,7 +12,6 @@ import org.smartregister.opd.domain.YamlConfig;
 import org.smartregister.opd.domain.YamlConfigItem;
 import org.smartregister.opd.domain.YamlConfigWrapper;
 import org.smartregister.opd.model.OpdProfileOverviewFragmentModel;
-import org.smartregister.opd.pojo.OpdCheckIn;
 import org.smartregister.opd.pojo.OpdDetails;
 import org.smartregister.opd.pojo.OpdVisit;
 import org.smartregister.opd.utils.FilePath;
@@ -28,6 +26,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import timber.log.Timber;
 
@@ -50,14 +49,14 @@ public class OpdProfileOverviewFragmentPresenter implements OpdProfileOverviewFr
     public void loadOverviewFacts(@NonNull String baseEntityId, @NonNull final OnFinishedCallback onFinishedCallback) {
         model.fetchLastCheckAndVisit(baseEntityId, new OpdProfileOverviewFragmentContract.Model.OnFetchedCallback() {
             @Override
-            public void onFetched(@Nullable OpdCheckIn opdCheckIn, @Nullable OpdVisit opdVisit, @Nullable OpdDetails opdDetails) {
+            public void onFetched(@Nullable Map<String, String> opdCheckIn, @Nullable OpdVisit opdVisit, @Nullable OpdDetails opdDetails) {
                 loadOverviewDataAndDisplay(opdCheckIn, opdVisit, opdDetails, onFinishedCallback);
             }
         });
     }
 
     @Override
-    public void loadOverviewDataAndDisplay(@Nullable OpdCheckIn opdCheckIn, @Nullable OpdVisit opdVisit, @Nullable OpdDetails opdDetails, @NonNull final OnFinishedCallback onFinishedCallback) {
+    public void loadOverviewDataAndDisplay(@Nullable Map<String, String> opdCheckIn, @Nullable OpdVisit opdVisit, @Nullable OpdDetails opdDetails, @NonNull final OnFinishedCallback onFinishedCallback) {
         List<YamlConfigWrapper> yamlConfigListGlobal = new ArrayList<>(); //This makes sure no data duplication happens
         Facts facts = new Facts();
         setDataFromCheckIn(opdCheckIn, opdVisit, opdDetails, facts);
@@ -108,46 +107,46 @@ public class OpdProfileOverviewFragmentPresenter implements OpdProfileOverviewFr
     }
 
     @Override
-    public void setDataFromCheckIn(@Nullable OpdCheckIn checkIn, @Nullable OpdVisit visit, @Nullable OpdDetails opdDetails, @NonNull Facts facts) {
+    public void setDataFromCheckIn(@Nullable Map<String, String> checkIn, @Nullable OpdVisit visit, @Nullable OpdDetails opdDetails, @NonNull Facts facts) {
         String unknownString = getString(R.string.unknown);
         if (checkIn != null) {
-            if (client != null && AllConstants.FEMALE_GENDER.equalsIgnoreCase(client.getColumnmaps().get(OpdConstants.ClientMapKey.GENDER))) {
-                OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.PREGNANCY_STATUS, checkIn.getPregnancyStatus());
-            }
-
-            String currentHivResult = checkIn.getCurrentHivResult() != null ? checkIn.getCurrentHivResult() : unknownString;
-
-
-            OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.PATIENT_ON_ART, checkIn.getIsTakingArt());
+//            if (client != null && AllConstants.FEMALE_GENDER.equalsIgnoreCase(client.getColumnmaps().get(OpdConstants.ClientMapKey.GENDER))) {
+//                OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.PREGNANCY_STATUS, checkIn.getPregnancyStatus());
+//            }
+//
+//            String currentHivResult = checkIn.getCurrentHivResult() != null ? checkIn.getCurrentHivResult() : unknownString;
+//
+//
+//            OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.PATIENT_ON_ART, checkIn.getIsTakingArt());
 
             // Client is currently checked-in, show the current check-in details
             if (OpdLibrary.getInstance().isClientCurrentlyCheckedIn(visit, opdDetails)) {
-                OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.IS_PREVIOUSLY_TESTED_HIV, checkIn.getHasHivTestPreviously());
-                OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.PREVIOUSLY_HIV_STATUS_RESULTS, checkIn.getHivResultsPreviously());
+//                OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.IS_PREVIOUSLY_TESTED_HIV, checkIn.getHasHivTestPreviously());
+//                OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.PREVIOUSLY_HIV_STATUS_RESULTS, checkIn.getHivResultsPreviously());
 
-                OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.CURRENT_HIV_STATUS, currentHivResult);
+//                OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.CURRENT_HIV_STATUS, currentHivResult);
 
-                OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.VISIT_TYPE, checkIn.getVisitType());
-                OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.APPOINTMENT_SCHEDULED_PREVIOUSLY, checkIn.getAppointmentScheduledPreviously());
-                OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.DATE_OF_APPOINTMENT, checkIn.getAppointmentDueDate());
+                OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.VISIT_TYPE, checkIn.get("visit_type"));
+                OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.APPOINTMENT_SCHEDULED_PREVIOUSLY, checkIn.get("appointment_scheduled"));
+                OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.DATE_OF_APPOINTMENT, checkIn.get("appointment_made_date"));
             } else {
-                OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.HIV_STATUS, currentHivResult);
+//                OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.HIV_STATUS, currentHivResult);
             }
         } else {
             if (client != null && unknownString != null) {
-                if (AllConstants.FEMALE_GENDER.equalsIgnoreCase(client.getColumnmaps().get(OpdConstants.ClientMapKey.GENDER))) {
-                    OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.PREGNANCY_STATUS, unknownString);
-                } else {
-                    OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.HIV_STATUS, unknownString);
-                }
+//                if (AllConstants.FEMALE_GENDER.equalsIgnoreCase(client.getColumnmaps().get(OpdConstants.ClientMapKey.GENDER))) {
+//                    OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.PREGNANCY_STATUS, unknownString);
+//                } else {
+//                    OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.HIV_STATUS, unknownString);
+//                }
             }
         }
 
         boolean shouldCheckIn = OpdLibrary.getInstance().canPatientCheckInInsteadOfDiagnoseAndTreat(visit, opdDetails);
         facts.put(OpdDbConstants.Column.OpdDetails.PENDING_DIAGNOSE_AND_TREAT, !shouldCheckIn);
 
-        if (visit != null && visit.getVisitDate() != null && checkIn != null && checkIn.getAppointmentDueDate() != null) {
-            facts.put(OpdConstants.FactKey.VISIT_TO_APPOINTMENT_DATE, getVisitToAppointmentDateDuration(visit.getVisitDate(), checkIn.getAppointmentDueDate()));
+        if (visit != null && visit.getVisitDate() != null && checkIn != null && checkIn.get("appointment_made_date") != null) {
+            facts.put(OpdConstants.FactKey.VISIT_TO_APPOINTMENT_DATE, getVisitToAppointmentDateDuration(visit.getVisitDate(), checkIn.get("appointment_made_date")));
         }
     }
 

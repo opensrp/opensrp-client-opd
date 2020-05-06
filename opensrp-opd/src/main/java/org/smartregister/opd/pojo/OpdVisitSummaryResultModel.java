@@ -94,6 +94,7 @@ public class OpdVisitSummaryResultModel {
         private String medicine;
         private String dosage;
         private String duration;
+        private String frequency;
 
         public String getMedicine() {
             return medicine;
@@ -117,6 +118,14 @@ public class OpdVisitSummaryResultModel {
 
         public void setDuration(String duration) {
             this.duration = duration;
+        }
+
+        public String getFrequency() {
+            return frequency;
+        }
+
+        public void setFrequency(String frequency) {
+            this.frequency = frequency;
         }
     }
 

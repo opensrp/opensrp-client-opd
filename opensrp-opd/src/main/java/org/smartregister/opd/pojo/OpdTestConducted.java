@@ -1,22 +1,12 @@
 package org.smartregister.opd.pojo;
 
 public class OpdTestConducted {
-    private String id;
     private String baseEntityId;
-    private String test;
+    private String testType;
+    private String testName;
     private String result;
     private String details;
-    private String createdAt;
-    private String updatedAt;
     private String visitId;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
 
     public String getBaseEntityId() {
         return baseEntityId;
@@ -26,36 +16,12 @@ public class OpdTestConducted {
         this.baseEntityId = baseEntityId;
     }
 
-    public String getTest() {
-        return test;
-    }
-
-    public void setTest(String test) {
-        this.test = test;
-    }
-
     public String getResult() {
         return result;
     }
 
     public void setResult(String result) {
         this.result = result;
-    }
-
-    public String getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public String getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(String updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
     public String getVisitId() {
@@ -72,5 +38,21 @@ public class OpdTestConducted {
 
     public void setDetails(String details) {
         this.details = details;
+    }
+
+    public String getTestType() {
+        return testType;
+    }
+
+    public void setTestType(String testType) {
+        this.testType = testType;
+    }
+
+    public String getTestName() {
+        return testName;
+    }
+
+    public void setTestName(String testName) {
+        this.testName = testName;
     }
 }

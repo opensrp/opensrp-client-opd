@@ -20,9 +20,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.opd.OpdLibrary;
-import org.smartregister.opd.pojo.OpdCheckIn;
 import org.smartregister.opd.pojo.OpdMetadata;
-import org.smartregister.repository.DetailsRepository;
 import org.smartregister.util.FormUtils;
 import org.smartregister.util.JsonFormUtils;
 import org.smartregister.util.Utils;
@@ -295,23 +293,48 @@ public class OpdUtils extends org.smartregister.util.Utils {
         return repeatingGroupMap;
     }
 
+    public static Map<String, String> getPatientDemographic(String baseEntityId) {
+        try {
+            return OpdLibrary.getInstance().context().getEventClientRepository()
+                    .rawQuery(OpdLibrary.getInstance().context().getEventClientRepository().getReadableDatabase(),
+                            "select * from " + metadata().getTableName() +
+                                    " where " + OpdDbConstants.Column.Client.BASE_ENTITY_ID + " = '" + baseEntityId + "' limit 1").get(0);
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+        return null;
+    }
+
     public static HashMap<String, String> getInjectableFields(@NonNull String formName, @NonNull String caseId) {
-        DetailsRepository detailsRepository = OpdLibrary.getInstance().context().detailsRepository();
-        Map<String, String> detailsMap = detailsRepository.getAllDetailsForClient(caseId);
+        Map<String, String> detailsMap = getPatientDemographic(caseId);
         HashMap<String, String> injectedValues = new HashMap<>();
         if (formName.equals(OpdConstants.Form.OPD_DIAGNOSIS_AND_TREAT)) {
-            injectedValues.put(OpdConstants.ClientMapKey.GENDER, detailsMap.get(OpdConstants.ClientMapKey.GENDER));
-            String strDob = detailsMap.get(OpdDbConstants.Column.Client.DOB);
-            String age = "";
-            if (StringUtils.isNotBlank(strDob)) {
-                age = String.valueOf(Utils.getAgeFromDate(strDob));
+            if (detailsMap != null) {
+                injectedValues.put(OpdConstants.ClientMapKey.GENDER, detailsMap.get(OpdConstants.ClientMapKey.GENDER));
+                String strDob = detailsMap.get(OpdDbConstants.Column.Client.DOB);
+                String age = "";
+                if (StringUtils.isNotBlank(strDob)) {
+                    age = String.valueOf(Utils.getAgeFromDate(strDob));
+                }
+                injectedValues.put(OpdConstants.JSON_FORM_KEY.AGE, age);
             }
-            injectedValues.put(OpdConstants.JSON_FORM_KEY.AGE, age);
-            OpdCheckIn opdCheckIn = OpdLibrary.getInstance().getCheckInRepository().getLatestCheckIn(caseId);
-            if (opdCheckIn != null) {
-                injectedValues.put("visit_id", opdCheckIn.getVisitId());
+            Map<String, String> opdCheckInMap = OpdLibrary.getInstance().getCheckInRepository().getLatestCheckIn(caseId);
+            if (!opdCheckInMap.isEmpty()) {
+                injectedValues.put("visit_id", opdCheckInMap.get(OpdDbConstants.Column.OpdCheckIn.VISIT_ID));
             }
         }
         return injectedValues;
+    }
+
+
+    public static String createTestName(String key) {
+        String result = key
+                .replace(OpdConstants.DIAGNOSTIC_TEST_RESULT, "")
+                .replaceAll("_", " ");
+        if (StringUtils.isNotBlank(result)) {
+            return result;
+        } else {
+            return "status";
+        }
     }
 }

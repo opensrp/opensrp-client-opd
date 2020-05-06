@@ -10,6 +10,7 @@ import com.vijay.jsonwizard.constants.JsonFormConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Triple;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -69,24 +70,7 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
 
         // Inject the field values
         if (injectedFieldValues != null && injectedFieldValues.size() > 0) {
-            if (form.has(JsonFormConstants.COUNT)) {
-                int stepCount = Integer.parseInt(form.optString(JsonFormConstants.COUNT));
-                for (int index = 0; index < stepCount; index++) {
-                    String stepName = JsonFormConstants.STEP + (index + 1);
-                    JSONObject step = form.optJSONObject(stepName);
-                    if (step != null) {
-                        JSONArray stepFields = step.optJSONArray(JsonFormConstants.FIELDS);
-                        for (int k = 0; k < stepFields.length(); k++) {
-                            JSONObject jsonObject = stepFields.optJSONObject(k);
-                            String fieldKey = jsonObject.optString(OpdJsonFormUtils.KEY);
-                            String fieldValue = injectedFieldValues.get(fieldKey);
-                            if (!TextUtils.isEmpty(fieldValue)) {
-                                jsonObject.put(OpdJsonFormUtils.VALUE, fieldValue);
-                            }
-                        }
-                    }
-                }
-            }
+            populateInjectedFields(form, injectedFieldValues);
         }
 
         if (OpdUtils.metadata().getOpdRegistrationFormName().equals(formName)) {
@@ -122,6 +106,27 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
 
         Timber.d("OpdJsonFormUtils --> form is %s", form.toString());
         return form;
+    }
+
+    public static void populateInjectedFields(@NonNull JSONObject form, @NotNull HashMap<String, String> injectedFieldValues) throws JSONException {
+        if (form.has(JsonFormConstants.COUNT)) {
+            int stepCount = Integer.parseInt(form.optString(JsonFormConstants.COUNT));
+            for (int index = 0; index < stepCount; index++) {
+                String stepName = JsonFormConstants.STEP + (index + 1);
+                JSONObject step = form.optJSONObject(stepName);
+                if (step != null) {
+                    JSONArray stepFields = step.optJSONArray(JsonFormConstants.FIELDS);
+                    for (int k = 0; k < stepFields.length(); k++) {
+                        JSONObject jsonObject = stepFields.optJSONObject(k);
+                        String fieldKey = jsonObject.optString(OpdJsonFormUtils.KEY);
+                        String fieldValue = injectedFieldValues.get(fieldKey);
+                        if (!TextUtils.isEmpty(fieldValue)) {
+                            jsonObject.put(OpdJsonFormUtils.VALUE, fieldValue);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     protected static void addRegLocHierarchyQuestions(@NonNull JSONObject form, @NonNull String widgetKey, @NonNull LocationHierarchy locationHierarchy) {

@@ -5,6 +5,9 @@ import android.support.annotation.Nullable;
 
 import org.smartregister.opd.pojo.OpdCheckIn;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-30
  */
@@ -12,10 +15,10 @@ import org.smartregister.opd.pojo.OpdCheckIn;
 public interface OpdCheckInDao {
 
     @Nullable
-    OpdCheckIn getLatestCheckIn(@NonNull String clientBaseEntityId);
+    Map<String, String> getLatestCheckIn(@NonNull String clientBaseEntityId);
 
     @Nullable
-    OpdCheckIn getCheckInByVisit(@NonNull String visitId);
+    Map<String, String> getCheckInByVisit(@NonNull String visitId);
 
     boolean addCheckIn(@NonNull OpdCheckIn checkIn);
 

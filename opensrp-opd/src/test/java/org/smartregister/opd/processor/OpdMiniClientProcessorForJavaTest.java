@@ -34,16 +34,16 @@ import org.smartregister.opd.BaseTest;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.exception.CheckInEventProcessException;
 import org.smartregister.opd.pojo.OpdDetails;
-import org.smartregister.opd.pojo.OpdDiagnosis;
+import org.smartregister.opd.pojo.OpdDiagnosisDetail;
 import org.smartregister.opd.pojo.OpdServiceDetail;
 import org.smartregister.opd.pojo.OpdTestConducted;
-import org.smartregister.opd.pojo.OpdTreatment;
+import org.smartregister.opd.pojo.OpdTreatmentDetail;
 import org.smartregister.opd.pojo.OpdVisit;
 import org.smartregister.opd.repository.OpdDetailsRepository;
-import org.smartregister.opd.repository.OpdDiagnosisRepository;
+import org.smartregister.opd.repository.OpdDiagnosisDetailRepository;
 import org.smartregister.opd.repository.OpdServiceDetailRepository;
 import org.smartregister.opd.repository.OpdTestConductedRepository;
-import org.smartregister.opd.repository.OpdTreatmentRepository;
+import org.smartregister.opd.repository.OpdTreatmentDetailRepository;
 import org.smartregister.opd.repository.OpdVisitRepository;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.repository.EventClientRepository;
@@ -65,13 +65,13 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
     private OpdServiceDetailRepository opdServiceDetailRepository;
 
     @Mock
-    private OpdTreatmentRepository opdTreatmentRepository;
+    private OpdTreatmentDetailRepository opdTreatmentDetailRepository;
 
     @Mock
     private OpdTestConductedRepository opdTestConductedRepository;
 
     @Mock
-    private OpdDiagnosisRepository opdDiagnosisRepository;
+    private OpdDiagnosisDetailRepository opdDiagnosisDetailRepository;
 
     @Mock
     private OpdDetailsRepository opdDetailsRepository;
@@ -80,10 +80,10 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
     private ArgumentCaptor<OpdServiceDetail> opdServiceDetailArgumentCaptor;
 
     @Captor
-    private ArgumentCaptor<OpdTreatment> opdTreatmentArgumentCaptor;
+    private ArgumentCaptor<OpdTreatmentDetail> opdTreatmentArgumentCaptor;
 
     @Captor
-    private ArgumentCaptor<OpdDiagnosis> opdDiagnosisArgumentCaptor;
+    private ArgumentCaptor<OpdDiagnosisDetail> opdDiagnosisArgumentCaptor;
 
     @Captor
     private ArgumentCaptor<OpdDetails> opdDetailsArgumentCaptor;
@@ -137,7 +137,7 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
     public void processTreatment() throws Exception {
         PowerMockito.mockStatic(OpdLibrary.class);
         PowerMockito.when(OpdLibrary.getInstance()).thenReturn(opdLibrary);
-        PowerMockito.when(opdLibrary.getOpdTreatmentRepository()).thenReturn(opdTreatmentRepository);
+        PowerMockito.when(opdLibrary.getOpdTreatmentDetailRepository()).thenReturn(opdTreatmentDetailRepository);
         Obs obs = new Obs();
         obs.setFormSubmissionField(OpdConstants.JSON_FORM_KEY.MEDICINE);
         obs.setValue("[]");
@@ -150,7 +150,7 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
 
 
         Whitebox.invokeMethod(opdMiniClientProcessorForJava, "processTreatment", event);
-        Mockito.verify(opdTreatmentRepository, Mockito.times(1)).saveOrUpdate(opdTreatmentArgumentCaptor.capture());
+        Mockito.verify(opdTreatmentDetailRepository, Mockito.times(1)).saveOrUpdate(opdTreatmentArgumentCaptor.capture());
         Assert.assertEquals("er", opdTreatmentArgumentCaptor.getValue().getDuration());
         Assert.assertEquals("er", opdTreatmentArgumentCaptor.getValue().getDosage());
         Assert.assertEquals("Bacteria Killer", opdTreatmentArgumentCaptor.getValue().getMedicine());
@@ -163,7 +163,7 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
     public void processDiagnosis() throws Exception {
         PowerMockito.mockStatic(OpdLibrary.class);
         PowerMockito.when(OpdLibrary.getInstance()).thenReturn(opdLibrary);
-        PowerMockito.when(opdLibrary.getOpdDiagnosisRepository()).thenReturn(opdDiagnosisRepository);
+        PowerMockito.when(opdLibrary.getOpdDiagnosisDetailRepository()).thenReturn(opdDiagnosisDetailRepository);
 
         Obs obs = new Obs();
         obs.setFormSubmissionField(OpdConstants.JSON_FORM_KEY.DISEASE_CODE);
@@ -191,7 +191,7 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
         event.addObs(obs2);
 
         Whitebox.invokeMethod(opdMiniClientProcessorForJava, "processDiagnosis", event);
-        Mockito.verify(opdDiagnosisRepository, Mockito.times(1)).saveOrUpdate(opdDiagnosisArgumentCaptor.capture());
+        Mockito.verify(opdDiagnosisDetailRepository, Mockito.times(1)).saveOrUpdate(opdDiagnosisArgumentCaptor.capture());
         Assert.assertEquals("diagnosis", opdDiagnosisArgumentCaptor.getValue().getDiagnosis());
         Assert.assertEquals("Bacterial Meningitis", opdDiagnosisArgumentCaptor.getValue().getDisease());
         Assert.assertEquals("Confirmed", opdDiagnosisArgumentCaptor.getValue().getType());

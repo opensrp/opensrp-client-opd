@@ -1,16 +1,26 @@
 package org.smartregister.opd.pojo;
 
-public class OpdTreatment {
+public class OpdTreatmentDetail {
     private String id;
     private String baseEntityId;
     private String medicine;
     private String dosage;
+    private String frequency;
     private String note;
     private String property;
     private String duration;
-    private String createdAt;
-    private String updatedAt;
+    private String specialInstructions;
+    private String treatmentType;
+    private String treatmentTypeSpecify;
     private String visitId;
+
+    public String getFrequency() {
+        return frequency;
+    }
+
+    public void setFrequency(String frequency) {
+        this.frequency = frequency;
+    }
 
     public String getNote() {
         return note;
@@ -60,22 +70,6 @@ public class OpdTreatment {
         this.duration = duration;
     }
 
-    public String getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public String getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(String updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
     public String getVisitId() {
         return visitId;
     }
@@ -90,5 +84,29 @@ public class OpdTreatment {
 
     public void setProperty(String property) {
         this.property = property;
+    }
+
+    public String getSpecialInstructions() {
+        return specialInstructions;
+    }
+
+    public void setSpecialInstructions(String specialInstructions) {
+        this.specialInstructions = specialInstructions;
+    }
+
+    public String getTreatmentType() {
+        return treatmentType;
+    }
+
+    public void setTreatmentType(String treatmentType) {
+        this.treatmentType = treatmentType;
+    }
+
+    public String getTreatmentTypeSpecify() {
+        return treatmentTypeSpecify;
+    }
+
+    public void setTreatmentTypeSpecify(String treatmentTypeSpecify) {
+        this.treatmentTypeSpecify = treatmentTypeSpecify;
     }
 }

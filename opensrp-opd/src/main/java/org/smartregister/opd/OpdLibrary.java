@@ -19,17 +19,16 @@ import org.smartregister.opd.configuration.OpdConfiguration;
 import org.smartregister.opd.domain.YamlConfig;
 import org.smartregister.opd.domain.YamlConfigItem;
 import org.smartregister.opd.helper.OpdRulesEngineHelper;
-import org.smartregister.opd.pojo.OpdCheckIn;
 import org.smartregister.opd.pojo.OpdDetails;
 import org.smartregister.opd.pojo.OpdDiagnosisAndTreatmentForm;
 import org.smartregister.opd.pojo.OpdVisit;
 import org.smartregister.opd.repository.OpdCheckInRepository;
 import org.smartregister.opd.repository.OpdDetailsRepository;
 import org.smartregister.opd.repository.OpdDiagnosisAndTreatmentFormRepository;
-import org.smartregister.opd.repository.OpdDiagnosisRepository;
+import org.smartregister.opd.repository.OpdDiagnosisDetailRepository;
 import org.smartregister.opd.repository.OpdServiceDetailRepository;
 import org.smartregister.opd.repository.OpdTestConductedRepository;
-import org.smartregister.opd.repository.OpdTreatmentRepository;
+import org.smartregister.opd.repository.OpdTreatmentDetailRepository;
 import org.smartregister.opd.repository.OpdVisitRepository;
 import org.smartregister.opd.repository.OpdVisitSummaryRepository;
 import org.smartregister.opd.utils.FilePath;
@@ -55,6 +54,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import id.zelory.compressor.Compressor;
 import timber.log.Timber;
@@ -80,8 +80,8 @@ public class OpdLibrary {
     private OpdDetailsRepository opdDetailsRepository;
     private OpdDiagnosisAndTreatmentFormRepository opdDiagnosisAndTreatmentFormRepository;
     private OpdServiceDetailRepository opdServiceDetailRepository;
-    private OpdDiagnosisRepository opdDiagnosisRepository;
-    private OpdTreatmentRepository opdTreatmentRepository;
+    private OpdDiagnosisDetailRepository opdDiagnosisDetailRepository;
+    private OpdTreatmentDetailRepository opdTreatmentDetailRepository;
     private OpdTestConductedRepository opdTestConductedRepository;
     private OpdVisitSummaryRepository opdVisitSummaryRepository;
 
@@ -170,11 +170,11 @@ public class OpdLibrary {
     }
 
     @NonNull
-    public OpdDiagnosisRepository getOpdDiagnosisRepository() {
-        if (opdDiagnosisRepository == null) {
-            opdDiagnosisRepository = new OpdDiagnosisRepository();
+    public OpdDiagnosisDetailRepository getOpdDiagnosisDetailRepository() {
+        if (opdDiagnosisDetailRepository == null) {
+            opdDiagnosisDetailRepository = new OpdDiagnosisDetailRepository();
         }
-        return opdDiagnosisRepository;
+        return opdDiagnosisDetailRepository;
     }
 
     @NonNull
@@ -186,11 +186,11 @@ public class OpdLibrary {
     }
 
     @NonNull
-    public OpdTreatmentRepository getOpdTreatmentRepository() {
-        if (opdTreatmentRepository == null) {
-            opdTreatmentRepository = new OpdTreatmentRepository();
+    public OpdTreatmentDetailRepository getOpdTreatmentDetailRepository() {
+        if (opdTreatmentDetailRepository == null) {
+            opdTreatmentDetailRepository = new OpdTreatmentDetailRepository();
         }
-        return opdTreatmentRepository;
+        return opdTreatmentDetailRepository;
     }
 
     @NonNull
@@ -282,6 +282,12 @@ public class OpdLibrary {
         JSONObject stepOne = jsonFormObject.getJSONObject(OpdJsonFormUtils.STEP1);
         JSONArray fieldsArray = stepOne.getJSONArray(OpdJsonFormUtils.FIELDS);
 
+        HashMap<String, String> injectedFields = new HashMap<>();
+        injectedFields.put("visit_id", JsonFormUtils.generateRandomUUIDString());
+        injectedFields.put("visit_date", OpdUtils.convertDate(new Date(), OpdDbConstants.DATE_FORMAT));
+
+        OpdJsonFormUtils.populateInjectedFields(jsonFormObject, injectedFields);
+
         FormTag formTag = OpdJsonFormUtils.formTag(OpdUtils.getAllSharedPreferences());
 
         String baseEntityId = OpdUtils.getIntentValue(data, OpdConstants.IntentKey.BASE_ENTITY_ID);
@@ -301,10 +307,6 @@ public class OpdLibrary {
         opdCheckinEvent.setClientDatabaseVersion(OpdLibrary.getInstance().getDatabaseVersion());
         opdCheckinEvent.setClientApplicationVersion(OpdLibrary.getInstance().getApplicationVersion());
 
-        // Create the visit Id
-        opdCheckinEvent.addDetails(OpdConstants.Event.CheckIn.Detail.VISIT_ID, JsonFormUtils.generateRandomUUIDString());
-        opdCheckinEvent.addDetails(OpdConstants.Event.CheckIn.Detail.VISIT_DATE, OpdUtils.convertDate(new Date(), OpdDbConstants.DATE_FORMAT));
-
         return opdCheckinEvent;
     }
 
@@ -313,11 +315,11 @@ public class OpdLibrary {
 
         String entityId = OpdUtils.getIntentValue(data, OpdConstants.IntentKey.BASE_ENTITY_ID);
 
-        OpdCheckIn opdCheckIn = OpdLibrary.getInstance().getCheckInRepository().getLatestCheckIn(entityId);
+        Map<String, String> opdCheckInMap = OpdLibrary.getInstance().getCheckInRepository().getLatestCheckIn(entityId);
         FormTag formTag = OpdJsonFormUtils.formTag(OpdUtils.getAllSharedPreferences());
 
-        if (opdCheckIn != null) {
-            String visitId = opdCheckIn.getVisitId();
+        if (opdCheckInMap != null && !opdCheckInMap.isEmpty()) {
+            String visitId = opdCheckInMap.get(OpdDbConstants.Column.OpdCheckIn.VISIT_ID);
             String steps = jsonFormObject.optString(JsonFormConstants.COUNT);
             int numOfSteps = Integer.valueOf(steps);
             List<Event> eventList = new ArrayList<>();
@@ -334,13 +336,17 @@ public class OpdLibrary {
                 JSONObject jsonObject;
                 JSONArray valueJsonArray = null;
 
-                Event baseEvent = JsonFormUtils.createEvent(fields, jsonFormObject.getJSONObject(METADATA),
-                        formTag, entityId, stepEncounterType, bindType);
-
+                HashMap<String, String> eventDetails = new HashMap<>();
                 if (OpdConstants.StepTitle.TEST_CONDUCTED.equals(title)) {
                     HashMap<String, HashMap<String, String>> buildRepeatingGroupTests = OpdUtils.buildRepeatingGroupTests(step);
                     if (!buildRepeatingGroupTests.isEmpty()) {
-                        baseEvent.addDetails(OpdConstants.REPEATING_GROUP_MAP, gson.toJson(buildRepeatingGroupTests));
+                        String strTest = gson.toJson(buildRepeatingGroupTests);
+                        eventDetails.put(OpdConstants.REPEATING_GROUP_MAP, strTest);
+                        JSONObject repeatingGroupObj = new JSONObject();
+                        repeatingGroupObj.put(JsonFormConstants.KEY, OpdConstants.REPEATING_GROUP_MAP);
+                        repeatingGroupObj.put(JsonFormConstants.VALUE, strTest);
+                        repeatingGroupObj.put(JsonFormConstants.TYPE, JsonFormConstants.HIDDEN);
+                        fields.put(repeatingGroupObj);
                         valueIds = OpdUtils.generateNIds(buildRepeatingGroupTests.size());
                     } else {
                         continue;
@@ -369,6 +375,10 @@ public class OpdLibrary {
                         valueIds = OpdUtils.generateNIds(valueJsonArray.length());
                     }
                 }
+
+                Event baseEvent = JsonFormUtils.createEvent(fields, jsonFormObject.getJSONObject(METADATA),
+                        formTag, entityId, stepEncounterType, bindType);
+
                 OpdJsonFormUtils.tagSyncMetadata(baseEvent);
                 baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_ID, visitId);
                 if (StringUtils.isNotBlank(valueIds)) {
@@ -376,6 +386,9 @@ public class OpdLibrary {
                 }
                 if (valueJsonArray != null) {
                     baseEvent.addDetails(OpdConstants.KEY.VALUE, valueJsonArray.toString());
+                }
+                if (!eventDetails.isEmpty()) {
+                    baseEvent.getDetails().putAll(eventDetails);
                 }
 
                 eventList.add(baseEvent);
