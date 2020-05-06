@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 
 import org.smartregister.opd.pojo.OpdCheckIn;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**

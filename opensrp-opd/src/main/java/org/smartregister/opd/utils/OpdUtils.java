@@ -41,7 +41,7 @@ import timber.log.Timber;
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-13
  */
 
-public class OpdUtils extends org.smartregister.util.Utils {
+public class OpdUtils extends Utils {
 
     private static final String OTHER_SUFFIX = ", other]";
     private static FormUtils formUtils;

@@ -110,35 +110,11 @@ public class OpdProfileOverviewFragmentPresenter implements OpdProfileOverviewFr
     public void setDataFromCheckIn(@Nullable Map<String, String> checkIn, @Nullable OpdVisit visit, @Nullable OpdDetails opdDetails, @NonNull Facts facts) {
         String unknownString = getString(R.string.unknown);
         if (checkIn != null) {
-//            if (client != null && AllConstants.FEMALE_GENDER.equalsIgnoreCase(client.getColumnmaps().get(OpdConstants.ClientMapKey.GENDER))) {
-//                OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.PREGNANCY_STATUS, checkIn.getPregnancyStatus());
-//            }
-//
-//            String currentHivResult = checkIn.getCurrentHivResult() != null ? checkIn.getCurrentHivResult() : unknownString;
-//
-//
-//            OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.PATIENT_ON_ART, checkIn.getIsTakingArt());
-
             // Client is currently checked-in, show the current check-in details
             if (OpdLibrary.getInstance().isClientCurrentlyCheckedIn(visit, opdDetails)) {
-//                OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.IS_PREVIOUSLY_TESTED_HIV, checkIn.getHasHivTestPreviously());
-//                OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.PREVIOUSLY_HIV_STATUS_RESULTS, checkIn.getHivResultsPreviously());
-
-//                OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.CURRENT_HIV_STATUS, currentHivResult);
-
                 OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.VISIT_TYPE, checkIn.get("visit_type"));
                 OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.APPOINTMENT_SCHEDULED_PREVIOUSLY, checkIn.get("appointment_scheduled"));
                 OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.DATE_OF_APPOINTMENT, checkIn.get("appointment_made_date"));
-            } else {
-//                OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.HIV_STATUS, currentHivResult);
-            }
-        } else {
-            if (client != null && unknownString != null) {
-//                if (AllConstants.FEMALE_GENDER.equalsIgnoreCase(client.getColumnmaps().get(OpdConstants.ClientMapKey.GENDER))) {
-//                    OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.PREGNANCY_STATUS, unknownString);
-//                } else {
-//                    OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.ProfileOverview.HIV_STATUS, unknownString);
-//                }
             }
         }
 

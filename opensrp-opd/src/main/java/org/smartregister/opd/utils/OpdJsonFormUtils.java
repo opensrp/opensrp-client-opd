@@ -46,7 +46,7 @@ import java.util.UUID;
 
 import timber.log.Timber;
 
-public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
+public class OpdJsonFormUtils extends JsonFormUtils {
 
     public static final String METADATA = "metadata";
     public static final String ENCOUNTER_TYPE = "encounter_type";

@@ -7,7 +7,6 @@ import android.support.annotation.StringRes;
 import org.jeasy.rules.api.Facts;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.opd.domain.YamlConfigWrapper;
-import org.smartregister.opd.pojo.OpdCheckIn;
 import org.smartregister.opd.pojo.OpdDetails;
 import org.smartregister.opd.pojo.OpdVisit;
 
