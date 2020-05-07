@@ -6,14 +6,14 @@ import android.support.annotation.NonNull;
 import net.sqlcipher.database.SQLiteDatabase;
 
 import org.apache.commons.lang3.NotImplementedException;
-import org.smartregister.opd.dao.OpdMedicineDao;
+import org.smartregister.opd.dao.OpdTreatmentDetailDao;
 import org.smartregister.opd.pojo.OpdTreatmentDetail;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.repository.BaseRepository;
 
 import java.util.List;
 
-public class OpdTreatmentDetailRepository extends BaseRepository implements OpdMedicineDao {
+public class OpdTreatmentDetailRepository extends BaseRepository implements OpdTreatmentDetailDao {
 
     private static final String CREATE_TABLE_SQL = "CREATE TABLE " + OpdDbConstants.Table.OPD_TREATMENT_DETAIL + "("
             + OpdDbConstants.Column.OpdTreatment.BASE_ENTITY_ID + " VARCHAR NOT NULL, "

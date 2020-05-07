@@ -330,7 +330,7 @@ public class OpdUtils extends Utils {
     public static String createTestName(String key) {
         String result = key
                 .replace(OpdConstants.DIAGNOSTIC_TEST_RESULT, "")
-                .replaceAll("_", " ");
+                .replaceAll("_", " ").trim();
         if (StringUtils.isNotBlank(result)) {
             return result;
         } else {

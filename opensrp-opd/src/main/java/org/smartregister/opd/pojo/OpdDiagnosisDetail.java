@@ -9,6 +9,7 @@ public class OpdDiagnosisDetail {
     private String icd10Code;
     private String code;
     private String details;
+    private String isDiagnosisSame;
     private String visitId;
 
     public String getId() {
@@ -81,5 +82,13 @@ public class OpdDiagnosisDetail {
 
     public void setVisitId(String visitId) {
         this.visitId = visitId;
+    }
+
+    public String getIsDiagnosisSame() {
+        return isDiagnosisSame;
+    }
+
+    public void setIsDiagnosisSame(String isDiagnosisSame) {
+        this.isDiagnosisSame = isDiagnosisSame;
     }
 }

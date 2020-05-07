@@ -20,6 +20,7 @@ public class OpdDiagnosisDetailRepository extends BaseRepository implements OpdD
             + OpdDbConstants.Column.OpdDiagnosis.DIAGNOSIS + " VARCHAR NOT NULL, "
             + OpdDbConstants.Column.OpdDiagnosis.TYPE + " VARCHAR NOT NULL, "
             + OpdDbConstants.Column.OpdDiagnosis.DISEASE + " VARCHAR NULL, "
+            + OpdDbConstants.Column.OpdDiagnosis.DIAGNOSIS_SAME + " VARCHAR NULL, "
             + OpdDbConstants.Column.OpdDiagnosis.ICD10_CODE + " VARCHAR NULL, "
             + OpdDbConstants.Column.OpdDiagnosis.CODE + " VARCHAR NULL, "
             + OpdDbConstants.Column.OpdDiagnosis.DETAILS + " VARCHAR NULL, "
@@ -49,6 +50,7 @@ public class OpdDiagnosisDetailRepository extends BaseRepository implements OpdD
         contentValues.put(OpdDbConstants.Column.OpdDiagnosis.DISEASE, opdDiagnosisDetail.getDisease());
         contentValues.put(OpdDbConstants.Column.OpdDiagnosis.ICD10_CODE, opdDiagnosisDetail.getIcd10Code());
         contentValues.put(OpdDbConstants.Column.OpdDiagnosis.CODE, opdDiagnosisDetail.getCode());
+        contentValues.put(OpdDbConstants.Column.OpdDiagnosis.DIAGNOSIS_SAME, opdDiagnosisDetail.getIsDiagnosisSame());
         contentValues.put(OpdDbConstants.Column.OpdDiagnosis.DETAILS, opdDiagnosisDetail.getDetails());
         contentValues.put(OpdDbConstants.Column.OpdDiagnosis.VISIT_ID, opdDiagnosisDetail.getVisitId());
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();

@@ -12,6 +12,7 @@ public class OpdVisitSummaryResultModel {
     private String diseaseCode;
     private OpdVisitSummary.Treatment treatment;
     private String dosage;
+    private String frequency;
     private String duration;
     private Date visitDate;
     private String disease;
@@ -92,6 +93,9 @@ public class OpdVisitSummaryResultModel {
     public static class Treatment {
 
         private String medicine;
+        private String treatmentType;
+        private String treatmentTypeSpecify;
+        private String specialInstructions;
         private String dosage;
         private String duration;
         private String frequency;
@@ -127,9 +131,34 @@ public class OpdVisitSummaryResultModel {
         public void setFrequency(String frequency) {
             this.frequency = frequency;
         }
+
+        public String getTreatmentType() {
+            return treatmentType;
+        }
+
+        public void setTreatmentType(String treatmentType) {
+            this.treatmentType = treatmentType;
+        }
+
+        public String getTreatmentTypeSpecify() {
+            return treatmentTypeSpecify;
+        }
+
+        public void setTreatmentTypeSpecify(String treatmentTypeSpecify) {
+            this.treatmentTypeSpecify = treatmentTypeSpecify;
+        }
+
+        public String getSpecialInstructions() {
+            return specialInstructions;
+        }
+
+        public void setSpecialInstructions(String specialInstructions) {
+            this.specialInstructions = specialInstructions;
+        }
     }
 
     public static class Test {
+        private String testType;
         private String name;
         private String result;
 
@@ -147,6 +176,14 @@ public class OpdVisitSummaryResultModel {
 
         public void setResult(String result) {
             this.result = result;
+        }
+
+        public String getTestType() {
+            return testType;
+        }
+
+        public void setTestType(String testType) {
+            this.testType = testType;
         }
     }
 }
