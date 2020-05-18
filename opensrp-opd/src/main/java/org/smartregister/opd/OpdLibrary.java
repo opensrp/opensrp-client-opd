@@ -293,7 +293,8 @@ public class OpdLibrary {
         String baseEntityId = OpdUtils.getIntentValue(data, OpdConstants.IntentKey.BASE_ENTITY_ID);
         String entityTable = OpdUtils.getIntentValue(data, OpdConstants.IntentKey.ENTITY_TABLE);
         Event opdCheckinEvent = OpdJsonFormUtils.createEvent(fieldsArray, jsonFormObject.getJSONObject(METADATA)
-                , formTag, baseEntityId, eventType, entityTable);
+                , formTag, baseEntityId, eventType, entityTable)
+                .withChildLocationId(OpdLibrary.getInstance().context().allSharedPreferences().fetchCurrentLocality());
 
         AllSharedPreferences allSharedPreferences = OpdUtils.getAllSharedPreferences();
         String providerId = allSharedPreferences.fetchRegisteredANM();

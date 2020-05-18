@@ -64,17 +64,52 @@ public class OpdConstants extends AllConstants {
 
         interface OpdVisit {
             String VISIT_DATE = "visit_date";
+
             String TEST_NAME = "test_name";
             String TEST_RESULT = "test_result";
-            String DIAGNOSIS = "diagnosis";
-            String DIAGNOSIS_TYPE = "diagnosis_type";
-            String DISEASE_CODE = "disease_code";
-            String TREATMENT = "treatment";
 
+            String TEST_TYPE = "test_type";
+            String TEST_TYPE_LABEL = "test_type_label";
+
+            String TESTS = "tests";
+            String TESTS_LABEL = "tests_label";
+
+            String DIAGNOSIS = "diagnosis";
             String DIAGNOSIS_LABEL = "diagnosis_label";
+
+            String DIAGNOSIS_SAME = "diagnosis_same";
+            String DIAGNOSIS_SAME_LABEL = "diagnosis_same_label";
+
+            String DIAGNOSIS_TYPE = "diagnosis_type";
             String DIAGNOSIS_TYPE_LABEL = "diagnosis_type_label";
+
+            String DISEASE_CODE = "disease_code";
             String DISEASE_CODE_LABEL = "disease_code_label";
+
+            String TREATMENT = "treatment";
             String TREATMENT_LABEL = "treatment_label";
+
+            String TREATMENT_TYPE = "treatment_type";
+            String TREATMENT_TYPE_LABEL = "treatment_type_label";
+
+            String TREATMENT_TYPE_SPECIFY = "treatment_type_specify";
+            String TREATMENT_TYPE_SPECIFY_LABEL = "treatment_type_specify_label";
+
+            String DISCHARGED_ALIVE = "discharged_alive";
+            String DISCHARGED_ALIVE_LABEL = "discharged_alive_label";
+
+            String DISCHARGED_HOME = "discharged_home";
+            String DISCHARGED_HOME_LABEL = "discharged_home_label";
+
+            String REFERRAL = "referral";
+            String REFERRAL_LABEL = "referral_label";
+
+            String REFERRAL_LOCATION = "referral_location";
+            String REFERRAL_LOCATION_LABEL = "referral_location_label";
+
+            String REFERRAL_LOCATION_SPECIFY = "referral_location_specify";
+            String REFERRAL_LOCATION_SPECIFY_LABEL = "referral_location_specify_label";
+
         }
 
     }

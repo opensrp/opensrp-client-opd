@@ -91,6 +91,16 @@ public interface OpdDbConstants {
             String CREATED_AT = "created_at";
         }
 
+        interface OpdOutcome {
+            String BASE_ENTITY_ID = "base_entity_id";
+            String DISCHARGED_ALIVE = "discharged_alive";
+            String DISCHARGED_HOME = "discharged_home";
+            String REFERRAL = "referral";
+            String REFERRAL_LOCATION = "referral_location";
+            String REFERRAL_LOCATION_SPECIFY = "referral_location_specify";
+            String VISIT_ID = "visit_id";
+        }
+
         interface OpdDiagnosis {
             String ID = "id";
             String BASE_ENTITY_ID = "base_entity_id";
@@ -162,6 +172,8 @@ public interface OpdDbConstants {
         String OPD_TREATMENT_AND_MANAGEMENT = "opd_treatment";
         String OPD_SERVICE_DETAIL = "opd_service_detail";
         String OPD_TEST_CONDUCTED = "opd_test_conducted";
+        String OPD_OUTCOME = "opd_outcome";
+
         String OPD_TEST = "opd_test";
         String OPD_MULTI_SELECT_LIST_OPTION = "opd_multi_select_list_option";
 

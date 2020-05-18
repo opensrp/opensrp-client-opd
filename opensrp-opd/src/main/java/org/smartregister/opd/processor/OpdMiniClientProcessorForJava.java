@@ -202,15 +202,14 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                     opdTreatmentDetail.setMedicine(valueJsonObject.optString(JsonFormConstants.MultiSelectUtils.TEXT));
                     opdTreatmentDetail.setProperty(valueJsonArray.toString());
                     opdTreatmentDetail.setSpecialInstructions(keyValues.get("special_instructions"));
+                    String treatmentType = keyValues.get("treatment_type") == null ? "" : keyValues.get("treatment_type");
+                    if ("The type of treatment provided".equals(treatmentType.trim())) {
+                        continue;
+                    }
                     opdTreatmentDetail.setTreatmentType(keyValues.get("treatment_type"));
                     opdTreatmentDetail.setTreatmentTypeSpecify(keyValues.get("treatment_type_specify"));
 
-                    boolean result = OpdLibrary.getInstance().getOpdTreatmentDetailRepository().saveOrUpdate(opdTreatmentDetail);
-                    if (result) {
-                        Timber.i("Opd processTreatment for %s saved", eventClient.getEvent().getBaseEntityId());
-                        continue;
-                    }
-                    Timber.e("Opd processTreatment for %s not saved", eventClient.getEvent().getBaseEntityId());
+                    saveOrUpdateTreatmentDetail(eventClient, opdTreatmentDetail);
                 }
             }
         } else {
@@ -220,11 +219,10 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
             opdTreatmentDetail.setSpecialInstructions(keyValues.get("special_instructions"));
             opdTreatmentDetail.setTreatmentType(keyValues.get("treatment_type"));
             opdTreatmentDetail.setTreatmentTypeSpecify(keyValues.get("treatment_type_specify"));
-            boolean result = OpdLibrary.getInstance().getOpdTreatmentDetailRepository().saveOrUpdate(opdTreatmentDetail);
-            if (result) {
-                Timber.i("Opd processTreatment for %s saved", eventClient.getEvent().getBaseEntityId());
+            String treatmentType = keyValues.get("treatment_type") == null ? "" : keyValues.get("treatment_type");
+            if (!"The type of treatment provided".equals(treatmentType.trim())) {
+                saveOrUpdateTreatmentDetail(eventClient, opdTreatmentDetail);
             }
-            Timber.e("Opd processTreatment for %s not saved", eventClient.getEvent().getBaseEntityId());
         }
 
         try {
@@ -235,12 +233,21 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
 
     }
 
+    private void saveOrUpdateTreatmentDetail(@NonNull EventClient eventClient, OpdTreatmentDetail opdTreatmentDetail) {
+        boolean result = OpdLibrary.getInstance().getOpdTreatmentDetailRepository().saveOrUpdate(opdTreatmentDetail);
+        if (result) {
+            Timber.i("Opd processTreatment for %s saved", eventClient.getEvent().getBaseEntityId());
+            return;
+        }
+        Timber.e("Opd processTreatment for %s not saved", eventClient.getEvent().getBaseEntityId());
+    }
+
     private void processDiagnosis(@NonNull EventClient eventClient, ClientClassification clientClassification) throws JSONException {
         Event event = eventClient.getEvent();
         Map<String, String> mapDetails = event.getDetails();
         String visitId = mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID);
 
-        JSONArray valuesJsonArray = null;
+        JSONArray valuesJsonArray = new JSONArray();
         if (mapDetails.containsKey(OpdConstants.KEY.VALUE)) {
             String strValue = mapDetails.get(OpdConstants.KEY.VALUE);
             if (!StringUtils.isBlank(strValue)) {
@@ -255,29 +262,30 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         String diagnosisType = keyValues.get(OpdConstants.JSON_FORM_KEY.DIAGNOSIS_TYPE);
 
         if (!TextUtils.isEmpty(diagnosis)) {
-            for (int i = 0; i < valuesJsonArray.length(); i++) {
+            if (valuesJsonArray.length() == 0) {
                 OpdDiagnosisDetail opdDiagnosisDetail = new OpdDiagnosisDetail();
                 opdDiagnosisDetail.setBaseEntityId(event.getBaseEntityId());
                 opdDiagnosisDetail.setDiagnosis(diagnosis);
                 opdDiagnosisDetail.setType(diagnosisType);
                 opdDiagnosisDetail.setVisitId(visitId);
-
-                if (valuesJsonArray != null) {
+                opdDiagnosisDetail.setIsDiagnosisSame(keyValues.get("diagnosis_same"));
+                saveOrupdateDiagnosis(event, opdDiagnosisDetail);
+            } else {
+                for (int i = 0; i < valuesJsonArray.length(); i++) {
+                    OpdDiagnosisDetail opdDiagnosisDetail = new OpdDiagnosisDetail();
+                    opdDiagnosisDetail.setBaseEntityId(event.getBaseEntityId());
+                    opdDiagnosisDetail.setDiagnosis(diagnosis);
+                    opdDiagnosisDetail.setType(diagnosisType);
+                    opdDiagnosisDetail.setVisitId(visitId);
                     JSONObject valueJsonObject = valuesJsonArray.optJSONObject(i);
                     JSONObject propertyJsonObject = valueJsonObject.optJSONObject(JsonFormConstants.MultiSelectUtils.PROPERTY);
                     opdDiagnosisDetail.setIcd10Code(propertyJsonObject.optString(OpdConstants.JSON_FORM_KEY.ICD10));
                     opdDiagnosisDetail.setCode(propertyJsonObject.optString(OpdConstants.JSON_FORM_KEY.CODE));
                     opdDiagnosisDetail.setDetails(propertyJsonObject.optString(OpdConstants.JSON_FORM_KEY.META));
                     opdDiagnosisDetail.setDisease(valueJsonObject.optString(JsonFormConstants.MultiSelectUtils.TEXT));
+                    opdDiagnosisDetail.setIsDiagnosisSame(keyValues.get("diagnosis_same"));
+                    saveOrupdateDiagnosis(event, opdDiagnosisDetail);
                 }
-                opdDiagnosisDetail.setIsDiagnosisSame(keyValues.get("diagnosis_same"));
-
-                boolean result = OpdLibrary.getInstance().getOpdDiagnosisDetailRepository().saveOrUpdate(opdDiagnosisDetail);
-                if (result) {
-                    Timber.i("Opd processDiagnosis for %s saved", event.getBaseEntityId());
-                    continue;
-                }
-                Timber.e("Opd processDiagnosis for %s not saved", event.getBaseEntityId());
             }
         }
 
@@ -286,6 +294,14 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         } catch (Exception e) {
             Timber.e(e);
         }
+    }
+
+    private void saveOrupdateDiagnosis(Event event, OpdDiagnosisDetail opdDiagnosisDetail) {
+        boolean result = OpdLibrary.getInstance().getOpdDiagnosisDetailRepository().saveOrUpdate(opdDiagnosisDetail);
+        if (result) {
+            Timber.i("Opd processDiagnosis for %s saved", event.getBaseEntityId());
+        }
+        Timber.e("Opd processDiagnosis for %s not saved", event.getBaseEntityId());
     }
 
     private void processTestConducted(@NonNull EventClient eventClient, @NonNull ClientClassification clientClassification) {

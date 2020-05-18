@@ -32,7 +32,7 @@ public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements 
     }
 
     private void createAdditionalDetailsDialog(@NonNull final MultiSelectItem multiSelectItem) {
-        LayoutInflater inflater = LayoutInflater.from(context);
+        LayoutInflater inflater = LayoutInflater.from(getContext());
         View view = inflater.inflate(R.layout.opd_drug_instructions_layout, null);
         ImageView imgClose = view.findViewById(R.id.multiSelectListCloseDialog);
         opd_btn_save_drug = view.findViewById(R.id.opd_btn_save_drug);
@@ -48,7 +48,7 @@ public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements 
         edtTreatmentDuration.addTextChangedListener(this);
         edtTreatmentFrequency.addTextChangedListener(this);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.FullScreenDialogStyle);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.FullScreenDialogStyle);
         builder.setView(view);
         builder.setCancelable(true);
         final AlertDialog alertDialog = builder.create();
@@ -96,7 +96,7 @@ public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements 
 
     protected void writeAdditionalDetails(@NonNull String duration, @NonNull String dosage, @NonNull String frequency, @NonNull MultiSelectItem multiSelectItem) {
         String multiSelectValue = multiSelectItem.getValue();
-        String msg = String.format(context.getString(R.string.opd_drug_instructions_text), dosage, duration, frequency);
+        String msg = String.format(getContext().getString(R.string.opd_drug_instructions_text), dosage, duration, frequency);
         JSONObject jsonObject = new JSONObject();
 
         try {
@@ -129,11 +129,11 @@ public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements 
     public void afterTextChanged(Editable s) {
         if (!s.toString().isEmpty()) {
             if (opd_btn_save_drug != null) {
-                opd_btn_save_drug.setTextColor(context.getResources().getColor(R.color.primary_text));
+                opd_btn_save_drug.setTextColor(getContext().getResources().getColor(R.color.primary_text));
             }
         } else {
             if (opd_btn_save_drug != null) {
-                opd_btn_save_drug.setTextColor(context.getResources().getColor(R.color.light_grey));
+                opd_btn_save_drug.setTextColor(getContext().getResources().getColor(R.color.light_grey));
             }
         }
     }

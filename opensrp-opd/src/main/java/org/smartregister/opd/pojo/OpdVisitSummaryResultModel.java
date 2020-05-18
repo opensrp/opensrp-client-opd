@@ -1,5 +1,7 @@
 package org.smartregister.opd.pojo;
 
+import android.support.annotation.Nullable;
+
 import java.util.Date;
 
 /**
@@ -8,18 +10,101 @@ import java.util.Date;
 public class OpdVisitSummaryResultModel {
 
     private OpdVisitSummary.Test test;
+
+    private String diagnosisType;
     private String diagnosis;
     private String diseaseCode;
+    private String isDiagnosisSame;
+
+    private String treatmentType;
+    private String treatmentTypeSpecify;
+    private String specialInstructions;
     private OpdVisitSummary.Treatment treatment;
-    private String dosage;
-    private String frequency;
-    private String duration;
+
+    private String dischargedAlive;
+    private String dischargedHome;
+    private String referral;
+    private String referralLocation;
+    private String referralLocationSpecify;
+
+
     private Date visitDate;
     private String disease;
-    private String diagnosisType;
+
+    public String getReferralLocationSpecify() {
+        return referralLocationSpecify;
+    }
+
+    public void setReferralLocationSpecify(String referralLocationSpecify) {
+        this.referralLocationSpecify = referralLocationSpecify;
+    }
+
+    public String getDischargedAlive() {
+        return dischargedAlive;
+    }
+
+    public void setDischargedAlive(String dischargedAlive) {
+        this.dischargedAlive = dischargedAlive;
+    }
+
+    public String getDischargedHome() {
+        return dischargedHome;
+    }
+
+    public void setDischargedHome(String dischargedHome) {
+        this.dischargedHome = dischargedHome;
+    }
+
+    public String getReferral() {
+        return referral;
+    }
+
+    public void setReferral(String referral) {
+        this.referral = referral;
+    }
+
+    public String getReferralLocation() {
+        return referralLocation;
+    }
+
+    public void setReferralLocation(String referralLocation) {
+        this.referralLocation = referralLocation;
+    }
 
     public Test getTest() {
         return test;
+    }
+
+    public String getIsDiagnosisSame() {
+        return isDiagnosisSame;
+    }
+
+    public void setIsDiagnosisSame(String isDiagnosisSame) {
+        this.isDiagnosisSame = isDiagnosisSame;
+    }
+
+    public String getTreatmentType() {
+        return treatmentType;
+    }
+
+    public void setTreatmentType(String treatmentType) {
+        this.treatmentType = treatmentType;
+    }
+
+    public String getTreatmentTypeSpecify() {
+        return treatmentTypeSpecify;
+    }
+
+    public void setTreatmentTypeSpecify(String treatmentTypeSpecify) {
+        this.treatmentTypeSpecify = treatmentTypeSpecify;
+    }
+
+    public String getSpecialInstructions() {
+        return specialInstructions;
+    }
+
+    public void setSpecialInstructions(String specialInstructions) {
+        this.specialInstructions = specialInstructions;
     }
 
     public void setTest(Test test) {
@@ -50,22 +135,6 @@ public class OpdVisitSummaryResultModel {
         this.treatment = treatment;
     }
 
-    public String getDosage() {
-        return dosage;
-    }
-
-    public void setDosage(String dosage) {
-        this.dosage = dosage;
-    }
-
-    public String getDuration() {
-        return duration;
-    }
-
-    public void setDuration(String duration) {
-        this.duration = duration;
-    }
-
     public Date getVisitDate() {
         return visitDate;
     }
@@ -93,9 +162,6 @@ public class OpdVisitSummaryResultModel {
     public static class Treatment {
 
         private String medicine;
-        private String treatmentType;
-        private String treatmentTypeSpecify;
-        private String specialInstructions;
         private String dosage;
         private String duration;
         private String frequency;
@@ -131,34 +197,10 @@ public class OpdVisitSummaryResultModel {
         public void setFrequency(String frequency) {
             this.frequency = frequency;
         }
-
-        public String getTreatmentType() {
-            return treatmentType;
-        }
-
-        public void setTreatmentType(String treatmentType) {
-            this.treatmentType = treatmentType;
-        }
-
-        public String getTreatmentTypeSpecify() {
-            return treatmentTypeSpecify;
-        }
-
-        public void setTreatmentTypeSpecify(String treatmentTypeSpecify) {
-            this.treatmentTypeSpecify = treatmentTypeSpecify;
-        }
-
-        public String getSpecialInstructions() {
-            return specialInstructions;
-        }
-
-        public void setSpecialInstructions(String specialInstructions) {
-            this.specialInstructions = specialInstructions;
-        }
     }
 
     public static class Test {
-        private String testType;
+        private String type;
         private String name;
         private String result;
 
@@ -178,12 +220,21 @@ public class OpdVisitSummaryResultModel {
             this.result = result;
         }
 
-        public String getTestType() {
-            return testType;
+        public String getType() {
+            return type;
         }
 
-        public void setTestType(String testType) {
-            this.testType = testType;
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        @Override
+        public boolean equals(@Nullable Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            String key = ((Test) obj).getName();
+            return this.getName().equals(key);
         }
     }
 }

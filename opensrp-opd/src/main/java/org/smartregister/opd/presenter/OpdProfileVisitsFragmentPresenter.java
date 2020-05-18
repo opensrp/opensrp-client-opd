@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import timber.log.Timber;
 
@@ -186,10 +187,15 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
             OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.VISIT_DATE, OpdUtils.convertDate(opdVisitSummary.getVisitDate(), OpdConstants.DateFormat.d_MMM_yyyy));
         }
 
-        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.TEST_NAME, OpdConstants.StepTitle.TEST_CONDUCTED);
-
+//        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.TEST_TYPE, opdVisitSummary.getTestType());
         OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.DIAGNOSIS, opdVisitSummary.getDiagnosis());
         OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.DIAGNOSIS_TYPE, opdVisitSummary.getDiagnosisType());
+        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.DIAGNOSIS_SAME, opdVisitSummary.getIsDiagnosisSame());
+        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.TREATMENT_TYPE_SPECIFY, opdVisitSummary.getTreatmentTypeSpecify());
+        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.TREATMENT_TYPE, opdVisitSummary.getTreatmentType()
+                .replace("[", "")
+                .replace("]", "").replaceAll("\"", ""));
+
 
         // Put the diseases text
         String diseasesText = generateDiseasesText(opdVisitSummary);
@@ -201,10 +207,16 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
         OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.TREATMENT, medicationText);
 
         // Put the test text
-        HashMap<String, OpdVisitSummaryResultModel.Test> test = opdVisitSummary.getTests();
+        HashMap<String, List<OpdVisitSummaryResultModel.Test>> test = opdVisitSummary.getTests();
         String testText = generateTestText(test);
 
-        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.TEST_RESULT, testText);
+        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.TESTS, testText);
+
+        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.DISCHARGED_ALIVE, opdVisitSummary.getDischargedAlive());
+        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.DISCHARGED_HOME, opdVisitSummary.getDischargedHome());
+        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.REFERRAL, opdVisitSummary.getReferral());
+        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.REFERRAL_LOCATION, opdVisitSummary.getReferralLocation());
+        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.REFERRAL_LOCATION_SPECIFY, opdVisitSummary.getReferralLocationSpecify());
 
         // Add translate-able labels
         setLabelsInFacts(facts);
@@ -213,29 +225,30 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
     }
 
     @NonNull
-    public String generateTestText(@NonNull HashMap<String, OpdVisitSummaryResultModel.Test> tests) {
+    public String generateTestText(@NonNull HashMap<String, List<OpdVisitSummaryResultModel.Test>> tests) {
         StringBuilder stringBuilder = new StringBuilder();
-        for (OpdVisitSummaryResultModel.Test test : tests.values()) {
-            if (test != null && StringUtils.isNotBlank(test.getName())) {
-                String testName = test.getName();
-                if (stringBuilder.length() > 1) {
-                    stringBuilder.append("<br/>");
-                }
+        for (Map.Entry<String, List<OpdVisitSummaryResultModel.Test>> entry : tests.entrySet()) {
+            stringBuilder.append(entry.getKey()).append("<br/>");
+            for (OpdVisitSummaryResultModel.Test test : entry.getValue()) {
+                if (test != null && StringUtils.isNotBlank(test.getResult())) {
+                    String medicationTemplate = getString(R.string.single_test_result_visit_preview_summary);
 
-                String medicationTemplate = getString(R.string.single_test_visit_preview_summary);
-
-                if (StringUtils.isNotBlank(testName)) {
                     if (StringUtils.isNotBlank(medicationTemplate)) {
-                        stringBuilder.append(String.format(medicationTemplate, testName));
+                        String testName = test.getName().trim();
+                        if (testName.equals("specify") || testName.equals("other") || testName.equals("status")) {
+                            testName = "";
+                        } else {
+                            testName += " ";
+                        }
+                        stringBuilder.append(String.format(medicationTemplate, testName.replace(entry.getKey().toLowerCase(), ""), test.getResult().toLowerCase()));
+                        stringBuilder.append("<br/>");
                     }
 
-                    String testResult = test.getResult().replace("\n", "<br/>");
-                    if (StringUtils.isNotBlank(testResult)) {
-                        stringBuilder.append(testResult.toLowerCase());
-                    }
                 }
             }
+            stringBuilder.append("<br/>");
         }
+
         return stringBuilder.toString();
     }
 
@@ -308,6 +321,7 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
 
         while (diseaseIterator.hasNext()) {
             String disease = diseaseIterator.next();
+
             if (!TextUtils.isEmpty(disease)) {
                 stringBuilder.append(disease);
 
@@ -323,7 +337,16 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
         OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.DIAGNOSIS_LABEL, getString(R.string.diagnosis));
         OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.DIAGNOSIS_TYPE_LABEL, getString(R.string.diagnosis_type));
         OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.DISEASE_CODE_LABEL, getString(R.string.disease_code));
-        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.TREATMENT_LABEL, getString(R.string.treatment));
+        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.TREATMENT_LABEL, getString(R.string.opd_treatment_label));
+        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.TREATMENT_TYPE_SPECIFY_LABEL, getString(R.string.opd_treatment_type_specify_label));
+        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.TREATMENT_TYPE_LABEL, getString(R.string.opd_treatment_type_label));
+        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.DIAGNOSIS_SAME_LABEL, getString(R.string.opd_is_diagnosis_same_label));
+        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.TEST_TYPE_LABEL, getString(R.string.opd_test_type_label));
+        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.TESTS_LABEL, getString(R.string.opd_test_result_label));
+        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.DISCHARGED_ALIVE_LABEL, getString(R.string.opd_discharged_alive_label));
+        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.DISCHARGED_HOME_LABEL, getString(R.string.opd_discharged_home_label));
+        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.REFERRAL_LABEL, getString(R.string.opd_referred_label));
+        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.REFERRAL_LOCATION_LABEL, getString(R.string.opd_referred_to_label));
     }
 
     @Nullable

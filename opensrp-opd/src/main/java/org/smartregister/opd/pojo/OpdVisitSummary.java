@@ -2,8 +2,10 @@ package org.smartregister.opd.pojo;
 
 import android.support.annotation.NonNull;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-10-31
@@ -13,8 +15,7 @@ public class OpdVisitSummary extends OpdVisitSummaryResultModel {
 
     private HashSet<String> diseases = new HashSet<>();
     private HashMap<String, Treatment> treatments = new HashMap<>();
-    private HashMap<String, Test> tests = new HashMap<>();
-
+    private HashMap<String, List<Test>> tests = new HashMap<>();
 
     public HashSet<String> getDiseases() {
         return diseases;
@@ -52,11 +53,22 @@ public class OpdVisitSummary extends OpdVisitSummaryResultModel {
         addTest(test);
     }
 
-    public HashMap<String, Test> getTests() {
+    public HashMap<String, List<Test>> getTests() {
         return tests;
     }
 
     public void addTest(@NonNull Test test) {
-        tests.put(test.getName(), test);
+        List<Test> testList = tests.get(test.getType()) == null ? new ArrayList<>() : tests.get(test.getType());
+        boolean shouldNotAdd = false;
+        for (Test t : testList) {
+            if (t.getName().equals(test.getName())) {
+                shouldNotAdd = true;
+                break;
+            }
+        }
+        if (!shouldNotAdd) {
+            testList.add(test);
+            tests.put(test.getType(), testList);
+        }
     }
 }
