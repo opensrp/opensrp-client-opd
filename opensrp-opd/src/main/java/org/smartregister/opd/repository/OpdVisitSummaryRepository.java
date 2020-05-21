@@ -33,11 +33,11 @@ public class OpdVisitSummaryRepository extends BaseRepository {
                 OpdDbConstants.Table.OPD_VISIT + "." + OpdDbConstants.Column.OpdVisit.VISIT_DATE,
                 OpdDbConstants.Table.OPD_VISIT + "." + OpdDbConstants.Column.OpdVisit.ID,
 
-                OpdDbConstants.Table.OPD_DIAGNOSIS_DETAIL + "." + OpdDbConstants.Column.OpdDiagnosis.DISEASE,
-                OpdDbConstants.Table.OPD_DIAGNOSIS_DETAIL + "." + OpdDbConstants.Column.OpdDiagnosis.TYPE,
-                OpdDbConstants.Table.OPD_DIAGNOSIS_DETAIL + "." + OpdDbConstants.Column.OpdDiagnosis.DIAGNOSIS,
-                OpdDbConstants.Table.OPD_DIAGNOSIS_DETAIL + "." + OpdDbConstants.Column.OpdDiagnosis.CODE,
-                OpdDbConstants.Table.OPD_DIAGNOSIS_DETAIL + "." + OpdDbConstants.Column.OpdDiagnosis.DIAGNOSIS_SAME,
+                OpdDbConstants.Table.OPD_DIAGNOSIS_DETAIL + "." + OpdDbConstants.Column.OpdDiagnosisDetail.DISEASE,
+                OpdDbConstants.Table.OPD_DIAGNOSIS_DETAIL + "." + OpdDbConstants.Column.OpdDiagnosisDetail.TYPE,
+                OpdDbConstants.Table.OPD_DIAGNOSIS_DETAIL + "." + OpdDbConstants.Column.OpdDiagnosisDetail.DIAGNOSIS,
+                OpdDbConstants.Table.OPD_DIAGNOSIS_DETAIL + "." + OpdDbConstants.Column.OpdDiagnosisDetail.CODE,
+                OpdDbConstants.Table.OPD_DIAGNOSIS_DETAIL + "." + OpdDbConstants.Column.OpdDiagnosisDetail.DIAGNOSIS_SAME,
 
                 OpdDbConstants.Table.OPD_OUTCOME + "." + OpdDbConstants.Column.OpdOutcome.DISCHARGED_HOME,
                 OpdDbConstants.Table.OPD_OUTCOME + "." + OpdDbConstants.Column.OpdOutcome.DISCHARGED_ALIVE,
@@ -45,19 +45,18 @@ public class OpdVisitSummaryRepository extends BaseRepository {
                 OpdDbConstants.Table.OPD_OUTCOME + "." + OpdDbConstants.Column.OpdOutcome.REFERRAL_LOCATION,
                 OpdDbConstants.Table.OPD_OUTCOME + "." + OpdDbConstants.Column.OpdOutcome.REFERRAL_LOCATION_SPECIFY,
 
-
                 OpdDbConstants.Table.OPD_TEST_CONDUCTED + "." + OpdDbConstants.Column.OpdTestConducted.TEST_TYPE,
                 OpdDbConstants.Table.OPD_TEST_CONDUCTED + "." + OpdDbConstants.Column.OpdTestConducted.TEST_NAME,
                 OpdDbConstants.Table.OPD_TEST_CONDUCTED + "." + OpdDbConstants.Column.OpdTestConducted.RESULT,
 
-                OpdDbConstants.Table.OPD_TREATMENT_DETAIL + "." + OpdDbConstants.Column.OpdTreatment.DOSAGE,
-                OpdDbConstants.Table.OPD_TREATMENT_DETAIL + "." + OpdDbConstants.Column.OpdTreatment.FREQUENCY,
-                OpdDbConstants.Table.OPD_TREATMENT_DETAIL + "." + OpdDbConstants.Column.OpdTreatment.DURATION,
-                OpdDbConstants.Table.OPD_TREATMENT_DETAIL + "." + OpdDbConstants.Column.OpdTreatment.NOTE,
-                OpdDbConstants.Table.OPD_TREATMENT_DETAIL + "." + OpdDbConstants.Column.OpdTreatment.TREATMENT_TYPE,
-                OpdDbConstants.Table.OPD_TREATMENT_DETAIL + "." + OpdDbConstants.Column.OpdTreatment.TREATMENT_TYPE_SPECIFY,
-                OpdDbConstants.Table.OPD_TREATMENT_DETAIL + "." + OpdDbConstants.Column.OpdTreatment.MEDICINE,
-                OpdDbConstants.Table.OPD_TREATMENT_DETAIL + "." + OpdDbConstants.Column.OpdTreatment.SPECIAL_INSTRUCTIONS};
+                OpdDbConstants.Table.OPD_TREATMENT_DETAIL + "." + OpdDbConstants.Column.OpdTreatmentDetail.DOSAGE,
+                OpdDbConstants.Table.OPD_TREATMENT_DETAIL + "." + OpdDbConstants.Column.OpdTreatmentDetail.FREQUENCY,
+                OpdDbConstants.Table.OPD_TREATMENT_DETAIL + "." + OpdDbConstants.Column.OpdTreatmentDetail.DURATION,
+                OpdDbConstants.Table.OPD_TREATMENT_DETAIL + "." + OpdDbConstants.Column.OpdTreatmentDetail.NOTE,
+                OpdDbConstants.Table.OPD_TREATMENT_DETAIL + "." + OpdDbConstants.Column.OpdTreatmentDetail.TREATMENT_TYPE,
+                OpdDbConstants.Table.OPD_TREATMENT_DETAIL + "." + OpdDbConstants.Column.OpdTreatmentDetail.TREATMENT_TYPE_SPECIFY,
+                OpdDbConstants.Table.OPD_TREATMENT_DETAIL + "." + OpdDbConstants.Column.OpdTreatmentDetail.MEDICINE,
+                OpdDbConstants.Table.OPD_TREATMENT_DETAIL + "." + OpdDbConstants.Column.OpdTreatmentDetail.SPECIAL_INSTRUCTIONS};
     }
 
     @NonNull
@@ -73,13 +72,13 @@ public class OpdVisitSummaryRepository extends BaseRepository {
 
             String query = "SELECT " + StringUtils.join(visitSummaryColumns(), ",") + " FROM " + OpdDbConstants.Table.OPD_VISIT +
                     " INNER JOIN " + OpdDbConstants.Table.OPD_DIAGNOSIS_DETAIL + " ON "
-                    + OpdDbConstants.Table.OPD_DIAGNOSIS_DETAIL + "." + OpdDbConstants.Column.OpdDiagnosis.VISIT_ID + " = " + OpdDbConstants.Table.OPD_VISIT + "." + OpdDbConstants.Column.OpdVisit.ID +
+                    + OpdDbConstants.Table.OPD_DIAGNOSIS_DETAIL + "." + OpdDbConstants.Column.OpdDiagnosisDetail.VISIT_ID + " = " + OpdDbConstants.Table.OPD_VISIT + "." + OpdDbConstants.Column.OpdVisit.ID +
                     " LEFT JOIN " + OpdDbConstants.Table.OPD_TEST_CONDUCTED + " ON "
                     + OpdDbConstants.Table.OPD_VISIT + "." + OpdDbConstants.Column.OpdVisit.ID + " = " + OpdDbConstants.Table.OPD_TEST_CONDUCTED + "." + OpdDbConstants.Column.OpdTestConducted.VISIT_ID +
                     " LEFT JOIN " + OpdDbConstants.Table.OPD_OUTCOME + " ON "
                     + OpdDbConstants.Table.OPD_VISIT + "." + OpdDbConstants.Column.OpdVisit.ID + " = " + OpdDbConstants.Table.OPD_OUTCOME + "." + OpdDbConstants.Column.OpdOutcome.VISIT_ID +
                     " LEFT JOIN " + OpdDbConstants.Table.OPD_TREATMENT_DETAIL + " ON "
-                    + OpdDbConstants.Table.OPD_TREATMENT_DETAIL + "." + OpdDbConstants.Column.OpdTreatment.VISIT_ID + " = " + OpdDbConstants.Table.OPD_VISIT + "." + OpdDbConstants.Column.OpdVisit.ID +
+                    + OpdDbConstants.Table.OPD_TREATMENT_DETAIL + "." + OpdDbConstants.Column.OpdTreatmentDetail.VISIT_ID + " = " + OpdDbConstants.Table.OPD_VISIT + "." + OpdDbConstants.Column.OpdVisit.ID +
                     " WHERE " + OpdDbConstants.Table.OPD_VISIT + "." + OpdDbConstants.Column.OpdVisit.BASE_ENTITY_ID + " = '" + baseEntityId + "'"
                     + " AND " + OpdDbConstants.Table.OPD_VISIT + "." + OpdDbConstants.Column.OpdVisit.ID + " IN (" + joinedIds + ") " +
                     " ORDER BY " + OpdDbConstants.Table.OPD_VISIT + "." + OpdDbConstants.Column.OpdVisit.VISIT_DATE + " DESC";
@@ -207,15 +206,15 @@ public class OpdVisitSummaryRepository extends BaseRepository {
     @NonNull
     public OpdVisitSummary getVisitSummaryResult(@NonNull Cursor cursor) {
         OpdVisitSummary opdVisitModel = new OpdVisitSummary();
-        opdVisitModel.setDiagnosis(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdDiagnosis.DIAGNOSIS)));
-        opdVisitModel.setDiagnosisType(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdDiagnosis.TYPE)));
-        opdVisitModel.setDiseaseCode(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdDiagnosis.CODE)));
-        opdVisitModel.setDisease(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdDiagnosis.DISEASE)));
-        opdVisitModel.setIsDiagnosisSame(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdDiagnosis.DIAGNOSIS_SAME)));
+        opdVisitModel.setDiagnosis(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdDiagnosisDetail.DIAGNOSIS)));
+        opdVisitModel.setDiagnosisType(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdDiagnosisDetail.TYPE)));
+        opdVisitModel.setDiseaseCode(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdDiagnosisDetail.CODE)));
+        opdVisitModel.setDisease(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdDiagnosisDetail.DISEASE)));
+        opdVisitModel.setIsDiagnosisSame(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdDiagnosisDetail.DIAGNOSIS_SAME)));
 
-        opdVisitModel.setSpecialInstructions(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTreatment.SPECIAL_INSTRUCTIONS)));
-        opdVisitModel.setTreatmentType(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTreatment.TREATMENT_TYPE)));
-        opdVisitModel.setTreatmentTypeSpecify(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTreatment.TREATMENT_TYPE_SPECIFY)));
+        opdVisitModel.setSpecialInstructions(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTreatmentDetail.SPECIAL_INSTRUCTIONS)));
+        opdVisitModel.setTreatmentType(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTreatmentDetail.TREATMENT_TYPE)));
+        opdVisitModel.setTreatmentTypeSpecify(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTreatmentDetail.TREATMENT_TYPE_SPECIFY)));
 
         opdVisitModel.setDischargedAlive(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdOutcome.DISCHARGED_HOME)));
         opdVisitModel.setDischargedHome(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdOutcome.DISCHARGED_HOME)));
@@ -223,13 +222,13 @@ public class OpdVisitSummaryRepository extends BaseRepository {
         opdVisitModel.setReferralLocation(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdOutcome.REFERRAL_LOCATION)));
         opdVisitModel.setReferralLocationSpecify(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdOutcome.REFERRAL_LOCATION_SPECIFY)));
 
-        String medicine = cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTreatment.MEDICINE));
+        String medicine = cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTreatmentDetail.MEDICINE));
 
         OpdVisitSummary.Treatment treatment = new OpdVisitSummary.Treatment();
         treatment.setMedicine(medicine);
-        treatment.setDosage(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTreatment.DOSAGE)));
-        treatment.setDuration(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTreatment.DURATION)));
-        treatment.setFrequency(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTreatment.FREQUENCY)));
+        treatment.setDosage(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTreatmentDetail.DOSAGE)));
+        treatment.setDuration(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTreatmentDetail.DURATION)));
+        treatment.setFrequency(cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTreatmentDetail.FREQUENCY)));
 
 
         String testType = cursor.getString(cursor.getColumnIndex(OpdDbConstants.Column.OpdTestConducted.TEST_TYPE));

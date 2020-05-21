@@ -101,7 +101,7 @@ public interface OpdDbConstants {
             String VISIT_ID = "visit_id";
         }
 
-        interface OpdDiagnosis {
+        interface OpdDiagnosisDetail {
             String ID = "id";
             String BASE_ENTITY_ID = "base_entity_id";
             String DIAGNOSIS = "diagnosis";
@@ -117,7 +117,7 @@ public interface OpdDbConstants {
             String DIAGNOSIS_SAME = "diagnosis_same";
         }
 
-        interface OpdTreatment {
+        interface OpdTreatmentDetail {
             String ID = "id";
             String BASE_ENTITY_ID = "base_entity_id";
             String MEDICINE = "medicine";
