@@ -107,21 +107,21 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
             CoreLibrary.getInstance().context().getEventClientRepository().markEventAsProcessed(eventClient.getEvent().getFormSubmissionId());
         } else if (event.getEventType().equals(OpdConstants.EventType.TEST_CONDUCTED)) {
             try {
-                processTestConducted(eventClient, clientClassification);
+                processTestConducted(eventClient);
                 CoreLibrary.getInstance().context().getEventClientRepository().markEventAsProcessed(eventClient.getEvent().getFormSubmissionId());
             } catch (Exception ex) {
                 Timber.e(ex);
             }
         } else if (event.getEventType().equals(OpdConstants.EventType.DIAGNOSIS)) {
             try {
-                processDiagnosis(eventClient, clientClassification);
+                processDiagnosis(eventClient);
                 CoreLibrary.getInstance().context().getEventClientRepository().markEventAsProcessed(eventClient.getEvent().getFormSubmissionId());
             } catch (Exception ex) {
                 Timber.e(ex);
             }
         } else if (event.getEventType().equals(OpdConstants.EventType.TREATMENT)) {
             try {
-                processTreatment(eventClient, clientClassification);
+                processTreatment(eventClient);
                 CoreLibrary.getInstance().context().getEventClientRepository().markEventAsProcessed(eventClient.getEvent().getFormSubmissionId());
             } catch (Exception ex) {
                 Timber.e(ex);
@@ -170,7 +170,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         }
     }
 
-    private void processTreatment(@NonNull EventClient eventClient, ClientClassification clientClassification) throws JSONException {
+    private void processTreatment(@NonNull EventClient eventClient) throws JSONException {
         Map<String, String> mapDetails = eventClient.getEvent().getDetails();
         HashMap<String, String> keyValues = new HashMap<>();
         generateKeyValuesFromEvent(eventClient.getEvent(), keyValues);
@@ -224,13 +224,6 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                 saveOrUpdateTreatmentDetail(eventClient, opdTreatmentDetail);
             }
         }
-
-        try {
-            processEvent(eventClient.getEvent(), eventClient.getClient(), clientClassification);
-        } catch (Exception e) {
-            Timber.e(e);
-        }
-
     }
 
     private void saveOrUpdateTreatmentDetail(@NonNull EventClient eventClient, OpdTreatmentDetail opdTreatmentDetail) {
@@ -242,7 +235,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         Timber.e("Opd processTreatment for %s not saved", eventClient.getEvent().getBaseEntityId());
     }
 
-    private void processDiagnosis(@NonNull EventClient eventClient, ClientClassification clientClassification) throws JSONException {
+    private void processDiagnosis(@NonNull EventClient eventClient) throws JSONException {
         Event event = eventClient.getEvent();
         Map<String, String> mapDetails = event.getDetails();
         String visitId = mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID);
@@ -288,12 +281,6 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                 }
             }
         }
-
-        try {
-            processEvent(eventClient.getEvent(), eventClient.getClient(), clientClassification);
-        } catch (Exception e) {
-            Timber.e(e);
-        }
     }
 
     private void saveOrupdateDiagnosis(Event event, OpdDiagnosisDetail opdDiagnosisDetail) {
@@ -304,7 +291,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         Timber.e("Opd processDiagnosis for %s not saved", event.getBaseEntityId());
     }
 
-    private void processTestConducted(@NonNull EventClient eventClient, @NonNull ClientClassification clientClassification) {
+    private void processTestConducted(@NonNull EventClient eventClient) {
         Event event = eventClient.getEvent();
         Map<String, String> mapDetails = event.getDetails();
 
@@ -352,12 +339,6 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
             } catch (JSONException e) {
                 Timber.e(e);
             }
-        }
-
-        try {
-            processEvent(event, eventClient.getClient(), clientClassification);
-        } catch (Exception e) {
-            Timber.e(e);
         }
     }
 
