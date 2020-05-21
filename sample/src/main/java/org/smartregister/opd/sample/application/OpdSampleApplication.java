@@ -12,11 +12,11 @@ import org.smartregister.opd.pojo.OpdMetadata;
 import org.smartregister.opd.sample.BuildConfig;
 import org.smartregister.opd.sample.activity.OpdFormActivity;
 import org.smartregister.opd.sample.configuration.OpdRegisterQueryProvider;
-import org.smartregister.opd.sample.job.SampleOpdJobCreator;
 import org.smartregister.opd.sample.configuration.SampleSyncConfiguration;
+import org.smartregister.opd.sample.job.SampleOpdJobCreator;
 import org.smartregister.opd.sample.repository.SampleRepository;
 import org.smartregister.opd.sample.utils.Constants;
-import org.smartregister.opd.sample.utils.Utils;
+import org.smartregister.opd.utils.DefaultOpdLocationUtils;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.receiver.SyncStatusBroadcastReceiver;
@@ -74,7 +74,7 @@ public class OpdSampleApplication extends org.smartregister.view.activity.Drisht
             names.add(Constants.Columns.DOB);
 
             return names.toArray(new String[names.size()]);
-        } else if (tableName.equals(OpdDbConstants.KEY.TABLE)){
+        } else if (tableName.equals(OpdDbConstants.KEY.TABLE)) {
 
             return new String[]{OpdDbConstants.KEY.BASE_ENTITY_ID, OpdDbConstants.KEY.FIRST_NAME, OpdDbConstants.KEY.LAST_NAME,
                     OpdDbConstants.KEY.LAST_INTERACTED_WITH, OpdDbConstants.KEY.DATE_REMOVED};
@@ -104,8 +104,8 @@ public class OpdSampleApplication extends org.smartregister.view.activity.Drisht
                 , OpdConstants.EventType.UPDATE_OPD_REGISTRATION
                 , OpdConstants.CONFIG
                 , OpdFormActivity.class
-                ,null
-                ,true);
+                , null
+                , true);
         OpdConfiguration opdConfiguration = new OpdConfiguration
                 .Builder(OpdRegisterQueryProvider.class)
                 .setOpdMetadata(opdMetadata)
@@ -118,7 +118,7 @@ public class OpdSampleApplication extends org.smartregister.view.activity.Drisht
         context.session().setPassword(SampleRepository.PASSWORD);
 
         SyncStatusBroadcastReceiver.init(this);
-        LocationHelper.init(Utils.ALLOWED_LEVELS, Utils.DEFAULT_LOCATION_LEVEL);
+        LocationHelper.init(DefaultOpdLocationUtils.getAllowedLevels(), DefaultOpdLocationUtils.getDefaultLocationLevel());
 
         //init Job Manager
         JobManager.create(this).addJobCreator(new SampleOpdJobCreator());

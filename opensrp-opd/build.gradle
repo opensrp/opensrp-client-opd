@@ -49,6 +49,8 @@ android {
             zipAlignEnabled true
             buildConfigField "String[]", "LOCATION_LEVELS", '{"Country", "Province", "District", "Facility", "Village"}'
             buildConfigField "String[]", "HEALTH_FACILITY_LEVELS", '{"Country", "Province", "District", "Health Facility", "Village"}'
+            buildConfigField "String[]", "ALLOWED_LEVELS", '{"Health Facility"}'
+            buildConfigField "String", "DEFAULT_LEVEL", '"Health Facility"'
 
         }
 
@@ -56,6 +58,8 @@ android {
             testCoverageEnabled true
             buildConfigField "String[]", "LOCATION_LEVELS", '{"Country", "Province", "District", "Facility", "Village"}'
             buildConfigField "String[]", "HEALTH_FACILITY_LEVELS", '{"Country", "Province", "District", "Health Facility", "Village"}'
+            buildConfigField "String[]", "ALLOWED_LEVELS", '{"Health Facility"}'
+            buildConfigField "String", "DEFAULT_LEVEL", '"Health Facility"'
         }
     }
 

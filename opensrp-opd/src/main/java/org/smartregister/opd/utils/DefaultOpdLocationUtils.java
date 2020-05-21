@@ -10,6 +10,16 @@ import java.util.Arrays;
 public class DefaultOpdLocationUtils {
 
     @NonNull
+    public static ArrayList<String> getAllowedLevels() {
+        return new ArrayList<>(Arrays.asList(BuildConfig.ALLOWED_LEVELS));
+    }
+
+    @NonNull
+    public static String getDefaultLocationLevel() {
+        return BuildConfig.DEFAULT_LEVEL;
+    }
+
+    @NonNull
     public static ArrayList<String> getLocationLevels() {
         return new ArrayList<>(Arrays.asList(BuildConfig.LOCATION_LEVELS));
     }
