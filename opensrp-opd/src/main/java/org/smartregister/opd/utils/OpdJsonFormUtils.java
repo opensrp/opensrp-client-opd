@@ -87,7 +87,7 @@ public class OpdJsonFormUtils extends JsonFormUtils {
                 entityId = entityId.replace("-", "");
             }
 
-            OpdJsonFormUtils.addRegLocHierarchyQuestions(form, OpdConstants.JSON_FORM_KEY.ADDRESS_WIDGET_KEY, LocationHierarchy.ENTIRE_TREE);
+            addRegLocHierarchyQuestions(form, LocationHierarchy.ENTIRE_TREE);
 
             // Inject OPenSrp id into the form
             JSONObject stepOne = form.getJSONObject(OpdJsonFormUtils.STEP1);
@@ -129,20 +129,11 @@ public class OpdJsonFormUtils extends JsonFormUtils {
         }
     }
 
-    protected static void addRegLocHierarchyQuestions(@NonNull JSONObject form, @NonNull String widgetKey, @NonNull LocationHierarchy locationHierarchy) {
+    public static void addRegLocHierarchyQuestions(JSONObject form, LocationHierarchy locationHierarchy) {
         try {
-            JSONArray questions = form.getJSONObject(JsonFormConstants.STEP1).getJSONArray(JsonFormConstants.FIELDS);
-
-            ArrayList<String> allLevels;
-            ArrayList<String> healthFacilities;
-            OpdMetadata metadata = OpdUtils.metadata();
-            if (metadata != null) {
-                allLevels = metadata.getLocationLevels();
-                healthFacilities = metadata.getHealthFacilityLevels();
-            } else {
-                allLevels = DefaultOpdLocationUtils.getLocationLevels();
-                healthFacilities = DefaultOpdLocationUtils.getLocationLevels();
-            }
+            JSONArray questions = com.vijay.jsonwizard.utils.FormUtils.getMultiStepFormFields(form);
+            ArrayList<String> allLevels = OpdUtils.metadata().getLocationLevels();
+            ArrayList<String> healthFacilities = OpdUtils.metadata().getHealthFacilityLevels();
 
             List<String> defaultLocation = LocationHelper.getInstance().generateDefaultLocationHierarchy(allLevels);
             List<String> defaultFacility = LocationHelper.getInstance().generateDefaultLocationHierarchy(healthFacilities);
@@ -165,94 +156,71 @@ public class OpdJsonFormUtils extends JsonFormUtils {
             String entireTreeString = AssetHandler.javaToJsonString(entireTree, new TypeToken<List<FormLocation>>() {
             }.getType());
 
-            updateLocationTree(widgetKey, locationHierarchy, questions, defaultLocationString, defaultFacilityString, upToFacilitiesString, upToFacilitiesWithOtherString, entireTreeString);
+            updateLocationTree(locationHierarchy, questions, defaultLocationString, defaultFacilityString, upToFacilitiesString, upToFacilitiesWithOtherString, entireTreeString);
+        } catch (Exception e) {
+            Timber.e(e, "JsonFormUtils --> addChildRegLocHierarchyQuestions");
+        }
 
-            //To Do Refactor to remove dependency on hardocded keys
+    }
+
+    private static void updateLocationTree(LocationHierarchy locationHierarchy, JSONArray questions,
+                                           String defaultLocationString, String defaultFacilityString,
+                                           String upToFacilitiesString, String upToFacilitiesWithOtherString,
+                                           String entireTreeString) throws JSONException {
+        OpdMetadata opdMetadata = OpdUtils.metadata();
+        if (opdMetadata != null && opdMetadata.getFieldsWithLocationHierarchy() != null && !opdMetadata.getFieldsWithLocationHierarchy().isEmpty()) {
+
             for (int i = 0; i < questions.length(); i++) {
-                if (questions.getJSONObject(i).getString("key").equals("Home_Facility")) {
-                    if (StringUtils.isNotBlank(upToFacilitiesString)) {
-                        questions.getJSONObject(i).put("tree", new JSONArray(upToFacilitiesString));
-                    }
-                    if (StringUtils.isNotBlank(defaultFacilityString)) {
-                        questions.getJSONObject(i).put("default", defaultFacilityString);
-                    }
-                } else if (questions.getJSONObject(i).getString("key").equals("Birth_Facility_Name")) {
-                    if (StringUtils.isNotBlank(upToFacilitiesWithOtherString)) {
-                        questions.getJSONObject(i).put("tree", new JSONArray(upToFacilitiesWithOtherString));
-                    }
-                    if (StringUtils.isNotBlank(defaultFacilityString)) {
-                        questions.getJSONObject(i).put("default", defaultFacilityString);
-                    }
-                } else if (questions.getJSONObject(i).getString("key").equals("Residential_Area")) {
-                    if (StringUtils.isNotBlank(entireTreeString)) {
-                        questions.getJSONObject(i).put("tree", new JSONArray(entireTreeString));
-                    }
-                    if (StringUtils.isNotBlank(defaultLocationString)) {
-                        questions.getJSONObject(i).put("default", defaultLocationString);
+                JSONObject widget = questions.getJSONObject(i);
+                String key = widget.optString(JsonFormConstants.KEY);
+                if (StringUtils.isNotBlank(key) && opdMetadata.getFieldsWithLocationHierarchy().contains(widget.optString(JsonFormConstants.KEY))) {
+                    switch (locationHierarchy) {
+                        case FACILITY_ONLY:
+                            if (StringUtils.isNotBlank(upToFacilitiesString)) {
+                                addLocationTree(key, widget, upToFacilitiesString, JsonFormConstants.TREE);
+                            }
+                            if (StringUtils.isNotBlank(defaultFacilityString)) {
+                                addLocationTreeDefault(key, widget, defaultFacilityString);
+                            }
+                            break;
+                        case FACILITY_WITH_OTHER_STRING:
+                            if (StringUtils.isNotBlank(upToFacilitiesWithOtherString)) {
+                                addLocationTree(key, widget, upToFacilitiesWithOtherString, JsonFormConstants.TREE);
+                            }
+                            if (StringUtils.isNotBlank(defaultFacilityString)) {
+                                addLocationTreeDefault(key, widget, defaultFacilityString);
+                            }
+                            break;
+                        case ENTIRE_TREE:
+                            if (StringUtils.isNotBlank(entireTreeString)) {
+                                addLocationTree(key, widget, entireTreeString, JsonFormConstants.TREE);
+                            }
+                            if (StringUtils.isNotBlank(defaultFacilityString)) {
+                                addLocationTreeDefault(key, widget, defaultLocationString);
+                            }
+                            break;
+                        default:
+                            break;
                     }
                 }
             }
-
-        } catch (Exception e) {
-            Timber.e(e, "OpdJsonFormUtils --> addRegLocHierarchyQuestions");
         }
     }
 
-    private static void updateLocationTree(@NonNull String widgetKey, @NonNull LocationHierarchy locationHierarchy, @NonNull JSONArray questions,
-                                           @NonNull String defaultLocationString, @NonNull String defaultFacilityString,
-                                           @NonNull String upToFacilitiesString, @NonNull String upToFacilitiesWithOtherString,
-                                           @NonNull String entireTreeString) throws JSONException {
-        for (int i = 0; i < questions.length(); i++) {
-            JSONObject widgets = questions.getJSONObject(i);
-            switch (locationHierarchy) {
-                case FACILITY_ONLY:
-                    if (StringUtils.isNotBlank(upToFacilitiesString)) {
-                        addLocationTree(widgetKey, widgets, upToFacilitiesString);
-                    }
-                    if (StringUtils.isNotBlank(defaultFacilityString)) {
-                        addLocationDefault(widgetKey, widgets, defaultFacilityString);
-                    }
-                    break;
-                case FACILITY_WITH_OTHER_STRING:
-                    if (StringUtils.isNotBlank(upToFacilitiesWithOtherString)) {
-                        addLocationTree(widgetKey, widgets, upToFacilitiesWithOtherString);
-                    }
-                    if (StringUtils.isNotBlank(defaultFacilityString)) {
-                        addLocationDefault(widgetKey, widgets, defaultFacilityString);
-                    }
-                    break;
-                case ENTIRE_TREE:
-                    if (StringUtils.isNotBlank(entireTreeString)) {
-                        addLocationTree(widgetKey, widgets, entireTreeString);
-                    }
-                    if (StringUtils.isNotBlank(defaultFacilityString)) {
-                        addLocationDefault(widgetKey, widgets, defaultLocationString);
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    private static void addLocationTree(@NonNull String widgetKey, @NonNull JSONObject widget, @NonNull String updateString) {
+    private static void addLocationTree(@NonNull String widgetKey, @NonNull JSONObject
+            widget, @NonNull String updateString, @NonNull String treeType) {
         try {
-            if (widget.getString(OpdJsonFormUtils.KEY).equals(widgetKey)) {
-                widget.put("tree", new JSONArray(updateString));
+            if (widgetKey.equals(widget.optString(JsonFormConstants.KEY))) {
+                widget.put(treeType, new JSONArray(updateString));
             }
         } catch (JSONException e) {
-            Timber.e(e, "OpdJsonFormUtils --> addLocationTree");
+            Timber.e(e, "JsonFormUtils --> addLocationTree");
         }
     }
 
-    private static void addLocationDefault(@NonNull String widgetKey, @NonNull JSONObject widget, @NonNull String updateString) {
-        try {
-            if (widget.getString(OpdJsonFormUtils.KEY).equals(widgetKey)) {
-                widget.put("default", new JSONArray(updateString));
-            }
-        } catch (JSONException e) {
-            Timber.e(e, "OpdJsonFormUtils --> addLocationDefault");
-        }
+    private static void addLocationTreeDefault(@NonNull String widgetKey, @NonNull JSONObject
+            widget, @NonNull String updateString) {
+        addLocationTree(widgetKey, widget, updateString, JsonFormConstants.DEFAULT);
     }
 
     public static Event tagSyncMetadata(@NonNull Event event) {
@@ -527,7 +495,7 @@ public class OpdJsonFormUtils extends JsonFormUtils {
 
             dobUnknownUpdateFromAge(fields);
 
-            processReminder(fields);
+//            processReminder(fields);
 
             Client baseClient = JsonFormUtils.createBaseClient(fields, formTag, entityId);
 

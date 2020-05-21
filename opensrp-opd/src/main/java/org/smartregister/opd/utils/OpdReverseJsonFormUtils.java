@@ -37,7 +37,7 @@ public class OpdReverseJsonFormUtils {
                 JSONObject form = formUtils.getFormJson(opdMetadata.getOpdRegistrationFormName());
                 Timber.d("Original Form %s", form);
                 if (form != null) {
-                    OpdJsonFormUtils.addRegLocHierarchyQuestions(form, OpdConstants.JSON_FORM_KEY.ADDRESS_WIDGET_KEY, LocationHierarchy.ENTIRE_TREE);
+                    OpdJsonFormUtils.addRegLocHierarchyQuestions(form, LocationHierarchy.ENTIRE_TREE);
                     form.put(OpdConstants.JSON_FORM_KEY.ENTITY_ID, detailsMap.get(OpdConstants.KEY.ID));
 
                     form.put(OpdConstants.JSON_FORM_KEY.ENCOUNTER_TYPE, opdMetadata.getUpdateEventType());

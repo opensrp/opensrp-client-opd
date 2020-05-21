@@ -52,7 +52,6 @@ public class SampleRepository extends Repository {
         SettingsRepository.onUpgrade(database);
 
         OpdVisitRepository.createTable(database);
-        OpdCheckInRepository.createTable(database);
         OpdDetailsRepository.createTable(database);
     }
 

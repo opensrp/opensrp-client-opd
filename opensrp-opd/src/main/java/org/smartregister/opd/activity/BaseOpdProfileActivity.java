@@ -181,8 +181,8 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
     }
 
     @Override
-    public void setProfileImage(@NonNull String baseEntityId) {
-        imageRenderHelper.refreshProfileImage(baseEntityId, imageView, R.drawable.avatar_woman);
+    public void setProfileImage(@NonNull String baseEntityId, int defaultImage) {
+        imageRenderHelper.refreshProfileImage(baseEntityId, imageView, defaultImage);
     }
 
     @Override

@@ -58,7 +58,7 @@ public interface OpdProfileActivityContract {
 
         void setProfileGender(@NonNull String gender);
 
-        void setProfileImage(@NonNull String baseEntityId);
+        void setProfileImage(@NonNull String baseEntityId, int defaultImage);
 
         void openDiagnoseAndTreatForm();
 
