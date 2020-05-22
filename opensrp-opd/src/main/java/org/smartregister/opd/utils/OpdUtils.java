@@ -327,21 +327,23 @@ public class OpdUtils extends Utils {
     }
 
     @NotNull
-    public static String cleanStringArray(String treatmentType) {
-        if (StringUtils.isNotBlank(treatmentType)) {
-            return treatmentType.replace("[", "")
+    public static String cleanStringArray(@Nullable String stringArray) {
+        if (StringUtils.isNotBlank(stringArray)) {
+            return stringArray.replace("[", "")
                     .replace("]", "").replaceAll("\"", "");
         }
         return "";
     }
 
-    public static String cleanTestName(String testName) {
+    @NonNull
+    public static String cleanTestName(@NonNull String testName) {
+        String result = "";
         if ("specify".equals(testName) || "other".equals(testName) || "status".equals(testName)) {
-            testName = "";
+            result = "";
         } else {
-            testName += " ";
+            result += " ";
         }
-        return testName;
+        return result;
     }
 
     public static String createTestName(String key) {
