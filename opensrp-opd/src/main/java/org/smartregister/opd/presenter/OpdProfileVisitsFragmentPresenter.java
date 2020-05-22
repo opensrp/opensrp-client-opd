@@ -192,9 +192,7 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
         OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.DIAGNOSIS_TYPE, opdVisitSummary.getDiagnosisType());
         OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.DIAGNOSIS_SAME, opdVisitSummary.getIsDiagnosisSame());
         OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.TREATMENT_TYPE_SPECIFY, opdVisitSummary.getTreatmentTypeSpecify());
-        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.TREATMENT_TYPE, opdVisitSummary.getTreatmentType()
-                .replace("[", "")
-                .replace("]", "").replaceAll("\"", ""));
+        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.TREATMENT_TYPE, OpdUtils.cleanStringArray(opdVisitSummary.getTreatmentType()));
 
 
         // Put the diseases text
@@ -232,23 +230,15 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
             for (OpdVisitSummaryResultModel.Test test : entry.getValue()) {
                 if (test != null && StringUtils.isNotBlank(test.getResult())) {
                     String medicationTemplate = getString(R.string.single_test_result_visit_preview_summary);
-
                     if (StringUtils.isNotBlank(medicationTemplate)) {
-                        String testName = test.getName().trim();
-                        if (testName.equals("specify") || testName.equals("other") || testName.equals("status")) {
-                            testName = "";
-                        } else {
-                            testName += " ";
-                        }
+                        String testName = OpdUtils.cleanTestName(test.getName().trim());
                         stringBuilder.append(String.format(medicationTemplate, testName.replace(entry.getKey().toLowerCase(), ""), test.getResult().toLowerCase()));
                         stringBuilder.append("<br/>");
                     }
-
                 }
             }
             stringBuilder.append("<br/>");
         }
-
         return stringBuilder.toString();
     }
 

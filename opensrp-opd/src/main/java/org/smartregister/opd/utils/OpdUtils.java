@@ -326,6 +326,23 @@ public class OpdUtils extends Utils {
         return injectedValues;
     }
 
+    @NotNull
+    public static String cleanStringArray(String treatmentType) {
+        if (StringUtils.isNotBlank(treatmentType)) {
+            return treatmentType.replace("[", "")
+                    .replace("]", "").replaceAll("\"", "");
+        }
+        return "";
+    }
+
+    public static String cleanTestName(String testName) {
+        if ("specify".equals(testName) || "other".equals(testName) || "status".equals(testName)) {
+            testName = "";
+        } else {
+            testName += " ";
+        }
+        return testName;
+    }
 
     public static String createTestName(String key) {
         String result = key
