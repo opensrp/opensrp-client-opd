@@ -20,8 +20,8 @@ public class OpdTestConductedRepository extends BaseRepository implements OpdTes
             + OpdDbConstants.Column.OpdTestConducted.TEST_NAME + " VARCHAR NOT NULL, "
             + OpdDbConstants.Column.OpdTestConducted.RESULT + " VARCHAR NOT NULL, "
             + OpdDbConstants.Column.OpdTestConducted.DETAILS + " VARCHAR NULL, "
-            + OpdDbConstants.Column.OpdTestConducted.VISIT_ID + " VARCHAR NOT NULL, "+
-            "UNIQUE(" + OpdDbConstants.Column.OpdTestConducted.TEST_TYPE + "," + OpdDbConstants.Column.OpdTestConducted.TEST_NAME + "," + OpdDbConstants.Column.OpdTestConducted.VISIT_ID + ") ON CONFLICT REPLACE)";
+            + OpdDbConstants.Column.OpdTestConducted.VISIT_ID + " VARCHAR NOT NULL, "
+            + OpdDbConstants.Column.OpdTestConducted.CREATED_AT + " VARCHAR NULL )";
 
     private static final String INDEX_BASE_ENTITY_ID = "CREATE INDEX " + OpdDbConstants.Table.OPD_TEST_CONDUCTED
             + "_" + OpdDbConstants.Column.OpdTestConducted.BASE_ENTITY_ID + "_index ON " + OpdDbConstants.Table.OPD_TEST_CONDUCTED +
@@ -47,6 +47,7 @@ public class OpdTestConductedRepository extends BaseRepository implements OpdTes
         contentValues.put(OpdDbConstants.Column.OpdTestConducted.RESULT, opdTestConducted.getResult());
         contentValues.put(OpdDbConstants.Column.OpdTestConducted.DETAILS, opdTestConducted.getDetails());
         contentValues.put(OpdDbConstants.Column.OpdTestConducted.VISIT_ID, opdTestConducted.getVisitId());
+        contentValues.put(OpdDbConstants.Column.OpdTestConducted.CREATED_AT, opdTestConducted.getCreatedAt());
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();
         long rows = sqLiteDatabase.insert(OpdDbConstants.Table.OPD_TEST_CONDUCTED, null, contentValues);
         return rows != -1;

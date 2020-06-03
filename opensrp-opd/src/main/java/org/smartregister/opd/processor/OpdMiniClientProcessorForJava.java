@@ -227,6 +227,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
     }
 
     private void saveOrUpdateTreatmentDetail(@NonNull EventClient eventClient, OpdTreatmentDetail opdTreatmentDetail) {
+        opdTreatmentDetail.setCreatedAt(OpdUtils.convertDate(eventClient.getEvent().getEventDate().toLocalDate().toDate(), OpdDbConstants.DATE_FORMAT));
         boolean result = OpdLibrary.getInstance().getOpdTreatmentDetailRepository().saveOrUpdate(opdTreatmentDetail);
         if (result) {
             Timber.i("Opd processTreatment for %s saved", eventClient.getEvent().getBaseEntityId());
@@ -262,7 +263,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                 opdDiagnosisDetail.setType(diagnosisType);
                 opdDiagnosisDetail.setVisitId(visitId);
                 opdDiagnosisDetail.setIsDiagnosisSame(keyValues.get("diagnosis_same"));
-                saveOrupdateDiagnosis(event, opdDiagnosisDetail);
+                saveOrUpdateDiagnosis(event, opdDiagnosisDetail);
             } else {
                 for (int i = 0; i < valuesJsonArray.length(); i++) {
                     OpdDiagnosisDetail opdDiagnosisDetail = new OpdDiagnosisDetail();
@@ -277,13 +278,14 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                     opdDiagnosisDetail.setDetails(propertyJsonObject.optString(OpdConstants.JSON_FORM_KEY.META));
                     opdDiagnosisDetail.setDisease(valueJsonObject.optString(JsonFormConstants.MultiSelectUtils.TEXT));
                     opdDiagnosisDetail.setIsDiagnosisSame(keyValues.get("diagnosis_same"));
-                    saveOrupdateDiagnosis(event, opdDiagnosisDetail);
+                    saveOrUpdateDiagnosis(event, opdDiagnosisDetail);
                 }
             }
         }
     }
 
-    private void saveOrupdateDiagnosis(Event event, OpdDiagnosisDetail opdDiagnosisDetail) {
+    private void saveOrUpdateDiagnosis(Event event, OpdDiagnosisDetail opdDiagnosisDetail) {
+        opdDiagnosisDetail.setCreatedAt(OpdUtils.convertDate(event.getEventDate().toLocalDate().toDate(), OpdDbConstants.DATE_FORMAT));
         boolean result = OpdLibrary.getInstance().getOpdDiagnosisDetailRepository().saveOrUpdate(opdDiagnosisDetail);
         if (result) {
             Timber.i("Opd processDiagnosis for %s saved", event.getBaseEntityId());
@@ -327,8 +329,8 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                         opdTestConducted.setTestName(testsMapEntry.getKey());
                         opdTestConducted.setVisitId(mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID));
                         opdTestConducted.setBaseEntityId(event.getBaseEntityId());
+                        opdTestConducted.setCreatedAt(OpdUtils.convertDate(event.getEventDate().toLocalDate().toDate(), OpdDbConstants.DATE_FORMAT));
                         boolean result = OpdLibrary.getInstance().getOpdTestConductedRepository().saveOrUpdate(opdTestConducted);
-
                         if (result) {
                             Timber.i("Opd processTestConducted for %s saved", event.getBaseEntityId());
                             continue;
@@ -511,7 +513,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         opdDetails.setCurrentVisitId(visitId);
         opdDetails.setCurrentVisitStartDate(visitDate);
         opdDetails.setCurrentVisitEndDate(null);
-        opdDetails.setCreatedAt(new Date());
+        opdDetails.setCreatedAt(event.getEventDate().toLocalDate().toDate());
 
         // This code and flag is useless now - Todo: Work on disabling the flag in the query by deleting the current_visit_date & change this flag to diagnose_and_treat_ongoing
         // Set Pending diagnose and treat if we have not lapsed the max check-in duration in minutes set in the opd library configuration

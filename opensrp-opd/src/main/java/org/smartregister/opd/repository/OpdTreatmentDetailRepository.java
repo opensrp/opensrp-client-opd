@@ -25,8 +25,8 @@ public class OpdTreatmentDetailRepository extends BaseRepository implements OpdT
             + OpdDbConstants.Column.OpdTreatmentDetail.NOTE + " VARCHAR NULL, "
             + OpdDbConstants.Column.OpdTreatmentDetail.PROPERTY + " VARCHAR NULL, "
             + OpdDbConstants.Column.OpdTreatmentDetail.SPECIAL_INSTRUCTIONS + " VARCHAR NULL, "
-            + OpdDbConstants.Column.OpdTreatmentDetail.VISIT_ID + " VARCHAR NOT NULL, " +
-            "UNIQUE(" + OpdDbConstants.Column.OpdTreatmentDetail.VISIT_ID + "," + OpdDbConstants.Column.OpdTreatmentDetail.MEDICINE + ") ON CONFLICT REPLACE)";
+            + OpdDbConstants.Column.OpdTreatmentDetail.VISIT_ID + " VARCHAR NOT NULL, "
+            + OpdDbConstants.Column.OpdTreatmentDetail.CREATED_AT + " VARCHAR NULL )";
 
     private static final String INDEX_BASE_ENTITY_ID = "CREATE INDEX " + OpdDbConstants.Table.OPD_TREATMENT_DETAIL
             + "_" + OpdDbConstants.Column.OpdTreatmentDetail.BASE_ENTITY_ID + "_index ON " + OpdDbConstants.Table.OPD_TREATMENT_DETAIL +
@@ -56,6 +56,7 @@ public class OpdTreatmentDetailRepository extends BaseRepository implements OpdT
         contentValues.put(OpdDbConstants.Column.OpdTreatmentDetail.SPECIAL_INSTRUCTIONS, opdTreatmentDetail.getSpecialInstructions());
         contentValues.put(OpdDbConstants.Column.OpdTreatmentDetail.TREATMENT_TYPE, opdTreatmentDetail.getTreatmentType());
         contentValues.put(OpdDbConstants.Column.OpdTreatmentDetail.TREATMENT_TYPE_SPECIFY, opdTreatmentDetail.getTreatmentTypeSpecify());
+        contentValues.put(OpdDbConstants.Column.OpdTreatmentDetail.CREATED_AT, opdTreatmentDetail.getCreatedAt());
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();
         long rows = sqLiteDatabase.insert(OpdDbConstants.Table.OPD_TREATMENT_DETAIL, null, contentValues);
         return rows != -1;

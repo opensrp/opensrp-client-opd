@@ -41,7 +41,6 @@ import org.smartregister.opd.pojo.OpdTreatmentDetail;
 import org.smartregister.opd.pojo.OpdVisit;
 import org.smartregister.opd.repository.OpdDetailsRepository;
 import org.smartregister.opd.repository.OpdDiagnosisDetailRepository;
-import org.smartregister.opd.repository.OpdServiceDetailRepository;
 import org.smartregister.opd.repository.OpdTestConductedRepository;
 import org.smartregister.opd.repository.OpdTreatmentDetailRepository;
 import org.smartregister.opd.repository.OpdVisitRepository;

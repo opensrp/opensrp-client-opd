@@ -23,8 +23,8 @@ public class OpdDiagnosisDetailRepository extends BaseRepository implements OpdD
             + OpdDbConstants.Column.OpdDiagnosisDetail.ICD10_CODE + " VARCHAR NULL, "
             + OpdDbConstants.Column.OpdDiagnosisDetail.CODE + " VARCHAR NULL, "
             + OpdDbConstants.Column.OpdDiagnosisDetail.DETAILS + " VARCHAR NULL, "
-            + OpdDbConstants.Column.OpdDiagnosisDetail.VISIT_ID + " VARCHAR NOT NULL, " +
-            "UNIQUE(" + OpdDbConstants.Column.OpdDiagnosisDetail.VISIT_ID + "," + OpdDbConstants.Column.OpdDiagnosisDetail.DISEASE + "," + OpdDbConstants.Column.OpdDiagnosisDetail.TYPE + ") ON CONFLICT REPLACE)";
+            + OpdDbConstants.Column.OpdDiagnosisDetail.CREATED_AT + " VARCHAR NULL, "
+            + OpdDbConstants.Column.OpdDiagnosisDetail.VISIT_ID + " VARCHAR NOT NULL )";
 
     private static final String INDEX_BASE_ENTITY_ID = "CREATE INDEX " + OpdDbConstants.Table.OPD_DIAGNOSIS_DETAIL
             + "_" + OpdDbConstants.Column.OpdDiagnosisDetail.BASE_ENTITY_ID + "_index ON " + OpdDbConstants.Table.OPD_DIAGNOSIS_DETAIL +
@@ -52,6 +52,7 @@ public class OpdDiagnosisDetailRepository extends BaseRepository implements OpdD
         contentValues.put(OpdDbConstants.Column.OpdDiagnosisDetail.DIAGNOSIS_SAME, opdDiagnosisDetail.getIsDiagnosisSame());
         contentValues.put(OpdDbConstants.Column.OpdDiagnosisDetail.DETAILS, opdDiagnosisDetail.getDetails());
         contentValues.put(OpdDbConstants.Column.OpdDiagnosisDetail.VISIT_ID, opdDiagnosisDetail.getVisitId());
+        contentValues.put(OpdDbConstants.Column.OpdDiagnosisDetail.CREATED_AT, opdDiagnosisDetail.getCreatedAt());
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();
         long rows = sqLiteDatabase.insert(OpdDbConstants.Table.OPD_DIAGNOSIS_DETAIL, null, contentValues);
         return rows != -1;

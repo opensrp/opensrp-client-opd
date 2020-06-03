@@ -26,7 +26,6 @@ import org.smartregister.opd.repository.OpdCheckInRepository;
 import org.smartregister.opd.repository.OpdDetailsRepository;
 import org.smartregister.opd.repository.OpdDiagnosisAndTreatmentFormRepository;
 import org.smartregister.opd.repository.OpdDiagnosisDetailRepository;
-import org.smartregister.opd.repository.OpdServiceDetailRepository;
 import org.smartregister.opd.repository.OpdTestConductedRepository;
 import org.smartregister.opd.repository.OpdTreatmentDetailRepository;
 import org.smartregister.opd.repository.OpdVisitRepository;
@@ -79,7 +78,6 @@ public class OpdLibrary {
     private OpdVisitRepository visitRepository;
     private OpdDetailsRepository opdDetailsRepository;
     private OpdDiagnosisAndTreatmentFormRepository opdDiagnosisAndTreatmentFormRepository;
-    private OpdServiceDetailRepository opdServiceDetailRepository;
     private OpdDiagnosisDetailRepository opdDiagnosisDetailRepository;
     private OpdTreatmentDetailRepository opdTreatmentDetailRepository;
     private OpdTestConductedRepository opdTestConductedRepository;
@@ -191,14 +189,6 @@ public class OpdLibrary {
             opdTreatmentDetailRepository = new OpdTreatmentDetailRepository();
         }
         return opdTreatmentDetailRepository;
-    }
-
-    @NonNull
-    public OpdServiceDetailRepository getOpdServiceDetailRepository() {
-        if (opdServiceDetailRepository == null) {
-            opdServiceDetailRepository = new OpdServiceDetailRepository();
-        }
-        return opdServiceDetailRepository;
     }
 
     @NonNull

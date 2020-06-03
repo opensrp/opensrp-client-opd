@@ -13,6 +13,15 @@ public class OpdTreatmentDetail {
     private String treatmentType;
     private String treatmentTypeSpecify;
     private String visitId;
+    private String createdAt;
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
 
     public String getFrequency() {
         return frequency;

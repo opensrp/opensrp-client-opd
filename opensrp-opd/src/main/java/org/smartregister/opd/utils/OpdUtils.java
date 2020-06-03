@@ -356,16 +356,4 @@ public class OpdUtils extends Utils {
             return "status";
         }
     }
-
-    public static HashMap<String, String> getOutcomeValues(String visitId) {
-        List<HashMap<String, String>> mapList = OpdLibrary.getInstance().context().getEventClientRepository()
-                .rawQuery(OpdLibrary.getInstance().getRepository().getReadableDatabase(),
-                        "select * from opd_outcome" +
-                                " where visit_id = '" + visitId + "' limit 1");
-        if (mapList.isEmpty()) {
-            return null;
-        } else {
-            return mapList.get(0);
-        }
-    }
 }

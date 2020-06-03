@@ -7,6 +7,15 @@ public class OpdTestConducted {
     private String result;
     private String details;
     private String visitId;
+    private String createdAt;
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
 
     public String getBaseEntityId() {
         return baseEntityId;
