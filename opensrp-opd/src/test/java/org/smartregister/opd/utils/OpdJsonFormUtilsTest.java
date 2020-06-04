@@ -1,7 +1,6 @@
 package org.smartregister.opd.utils;
 
 import com.vijay.jsonwizard.constants.JsonFormConstants;
-import com.vijay.jsonwizard.utils.FormUtils;
 
 import org.apache.commons.lang3.tuple.Triple;
 import org.json.JSONArray;
@@ -34,17 +33,13 @@ import org.smartregister.domain.tag.FormTag;
 import org.smartregister.location.helper.LocationHelper;
 import org.smartregister.opd.BuildConfig;
 import org.smartregister.opd.OpdLibrary;
-import org.smartregister.opd.activity.BaseOpdFormActivity;
-import org.smartregister.opd.activity.BaseOpdProfileActivity;
 import org.smartregister.opd.configuration.OpdConfiguration;
 import org.smartregister.opd.configuration.OpdRegisterQueryProviderTest;
-import org.smartregister.opd.enums.LocationHierarchy;
 import org.smartregister.opd.pojo.OpdMetadata;
 import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.repository.Repository;
 import org.smartregister.sync.helper.ECSyncHelper;
 import org.smartregister.util.JsonFormUtils;
-import org.smartregister.view.activity.BaseProfileActivity;
 
 import java.util.ArrayList;
 import java.util.Arrays;

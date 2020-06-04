@@ -3,12 +3,13 @@ package org.smartregister.opd.pojo;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.smartregister.opd.activity.BaseOpdFormActivity;
+import org.smartregister.opd.activity.BaseOpdProfileActivity;
 import org.smartregister.opd.utils.DefaultOpdLocationUtils;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 public class OpdMetadata {
@@ -23,9 +24,9 @@ public class OpdMetadata {
 
     private String config;
 
-    private Class opdFormActivity;
+    private Class<? extends BaseOpdFormActivity> opdFormActivity;
 
-    private Class profileActivity;
+    private Class<? extends BaseOpdProfileActivity> profileActivity;
 
     private boolean formWizardValidateRequiredFieldsBefore;
 

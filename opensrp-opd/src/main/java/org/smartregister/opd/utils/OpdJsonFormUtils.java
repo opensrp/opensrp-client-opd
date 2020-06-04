@@ -471,7 +471,7 @@ public class OpdJsonFormUtils extends JsonFormUtils {
             Event baseEvent = JsonFormUtils.createEvent(fields, getJSONObject(jsonForm, METADATA),
                     formTag, entityId, OpdUtils.metadata().getRegisterEventType(), OpdUtils.metadata().getTableName())
                     .withChildLocationId(OpdLibrary.getInstance().context().allSharedPreferences().fetchCurrentLocality());
-            ;
+
             tagSyncMetadata(baseEvent);
 
             return new OpdEventClient(baseClient, baseEvent);

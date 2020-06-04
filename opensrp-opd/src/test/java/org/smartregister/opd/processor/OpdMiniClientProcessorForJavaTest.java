@@ -36,7 +36,6 @@ import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.exception.CheckInEventProcessException;
 import org.smartregister.opd.pojo.OpdDetails;
 import org.smartregister.opd.pojo.OpdDiagnosisDetail;
-import org.smartregister.opd.pojo.OpdServiceDetail;
 import org.smartregister.opd.pojo.OpdTestConducted;
 import org.smartregister.opd.pojo.OpdTreatmentDetail;
 import org.smartregister.opd.pojo.OpdVisit;
@@ -46,52 +45,38 @@ import org.smartregister.opd.repository.OpdTestConductedRepository;
 import org.smartregister.opd.repository.OpdTreatmentDetailRepository;
 import org.smartregister.opd.repository.OpdVisitRepository;
 import org.smartregister.opd.utils.OpdConstants;
-import org.smartregister.opd.utils.OpdDbConstants;
-import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.repository.EventClientRepository;
 import org.smartregister.repository.Repository;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(OpdLibrary.class)
 public class OpdMiniClientProcessorForJavaTest extends BaseTest {
 
-    private OpdMiniClientProcessorForJava opdMiniClientProcessorForJava;
-
-    @Mock
-    private OpdLibrary opdLibrary;
-
-    @Mock
-    private OpdTreatmentDetailRepository opdTreatmentDetailRepository;
-
-    @Mock
-    private OpdTestConductedRepository opdTestConductedRepository;
-
-    @Mock
-    private OpdDiagnosisDetailRepository opdDiagnosisDetailRepository;
-
-    @Mock
-    private OpdDetailsRepository opdDetailsRepository;
-
-    @Captor
-    private ArgumentCaptor<OpdTreatmentDetail> opdTreatmentArgumentCaptor;
-
-    @Captor
-    private ArgumentCaptor<OpdDiagnosisDetail> opdDiagnosisArgumentCaptor;
-
-    @Captor
-    private ArgumentCaptor<OpdDetails> opdDetailsArgumentCaptor;
-
-    @Captor
-    private ArgumentCaptor<OpdTestConducted> opdTestConductedArgumentCaptor;
-
-    private Event event;
-
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
+    private OpdMiniClientProcessorForJava opdMiniClientProcessorForJava;
+    @Mock
+    private OpdLibrary opdLibrary;
+    @Mock
+    private OpdTreatmentDetailRepository opdTreatmentDetailRepository;
+    @Mock
+    private OpdTestConductedRepository opdTestConductedRepository;
+    @Mock
+    private OpdDiagnosisDetailRepository opdDiagnosisDetailRepository;
+    @Mock
+    private OpdDetailsRepository opdDetailsRepository;
+    @Captor
+    private ArgumentCaptor<OpdTreatmentDetail> opdTreatmentArgumentCaptor;
+    @Captor
+    private ArgumentCaptor<OpdDiagnosisDetail> opdDiagnosisArgumentCaptor;
+    @Captor
+    private ArgumentCaptor<OpdDetails> opdDetailsArgumentCaptor;
+    @Captor
+    private ArgumentCaptor<OpdTestConducted> opdTestConductedArgumentCaptor;
+    private Event event;
 
     @Before
     public void setUp() {

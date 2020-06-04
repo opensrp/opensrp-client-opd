@@ -141,6 +141,36 @@ public class OpdConstants extends AllConstants {
         String PRESUMED_ID = "presumed-id";
     }
 
+    public interface ColumnMapKey {
+        String REGISTER_ID = "register_id";
+        String REGISTER_TYPE = "register_type";
+    }
+
+    public interface DateFormat {
+        String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
+        String d_MMM_yyyy = "d MMM yyyy";
+        String YYYY_MM_DD = "yyyy-MM-dd";
+    }
+
+    public interface Form {
+        String OPD_DIAGNOSIS_AND_TREAT = "opd_diagnose_and_treat";
+        String OPD_CHECK_IN = "opd_checkin";
+    }
+
+    public interface FormValue {
+        String IS_DOB_UNKNOWN = "isDobUnknown";
+        String IS_ENROLLED_IN_MESSAGES = "isEnrolledInSmsMessages";
+        String OTHER = "other";
+    }
+
+    public interface RegisterType {
+        String OPD = "opd";
+    }
+
+    public interface ClientMapKey {
+        String GENDER = "gender";
+    }
+
     public static class JSON_FORM_KEY {
         public static final String OPTIONS = "options";
         public static final String LAST_INTERACTED_WITH = "last_interacted_with";
@@ -261,35 +291,5 @@ public class OpdConstants extends AllConstants {
         public static final String MEDICAL_CONDITIONS_AND_HIV_DETAILS = "OPD Medical Conditions And HIV Details";
         public static final String OUTCOME = "OPD Outcome";
         public static final String CLOSE_OPD_VISIT = "OPD Close Visit";
-    }
-
-    public interface ColumnMapKey {
-        String REGISTER_ID = "register_id";
-        String REGISTER_TYPE = "register_type";
-    }
-
-    public interface DateFormat {
-        String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
-        String d_MMM_yyyy = "d MMM yyyy";
-        String YYYY_MM_DD = "yyyy-MM-dd";
-    }
-
-    public interface Form {
-        String OPD_DIAGNOSIS_AND_TREAT = "opd_diagnose_and_treat";
-        String OPD_CHECK_IN = "opd_checkin";
-    }
-
-    public interface FormValue {
-        String IS_DOB_UNKNOWN = "isDobUnknown";
-        String IS_ENROLLED_IN_MESSAGES = "isEnrolledInSmsMessages";
-        String OTHER = "other";
-    }
-
-    public interface RegisterType {
-        String OPD = "opd";
-    }
-
-    public interface ClientMapKey {
-        String GENDER = "gender";
     }
 }
