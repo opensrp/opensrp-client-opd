@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -17,6 +18,7 @@ import org.smartregister.commonregistry.CommonPersonObject;
 import org.smartregister.opd.BuildConfig;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.configuration.OpdConfiguration;
+import org.smartregister.opd.pojo.OpdMetadata;
 import org.smartregister.repository.Repository;
 
 import java.util.ArrayList;
@@ -33,15 +35,19 @@ public class OpdLookUpUtilsTest {
 
 
     @Before
-    public void setUp(){
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
     }
 
     @Test
     public void testLookUpQuery() throws Exception {
         PowerMockito.mockStatic(OpdLibrary.class);
+        OpdMetadata opdMetadata = Mockito.mock(OpdMetadata.class);
+        OpdConfiguration op = Mockito.mock(OpdConfiguration.class);
+        Mockito.when(op.getOpdMetadata()).thenReturn(opdMetadata);
+        PowerMockito.when(opdLibrary.getOpdConfiguration()).thenReturn(op);
         PowerMockito.when(OpdLibrary.getInstance()).thenReturn(opdLibrary);
-        PowerMockito.when(opdLibrary.opdLookUpQuery()).thenReturn("");
+        PowerMockito.when(opdLibrary.getOpdConfiguration().getOpdMetadata().getLookUpQueryForOpdClient()).thenReturn("");
 
         Map<String, String> entityMap = new HashMap<>();
         String result = Whitebox.invokeMethod(OpdLookUpUtils.class, "lookUpQuery", entityMap);
@@ -98,8 +104,8 @@ public class OpdLookUpUtilsTest {
     }
 
     @After
-    public void tearDown(){
-        ReflectionHelpers.setStaticField(OpdLibrary.class,"instance", null);
+    public void tearDown() {
+        ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", null);
     }
 
 }

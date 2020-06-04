@@ -293,20 +293,20 @@ public class OpdUtils extends Utils {
         return repeatingGroupMap;
     }
 
-    public static Map<String, String> getPatientDemographic(String baseEntityId) {
+    public static Map<String, String> getClientDemographicDetails(String baseEntityId) {
         try {
             return OpdLibrary.getInstance().context().getEventClientRepository()
                     .rawQuery(OpdLibrary.getInstance().context().getEventClientRepository().getReadableDatabase(),
                             "select * from " + metadata().getTableName() +
                                     " where " + OpdDbConstants.Column.Client.BASE_ENTITY_ID + " = '" + baseEntityId + "' limit 1").get(0);
-        } catch (Exception e) {
+        } catch (NullPointerException | IndexOutOfBoundsException e) {
             Timber.e(e);
         }
         return null;
     }
 
     public static HashMap<String, String> getInjectableFields(@NonNull String formName, @NonNull String caseId) {
-        Map<String, String> detailsMap = getPatientDemographic(caseId);
+        Map<String, String> detailsMap = getClientDemographicDetails(caseId);
         HashMap<String, String> injectedValues = new HashMap<>();
         if (formName.equals(OpdConstants.Form.OPD_DIAGNOSIS_AND_TREAT)) {
             if (detailsMap != null) {

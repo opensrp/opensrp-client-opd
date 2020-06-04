@@ -131,8 +131,6 @@ public class OpdLibraryTest extends BaseTest {
         String jsonString = opdForm.toString();
         Event opdCheckInEvent = OpdLibrary.getInstance().processOpdCheckInForm(OpdConstants.EventType.CHECK_IN, jsonString, intentData);
 
-        assertNotNull(opdCheckInEvent.getDetails().get(OpdConstants.Event.CheckIn.Detail.VISIT_DATE));
-        assertNotNull(opdCheckInEvent.getDetails().get(OpdConstants.Event.CheckIn.Detail.VISIT_ID));
         assertNull(opdCheckInEvent.getEventId());
         assertEquals(applicationVersion, (int) opdCheckInEvent.getClientApplicationVersion());
         assertEquals(databaseVersion, (int) opdCheckInEvent.getClientDatabaseVersion());

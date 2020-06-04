@@ -31,7 +31,7 @@ public class FetchRegistrationDataTask extends AsyncTask<String, Void, String> {
 
     @Nullable
     protected String doInBackground(String... params) {
-        Map<String, String> detailsMap = OpdUtils.getPatientDemographic(params[0]);
+        Map<String, String> detailsMap = OpdUtils.getClientDemographicDetails(params[0]);
 
         OpdProfileActivityContract.View view = viewWeakReference.get();
 

@@ -62,10 +62,8 @@ public class OpdLookUpUtils {
             if (query == null) {
                 return results;
             }
-            Cursor cursor = null;
-            try {
+            try (Cursor cursor = commonRepository.rawCustomQueryForAdapter(query)) {
 
-                cursor = commonRepository.rawCustomQueryForAdapter(query);
                 if (cursor != null && cursor.getCount() > 0 && cursor.moveToFirst()) {
                     while (!cursor.isAfterLast()) {
                         CommonPersonObject commonPersonObject = commonRepository.readAllcommonforCursorAdapter(cursor);
@@ -75,10 +73,6 @@ public class OpdLookUpUtils {
                 }
             } catch (Exception e) {
                 Timber.e(e);
-            } finally {
-                if (cursor != null) {
-                    cursor.close();
-                }
             }
         }
 

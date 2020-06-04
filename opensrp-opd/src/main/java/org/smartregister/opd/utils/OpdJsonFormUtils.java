@@ -87,7 +87,7 @@ public class OpdJsonFormUtils extends JsonFormUtils {
                 entityId = entityId.replace("-", "");
             }
 
-            addRegLocHierarchyQuestions(form, LocationHierarchy.ENTIRE_TREE);
+            addRegLocHierarchyQuestions(form);
 
             // Inject OPenSrp id into the form
             JSONObject stepOne = form.getJSONObject(OpdJsonFormUtils.STEP1);
@@ -129,7 +129,7 @@ public class OpdJsonFormUtils extends JsonFormUtils {
         }
     }
 
-    public static void addRegLocHierarchyQuestions(JSONObject form, LocationHierarchy locationHierarchy) {
+    public static void addRegLocHierarchyQuestions(JSONObject form) {
         try {
             JSONArray questions = com.vijay.jsonwizard.utils.FormUtils.getMultiStepFormFields(form);
             ArrayList<String> allLevels = OpdUtils.metadata().getLocationLevels();
@@ -137,8 +137,6 @@ public class OpdJsonFormUtils extends JsonFormUtils {
 
             List<String> defaultLocation = LocationHelper.getInstance().generateDefaultLocationHierarchy(allLevels);
             List<String> defaultFacility = LocationHelper.getInstance().generateDefaultLocationHierarchy(healthFacilities);
-            List<FormLocation> upToFacilities = LocationHelper.getInstance().generateLocationHierarchyTree(false, healthFacilities);
-            List<FormLocation> upToFacilitiesWithOther = LocationHelper.getInstance().generateLocationHierarchyTree(true, healthFacilities);
             List<FormLocation> entireTree = LocationHelper.getInstance().generateLocationHierarchyTree(true, allLevels);
 
             String defaultLocationString = AssetHandler.javaToJsonString(defaultLocation, new TypeToken<List<String>>() {
@@ -147,25 +145,18 @@ public class OpdJsonFormUtils extends JsonFormUtils {
             String defaultFacilityString = AssetHandler.javaToJsonString(defaultFacility, new TypeToken<List<String>>() {
             }.getType());
 
-            String upToFacilitiesString = AssetHandler.javaToJsonString(upToFacilities, new TypeToken<List<FormLocation>>() {
-            }.getType());
-
-            String upToFacilitiesWithOtherString = AssetHandler.javaToJsonString(upToFacilitiesWithOther, new TypeToken<List<FormLocation>>() {
-            }.getType());
-
             String entireTreeString = AssetHandler.javaToJsonString(entireTree, new TypeToken<List<FormLocation>>() {
             }.getType());
 
-            updateLocationTree(locationHierarchy, questions, defaultLocationString, defaultFacilityString, upToFacilitiesString, upToFacilitiesWithOtherString, entireTreeString);
+            updateLocationTree(questions, defaultLocationString, defaultFacilityString, entireTreeString);
         } catch (Exception e) {
             Timber.e(e, "JsonFormUtils --> addChildRegLocHierarchyQuestions");
         }
 
     }
 
-    private static void updateLocationTree(LocationHierarchy locationHierarchy, JSONArray questions,
+    private static void updateLocationTree(JSONArray questions,
                                            String defaultLocationString, String defaultFacilityString,
-                                           String upToFacilitiesString, String upToFacilitiesWithOtherString,
                                            String entireTreeString) throws JSONException {
         OpdMetadata opdMetadata = OpdUtils.metadata();
         if (opdMetadata != null && opdMetadata.getFieldsWithLocationHierarchy() != null && !opdMetadata.getFieldsWithLocationHierarchy().isEmpty()) {
@@ -174,33 +165,11 @@ public class OpdJsonFormUtils extends JsonFormUtils {
                 JSONObject widget = questions.getJSONObject(i);
                 String key = widget.optString(JsonFormConstants.KEY);
                 if (StringUtils.isNotBlank(key) && opdMetadata.getFieldsWithLocationHierarchy().contains(widget.optString(JsonFormConstants.KEY))) {
-                    switch (locationHierarchy) {
-                        case FACILITY_ONLY:
-                            if (StringUtils.isNotBlank(upToFacilitiesString)) {
-                                addLocationTree(key, widget, upToFacilitiesString, JsonFormConstants.TREE);
-                            }
-                            if (StringUtils.isNotBlank(defaultFacilityString)) {
-                                addLocationTreeDefault(key, widget, defaultFacilityString);
-                            }
-                            break;
-                        case FACILITY_WITH_OTHER_STRING:
-                            if (StringUtils.isNotBlank(upToFacilitiesWithOtherString)) {
-                                addLocationTree(key, widget, upToFacilitiesWithOtherString, JsonFormConstants.TREE);
-                            }
-                            if (StringUtils.isNotBlank(defaultFacilityString)) {
-                                addLocationTreeDefault(key, widget, defaultFacilityString);
-                            }
-                            break;
-                        case ENTIRE_TREE:
-                            if (StringUtils.isNotBlank(entireTreeString)) {
-                                addLocationTree(key, widget, entireTreeString, JsonFormConstants.TREE);
-                            }
-                            if (StringUtils.isNotBlank(defaultFacilityString)) {
-                                addLocationTreeDefault(key, widget, defaultLocationString);
-                            }
-                            break;
-                        default:
-                            break;
+                    if (StringUtils.isNotBlank(entireTreeString)) {
+                        addLocationTree(key, widget, entireTreeString, JsonFormConstants.TREE);
+                    }
+                    if (StringUtils.isNotBlank(defaultFacilityString)) {
+                        addLocationTreeDefault(key, widget, defaultLocationString);
                     }
                 }
             }
@@ -500,8 +469,9 @@ public class OpdJsonFormUtils extends JsonFormUtils {
             Client baseClient = JsonFormUtils.createBaseClient(fields, formTag, entityId);
 
             Event baseEvent = JsonFormUtils.createEvent(fields, getJSONObject(jsonForm, METADATA),
-                    formTag, entityId, OpdUtils.metadata().getRegisterEventType(), OpdUtils.metadata().getTableName());
-
+                    formTag, entityId, OpdUtils.metadata().getRegisterEventType(), OpdUtils.metadata().getTableName())
+                    .withChildLocationId(OpdLibrary.getInstance().context().allSharedPreferences().fetchCurrentLocality());
+            ;
             tagSyncMetadata(baseEvent);
 
             return new OpdEventClient(baseClient, baseEvent);

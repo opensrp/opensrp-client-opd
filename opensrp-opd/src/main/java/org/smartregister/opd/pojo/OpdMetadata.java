@@ -9,6 +9,7 @@ import org.smartregister.opd.utils.OpdDbConstants;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class OpdMetadata {
 
@@ -32,7 +33,7 @@ public class OpdMetadata {
 
     private ArrayList<String> healthFacilityLevels;
 
-    private List<String> fieldsWithLocationHierarchy;
+    private Set<String> fieldsWithLocationHierarchy;
 
     private String lookUpQueryForOpdClient = String.format("select id as _id, %s, %s, %s, %s, %s, %s, %s, national_id from " + getTableName() + " where [condition] ", OpdConstants.KEY.RELATIONALID, OpdConstants.KEY.FIRST_NAME,
             OpdConstants.KEY.LAST_NAME, OpdConstants.KEY.GENDER, OpdConstants.KEY.DOB, OpdConstants.KEY.BASE_ENTITY_ID, OpdDbConstants.KEY.OPENSRP_ID);
@@ -147,11 +148,11 @@ public class OpdMetadata {
         this.lookUpQueryForOpdClient = lookUpQueryForOpdClient;
     }
 
-    public List<String> getFieldsWithLocationHierarchy() {
+    public Set<String> getFieldsWithLocationHierarchy() {
         return fieldsWithLocationHierarchy;
     }
 
-    public void setFieldsWithLocationHierarchy(List<String> fieldsWithLocationHierarchy) {
+    public void setFieldsWithLocationHierarchy(Set<String> fieldsWithLocationHierarchy) {
         this.fieldsWithLocationHierarchy = fieldsWithLocationHierarchy;
     }
 }

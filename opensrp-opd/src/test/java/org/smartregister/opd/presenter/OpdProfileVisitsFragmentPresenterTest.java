@@ -171,24 +171,30 @@ public class OpdProfileVisitsFragmentPresenterTest extends BaseTest {
 
     @Test
     public void generateTestText() {
-        HashMap<String, OpdVisitSummaryResultModel.Test> tests = new HashMap<>();
+        HashMap<String, List<OpdVisitSummaryResultModel.Test>> tests = new HashMap<>();
+        List<OpdVisitSummaryResultModel.Test> hepatitisBTests = new ArrayList<>();
         OpdVisitSummaryResultModel.Test test = new OpdVisitSummaryResultModel.Test();
-        test.setName("Hepatitis B");
+        test.setType("Hepatitis B");
+        test.setName("status");
         test.setResult("Negative");
+        hepatitisBTests.add(test);
 
+        List<OpdVisitSummaryResultModel.Test> hepatitisCTests = new ArrayList<>();
         OpdVisitSummaryResultModel.Test test2 = new OpdVisitSummaryResultModel.Test();
-        test2.setName("Hepatitis C");
+        test2.setType("Hepatitis C");
+        test2.setName("status");
         test2.setResult("Negative");
+        hepatitisCTests.add(test2);
 
-        tests.put("Hepatitis B", test);
-        tests.put("Hepatitis C", test2);
+        tests.put("Hepatitis B", hepatitisBTests);
+        tests.put("Hepatitis C", hepatitisCTests);
         OpdProfileVisitsFragmentContract.View view = Mockito.mock(OpdProfileVisitsFragmentContract.View.class);
-        Mockito.when(view.getString(R.string.single_test_visit_preview_summary))
-                .thenReturn("<b><font color=\\'black\\'>%s</font><br/></b>");
+        Mockito.when(view.getString(R.string.single_test_result_visit_preview_summary))
+                .thenReturn("%s%s");
         OpdProfileVisitsFragmentPresenter profileVisitsFragmentPresenter = new OpdProfileVisitsFragmentPresenter(view);
 
         String result = profileVisitsFragmentPresenter.generateTestText(tests);
-        String expected = "<b><font color=\\'black\\'>Hepatitis C</font><br/></b>negative<br/><b><font color=\\'black\\'>Hepatitis B</font><br/></b>negative";
+        String expected = "Hepatitis C<br/>negative<br/><br/>Hepatitis B<br/>negative<br/><br/>";
         assertEquals(expected, result);
     }
 }

@@ -368,7 +368,7 @@ public class OpdLibrary {
                 }
 
                 Event baseEvent = JsonFormUtils.createEvent(fields, jsonFormObject.getJSONObject(METADATA),
-                        formTag, entityId, stepEncounterType, bindType);
+                        formTag, entityId, stepEncounterType, bindType).withChildLocationId(OpdLibrary.getInstance().context().allSharedPreferences().fetchCurrentLocality());
 
                 OpdJsonFormUtils.tagSyncMetadata(baseEvent);
                 baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_ID, visitId);
@@ -390,7 +390,8 @@ public class OpdLibrary {
             OpdLibrary.getInstance().getOpdDiagnosisAndTreatmentFormRepository().delete(opdDiagnosisAndTreatmentForm);
 
             Event closeOpdVisit = JsonFormUtils.createEvent(new JSONArray(), new JSONObject(),
-                    formTag, entityId, OpdConstants.EventType.CLOSE_OPD_VISIT, "");
+                    formTag, entityId, OpdConstants.EventType.CLOSE_OPD_VISIT, "").withChildLocationId(OpdLibrary.getInstance().context().allSharedPreferences().fetchCurrentLocality());
+
             OpdJsonFormUtils.tagSyncMetadata(closeOpdVisit);
             closeOpdVisit.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_ID, visitId);
             closeOpdVisit.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_END_DATE, OpdUtils.convertDate(new Date(), OpdConstants.DateFormat.YYYY_MM_DD_HH_MM_SS));
