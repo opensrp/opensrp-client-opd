@@ -293,7 +293,7 @@ public class OpdUtils extends Utils {
         return repeatingGroupMap;
     }
 
-    public static Map<String, String> getClientDemographicDetails(String baseEntityId) {
+    public static Map<String, String> getClientDemographicDetails(@NonNull String baseEntityId) {
         try {
             return OpdLibrary.getInstance().context().getEventClientRepository()
                     .rawQuery(OpdLibrary.getInstance().context().getEventClientRepository().getReadableDatabase(),
@@ -341,19 +341,41 @@ public class OpdUtils extends Utils {
         if ("specify".equals(testName) || "other".equals(testName) || "status".equals(testName)) {
             result = "";
         } else {
-            result += " ";
+            result = testName + " ";
         }
         return result;
     }
 
-    public static String createTestName(String key) {
-        String result = key
-                .replace(OpdConstants.DIAGNOSTIC_TEST_RESULT, "")
-                .replaceAll("_", " ").trim();
+    public static String createTestName(@NonNull String key) {
+        String result = removeHyphen(key
+                .replace(OpdConstants.DIAGNOSTIC_TEST_RESULT, ""))
+                .trim();
         if (StringUtils.isNotBlank(result)) {
             return result;
         } else {
             return "status";
         }
+    }
+
+    public static String removeHyphen(@Nullable String s) {
+        if (StringUtils.isNotBlank(s)) {
+            return s.replaceAll("_", " ");
+        }
+        return "";
+    }
+
+    public static JSONArray addOpenMrsEntityId(@NonNull String diagnosisType, @NonNull JSONArray jsonArray) {
+        try {
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.optJSONObject(i);
+                jsonObject.put(JsonFormConstants.OPENMRS_ENTITY_ID, jsonObject.optJSONObject(JsonFormConstants.MultiSelectUtils.PROPERTY)
+                        .optString(diagnosisType.concat("-id")));
+            }
+
+            return jsonArray;
+        } catch (JSONException e) {
+            Timber.e(e);
+        }
+        return jsonArray;
     }
 }

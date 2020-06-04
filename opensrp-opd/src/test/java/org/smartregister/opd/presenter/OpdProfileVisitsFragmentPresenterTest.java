@@ -191,10 +191,12 @@ public class OpdProfileVisitsFragmentPresenterTest extends BaseTest {
         OpdProfileVisitsFragmentContract.View view = Mockito.mock(OpdProfileVisitsFragmentContract.View.class);
         Mockito.when(view.getString(R.string.single_test_result_visit_preview_summary))
                 .thenReturn("%s%s");
+        Mockito.when(view.getString(R.string.single_test_visit_preview_summary))
+                .thenReturn("<![CDATA[<b><font color=\\'black\\'>%s</font><br/></b>]]>");
         OpdProfileVisitsFragmentPresenter profileVisitsFragmentPresenter = new OpdProfileVisitsFragmentPresenter(view);
 
         String result = profileVisitsFragmentPresenter.generateTestText(tests);
-        String expected = "Hepatitis C<br/>negative<br/><br/>Hepatitis B<br/>negative<br/><br/>";
+        String expected = "<![CDATA[<b><font color=\\'black\\'>Hepatitis C</font><br/></b>]]>negative<br/><br/><![CDATA[<b><font color=\\'black\\'>Hepatitis B</font><br/></b>]]>negative<br/><br/>";
         assertEquals(expected, result);
     }
 }

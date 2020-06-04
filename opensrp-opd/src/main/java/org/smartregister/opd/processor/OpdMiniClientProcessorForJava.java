@@ -102,7 +102,6 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
             if (eventClient.getClient() == null) {
                 throw new CheckInEventProcessException(String.format("Client %s referenced by %s event does not exist", event.getBaseEntityId(), OpdConstants.EventType.CHECK_IN));
             }
-
             processCheckIn(eventClient, clientClassification);
             CoreLibrary.getInstance().context().getEventClientRepository().markEventAsProcessed(eventClient.getEvent().getFormSubmissionId());
         } else if (event.getEventType().equals(OpdConstants.EventType.TEST_CONDUCTED)) {
@@ -314,7 +313,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                     while (testStringIterator.hasNext()) {
                         String resultKey = testStringIterator.next();
                         if (OpdConstants.DIAGNOSTIC_TEST.equals(resultKey)) {
-                            opdTestConducted.setTestType(jsonTestObject.optString(resultKey));
+                            opdTestConducted.setTestType(OpdUtils.removeHyphen(jsonTestObject.optString(resultKey)));
                         }
                         if (resultKey.startsWith(OpdConstants.DIAGNOSTIC_TEST_RESULT)) {
                             testNameResultMap.put(OpdUtils.createTestName(resultKey), jsonTestObject.optString(resultKey));
@@ -432,6 +431,11 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                 String value = (String) values.get(0);
 
                 if (!TextUtils.isEmpty(value)) {
+
+                    if (values.size() > 1) {
+                        value = values.toString();
+                    }
+
                     keyValues.put(key, value);
                     continue;
                 }
@@ -442,6 +446,11 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                 String value = (String) humanReadableValues.get(0);
 
                 if (!TextUtils.isEmpty(value)) {
+
+                    if (values.size() > 1) {
+                        value = values.toString();
+                    }
+
                     keyValues.put(key, value);
                     continue;
                 }

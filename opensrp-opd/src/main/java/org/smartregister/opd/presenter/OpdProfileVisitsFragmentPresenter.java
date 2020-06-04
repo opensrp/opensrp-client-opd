@@ -85,12 +85,9 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
     @Override
     public void loadPageCounter(@NonNull String baseEntityId) {
         if (mProfileInteractor != null) {
-            mProfileInteractor.fetchVisitsPageCount(baseEntityId, new OpdProfileVisitsFragmentContract.Interactor.OnFetchVisitsPageCountCallback() {
-                @Override
-                public void onFetchVisitsPageCount(int visitsPageCount) {
-                    totalPages = visitsPageCount;
-                    updatePageCounter();
-                }
+            mProfileInteractor.fetchVisitsPageCount(baseEntityId, visitsPageCount -> {
+                totalPages = visitsPageCount;
+                updatePageCounter();
             });
         }
     }
@@ -226,18 +223,24 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
     public String generateTestText(@NonNull HashMap<String, List<OpdVisitSummaryResultModel.Test>> tests) {
         StringBuilder stringBuilder = new StringBuilder();
         for (Map.Entry<String, List<OpdVisitSummaryResultModel.Test>> entry : tests.entrySet()) {
-            stringBuilder.append(entry.getKey()).append("<br/>");
-            for (OpdVisitSummaryResultModel.Test test : entry.getValue()) {
-                if (test != null && StringUtils.isNotBlank(test.getResult())) {
-                    String medicationTemplate = getString(R.string.single_test_result_visit_preview_summary);
-                    if (StringUtils.isNotBlank(medicationTemplate)) {
-                        String testName = OpdUtils.cleanTestName(test.getName().trim());
-                        stringBuilder.append(String.format(medicationTemplate, testName.replace(entry.getKey().toLowerCase(), ""), test.getResult().toLowerCase()));
-                        stringBuilder.append("<br/>");
+            String testTypeTemplate = getString(R.string.single_test_visit_preview_summary);
+            if (StringUtils.isNotBlank(testTypeTemplate)) {
+                String testType = String.format(testTypeTemplate, StringUtils.capitalize(entry.getKey()));
+                stringBuilder.append(testType);
+                for (OpdVisitSummaryResultModel.Test test : entry.getValue()) {
+                    if (test != null && StringUtils.isNotBlank(test.getResult())) {
+                        String medicationTemplate = getString(R.string.single_test_result_visit_preview_summary);
+                        if (StringUtils.isNotBlank(medicationTemplate)) {
+                            String testName = OpdUtils.cleanTestName(test.getName().trim());
+                            stringBuilder.append(String.format(medicationTemplate,
+                                    testName.replace(entry.getKey().toLowerCase(), ""),
+                                    test.getResult().toLowerCase()));
+                            stringBuilder.append("<br/>");
+                        }
                     }
                 }
+                stringBuilder.append("<br/>");
             }
-            stringBuilder.append("<br/>");
         }
         return stringBuilder.toString();
     }
