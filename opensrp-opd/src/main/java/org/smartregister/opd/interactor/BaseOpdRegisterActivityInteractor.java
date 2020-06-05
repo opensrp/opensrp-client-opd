@@ -17,13 +17,13 @@ import org.smartregister.opd.pojo.OpdEventClient;
 import org.smartregister.opd.pojo.RegisterParams;
 import org.smartregister.opd.utils.AppExecutors;
 import org.smartregister.repository.AllSharedPreferences;
-import org.smartregister.repository.BaseRepository;
 import org.smartregister.repository.UniqueIdRepository;
 import org.smartregister.sync.ClientProcessorForJava;
 import org.smartregister.sync.helper.ECSyncHelper;
 import org.smartregister.util.JsonFormUtils;
 import org.smartregister.view.activity.DrishtiApplication;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -83,22 +83,15 @@ public class BaseOpdRegisterActivityInteractor implements OpdRegisterActivityCon
 
     @Override
     public void saveEvents(@NonNull final List<Event> events, @NonNull final OpdRegisterActivityContract.InteractorCallBack callBack) {
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                for (Event event : events) {
-                    saveEventInDb(event);
-                }
-
-                processLatestUnprocessedEvents();
-
-                appExecutors.mainThread().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        callBack.onEventSaved();
-                    }
-                });
+        Runnable runnable = () -> {
+            List<String> formSubmissionsIds = new ArrayList<>();
+            for (Event event : events) {
+                formSubmissionsIds.add(event.getFormSubmissionId());
+                saveEventInDb(event);
             }
+            processLatestUnprocessedEvents(formSubmissionsIds);
+
+            appExecutors.mainThread().execute(() -> callBack.onEventSaved());
         };
 
         appExecutors.diskIO().execute(runnable);
@@ -117,13 +110,10 @@ public class BaseOpdRegisterActivityInteractor implements OpdRegisterActivityCon
         }
     }
 
-    private void processLatestUnprocessedEvents() {
+    private void processLatestUnprocessedEvents(List<String> formSubmissionsIds) {
         // Process this event
-        long lastSyncTimeStamp = getAllSharedPreferences().fetchLastUpdatedAtDate(0);
-        Date lastSyncDate = new Date(lastSyncTimeStamp);
-
         try {
-            getClientProcessorForJava().processClient(getSyncHelper().getEvents(lastSyncDate, BaseRepository.TYPE_Unprocessed));
+            getClientProcessorForJava().processClient(getSyncHelper().getEvents(formSubmissionsIds));
             getAllSharedPreferences().saveLastUpdatedAtDate(new Date().getTime());
         } catch (Exception e) {
             Timber.e(e);

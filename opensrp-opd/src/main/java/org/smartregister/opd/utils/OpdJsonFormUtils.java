@@ -23,7 +23,6 @@ import org.smartregister.domain.form.FormLocation;
 import org.smartregister.domain.tag.FormTag;
 import org.smartregister.location.helper.LocationHelper;
 import org.smartregister.opd.OpdLibrary;
-import org.smartregister.opd.enums.LocationHierarchy;
 import org.smartregister.opd.pojo.OpdEventClient;
 import org.smartregister.opd.pojo.OpdMetadata;
 import org.smartregister.repository.AllSharedPreferences;
@@ -464,8 +463,6 @@ public class OpdJsonFormUtils extends JsonFormUtils {
 
             dobUnknownUpdateFromAge(fields);
 
-//            processReminder(fields);
-
             Client baseClient = JsonFormUtils.createBaseClient(fields, formTag, entityId);
 
             Event baseEvent = JsonFormUtils.createEvent(fields, getJSONObject(jsonForm, METADATA),
@@ -484,21 +481,6 @@ public class OpdJsonFormUtils extends JsonFormUtils {
         } catch (IllegalArgumentException e) {
             Timber.e(e);
             return null;
-        }
-    }
-
-    private static void processReminder(@NonNull JSONArray fields) {
-        try {
-            JSONObject reminderObject = getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.REMINDERS);
-            if (reminderObject != null) {
-                JSONArray options = getJSONArray(reminderObject, OpdConstants.JSON_FORM_KEY.OPTIONS);
-                JSONObject option = getJSONObject(options, 0);
-                String value = option.optString(JsonFormConstants.VALUE);
-                int result = value.equals(Boolean.toString(false)) ? 0 : 1;
-                reminderObject.put(OpdConstants.KEY.VALUE, result);
-            }
-        } catch (JSONException e) {
-            Timber.e(e, "OpdJsonFormUtils --> processReminder");
         }
     }
 }

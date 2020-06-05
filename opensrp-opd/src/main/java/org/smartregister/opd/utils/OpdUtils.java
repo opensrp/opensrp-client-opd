@@ -130,11 +130,7 @@ public class OpdUtils extends Utils {
 
     @Nullable
     public static String getIntentValue(@Nullable Intent data, @NonNull String key) {
-        if (data == null) {
-            return null;
-        }
-
-        return data.hasExtra(key) ? data.getStringExtra(key) : null;
+        return data == null ? null : data.hasExtra(key) ? data.getStringExtra(key) : null;
     }
 
     @NonNull
@@ -156,19 +152,6 @@ public class OpdUtils extends Utils {
             }
         }
         return date;
-    }
-
-    @NonNull
-    public static String generateNIds(int n) {
-        StringBuilder strIds = new StringBuilder();
-        for (int i = 0; i < n; i++) {
-            if ((i + 1) == n) {
-                strIds.append(JsonFormUtils.generateRandomUUIDString());
-            } else {
-                strIds.append(JsonFormUtils.generateRandomUUIDString()).append(",");
-            }
-        }
-        return strIds.toString();
     }
 
     @NotNull

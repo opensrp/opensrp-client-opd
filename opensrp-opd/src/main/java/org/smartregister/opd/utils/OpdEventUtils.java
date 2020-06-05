@@ -8,9 +8,9 @@ import org.smartregister.CoreLibrary;
 import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.listener.OpdEventActionCallBack;
-import org.smartregister.repository.BaseRepository;
 import org.smartregister.util.JsonFormUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -27,21 +27,14 @@ public class OpdEventUtils {
     }
 
     public void saveEvents(@NonNull final List<Event> events, @NonNull final OpdEventActionCallBack callBack) {
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                for (Event event : events) {
-                    saveEventInDb(event);
-                }
-
-                processLatestUnprocessedEvents();
-                appExecutors.mainThread().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        callBack.onOpdEventSaved();
-                    }
-                });
+        Runnable runnable = () -> {
+            List<String> formSubmissionsIds = new ArrayList<>();
+            for (Event event : events) {
+                formSubmissionsIds.add(event.getFormSubmissionId());
+                saveEventInDb(event);
             }
+            processLatestUnprocessedEvents(formSubmissionsIds);
+            appExecutors.mainThread().execute(() -> callBack.onOpdEventSaved());
         };
 
         appExecutors.diskIO().execute(runnable);
@@ -59,12 +52,9 @@ public class OpdEventUtils {
         }
     }
 
-    private void processLatestUnprocessedEvents() {
-        // Process this event
-        long lastSyncTimeStamp = OpdUtils.getAllSharedPreferences().fetchLastUpdatedAtDate(0);
-        Date lastSyncDate = new Date(lastSyncTimeStamp);
+    private void processLatestUnprocessedEvents(List<String> formSubmissionsId) {
         try {
-            opdLibrary.getClientProcessorForJava().processClient(opdLibrary.getEcSyncHelper().getEvents(lastSyncDate, BaseRepository.TYPE_Unprocessed));
+            opdLibrary.getClientProcessorForJava().processClient(opdLibrary.getEcSyncHelper().getEvents(formSubmissionsId));
             OpdUtils.getAllSharedPreferences().saveLastUpdatedAtDate(new Date().getTime());
         } catch (Exception e) {
             Timber.e(e);
