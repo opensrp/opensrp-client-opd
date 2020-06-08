@@ -128,7 +128,7 @@ public class OpdJsonFormUtils extends JsonFormUtils {
         }
     }
 
-    public static void addRegLocHierarchyQuestions(JSONObject form) {
+    public static void addRegLocHierarchyQuestions(@NonNull JSONObject form) {
         try {
             JSONArray questions = com.vijay.jsonwizard.utils.FormUtils.getMultiStepFormFields(form);
             ArrayList<String> allLevels = OpdUtils.metadata().getLocationLevels();
@@ -466,8 +466,7 @@ public class OpdJsonFormUtils extends JsonFormUtils {
             Client baseClient = JsonFormUtils.createBaseClient(fields, formTag, entityId);
 
             Event baseEvent = JsonFormUtils.createEvent(fields, getJSONObject(jsonForm, METADATA),
-                    formTag, entityId, OpdUtils.metadata().getRegisterEventType(), OpdUtils.metadata().getTableName())
-                    .withChildLocationId(OpdLibrary.getInstance().context().allSharedPreferences().fetchCurrentLocality());
+                    formTag, entityId, OpdUtils.metadata().getRegisterEventType(), OpdUtils.metadata().getTableName());
 
             tagSyncMetadata(baseEvent);
 

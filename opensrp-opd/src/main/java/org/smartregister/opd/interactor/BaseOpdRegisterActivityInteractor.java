@@ -110,7 +110,7 @@ public class BaseOpdRegisterActivityInteractor implements OpdRegisterActivityCon
         }
     }
 
-    private void processLatestUnprocessedEvents(List<String> formSubmissionsIds) {
+    private void processLatestUnprocessedEvents(@NonNull List<String> formSubmissionsIds) {
         // Process this event
         try {
             getClientProcessorForJava().processClient(getSyncHelper().getEvents(formSubmissionsIds));

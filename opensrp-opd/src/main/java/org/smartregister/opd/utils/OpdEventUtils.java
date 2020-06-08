@@ -52,7 +52,7 @@ public class OpdEventUtils {
         }
     }
 
-    private void processLatestUnprocessedEvents(List<String> formSubmissionsId) {
+    private void processLatestUnprocessedEvents(@NonNull List<String> formSubmissionsId) {
         try {
             opdLibrary.getClientProcessorForJava().processClient(opdLibrary.getEcSyncHelper().getEvents(formSubmissionsId));
             OpdUtils.getAllSharedPreferences().saveLastUpdatedAtDate(new Date().getTime());
