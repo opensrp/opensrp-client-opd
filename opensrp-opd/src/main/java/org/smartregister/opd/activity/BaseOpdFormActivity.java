@@ -95,7 +95,8 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
 
     protected void initializeFormFragmentCore() {
         opdFormFragment = (BaseOpdFormFragment) BaseOpdFormFragment.getFormFragment(JsonFormConstants.FIRST_STEP_NAME);
-        getSupportFragmentManager().beginTransaction().add(R.id.container, opdFormFragment).commit();
+        getSupportFragmentManager().beginTransaction().add(R.id.container, opdFormFragment)
+                .addToBackStack(opdFormFragment.getArguments().getString(JsonFormConstants.STEPNAME)).commit();
     }
 
     @Override
