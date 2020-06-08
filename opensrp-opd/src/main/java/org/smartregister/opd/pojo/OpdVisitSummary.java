@@ -49,7 +49,6 @@ public class OpdVisitSummary extends OpdVisitSummaryResultModel {
     @Override
     public void setTest(Test test) {
         super.setTest(test);
-
         addTest(test);
     }
 
@@ -59,14 +58,7 @@ public class OpdVisitSummary extends OpdVisitSummaryResultModel {
 
     public void addTest(@NonNull Test test) {
         List<Test> testList = tests.get(test.getType()) == null ? new ArrayList<>() : tests.get(test.getType());
-        boolean shouldNotAdd = false;
-        for (Test t : testList) {
-            if (t.getName().equals(test.getName())) {
-                shouldNotAdd = true;
-                break;
-            }
-        }
-        if (!shouldNotAdd) {
+        if (!testList.contains(test)) {
             testList.add(test);
             tests.put(test.getType(), testList);
         }
