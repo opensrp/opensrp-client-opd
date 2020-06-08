@@ -20,7 +20,6 @@ import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.reflect.Whitebox;
 import org.powermock.reflect.internal.WhiteboxImpl;
 import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.Context;
@@ -388,48 +387,6 @@ public class OpdJsonFormUtilsTest {
         OpdJsonFormUtils.dobUnknownUpdateFromAge(jsonArrayFields);
 
         Assert.assertEquals(expected, jsonArrayFields.toString());
-    }
-
-    @Test
-    public void testProcessReminderSetToTrue() throws Exception {
-        JSONArray jsonArrayFields = new JSONArray();
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put(OpdConstants.KEY.KEY, OpdConstants.JSON_FORM_KEY.REMINDERS);
-
-        JSONArray jsonArrayOptions = new JSONArray();
-        JSONObject jsonObject1 = new JSONObject();
-        jsonObject1.put(OpdConstants.KEY.VALUE, Boolean.toString(true));
-        jsonArrayOptions.put(jsonObject1);
-
-        jsonObject.put(OpdConstants.JSON_FORM_KEY.OPTIONS, jsonArrayOptions);
-        jsonArrayFields.put(jsonObject);
-
-        Whitebox.invokeMethod(OpdJsonFormUtils.class, "processReminder", jsonArrayFields);
-
-        String expected = "[{\"options\":[{\"value\":\"true\"}],\"value\":1,\"key\":\"reminders\"}]";
-        Assert.assertEquals(expected, jsonArrayFields.toString());
-
-    }
-
-    @Test
-    public void testProcessReminderSetToFalse() throws Exception {
-        JSONArray jsonArrayFields = new JSONArray();
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put(OpdConstants.KEY.KEY, OpdConstants.JSON_FORM_KEY.REMINDERS);
-
-        JSONArray jsonArrayOptions = new JSONArray();
-        JSONObject jsonObject1 = new JSONObject();
-        jsonObject1.put(OpdConstants.KEY.VALUE, Boolean.toString(false));
-        jsonArrayOptions.put(jsonObject1);
-
-        jsonObject.put(OpdConstants.JSON_FORM_KEY.OPTIONS, jsonArrayOptions);
-        jsonArrayFields.put(jsonObject);
-
-        Whitebox.invokeMethod(OpdJsonFormUtils.class, "processReminder", jsonArrayFields);
-
-        String expected = "[{\"options\":[{\"value\":\"false\"}],\"value\":0,\"key\":\"reminders\"}]";
-        Assert.assertEquals(expected, jsonArrayFields.toString());
-
     }
 
     @Test

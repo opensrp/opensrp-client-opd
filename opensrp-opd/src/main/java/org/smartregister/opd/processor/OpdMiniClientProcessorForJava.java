@@ -202,6 +202,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                     opdTreatmentDetail.setProperty(valueJsonArray.toString());
                     opdTreatmentDetail.setSpecialInstructions(keyValues.get("special_instructions"));
                     String treatmentType = keyValues.get("treatment_type") == null ? "" : keyValues.get("treatment_type");
+                    //TODO spinner should not save the first item in the list, fix to be in native forms
                     if ("The type of treatment provided".equals(treatmentType.trim())) {
                         continue;
                     }

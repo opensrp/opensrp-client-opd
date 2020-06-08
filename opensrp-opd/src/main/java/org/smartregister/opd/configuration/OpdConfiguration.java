@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.smartregister.opd.pojo.OpdMetadata;
+import org.smartregister.opd.processor.OpdDiagnoseAndTreatFormProcessor;
 import org.smartregister.opd.utils.OpdConstants;
 
 import java.util.HashMap;
