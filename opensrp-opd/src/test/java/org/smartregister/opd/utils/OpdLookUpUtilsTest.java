@@ -17,6 +17,7 @@ import org.smartregister.Context;
 import org.smartregister.commonregistry.CommonPersonObject;
 import org.smartregister.opd.BuildConfig;
 import org.smartregister.opd.OpdLibrary;
+import org.smartregister.opd.activity.BaseOpdFormActivity;
 import org.smartregister.opd.configuration.OpdConfiguration;
 import org.smartregister.opd.pojo.OpdMetadata;
 import org.smartregister.repository.Repository;
@@ -40,18 +41,23 @@ public class OpdLookUpUtilsTest {
     }
 
     @Test
-    public void testLookUpQuery() throws Exception {
+    public void testLookUpQueryShouldReturnQueryString() throws Exception {
         PowerMockito.mockStatic(OpdLibrary.class);
-        OpdMetadata opdMetadata = Mockito.mock(OpdMetadata.class);
+        OpdMetadata opdMetadata = new OpdMetadata(OpdConstants.JSON_FORM_KEY.NAME
+                , OpdDbConstants.KEY.TABLE
+                , OpdConstants.EventType.OPD_REGISTRATION
+                , OpdConstants.EventType.UPDATE_OPD_REGISTRATION
+                , OpdConstants.CONFIG
+                , BaseOpdFormActivity.class
+                , null
+                , true);
         OpdConfiguration op = Mockito.mock(OpdConfiguration.class);
-        Mockito.when(op.getOpdMetadata()).thenReturn(opdMetadata);
+        PowerMockito.when(op.getOpdMetadata()).thenReturn(opdMetadata);
         PowerMockito.when(opdLibrary.getOpdConfiguration()).thenReturn(op);
         PowerMockito.when(OpdLibrary.getInstance()).thenReturn(opdLibrary);
-        PowerMockito.when(opdLibrary.getOpdConfiguration().getOpdMetadata().getLookUpQueryForOpdClient()).thenReturn("");
-
         Map<String, String> entityMap = new HashMap<>();
         String result = Whitebox.invokeMethod(OpdLookUpUtils.class, "lookUpQuery", entityMap);
-        Assert.assertEquals(";", result);
+        Assert.assertEquals("select id as _id, relationalid, first_name, last_name, gender, dob, base_entity_id, opensrp_id, national_id from null where  ;", result);
     }
 
     @Test
