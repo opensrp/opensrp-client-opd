@@ -12,6 +12,8 @@ public class OpdConstants extends AllConstants {
     public static final String DIAGNOSTIC_TEST = "diagnostic_test";
     public static final String REPEATING_GROUP_MAP = "repeatingGroupMap";
     public static final String BIND_TYPE = "bind_type";
+    public static final String VISIT_ID = "visit_id";
+    public static final String VISIT_DATE = "visit_date";
 
     public interface StepTitle {
         String TEST_CONDUCTED = "Test Conducted";
@@ -224,6 +226,10 @@ public class OpdConstants extends AllConstants {
         public static final String DIAGNOSTIC_TEST_RESULT_SPINNER_BLOOD_TYPE = "diagnostic_test_result_spinner_blood_type";
         public static final String FREQUENCY = "frequency";
         public static final String HOME_FACILITY = "Home_Facility";
+        public static final String SPECIAL_INSTRUCTIONS = "special_instructions";
+        public static final String TREATMENT_TYPE = "treatment_type";
+        public static final String TREATMENT_TYPE_SPECIFY = "treatment_type_specify";
+        public static final String DIAGNOSIS_SAME = "diagnosis_same";
         public static String TESTS_REPEATING_GROUP = "tests_repeating_group";
     }
 
@@ -242,6 +248,7 @@ public class OpdConstants extends AllConstants {
 
         public static final String ZEIR_ID = "zeir_id";
         public static final String ID = "id";
+        public static final String TYPE_OF_TREATMENT_LABEL = "The type of treatment provided";
     }
 
     public static class OPENMRS {
