@@ -472,7 +472,7 @@ public class OpdJsonFormUtilsTest {
         String imageLocation = "/";
         Compressor compressor = Mockito.mock(Compressor.class);
         PowerMockito.mockStatic(OpdUtils.class);
-        PowerMockito.doNothing().when(OpdUtils.class, "saveAndCloseOutputStream", Mockito.any(Bitmap.class), Mockito.any(File.class));
+        PowerMockito.doNothing().when(OpdUtils.class, "saveImageAndCloseOutputStream", Mockito.any(Bitmap.class), Mockito.any(File.class));
         Bitmap bitmap = Mockito.mock(Bitmap.class);
         Mockito.when(compressor.compressToBitmap(Mockito.any(File.class))).thenReturn(bitmap);
         Mockito.when(opdLibrary.getCompressor()).thenReturn(compressor);

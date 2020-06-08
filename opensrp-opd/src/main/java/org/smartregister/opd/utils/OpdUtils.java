@@ -137,7 +137,7 @@ public class OpdUtils extends Utils {
         return data == null ? null : data.hasExtra(key) ? data.getStringExtra(key) : null;
     }
 
-    public static void saveAndCloseOutputStream(Bitmap image, File outputFile) throws FileNotFoundException {
+    public static void saveImageAndCloseOutputStream(Bitmap image, File outputFile) throws FileNotFoundException {
         FileOutputStream os = new FileOutputStream(outputFile);
         Bitmap.CompressFormat compressFormat = Bitmap.CompressFormat.JPEG;
         image.compress(compressFormat, 100, os);

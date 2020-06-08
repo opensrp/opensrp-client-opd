@@ -372,7 +372,7 @@ public class OpdJsonFormUtils extends JsonFormUtils {
         try {
             String absoluteFileName = DrishtiApplication.getAppDir() + File.separator + entityId + ".JPEG";
             File outputFile = new File(absoluteFileName);
-            OpdUtils.saveAndCloseOutputStream(image, outputFile);
+            OpdUtils.saveImageAndCloseOutputStream(image, outputFile);
             // insert into the db
             ProfileImage profileImage = new ProfileImage();
             profileImage.setImageid(UUID.randomUUID().toString());
