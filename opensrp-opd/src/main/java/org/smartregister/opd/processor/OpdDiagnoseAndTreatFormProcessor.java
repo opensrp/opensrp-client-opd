@@ -124,7 +124,7 @@ public class OpdDiagnoseAndTreatFormProcessor implements OpdFormProcessor<List<E
                 eventList.add(closeOpdVisit);
                 return eventList;
             } else {
-                Timber.e("Corresponding OpjsonObjectdCheckIn record for EntityId %s is missing", entityId);
+                Timber.e("Corresponding OpdCheckIn record for EntityId %s is missing", entityId);
                 return null;
             }
         }
