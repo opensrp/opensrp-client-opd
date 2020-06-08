@@ -1,6 +1,7 @@
 package org.smartregister.opd.processor;
 
 
+import android.content.ContentValues;
 import android.content.Context;
 
 import com.vijay.jsonwizard.constants.JsonFormConstants;
@@ -14,28 +15,29 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.CoreLibrary;
+import org.smartregister.commonregistry.CommonFtsObject;
+import org.smartregister.commonregistry.CommonRepository;
 import org.smartregister.domain.db.Client;
 import org.smartregister.domain.db.Event;
 import org.smartregister.domain.db.EventClient;
 import org.smartregister.domain.db.Obs;
 import org.smartregister.domain.jsonmapping.ClientClassification;
-import org.smartregister.opd.BaseTest;
+import org.smartregister.opd.BaseRobolectricUnitTest;
 import org.smartregister.opd.OpdLibrary;
+import org.smartregister.opd.configuration.OpdConfiguration;
 import org.smartregister.opd.exception.CheckInEventProcessException;
 import org.smartregister.opd.pojo.OpdDetails;
 import org.smartregister.opd.pojo.OpdDiagnosisDetail;
+import org.smartregister.opd.pojo.OpdMetadata;
 import org.smartregister.opd.pojo.OpdTestConducted;
 import org.smartregister.opd.pojo.OpdTreatmentDetail;
 import org.smartregister.opd.pojo.OpdVisit;
@@ -45,15 +47,15 @@ import org.smartregister.opd.repository.OpdTestConductedRepository;
 import org.smartregister.opd.repository.OpdTreatmentDetailRepository;
 import org.smartregister.opd.repository.OpdVisitRepository;
 import org.smartregister.opd.utils.OpdConstants;
+import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.repository.EventClientRepository;
 import org.smartregister.repository.Repository;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(OpdLibrary.class)
-public class OpdMiniClientProcessorForJavaTest extends BaseTest {
+public class OpdMiniClientProcessorForJavaTest extends BaseRobolectricUnitTest {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -77,6 +79,8 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
     @Captor
     private ArgumentCaptor<OpdTestConducted> opdTestConductedArgumentCaptor;
     private Event event;
+    private String baseEntityId = "2323-scvdp-sd";
+    private String visitId = "23we-sfdddp-sd";
 
     @Before
     public void setUp() {
@@ -93,14 +97,8 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
     }
 
     @Test
-    public void processServiceDetail() throws Exception {
-
-    }
-
-    @Test
-    public void processTreatment() throws Exception {
-        PowerMockito.mockStatic(OpdLibrary.class);
-        PowerMockito.when(OpdLibrary.getInstance()).thenReturn(opdLibrary);
+    public void testProcessTreatmentShouldParseCorrectValues() throws Exception {
+        ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", opdLibrary);
         PowerMockito.when(opdLibrary.getOpdTreatmentDetailRepository()).thenReturn(opdTreatmentDetailRepository);
         Obs obs = new Obs();
         obs.setFormSubmissionField(OpdConstants.JSON_FORM_KEY.MEDICINE);
@@ -126,9 +124,8 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
     }
 
     @Test
-    public void processDiagnosis() throws Exception {
-        PowerMockito.mockStatic(OpdLibrary.class);
-        PowerMockito.when(OpdLibrary.getInstance()).thenReturn(opdLibrary);
+    public void testProcessDiagnosisShouldParseCorrectValues() throws Exception {
+        ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", opdLibrary);
         PowerMockito.when(opdLibrary.getOpdDiagnosisDetailRepository()).thenReturn(opdDiagnosisDetailRepository);
 
         Obs obs = new Obs();
@@ -169,9 +166,8 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
 
 
     @Test
-    public void processTestConducted() throws Exception {
-        PowerMockito.mockStatic(OpdLibrary.class);
-        PowerMockito.when(OpdLibrary.getInstance()).thenReturn(opdLibrary);
+    public void testProcessTestConductedShouldParseCorrectValues() throws Exception {
+        ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", opdLibrary);
         PowerMockito.when(opdLibrary.getOpdTestConductedRepository()).thenReturn(opdTestConductedRepository);
 
         Obs obs2 = new Obs();
@@ -308,7 +304,6 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
         Client client = new Client(baseEntityId);
 
         //Mock OpdLibrary
-        OpdLibrary opdLibrary = Mockito.mock(OpdLibrary.class);
         ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", opdLibrary);
         OpdVisitRepository opdVisitRepository = Mockito.mock(OpdVisitRepository.class);
         Mockito.doReturn(opdVisitRepository).when(opdLibrary).getVisitRepository();
@@ -328,11 +323,10 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
 
     @Test
     public void processOpdCloseVisitEvent() throws Exception {
-        PowerMockito.mockStatic(OpdLibrary.class);
         OpdDetails opdDetails = new OpdDetails("id", "id");
-        PowerMockito.when(opdDetailsRepository.findOne(Mockito.any(OpdDetails.class))).thenReturn(opdDetails);
-        PowerMockito.when(opdLibrary.getOpdDetailsRepository()).thenReturn(opdDetailsRepository);
-        PowerMockito.when(OpdLibrary.getInstance()).thenReturn(opdLibrary);
+        Mockito.when(opdDetailsRepository.findOne(Mockito.any(OpdDetails.class))).thenReturn(opdDetails);
+        Mockito.when(opdLibrary.getOpdDetailsRepository()).thenReturn(opdDetailsRepository);
+        ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", opdLibrary);
 
 
         event.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_ID, "id");
@@ -349,5 +343,98 @@ public class OpdMiniClientProcessorForJavaTest extends BaseTest {
     @Test
     public void getEventTypes() {
         Assert.assertNotNull(opdMiniClientProcessorForJava.getEventTypes());
+    }
+
+    @Test
+    public void testUpdateLastInteractedWithShouldThrowExceptionWhenRecordNotUpdated() throws Exception {
+        OpdMetadata opdMetadata = new OpdMetadata(OpdConstants.JSON_FORM_KEY.NAME
+                , OpdDbConstants.KEY.TABLE
+                , OpdConstants.EventType.OPD_REGISTRATION
+                , OpdConstants.EventType.UPDATE_OPD_REGISTRATION
+                , OpdConstants.CONFIG
+                , Class.class
+                , Class.class
+                , true);
+        expectedException.expect(CheckInEventProcessException.class);
+        expectedException.expectMessage("Updating last interacted with for visit " + visitId + " for base_entity_id " + baseEntityId + " in table " + opdMetadata.getTableName() + " failed");
+        Event event = new Event();
+        event.setBaseEntityId(baseEntityId);
+        OpdConfiguration opdConfiguration = Mockito.mock(OpdConfiguration.class);
+        org.smartregister.Context opensrpContext = Mockito.mock(org.smartregister.Context.class);
+        Mockito.when(opdConfiguration.getOpdMetadata()).thenReturn(opdMetadata);
+        Repository repository = Mockito.mock(Repository.class);
+        SQLiteDatabase sqLiteDatabase = Mockito.mock(SQLiteDatabase.class);
+        Mockito.when(repository.getWritableDatabase()).thenReturn(sqLiteDatabase);
+        Mockito.when(opdLibrary.getRepository()).thenReturn(repository);
+        Mockito.when(opdLibrary.context()).thenReturn(opensrpContext);
+        Mockito.when(opdLibrary.getOpdConfiguration()).thenReturn(opdConfiguration);
+        ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", opdLibrary);
+        Whitebox.invokeMethod(opdMiniClientProcessorForJava, "updateLastInteractedWith", event, visitId);
+        Mockito.verify(sqLiteDatabase, Mockito.times(1)).update(Mockito.eq(opdMetadata.getTableName()),
+                Mockito.any(ContentValues.class),
+                Mockito.eq("base_entity_id = ?"),
+                Mockito.eq(new String[]{event.getBaseEntityId()}));
+    }
+
+    @Test
+    public void testUpdateLastInteractedWithShouldThrowExceptionWhenFtsNotUpdated() throws Exception {
+        OpdMetadata opdMetadata = new OpdMetadata(OpdConstants.JSON_FORM_KEY.NAME
+                , OpdDbConstants.KEY.TABLE
+                , OpdConstants.EventType.OPD_REGISTRATION
+                , OpdConstants.EventType.UPDATE_OPD_REGISTRATION
+                , OpdConstants.CONFIG
+                , Class.class
+                , Class.class
+                , true);
+        expectedException.expect(CheckInEventProcessException.class);
+        expectedException.expectMessage("Updating last interacted with for visit " + visitId + " for base_entity_id " + baseEntityId + " in table " + opdMetadata.getTableName() + " failed");
+        Event event = new Event();
+        event.setBaseEntityId(baseEntityId);
+        OpdConfiguration opdConfiguration = Mockito.mock(OpdConfiguration.class);
+        org.smartregister.Context opensrpContext = Mockito.mock(org.smartregister.Context.class);
+        CommonRepository commonRepository = Mockito.mock(CommonRepository.class);
+        Mockito.when(commonRepository.isFts()).thenReturn(true);
+        Mockito.when(opdConfiguration.getOpdMetadata()).thenReturn(opdMetadata);
+        Repository repository = Mockito.mock(Repository.class);
+        SQLiteDatabase sqLiteDatabase = Mockito.mock(SQLiteDatabase.class);
+        Mockito.when(repository.getWritableDatabase()).thenReturn(sqLiteDatabase);
+        Mockito.when(opdLibrary.getRepository()).thenReturn(repository);
+        Mockito.when(opensrpContext.commonrepository(opdMetadata.getTableName())).thenReturn(commonRepository);
+        Mockito.when(opdLibrary.context()).thenReturn(opensrpContext);
+        Mockito.when(opdLibrary.getOpdConfiguration()).thenReturn(opdConfiguration);
+        ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", opdLibrary);
+        Mockito.when(sqLiteDatabase.update(Mockito.eq(opdMetadata.getTableName()),
+                Mockito.any(ContentValues.class)
+                , Mockito.eq("base_entity_id = ?"), Mockito.eq(new String[]{event.getBaseEntityId()}))).thenReturn(1);
+
+        Whitebox.invokeMethod(opdMiniClientProcessorForJava, "updateLastInteractedWith", event, visitId);
+        Mockito.verify(sqLiteDatabase, Mockito.times(1)).update(Mockito.eq(opdMetadata.getTableName()),
+                Mockito.any(ContentValues.class),
+                Mockito.eq("base_entity_id = ?"),
+                Mockito.eq(new String[]{event.getBaseEntityId()}));
+
+        Mockito.verify(sqLiteDatabase, Mockito.times(1)).update(Mockito.eq(CommonFtsObject.searchTableName(opdMetadata.getTableName())),
+                Mockito.any(ContentValues.class),
+                Mockito.anyString(),
+                Mockito.eq(new String[]{event.getBaseEntityId()}));
+    }
+
+    @Test
+    public void testGenerateOpdDetailsFromCheckInEventShould() throws Exception {
+        OpdConfiguration opdConfiguration = Mockito.mock(OpdConfiguration.class);
+        Mockito.when(opdConfiguration.getMaxCheckInDurationInMinutes()).thenReturn(15);
+        Mockito.when(opdLibrary.getOpdConfiguration()).thenReturn(opdConfiguration);
+        ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", opdLibrary);
+        Event event = new Event();
+        event.setBaseEntityId(baseEntityId);
+        event.setEventDate(new DateTime());
+        Date visitDate = new Date();
+        visitDate.setTime(1591610528000l);
+        Date testTime = new Date();
+        testTime.setTime(1591609808000l);
+        Mockito.when(opdMiniClientProcessorForJava.getDate()).thenReturn(testTime);
+        OpdDetails opdDetails = Whitebox.invokeMethod(opdMiniClientProcessorForJava, "generateOpdDetailsFromCheckInEvent", event, visitId, visitDate);
+        Assert.assertNotNull(opdDetails);
+        Assert.assertTrue(opdDetails.isPendingDiagnoseAndTreat());
     }
 }

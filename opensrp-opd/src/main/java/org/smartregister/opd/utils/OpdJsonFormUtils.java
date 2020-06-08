@@ -34,7 +34,6 @@ import org.smartregister.view.activity.DrishtiApplication;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -364,7 +363,8 @@ public class OpdJsonFormUtils extends JsonFormUtils {
 
     }
 
-    private static void saveStaticImageToDisk(@Nullable Bitmap image, @Nullable String providerId, @Nullable String entityId) {
+    private static void saveStaticImageToDisk(@Nullable Bitmap image, @Nullable String providerId,
+                                              @Nullable String entityId) {
         if (image == null || StringUtils.isBlank(providerId) || StringUtils.isBlank(entityId)) {
             return;
         }
@@ -372,9 +372,7 @@ public class OpdJsonFormUtils extends JsonFormUtils {
         try {
             String absoluteFileName = DrishtiApplication.getAppDir() + File.separator + entityId + ".JPEG";
             File outputFile = new File(absoluteFileName);
-            os = new FileOutputStream(outputFile);
-            Bitmap.CompressFormat compressFormat = Bitmap.CompressFormat.JPEG;
-            image.compress(compressFormat, 100, os);
+            OpdUtils.saveAndCloseOutputStream(image, outputFile);
             // insert into the db
             ProfileImage profileImage = new ProfileImage();
             profileImage.setImageid(UUID.randomUUID().toString());

@@ -2,6 +2,7 @@ package org.smartregister.opd.utils;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.Html;
@@ -25,6 +26,9 @@ import org.smartregister.util.FormUtils;
 import org.smartregister.util.JsonFormUtils;
 import org.smartregister.util.Utils;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -131,6 +135,12 @@ public class OpdUtils extends Utils {
     @Nullable
     public static String getIntentValue(@Nullable Intent data, @NonNull String key) {
         return data == null ? null : data.hasExtra(key) ? data.getStringExtra(key) : null;
+    }
+
+    public static void saveAndCloseOutputStream(Bitmap image, File outputFile) throws FileNotFoundException {
+        FileOutputStream os = new FileOutputStream(outputFile);
+        Bitmap.CompressFormat compressFormat = Bitmap.CompressFormat.JPEG;
+        image.compress(compressFormat, 100, os);
     }
 
     @NonNull

@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
@@ -480,7 +481,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         }
 
         // Update FTS
-        CommonRepository commonrepository = CoreLibrary.getInstance().context().commonrepository(tableName);
+        CommonRepository commonrepository = OpdLibrary.getInstance().context().commonrepository(tableName);
 
         ContentValues contentValues1 = new ContentValues();
         contentValues1.put("last_interacted_with", lastInteractedWithDate);
@@ -528,11 +529,16 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         // This code and flag is useless now - Todo: Work on disabling the flag in the query by deleting the current_visit_date & change this flag to diagnose_and_treat_ongoing
         // Set Pending diagnose and treat if we have not lapsed the max check-in duration in minutes set in the opd library configuration
         if (visitDate != null) {
-            long timeDifferenceInMinutes = ((new Date().getTime()) - visitDate.getTime()) / (60 * 1000);
+            long timeDifferenceInMinutes = ((getDate().getTime()) - visitDate.getTime()) / (60 * 1000);
             opdDetails.setPendingDiagnoseAndTreat(timeDifferenceInMinutes <= OpdLibrary.getInstance().getOpdConfiguration().getMaxCheckInDurationInMinutes());
         }
 
         return opdDetails;
+    }
+
+    @VisibleForTesting
+    Date getDate() {
+        return new Date();
     }
 
     @Override
