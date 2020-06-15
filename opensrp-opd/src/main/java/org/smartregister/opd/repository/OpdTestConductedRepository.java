@@ -7,6 +7,7 @@ import net.sqlcipher.database.SQLiteDatabase;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.smartregister.opd.dao.OpdTestConductedDao;
+import org.smartregister.opd.pojo.OpdTestConducted;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.repository.BaseRepository;
 
@@ -39,7 +40,7 @@ public class OpdTestConductedRepository extends BaseRepository implements OpdTes
 
 
     @Override
-    public boolean saveOrUpdate(@NonNull org.smartregister.opd.pojo.OpdTestConducted opdTestConducted) {
+    public boolean save(@NonNull OpdTestConducted opdTestConducted) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(OpdDbConstants.Column.OpdTestConducted.BASE_ENTITY_ID, opdTestConducted.getBaseEntityId());
         contentValues.put(OpdDbConstants.Column.OpdTestConducted.TEST_TYPE, opdTestConducted.getTestType());
@@ -54,17 +55,22 @@ public class OpdTestConductedRepository extends BaseRepository implements OpdTes
     }
 
     @Override
-    public org.smartregister.opd.pojo.OpdTestConducted findOne(org.smartregister.opd.pojo.OpdTestConducted opdTestConducted) {
+    public boolean saveOrUpdate(OpdTestConducted opdTestConducted) {
         throw new NotImplementedException("Not Implemented");
     }
 
     @Override
-    public boolean delete(org.smartregister.opd.pojo.OpdTestConducted opdTestConducted) {
+    public OpdTestConducted findOne(OpdTestConducted opdTestConducted) {
         throw new NotImplementedException("Not Implemented");
     }
 
     @Override
-    public List<org.smartregister.opd.pojo.OpdTestConducted> findAll() {
+    public boolean delete(OpdTestConducted opdTestConducted) {
+        throw new NotImplementedException("Not Implemented");
+    }
+
+    @Override
+    public List<OpdTestConducted> findAll() {
         throw new NotImplementedException("Not Implemented");
     }
 }

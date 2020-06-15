@@ -51,6 +51,11 @@ public class OpdDiagnosisAndTreatmentFormRepository extends BaseRepository imple
         return rows != -1;
     }
 
+    @Override
+    public boolean save(OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm) {
+        return saveOrUpdate(opdDiagnosisAndTreatmentForm);
+    }
+
     @Nullable
     @Override
     public OpdDiagnosisAndTreatmentForm findOne(@NonNull OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm) {

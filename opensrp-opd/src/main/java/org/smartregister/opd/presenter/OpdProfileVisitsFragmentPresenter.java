@@ -181,7 +181,7 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
         Facts facts = new Facts();
 
         if (opdVisitSummary.getVisitDate() != null) {
-            OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.VISIT_DATE, OpdUtils.convertDate(opdVisitSummary.getVisitDate(), OpdConstants.DateFormat.d_MMM_yyyy));
+            OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.VISIT_DATE, OpdUtils.convertDate(opdVisitSummary.getVisitDate(), OpdConstants.DateFormat.d_MMM_yyyy_hh_mm_ss));
         }
 
 //        OpdFactsUtil.putNonNullFact(facts, OpdConstants.FactKey.OpdVisit.TEST_TYPE, opdVisitSummary.getTestType());

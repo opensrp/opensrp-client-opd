@@ -115,7 +115,7 @@ public class OpdMiniClientProcessorForJavaTest extends BaseRobolectricUnitTest {
         Client client = new Client("123");
         EventClient eventClient = new EventClient(event, client);
         Whitebox.invokeMethod(opdMiniClientProcessorForJava, "processTreatment", eventClient);
-        Mockito.verify(opdTreatmentDetailRepository, Mockito.times(1)).saveOrUpdate(opdTreatmentArgumentCaptor.capture());
+        Mockito.verify(opdTreatmentDetailRepository, Mockito.times(1)).save(opdTreatmentArgumentCaptor.capture());
         Assert.assertEquals("er", opdTreatmentArgumentCaptor.getValue().getDuration());
         Assert.assertEquals("er", opdTreatmentArgumentCaptor.getValue().getDosage());
         Assert.assertEquals("Bacteria Killer", opdTreatmentArgumentCaptor.getValue().getMedicine());
@@ -156,7 +156,7 @@ public class OpdMiniClientProcessorForJavaTest extends BaseRobolectricUnitTest {
         Client client = new Client("123");
         EventClient eventClient = new EventClient(event, client);
         Whitebox.invokeMethod(opdMiniClientProcessorForJava, "processDiagnosis", eventClient);
-        Mockito.verify(opdDiagnosisDetailRepository, Mockito.times(1)).saveOrUpdate(opdDiagnosisArgumentCaptor.capture());
+        Mockito.verify(opdDiagnosisDetailRepository, Mockito.times(1)).save(opdDiagnosisArgumentCaptor.capture());
         Assert.assertEquals("diagnosis", opdDiagnosisArgumentCaptor.getValue().getDiagnosis());
         Assert.assertEquals("Bacterial Meningitis", opdDiagnosisArgumentCaptor.getValue().getDisease());
         Assert.assertEquals("Confirmed", opdDiagnosisArgumentCaptor.getValue().getType());
@@ -187,7 +187,7 @@ public class OpdMiniClientProcessorForJavaTest extends BaseRobolectricUnitTest {
 
         Whitebox.invokeMethod(opdMiniClientProcessorForJava, "processTestConducted", eventClient);
 
-        Mockito.verify(opdTestConductedRepository, Mockito.times(1)).saveOrUpdate(opdTestConductedArgumentCaptor.capture());
+        Mockito.verify(opdTestConductedRepository, Mockito.times(1)).save(opdTestConductedArgumentCaptor.capture());
         Assert.assertEquals("Negative", opdTestConductedArgumentCaptor.getValue().getResult());
         Assert.assertEquals("TB Screening", opdTestConductedArgumentCaptor.getValue().getTestType());
         Assert.assertEquals("visitId", opdTestConductedArgumentCaptor.getValue().getVisitId());

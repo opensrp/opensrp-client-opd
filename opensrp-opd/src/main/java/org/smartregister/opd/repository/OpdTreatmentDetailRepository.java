@@ -7,6 +7,7 @@ import net.sqlcipher.database.SQLiteDatabase;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.smartregister.opd.dao.OpdTreatmentDetailDao;
+import org.smartregister.opd.pojo.OpdTreatmentDetail;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.repository.BaseRepository;
 
@@ -43,7 +44,7 @@ public class OpdTreatmentDetailRepository extends BaseRepository implements OpdT
     }
 
     @Override
-    public boolean saveOrUpdate(@NonNull org.smartregister.opd.pojo.OpdTreatmentDetail opdTreatmentDetail) {
+    public boolean save(@NonNull OpdTreatmentDetail opdTreatmentDetail) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(OpdDbConstants.Column.OpdTreatmentDetail.BASE_ENTITY_ID, opdTreatmentDetail.getBaseEntityId());
         contentValues.put(OpdDbConstants.Column.OpdTreatmentDetail.MEDICINE, opdTreatmentDetail.getMedicine());
@@ -63,17 +64,22 @@ public class OpdTreatmentDetailRepository extends BaseRepository implements OpdT
     }
 
     @Override
-    public org.smartregister.opd.pojo.OpdTreatmentDetail findOne(org.smartregister.opd.pojo.OpdTreatmentDetail opdTreatmentDetailDao) {
+    public boolean saveOrUpdate(OpdTreatmentDetail opdTreatmentDetail) {
         throw new NotImplementedException("Not Implemented");
     }
 
     @Override
-    public boolean delete(org.smartregister.opd.pojo.OpdTreatmentDetail opdTreatmentDetailDao) {
+    public OpdTreatmentDetail findOne(OpdTreatmentDetail opdTreatmentDetailDao) {
         throw new NotImplementedException("Not Implemented");
     }
 
     @Override
-    public List<org.smartregister.opd.pojo.OpdTreatmentDetail> findAll() {
+    public boolean delete(OpdTreatmentDetail opdTreatmentDetailDao) {
+        throw new NotImplementedException("Not Implemented");
+    }
+
+    @Override
+    public List<OpdTreatmentDetail> findAll() {
         throw new NotImplementedException("Not Implemented");
     }
 }

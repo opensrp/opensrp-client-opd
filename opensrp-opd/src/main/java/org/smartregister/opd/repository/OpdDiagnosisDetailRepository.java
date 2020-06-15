@@ -6,13 +6,14 @@ import android.support.annotation.NonNull;
 import net.sqlcipher.database.SQLiteDatabase;
 
 import org.apache.commons.lang3.NotImplementedException;
-import org.smartregister.opd.dao.OpdDiagnosisDao;
+import org.smartregister.opd.dao.OpdDiagnosisDetailDao;
+import org.smartregister.opd.pojo.OpdDiagnosisDetail;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.repository.BaseRepository;
 
 import java.util.List;
 
-public class OpdDiagnosisDetailRepository extends BaseRepository implements OpdDiagnosisDao {
+public class OpdDiagnosisDetailRepository extends BaseRepository implements OpdDiagnosisDetailDao {
 
     private static final String CREATE_TABLE_SQL = "CREATE TABLE " + OpdDbConstants.Table.OPD_DIAGNOSIS_DETAIL + "("
             + OpdDbConstants.Column.OpdDiagnosisDetail.BASE_ENTITY_ID + " VARCHAR NOT NULL, "
@@ -41,7 +42,7 @@ public class OpdDiagnosisDetailRepository extends BaseRepository implements OpdD
     }
 
     @Override
-    public boolean saveOrUpdate(@NonNull org.smartregister.opd.pojo.OpdDiagnosisDetail opdDiagnosisDetail) {
+    public boolean save(@NonNull OpdDiagnosisDetail opdDiagnosisDetail) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(OpdDbConstants.Column.OpdDiagnosisDetail.BASE_ENTITY_ID, opdDiagnosisDetail.getBaseEntityId());
         contentValues.put(OpdDbConstants.Column.OpdDiagnosisDetail.DIAGNOSIS, opdDiagnosisDetail.getDiagnosis());
@@ -59,17 +60,22 @@ public class OpdDiagnosisDetailRepository extends BaseRepository implements OpdD
     }
 
     @Override
-    public org.smartregister.opd.pojo.OpdDiagnosisDetail findOne(org.smartregister.opd.pojo.OpdDiagnosisDetail opdDiagnosisDetail) {
+    public boolean saveOrUpdate(OpdDiagnosisDetail opdDiagnosisDetail) {
         throw new NotImplementedException("Not Implemented");
     }
 
     @Override
-    public boolean delete(org.smartregister.opd.pojo.OpdDiagnosisDetail opdDiagnosisDetail) {
+    public OpdDiagnosisDetail findOne(OpdDiagnosisDetail opdDiagnosisDetail) {
         throw new NotImplementedException("Not Implemented");
     }
 
     @Override
-    public List<org.smartregister.opd.pojo.OpdDiagnosisDetail> findAll() {
+    public boolean delete(OpdDiagnosisDetail opdDiagnosisDetail) {
+        throw new NotImplementedException("Not Implemented");
+    }
+
+    @Override
+    public List<OpdDiagnosisDetail> findAll() {
         throw new NotImplementedException("Not Implemented");
     }
 }

@@ -151,6 +151,7 @@ public class OpdConstants extends AllConstants {
     public interface DateFormat {
         String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
         String d_MMM_yyyy = "d MMM yyyy";
+        String  d_MMM_yyyy_hh_mm_ss = "d MMM yyyy HH:mm:ss";
         String YYYY_MM_DD = "yyyy-MM-dd";
     }
 
@@ -230,6 +231,7 @@ public class OpdConstants extends AllConstants {
         public static final String TREATMENT_TYPE = "treatment_type";
         public static final String TREATMENT_TYPE_SPECIFY = "treatment_type_specify";
         public static final String DIAGNOSIS_SAME = "diagnosis_same";
+        public static final String VILLAGE = "village";
         public static String TESTS_REPEATING_GROUP = "tests_repeating_group";
     }
 

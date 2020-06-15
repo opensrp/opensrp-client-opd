@@ -228,7 +228,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
 
     private void saveOrUpdateTreatmentDetail(@NonNull EventClient eventClient, OpdTreatmentDetail opdTreatmentDetail) {
         opdTreatmentDetail.setCreatedAt(OpdUtils.convertDate(eventClient.getEvent().getEventDate().toLocalDate().toDate(), OpdDbConstants.DATE_FORMAT));
-        boolean result = OpdLibrary.getInstance().getOpdTreatmentDetailRepository().saveOrUpdate(opdTreatmentDetail);
+        boolean result = OpdLibrary.getInstance().getOpdTreatmentDetailRepository().save(opdTreatmentDetail);
         if (result) {
             Timber.i("Opd processTreatment for %s saved", eventClient.getEvent().getBaseEntityId());
             return;
@@ -286,7 +286,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
 
     private void saveOrUpdateDiagnosis(Event event, OpdDiagnosisDetail opdDiagnosisDetail) {
         opdDiagnosisDetail.setCreatedAt(OpdUtils.convertDate(event.getEventDate().toLocalDate().toDate(), OpdDbConstants.DATE_FORMAT));
-        boolean result = OpdLibrary.getInstance().getOpdDiagnosisDetailRepository().saveOrUpdate(opdDiagnosisDetail);
+        boolean result = OpdLibrary.getInstance().getOpdDiagnosisDetailRepository().save(opdDiagnosisDetail);
         if (result) {
             Timber.i("Opd processDiagnosis for %s saved", event.getBaseEntityId());
         }
@@ -328,7 +328,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
                             opdTestConducted.setVisitId(mapDetails.get(OpdConstants.JSON_FORM_KEY.VISIT_ID));
                             opdTestConducted.setBaseEntityId(event.getBaseEntityId());
                             opdTestConducted.setCreatedAt(OpdUtils.convertDate(event.getEventDate().toLocalDate().toDate(), OpdDbConstants.DATE_FORMAT));
-                            boolean result = OpdLibrary.getInstance().getOpdTestConductedRepository().saveOrUpdate(opdTestConducted);
+                            boolean result = OpdLibrary.getInstance().getOpdTestConductedRepository().save(opdTestConducted);
                             if (result) {
                                 Timber.i("Opd processTestConducted for %s saved", event.getBaseEntityId());
                                 continue;
