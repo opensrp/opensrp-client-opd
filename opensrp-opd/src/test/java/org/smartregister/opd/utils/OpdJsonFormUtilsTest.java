@@ -1,5 +1,7 @@
 package org.smartregister.opd.utils;
 
+import android.graphics.Bitmap;
+
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 
 import org.apache.commons.lang3.tuple.Triple;
@@ -12,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -19,13 +22,15 @@ import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.reflect.Whitebox;
+import org.powermock.reflect.internal.WhiteboxImpl;
 import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.Context;
 import org.smartregister.CoreLibrary;
 import org.smartregister.SyncConfiguration;
 import org.smartregister.clientandeventmodel.Client;
 import org.smartregister.clientandeventmodel.Event;
+import org.smartregister.domain.ProfileImage;
+import org.smartregister.domain.form.FormLocation;
 import org.smartregister.domain.tag.FormTag;
 import org.smartregister.location.helper.LocationHelper;
 import org.smartregister.opd.BuildConfig;
@@ -34,12 +39,20 @@ import org.smartregister.opd.configuration.OpdConfiguration;
 import org.smartregister.opd.configuration.OpdRegisterQueryProviderTest;
 import org.smartregister.opd.pojo.OpdMetadata;
 import org.smartregister.repository.AllSharedPreferences;
+import org.smartregister.repository.ImageRepository;
 import org.smartregister.repository.Repository;
 import org.smartregister.sync.helper.ECSyncHelper;
 import org.smartregister.util.JsonFormUtils;
+import org.smartregister.view.activity.DrishtiApplication;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+
+import id.zelory.compressor.Compressor;
 
 @PrepareForTest({OpdUtils.class, OpdLibrary.class})
 @RunWith(PowerMockRunner.class)
@@ -48,16 +61,38 @@ public class OpdJsonFormUtilsTest {
     @Mock
     private OpdLibrary opdLibrary;
 
+    @Mock
+    private DrishtiApplication drishtiApplication;
+
+    @Mock
+    private OpdConfiguration opdConfiguration;
+
     @Captor
     private ArgumentCaptor addClientCaptor;
 
+    private OpdMetadata opdMetadata;
+
+    @Mock
+    private LocationHelper locationHelper;
+
+
     @Before
     public void setUp() {
+        opdMetadata = new OpdMetadata(OpdConstants.JSON_FORM_KEY.NAME
+                , OpdDbConstants.KEY.TABLE
+                , OpdConstants.EventType.OPD_REGISTRATION
+                , OpdConstants.EventType.UPDATE_OPD_REGISTRATION
+                , OpdConstants.CONFIG
+                , Class.class
+                , Class.class
+                , true);
         MockitoAnnotations.initMocks(this);
     }
 
     @After
     public void tearDown() {
+        ReflectionHelpers.setStaticField(CoreLibrary.class, "instance", null);
+        ReflectionHelpers.setStaticField(LocationHelper.class, "instance", null);
         ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", null);
     }
 
@@ -86,14 +121,6 @@ public class OpdJsonFormUtilsTest {
 
     @Test
     public void testGetFormAsJsonWithNonEmptyJsonObjectAndEntityIdBlank() throws Exception {
-        OpdMetadata opdMetadata = new OpdMetadata(OpdConstants.JSON_FORM_KEY.NAME
-                , OpdDbConstants.KEY.TABLE
-                , OpdConstants.EventType.OPD_REGISTRATION
-                , OpdConstants.EventType.UPDATE_OPD_REGISTRATION
-                , OpdConstants.CONFIG
-                , Class.class
-                , Class.class
-                , true);
         OpdConfiguration opdConfiguration = new OpdConfiguration.Builder(OpdRegisterQueryProviderTest.class)
                 .setOpdMetadata(opdMetadata)
                 .build();
@@ -108,15 +135,6 @@ public class OpdJsonFormUtilsTest {
 
     @Test
     public void testGetFormAsJsonWithNonEmptyJsonObjectAndEntityIdNonEmpty() throws Exception {
-        OpdMetadata opdMetadata = new OpdMetadata(OpdConstants.JSON_FORM_KEY.NAME
-                , OpdDbConstants.KEY.TABLE
-                , OpdConstants.EventType.OPD_REGISTRATION
-                , OpdConstants.EventType.UPDATE_OPD_REGISTRATION
-                , OpdConstants.CONFIG
-                , Class.class
-                , Class.class
-                , true);
-
         OpdConfiguration opdConfiguration = new OpdConfiguration.Builder(OpdRegisterQueryProviderTest.class)
                 .setOpdMetadata(opdMetadata)
                 .build();
@@ -143,15 +161,6 @@ public class OpdJsonFormUtilsTest {
 
     @Test
     public void testGetFormAsJsonWithNonEmptyJsonObjectAndInjectableFields() throws Exception {
-        OpdMetadata opdMetadata = new OpdMetadata(OpdConstants.JSON_FORM_KEY.NAME
-                , OpdDbConstants.KEY.TABLE
-                , OpdConstants.EventType.OPD_REGISTRATION
-                , OpdConstants.EventType.UPDATE_OPD_REGISTRATION
-                , OpdConstants.CONFIG
-                , Class.class
-                , Class.class
-                , true);
-
         OpdConfiguration opdConfiguration = new OpdConfiguration.Builder(OpdRegisterQueryProviderTest.class)
                 .setOpdMetadata(opdMetadata)
                 .build();
@@ -173,6 +182,7 @@ public class OpdJsonFormUtilsTest {
         jsonObjectForFields.put(OpdJsonFormUtils.FIELDS, jsonArrayFields);
 
         JSONObject jsonObject = new JSONObject();
+        jsonObject.put("count", "1");
         jsonObject.put("metadata", new JSONObject());
         jsonObject.put(OpdJsonFormUtils.STEP1, jsonObjectForFields);
 
@@ -184,47 +194,58 @@ public class OpdJsonFormUtilsTest {
     }
 
     @Test
-    public void testAddLocationTreeWithEmptyJsonObject() throws Exception {
-        JSONObject jsonObject = new JSONObject();
-        Whitebox.invokeMethod(OpdJsonFormUtils.class, "addLocationTree", "", jsonObject, "");
-        Assert.assertFalse(jsonObject.has("tree"));
-    }
+    public void testUpdateLocationStringShouldPopulateTreeAndDefaultAttributeUsingLocationHierarchyTree() throws Exception {
+        Mockito.when(opdConfiguration.getOpdMetadata()).thenReturn(opdMetadata);
+        Mockito.when(opdLibrary.getOpdConfiguration()).thenReturn(opdConfiguration);
+        ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", opdLibrary);
+        opdMetadata.setFieldsWithLocationHierarchy(new HashSet<>(Arrays.asList("village")));
 
-    @Test
-    public void testAddLocationTreeWithNonEmptyJsonObject() throws Exception {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put(OpdJsonFormUtils.KEY, "");
         JSONArray jsonArray = new JSONArray();
-        Whitebox.invokeMethod(OpdJsonFormUtils.class, "addLocationTree", "", jsonObject, jsonArray.toString());
-        Assert.assertTrue(jsonObject.has("tree"));
-    }
-
-    @Test
-    public void testAddLocationDefaultWithEmptyJsonObject() throws Exception {
         JSONObject jsonObject = new JSONObject();
-        Whitebox.invokeMethod(OpdJsonFormUtils.class, "addLocationDefault", "", jsonObject, "");
-        Assert.assertFalse(jsonObject.has("default"));
-    }
+        jsonObject.put(JsonFormConstants.KEY, "village");
+        jsonObject.put(JsonFormConstants.TYPE, JsonFormConstants.TREE);
+        jsonArray.put(jsonObject);
+        String hierarchyString = "[\"Kenya\",\"Central\"]";
+        String entireTreeString = "[{\"nodes\":[{\"level\":\"Province\",\"name\":\"Central\",\"key\":\"1\"}],\"level\":\"Country\",\"name\":\"Kenya\",\"key\":\"0\"}]";
+        ArrayList<String> healthFacilities = new ArrayList<>();
+        healthFacilities.add("Country");
+        healthFacilities.add("Province");
 
-    @Test
-    public void testAddLocationDefaultTreeWithNonEmptyJsonObject() throws Exception {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put(OpdJsonFormUtils.KEY, "");
-        JSONArray jsonArray = new JSONArray();
-        Whitebox.invokeMethod(OpdJsonFormUtils.class, "addLocationDefault", "", jsonObject, jsonArray.toString());
-        Assert.assertTrue(jsonObject.has("default"));
+        List<FormLocation> entireTree = new ArrayList<>();
+        FormLocation formLocationCountry = new FormLocation();
+        formLocationCountry.level = "Country";
+        formLocationCountry.name = "Kenya";
+        formLocationCountry.key = "0";
+        FormLocation formLocationProvince = new FormLocation();
+        formLocationProvince.level = "Province";
+        formLocationProvince.name = "Central";
+        formLocationProvince.key = "1";
+
+        List<FormLocation> entireTreeCountryNode = new ArrayList<>();
+        entireTreeCountryNode.add(formLocationProvince);
+        formLocationCountry.nodes = entireTreeCountryNode;
+        entireTree.add(formLocationCountry);
+
+        ReflectionHelpers.setStaticField(LocationHelper.class, "instance", locationHelper);
+
+        Mockito.doReturn(entireTree).when(locationHelper).generateLocationHierarchyTree(ArgumentMatchers.anyBoolean(), ArgumentMatchers.eq(healthFacilities));
+
+        WhiteboxImpl.invokeMethod(OpdJsonFormUtils.class, "updateLocationTree", jsonArray, hierarchyString, entireTreeString, entireTreeString);
+        Assert.assertTrue(jsonObject.has(JsonFormConstants.TREE));
+        Assert.assertTrue(jsonObject.has(JsonFormConstants.DEFAULT));
+        Assert.assertEquals(hierarchyString, jsonObject.optString(JsonFormConstants.DEFAULT));
+        JSONArray resultTreeObject = new JSONArray(jsonObject.optString(JsonFormConstants.TREE));
+        Assert.assertTrue(resultTreeObject.optJSONObject(0).has("nodes"));
+        Assert.assertEquals("Kenya", resultTreeObject.optJSONObject(0).optString("name"));
+        Assert.assertEquals("Country", resultTreeObject.optJSONObject(0).optString("level"));
+        Assert.assertEquals("0", resultTreeObject.optJSONObject(0).optString("key"));
+        Assert.assertEquals("Central", resultTreeObject.optJSONObject(0).optJSONArray("nodes").optJSONObject(0).optString("name"));
+        Assert.assertEquals("1", resultTreeObject.optJSONObject(0).optJSONArray("nodes").optJSONObject(0).optString("key"));
+        Assert.assertEquals("Province", resultTreeObject.optJSONObject(0).optJSONArray("nodes").optJSONObject(0).optString("level"));
     }
 
     @Test
     public void testTagSyncMetadataWithEmptyEvent() throws Exception {
-        OpdMetadata opdMetadata = new OpdMetadata(OpdConstants.JSON_FORM_KEY.NAME
-                , OpdDbConstants.KEY.TABLE
-                , OpdConstants.EventType.OPD_REGISTRATION
-                , OpdConstants.EventType.UPDATE_OPD_REGISTRATION
-                , OpdConstants.CONFIG
-                , Class.class
-                , Class.class
-                , true);
         OpdConfiguration opdConfiguration = new OpdConfiguration
                 .Builder(null)
                 .setOpdMetadata(opdMetadata)
@@ -241,14 +262,6 @@ public class OpdJsonFormUtilsTest {
 
     @Test
     public void testGetLocationIdWithCurrentLocalityIsNotNull() throws Exception {
-        OpdMetadata opdMetadata = new OpdMetadata(OpdConstants.JSON_FORM_KEY.NAME
-                , OpdDbConstants.KEY.TABLE
-                , OpdConstants.EventType.OPD_REGISTRATION
-                , OpdConstants.EventType.UPDATE_OPD_REGISTRATION
-                , OpdConstants.CONFIG
-                , Class.class
-                , Class.class
-                , true);
         opdMetadata.setHealthFacilityLevels(new ArrayList<String>());
         OpdConfiguration opdConfiguration = new OpdConfiguration
                 .Builder(OpdRegisterQueryProviderTest.class)
@@ -388,48 +401,6 @@ public class OpdJsonFormUtilsTest {
     }
 
     @Test
-    public void testProcessReminderSetToTrue() throws Exception {
-        JSONArray jsonArrayFields = new JSONArray();
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put(OpdConstants.KEY.KEY, OpdConstants.JSON_FORM_KEY.REMINDERS);
-
-        JSONArray jsonArrayOptions = new JSONArray();
-        JSONObject jsonObject1 = new JSONObject();
-        jsonObject1.put(OpdConstants.KEY.VALUE, Boolean.toString(true));
-        jsonArrayOptions.put(jsonObject1);
-
-        jsonObject.put(OpdConstants.JSON_FORM_KEY.OPTIONS, jsonArrayOptions);
-        jsonArrayFields.put(jsonObject);
-
-        Whitebox.invokeMethod(OpdJsonFormUtils.class, "processReminder", jsonArrayFields);
-
-        String expected = "[{\"options\":[{\"value\":\"true\"}],\"value\":1,\"key\":\"reminders\"}]";
-        Assert.assertEquals(expected, jsonArrayFields.toString());
-
-    }
-
-    @Test
-    public void testProcessReminderSetToFalse() throws Exception {
-        JSONArray jsonArrayFields = new JSONArray();
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put(OpdConstants.KEY.KEY, OpdConstants.JSON_FORM_KEY.REMINDERS);
-
-        JSONArray jsonArrayOptions = new JSONArray();
-        JSONObject jsonObject1 = new JSONObject();
-        jsonObject1.put(OpdConstants.KEY.VALUE, Boolean.toString(false));
-        jsonArrayOptions.put(jsonObject1);
-
-        jsonObject.put(OpdConstants.JSON_FORM_KEY.OPTIONS, jsonArrayOptions);
-        jsonArrayFields.put(jsonObject);
-
-        Whitebox.invokeMethod(OpdJsonFormUtils.class, "processReminder", jsonArrayFields);
-
-        String expected = "[{\"options\":[{\"value\":\"false\"}],\"value\":0,\"key\":\"reminders\"}]";
-        Assert.assertEquals(expected, jsonArrayFields.toString());
-
-    }
-
-    @Test
     public void testFieldsHasEmptyStep() {
         JSONObject jsonObject = new JSONObject();
         JSONArray jsonArray = OpdJsonFormUtils.fields(jsonObject, "");
@@ -493,4 +464,38 @@ public class OpdJsonFormUtilsTest {
         Assert.assertNull(OpdJsonFormUtils.processOpdDetailsForm("", Mockito.mock(FormTag.class)));
     }
 
+
+    @Test
+    public void testSaveImage() throws Exception {
+        String providerId = "demo";
+        String baseEntityId = "2323-wxdfd9-34";
+        String imageLocation = "/";
+        Compressor compressor = Mockito.mock(Compressor.class);
+        PowerMockito.mockStatic(OpdUtils.class);
+        PowerMockito.doNothing().when(OpdUtils.class, "saveImageAndCloseOutputStream", Mockito.any(Bitmap.class), Mockito.any(File.class));
+        Bitmap bitmap = Mockito.mock(Bitmap.class);
+        Mockito.when(compressor.compressToBitmap(Mockito.any(File.class))).thenReturn(bitmap);
+        Mockito.when(opdLibrary.getCompressor()).thenReturn(compressor);
+        android.content.Context context = Mockito.mock(android.content.Context.class);
+        File file = Mockito.mock(File.class);
+        Mockito.when(file.getAbsolutePath()).thenReturn("/home/opensrp");
+        Mockito.when(context.getDir("opensrp", android.content.Context.MODE_PRIVATE)).thenReturn(file);
+        Mockito.when(drishtiApplication.getApplicationContext()).thenReturn(context);
+        Context opensrpContext = Mockito.mock(Context.class);
+        ImageRepository imageRepository = Mockito.mock(ImageRepository.class);
+        Mockito.when(opensrpContext.imageRepository()).thenReturn(imageRepository);
+        PowerMockito.when(OpdUtils.class, "context").thenReturn(opensrpContext);
+        Mockito.when(opdLibrary.context()).thenReturn(opensrpContext);
+        ReflectionHelpers.setStaticField(DrishtiApplication.class, "mInstance", drishtiApplication);
+        ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", opdLibrary);
+        OpdJsonFormUtils.saveImage(providerId, baseEntityId, imageLocation);
+        ArgumentCaptor<ProfileImage> profileImageArgumentCaptor = ArgumentCaptor.forClass(ProfileImage.class);
+        Mockito.verify(imageRepository, Mockito.times(1)).add(profileImageArgumentCaptor.capture());
+        ProfileImage profileImage = profileImageArgumentCaptor.getValue();
+        Assert.assertNotNull(profileImage);
+        Assert.assertEquals("demo", profileImage.getAnmId());
+        Assert.assertEquals(baseEntityId, profileImage.getEntityID());
+        Assert.assertEquals("/home/opensrp/2323-wxdfd9-34.JPEG", profileImage.getFilepath());
+        Assert.assertEquals(ImageRepository.TYPE_Unsynced, profileImage.getSyncStatus());
+    }
 }

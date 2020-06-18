@@ -4,10 +4,11 @@ import android.support.annotation.NonNull;
 
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.contract.OpdProfileOverviewFragmentContract;
-import org.smartregister.opd.pojo.OpdCheckIn;
 import org.smartregister.opd.pojo.OpdDetails;
 import org.smartregister.opd.pojo.OpdVisit;
 import org.smartregister.opd.utils.AppExecutors;
+
+import java.util.Map;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-10-17
@@ -29,7 +30,7 @@ public class OpdProfileOverviewFragmentModel implements OpdProfileOverviewFragme
             @Override
             public void run() {
                 final OpdVisit visit = OpdLibrary.getInstance().getVisitRepository().getLatestVisit(baseEntityId);
-                final OpdCheckIn checkIn = visit != null ? OpdLibrary.getInstance().getCheckInRepository().getCheckInByVisit(visit.getId()) : null;
+                final Map<String, String> checkInMap = visit != null ? OpdLibrary.getInstance().getCheckInRepository().getCheckInByVisit(visit.getId()) : null;
 
                 opdDetails = null;
 
@@ -42,7 +43,7 @@ public class OpdProfileOverviewFragmentModel implements OpdProfileOverviewFragme
 
                     @Override
                     public void run() {
-                        onFetchedCallback.onFetched(checkIn, visit, opdDetails);
+                        onFetchedCallback.onFetched(checkInMap, visit, opdDetails);
                     }
                 });
             }

@@ -6,6 +6,9 @@ import org.smartregister.opd.sample.BuildConfig;
 import org.smartregister.opd.sample.application.OpdSampleApplication;
 import org.smartregister.repository.AllSharedPreferences;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-18
  */
@@ -56,6 +59,16 @@ public class SampleSyncConfiguration extends SyncConfiguration {
     @Override
     public boolean updateClientDetailsTable() {
         return true;
+    }
+
+    @Override
+    public List<String> getSynchronizedLocationTags() {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public String getTopAllowedLocationLevel() {
+        return null;
     }
 
 }

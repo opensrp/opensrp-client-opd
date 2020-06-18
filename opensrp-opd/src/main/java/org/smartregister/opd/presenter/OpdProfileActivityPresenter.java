@@ -138,15 +138,19 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
                 profileView.setProfileAge(clientAge);
             }
 
+            String gender = "";
             try {
-                profileView.setProfileGender(Utils.getValue(client, OpdDbConstants.KEY.GENDER, true));
+                gender = Utils.getValue(client, OpdDbConstants.KEY.GENDER, true);
+                profileView.setProfileGender(gender);
             } catch (Exception e) {
                 Timber.e(e);
-                profileView.setProfileGender("");
+                profileView.setProfileGender(gender);
             }
 
             profileView.setProfileID(Utils.getValue(client, OpdDbConstants.KEY.REGISTER_ID, false));
-            profileView.setProfileImage(Utils.getValue(client, OpdDbConstants.KEY.ID, false));
+
+            int defaultImage = gender.equalsIgnoreCase("Male") ? R.drawable.avatar_man : R.drawable.avatar_woman;
+            profileView.setProfileImage(Utils.getValue(client, OpdDbConstants.KEY.ID, false), defaultImage);
         }
     }
 

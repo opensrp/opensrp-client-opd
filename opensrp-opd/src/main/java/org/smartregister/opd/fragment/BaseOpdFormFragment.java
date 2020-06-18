@@ -80,7 +80,7 @@ public class BaseOpdFormFragment extends JsonWizardFormFragment implements Clien
 
         if (form != null && form.isWizard() && opdMetadata != null
                 && !opdMetadata.isFormWizardValidateRequiredFieldsBefore()) {
-            this.getMenu().findItem(com.vijay.jsonwizard.R.id.action_save).setVisible(save);
+            this.getMenu().findItem(R.id.action_save).setVisible(save);
         }
     }
 

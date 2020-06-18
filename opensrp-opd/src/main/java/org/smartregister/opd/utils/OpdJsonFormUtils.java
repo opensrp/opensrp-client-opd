@@ -10,6 +10,7 @@ import com.vijay.jsonwizard.constants.JsonFormConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Triple;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,7 +23,6 @@ import org.smartregister.domain.form.FormLocation;
 import org.smartregister.domain.tag.FormTag;
 import org.smartregister.location.helper.LocationHelper;
 import org.smartregister.opd.OpdLibrary;
-import org.smartregister.opd.enums.LocationHierarchy;
 import org.smartregister.opd.pojo.OpdEventClient;
 import org.smartregister.opd.pojo.OpdMetadata;
 import org.smartregister.repository.AllSharedPreferences;
@@ -34,7 +34,6 @@ import org.smartregister.view.activity.DrishtiApplication;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -45,7 +44,7 @@ import java.util.UUID;
 
 import timber.log.Timber;
 
-public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
+public class OpdJsonFormUtils extends JsonFormUtils {
 
     public static final String METADATA = "metadata";
     public static final String ENCOUNTER_TYPE = "encounter_type";
@@ -69,19 +68,7 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
 
         // Inject the field values
         if (injectedFieldValues != null && injectedFieldValues.size() > 0) {
-            JSONObject stepOne = form.getJSONObject(OpdJsonFormUtils.STEP1);
-            JSONArray jsonArray = stepOne.getJSONArray(OpdJsonFormUtils.FIELDS);
-
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                String fieldKey = jsonObject.getString(OpdJsonFormUtils.KEY);
-
-                String fieldValue = injectedFieldValues.get(fieldKey);
-
-                if (!TextUtils.isEmpty(fieldValue)) {
-                    jsonObject.put(OpdJsonFormUtils.VALUE, fieldValue);
-                }
-            }
+            populateInjectedFields(form, injectedFieldValues);
         }
 
         if (OpdUtils.metadata().getOpdRegistrationFormName().equals(formName)) {
@@ -98,7 +85,7 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
                 entityId = entityId.replace("-", "");
             }
 
-            OpdJsonFormUtils.addRegLocHierarchyQuestions(form, OpdConstants.JSON_FORM_KEY.ADDRESS_WIDGET_KEY, LocationHierarchy.ENTIRE_TREE);
+            addRegLocHierarchyQuestions(form);
 
             // Inject OPenSrp id into the form
             JSONObject stepOne = form.getJSONObject(OpdJsonFormUtils.STEP1);
@@ -119,25 +106,35 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
         return form;
     }
 
-    protected static void addRegLocHierarchyQuestions(@NonNull JSONObject form, @NonNull String widgetKey, @NonNull LocationHierarchy locationHierarchy) {
-        try {
-            JSONArray questions = form.getJSONObject(JsonFormConstants.STEP1).getJSONArray(JsonFormConstants.FIELDS);
-
-            ArrayList<String> allLevels;
-            ArrayList<String> healthFacilities;
-            OpdMetadata metadata = OpdUtils.metadata();
-            if (metadata != null) {
-                allLevels = metadata.getLocationLevels();
-                healthFacilities = metadata.getHealthFacilityLevels();
-            } else {
-                allLevels = DefaultOpdLocationUtils.getLocationLevels();
-                healthFacilities = DefaultOpdLocationUtils.getLocationLevels();
+    public static void populateInjectedFields(@NonNull JSONObject form, @NotNull HashMap<String, String> injectedFieldValues) throws JSONException {
+        if (form.has(JsonFormConstants.COUNT)) {
+            int stepCount = Integer.parseInt(form.optString(JsonFormConstants.COUNT));
+            for (int index = 0; index < stepCount; index++) {
+                String stepName = JsonFormConstants.STEP + (index + 1);
+                JSONObject step = form.optJSONObject(stepName);
+                if (step != null) {
+                    JSONArray stepFields = step.optJSONArray(JsonFormConstants.FIELDS);
+                    for (int k = 0; k < stepFields.length(); k++) {
+                        JSONObject jsonObject = stepFields.optJSONObject(k);
+                        String fieldKey = jsonObject.optString(OpdJsonFormUtils.KEY);
+                        String fieldValue = injectedFieldValues.get(fieldKey);
+                        if (!TextUtils.isEmpty(fieldValue)) {
+                            jsonObject.put(OpdJsonFormUtils.VALUE, fieldValue);
+                        }
+                    }
+                }
             }
+        }
+    }
+
+    public static void addRegLocHierarchyQuestions(@NonNull JSONObject form) {
+        try {
+            JSONArray questions = com.vijay.jsonwizard.utils.FormUtils.getMultiStepFormFields(form);
+            ArrayList<String> allLevels = OpdUtils.metadata().getLocationLevels();
+            ArrayList<String> healthFacilities = OpdUtils.metadata().getHealthFacilityLevels();
 
             List<String> defaultLocation = LocationHelper.getInstance().generateDefaultLocationHierarchy(allLevels);
             List<String> defaultFacility = LocationHelper.getInstance().generateDefaultLocationHierarchy(healthFacilities);
-            List<FormLocation> upToFacilities = LocationHelper.getInstance().generateLocationHierarchyTree(false, healthFacilities);
-            List<FormLocation> upToFacilitiesWithOther = LocationHelper.getInstance().generateLocationHierarchyTree(true, healthFacilities);
             List<FormLocation> entireTree = LocationHelper.getInstance().generateLocationHierarchyTree(true, allLevels);
 
             String defaultLocationString = AssetHandler.javaToJsonString(defaultLocation, new TypeToken<List<String>>() {
@@ -146,103 +143,51 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
             String defaultFacilityString = AssetHandler.javaToJsonString(defaultFacility, new TypeToken<List<String>>() {
             }.getType());
 
-            String upToFacilitiesString = AssetHandler.javaToJsonString(upToFacilities, new TypeToken<List<FormLocation>>() {
-            }.getType());
-
-            String upToFacilitiesWithOtherString = AssetHandler.javaToJsonString(upToFacilitiesWithOther, new TypeToken<List<FormLocation>>() {
-            }.getType());
-
             String entireTreeString = AssetHandler.javaToJsonString(entireTree, new TypeToken<List<FormLocation>>() {
             }.getType());
 
-            updateLocationTree(widgetKey, locationHierarchy, questions, defaultLocationString, defaultFacilityString, upToFacilitiesString, upToFacilitiesWithOtherString, entireTreeString);
+            updateLocationTree(questions, defaultLocationString, defaultFacilityString, entireTreeString);
+        } catch (Exception e) {
+            Timber.e(e, "JsonFormUtils --> addChildRegLocHierarchyQuestions");
+        }
 
-            //To Do Refactor to remove dependency on hardocded keys
+    }
+
+    private static void updateLocationTree(JSONArray questions,
+                                           String defaultLocationString, String defaultFacilityString,
+                                           String entireTreeString) throws JSONException {
+        OpdMetadata opdMetadata = OpdUtils.metadata();
+        if (opdMetadata != null && opdMetadata.getFieldsWithLocationHierarchy() != null && !opdMetadata.getFieldsWithLocationHierarchy().isEmpty()) {
+
             for (int i = 0; i < questions.length(); i++) {
-                if (questions.getJSONObject(i).getString("key").equals("Home_Facility")) {
-                    if (StringUtils.isNotBlank(upToFacilitiesString)) {
-                        questions.getJSONObject(i).put("tree", new JSONArray(upToFacilitiesString));
-                    }
-                    if (StringUtils.isNotBlank(defaultFacilityString)) {
-                        questions.getJSONObject(i).put("default", defaultFacilityString);
-                    }
-                } else if (questions.getJSONObject(i).getString("key").equals("Birth_Facility_Name")) {
-                    if (StringUtils.isNotBlank(upToFacilitiesWithOtherString)) {
-                        questions.getJSONObject(i).put("tree", new JSONArray(upToFacilitiesWithOtherString));
-                    }
-                    if (StringUtils.isNotBlank(defaultFacilityString)) {
-                        questions.getJSONObject(i).put("default", defaultFacilityString);
-                    }
-                } else if (questions.getJSONObject(i).getString("key").equals("Residential_Area")) {
+                JSONObject widget = questions.getJSONObject(i);
+                String key = widget.optString(JsonFormConstants.KEY);
+                if (StringUtils.isNotBlank(key) && opdMetadata.getFieldsWithLocationHierarchy().contains(widget.optString(JsonFormConstants.KEY))) {
                     if (StringUtils.isNotBlank(entireTreeString)) {
-                        questions.getJSONObject(i).put("tree", new JSONArray(entireTreeString));
+                        addLocationTree(key, widget, entireTreeString, JsonFormConstants.TREE);
                     }
-                    if (StringUtils.isNotBlank(defaultLocationString)) {
-                        questions.getJSONObject(i).put("default", defaultLocationString);
+                    if (StringUtils.isNotBlank(defaultFacilityString)) {
+                        addLocationTreeDefault(key, widget, defaultLocationString);
                     }
                 }
             }
-
-        } catch (Exception e) {
-            Timber.e(e, "OpdJsonFormUtils --> addRegLocHierarchyQuestions");
         }
     }
 
-    private static void updateLocationTree(@NonNull String widgetKey, @NonNull LocationHierarchy locationHierarchy, @NonNull JSONArray questions,
-                                           @NonNull String defaultLocationString, @NonNull String defaultFacilityString,
-                                           @NonNull String upToFacilitiesString, @NonNull String upToFacilitiesWithOtherString,
-                                           @NonNull String entireTreeString) throws JSONException {
-        for (int i = 0; i < questions.length(); i++) {
-            JSONObject widgets = questions.getJSONObject(i);
-            switch (locationHierarchy) {
-                case FACILITY_ONLY:
-                    if (StringUtils.isNotBlank(upToFacilitiesString)) {
-                        addLocationTree(widgetKey, widgets, upToFacilitiesString);
-                    }
-                    if (StringUtils.isNotBlank(defaultFacilityString)) {
-                        addLocationDefault(widgetKey, widgets, defaultFacilityString);
-                    }
-                    break;
-                case FACILITY_WITH_OTHER_STRING:
-                    if (StringUtils.isNotBlank(upToFacilitiesWithOtherString)) {
-                        addLocationTree(widgetKey, widgets, upToFacilitiesWithOtherString);
-                    }
-                    if (StringUtils.isNotBlank(defaultFacilityString)) {
-                        addLocationDefault(widgetKey, widgets, defaultFacilityString);
-                    }
-                    break;
-                case ENTIRE_TREE:
-                    if (StringUtils.isNotBlank(entireTreeString)) {
-                        addLocationTree(widgetKey, widgets, entireTreeString);
-                    }
-                    if (StringUtils.isNotBlank(defaultFacilityString)) {
-                        addLocationDefault(widgetKey, widgets, defaultLocationString);
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    private static void addLocationTree(@NonNull String widgetKey, @NonNull JSONObject widget, @NonNull String updateString) {
+    private static void addLocationTree(@NonNull String widgetKey, @NonNull JSONObject
+            widget, @NonNull String updateString, @NonNull String treeType) {
         try {
-            if (widget.getString(OpdJsonFormUtils.KEY).equals(widgetKey)) {
-                widget.put("tree", new JSONArray(updateString));
+            if (widgetKey.equals(widget.optString(JsonFormConstants.KEY))) {
+                widget.put(treeType, new JSONArray(updateString));
             }
         } catch (JSONException e) {
-            Timber.e(e, "OpdJsonFormUtils --> addLocationTree");
+            Timber.e(e, "JsonFormUtils --> addLocationTree");
         }
     }
 
-    private static void addLocationDefault(@NonNull String widgetKey, @NonNull JSONObject widget, @NonNull String updateString) {
-        try {
-            if (widget.getString(OpdJsonFormUtils.KEY).equals(widgetKey)) {
-                widget.put("default", new JSONArray(updateString));
-            }
-        } catch (JSONException e) {
-            Timber.e(e, "OpdJsonFormUtils --> addLocationDefault");
-        }
+    private static void addLocationTreeDefault(@NonNull String widgetKey, @NonNull JSONObject
+            widget, @NonNull String updateString) {
+        addLocationTree(widgetKey, widget, updateString, JsonFormConstants.DEFAULT);
     }
 
     public static Event tagSyncMetadata(@NonNull Event event) {
@@ -418,7 +363,8 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
 
     }
 
-    private static void saveStaticImageToDisk(@Nullable Bitmap image, @Nullable String providerId, @Nullable String entityId) {
+    private static void saveStaticImageToDisk(@Nullable Bitmap image, @Nullable String providerId,
+                                              @Nullable String entityId) {
         if (image == null || StringUtils.isBlank(providerId) || StringUtils.isBlank(entityId)) {
             return;
         }
@@ -426,9 +372,7 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
         try {
             String absoluteFileName = DrishtiApplication.getAppDir() + File.separator + entityId + ".JPEG";
             File outputFile = new File(absoluteFileName);
-            os = new FileOutputStream(outputFile);
-            Bitmap.CompressFormat compressFormat = Bitmap.CompressFormat.JPEG;
-            image.compress(compressFormat, 100, os);
+            OpdUtils.saveImageAndCloseOutputStream(image, outputFile);
             // insert into the db
             ProfileImage profileImage = new ProfileImage();
             profileImage.setImageid(UUID.randomUUID().toString());
@@ -517,8 +461,6 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
 
             dobUnknownUpdateFromAge(fields);
 
-            processReminder(fields);
-
             Client baseClient = JsonFormUtils.createBaseClient(fields, formTag, entityId);
 
             Event baseEvent = JsonFormUtils.createEvent(fields, getJSONObject(jsonForm, METADATA),
@@ -536,21 +478,6 @@ public class OpdJsonFormUtils extends org.smartregister.util.JsonFormUtils {
         } catch (IllegalArgumentException e) {
             Timber.e(e);
             return null;
-        }
-    }
-
-    private static void processReminder(@NonNull JSONArray fields) {
-        try {
-            JSONObject reminderObject = getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.REMINDERS);
-            if (reminderObject != null) {
-                JSONArray options = getJSONArray(reminderObject, OpdConstants.JSON_FORM_KEY.OPTIONS);
-                JSONObject option = getJSONObject(options, 0);
-                String value = option.optString(JsonFormConstants.VALUE);
-                int result = value.equals(Boolean.toString(false)) ? 0 : 1;
-                reminderObject.put(OpdConstants.KEY.VALUE, result);
-            }
-        } catch (JSONException e) {
-            Timber.e(e, "OpdJsonFormUtils --> processReminder");
         }
     }
 }

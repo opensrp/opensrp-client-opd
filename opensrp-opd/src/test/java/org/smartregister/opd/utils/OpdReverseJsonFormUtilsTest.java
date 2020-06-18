@@ -12,9 +12,12 @@ import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.reflect.internal.WhiteboxImpl;
+import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.Context;
 import org.smartregister.CoreLibrary;
 import org.smartregister.domain.Photo;
+import org.smartregister.domain.form.FormLocation;
 import org.smartregister.location.helper.LocationHelper;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.activity.BaseOpdFormActivity;
@@ -26,8 +29,10 @@ import org.smartregister.util.FormUtils;
 import org.smartregister.util.ImageUtils;
 import org.smartregister.util.JsonFormUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RunWith(PowerMockRunner.class)
@@ -487,5 +492,50 @@ public class OpdReverseJsonFormUtilsTest {
         Assert.assertEquals(detailsMap.get(OpdConstants.JSON_FORM_KEY.FIRST_NAME), JsonFormUtils.getFieldValue(step1JsonObject.optJSONArray(JsonFormConstants.FIELDS), OpdConstants.JSON_FORM_KEY.FIRST_NAME));
         Assert.assertEquals(detailsMap.get(OpdConstants.JSON_FORM_KEY.LAST_NAME), JsonFormUtils.getFieldValue(step1JsonObject.optJSONArray(JsonFormConstants.FIELDS), OpdConstants.JSON_FORM_KEY.LAST_NAME));
         Assert.assertEquals(detailsMap.get(OpdConstants.JSON_FORM_KEY.GENDER), JsonFormUtils.getFieldValue(step1JsonObject.optJSONArray(JsonFormConstants.FIELDS), "Sex"));
+    }
+
+    @Test
+    public void testReverseVillageShouldPopulateValueAndTreeWithCorrectValues() throws Exception {
+        ArrayList<String> healthFacilities = new ArrayList<>();
+        healthFacilities.add("Country");
+        healthFacilities.add("Province");
+        String entity = "232-432-3232";
+        List<String> entityHierarchy = new ArrayList<>();
+        entityHierarchy.add("Kenya");
+        entityHierarchy.add("Central");
+        PowerMockito.mockStatic(LocationHelper.class);
+        Mockito.when(LocationHelper.getInstance()).thenReturn(locationHelper);
+        Mockito.doReturn("locationA").when(locationHelper).getOpenMrsLocationId(entity);
+        Mockito.doReturn(entityHierarchy).when(locationHelper).getOpenMrsLocationHierarchy("locationA", false);
+        List<FormLocation> entireTree = new ArrayList<>();
+        FormLocation formLocationCountry = new FormLocation();
+        formLocationCountry.level = "Country";
+        formLocationCountry.name = "Kenya";
+        formLocationCountry.key = "0";
+        FormLocation formLocationProvince = new FormLocation();
+        formLocationProvince.level = "Province";
+        formLocationProvince.name = "Central";
+        formLocationProvince.key = "1";
+        List<FormLocation> entireTreeCountryNode = new ArrayList<>();
+        entireTreeCountryNode.add(formLocationProvince);
+        formLocationCountry.nodes = entireTreeCountryNode;
+        entireTree.add(formLocationCountry);
+        Mockito.doReturn(entireTree).when(locationHelper).generateLocationHierarchyTree(true, healthFacilities);
+        OpdMetadata opdMetadata = new OpdMetadata(OpdConstants.JSON_FORM_KEY.NAME, OpdDbConstants.KEY.TABLE,
+                OpdConstants.EventType.OPD_REGISTRATION, OpdConstants.EventType.UPDATE_OPD_REGISTRATION,
+                OpdConstants.CONFIG, BaseOpdFormActivity.class, BaseOpdProfileActivity.class, true);
+        opdMetadata.setHealthFacilityLevels(healthFacilities);
+        Mockito.when(opdConfiguration.getOpdMetadata()).thenReturn(opdMetadata);
+        Mockito.when(opdLibrary.getOpdConfiguration()).thenReturn(opdConfiguration);
+        ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", opdLibrary);
+        JSONObject jsonObject = new JSONObject();
+        WhiteboxImpl.invokeMethod(OpdReverseJsonFormUtils.class, "reverseVillage", jsonObject, entity);
+        Assert.assertTrue(jsonObject.has(OpdJsonFormUtils.VALUE));
+        Assert.assertTrue(jsonObject.has(JsonFormConstants.TREE));
+        String expectedTree = "[{\"nodes\":[{\"level\":\"Province\",\"name\":\"Central\",\"key\":\"1\"}],\"level\":\"Country\",\"name\":\"Kenya\",\"key\":\"0\"}]";
+        String expectedValue = "[\"Kenya\",\"Central\"]";
+        Assert.assertEquals(expectedValue, jsonObject.optString(OpdJsonFormUtils.VALUE));
+        Assert.assertEquals(expectedTree, jsonObject.optString(JsonFormConstants.TREE));
+        ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", null);
     }
 }

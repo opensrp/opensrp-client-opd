@@ -129,7 +129,7 @@ public class OpdProfileActivityPresenterTest extends BaseTest {
         Mockito.verify(view, Mockito.times(1)).setProfileName(Mockito.eq(firstName + " " + lastName));
         Mockito.verify(view, Mockito.times(1)).setProfileGender(Mockito.eq(gender));
         Mockito.verify(view, Mockito.times(1)).setProfileID(Mockito.eq(registerId));
-        Mockito.verify(view, Mockito.times(1)).setProfileImage(Mockito.eq(clientId));
+        Mockito.verify(view, Mockito.times(1)).setProfileImage(Mockito.eq(clientId), Mockito.anyInt());
     }
 
     @Test

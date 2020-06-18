@@ -11,7 +11,6 @@ import org.smartregister.Context;
 import org.smartregister.commonregistry.CommonPersonObject;
 import org.smartregister.commonregistry.CommonRepository;
 import org.smartregister.event.Listener;
-import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.pojo.OpdMetadata;
 
 import java.util.ArrayList;
@@ -63,10 +62,8 @@ public class OpdLookUpUtils {
             if (query == null) {
                 return results;
             }
-            Cursor cursor = null;
-            try {
+            try (Cursor cursor = commonRepository.rawCustomQueryForAdapter(query)) {
 
-                cursor = commonRepository.rawCustomQueryForAdapter(query);
                 if (cursor != null && cursor.getCount() > 0 && cursor.moveToFirst()) {
                     while (!cursor.isAfterLast()) {
                         CommonPersonObject commonPersonObject = commonRepository.readAllcommonforCursorAdapter(cursor);
@@ -76,10 +73,6 @@ public class OpdLookUpUtils {
                 }
             } catch (Exception e) {
                 Timber.e(e);
-            } finally {
-                if (cursor != null) {
-                    cursor.close();
-                }
             }
         }
 
@@ -89,7 +82,7 @@ public class OpdLookUpUtils {
     protected static String lookUpQuery(@NonNull Map<String, String> entityMap) {
         String mainCondition = getMainConditionString(entityMap);
         if (!TextUtils.isEmpty(mainCondition)) {
-            return OpdLibrary.getInstance().opdLookUpQuery().replace("[condition]", mainCondition) + ";";
+            return OpdUtils.metadata().getLookUpQueryForOpdClient().replace("[condition]", mainCondition) + ";";
         }
         return null;
     }

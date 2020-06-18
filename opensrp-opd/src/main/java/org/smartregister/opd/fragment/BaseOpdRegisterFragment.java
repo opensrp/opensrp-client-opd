@@ -56,6 +56,10 @@ public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment imple
         opdRegisterQueryProvider = ConfigurationInstancesHelper.newInstance(OpdLibrary.getInstance().getOpdConfiguration().getOpdRegisterQueryProvider());
     }
 
+    public void setOpdRegisterQueryProvider(OpdRegisterQueryProviderContract opdRegisterQueryProvider) {
+        this.opdRegisterQueryProvider = opdRegisterQueryProvider;
+    }
+
     @Override
     public void setupViews(View view) {
         super.setupViews(view);

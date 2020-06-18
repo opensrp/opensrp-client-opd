@@ -4,12 +4,16 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.smartregister.opd.pojo.OpdMetadata;
+import org.smartregister.opd.processor.OpdDiagnoseAndTreatFormProcessor;
+import org.smartregister.opd.utils.OpdConstants;
+
+import java.util.HashMap;
 
 /**
  * This is the object used to configure any configurations added to OPD. We mostly use objects that are
  * instantiated using {@link org.smartregister.opd.utils.ConfigurationInstancesHelper} which means
  * that the constructors of any of the classes should not have any parameters
- *
+ * <p>
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-13
  */
 
@@ -26,6 +30,9 @@ public class OpdConfiguration {
     private void setDefaults() {
         if (builder.opdRegisterProviderMetadata == null) {
             builder.opdRegisterProviderMetadata = BaseOpdRegisterProviderMetadata.class;
+        }
+        if (!builder.opdFormProcessingMap.containsKey(OpdConstants.EventType.DIAGNOSIS_AND_TREAT)) {
+            builder.opdFormProcessingMap.put(OpdConstants.EventType.DIAGNOSIS_AND_TREAT, new OpdDiagnoseAndTreatFormProcessor());
         }
     }
 
@@ -54,6 +61,11 @@ public class OpdConfiguration {
         return builder.opdRegisterSwitcher;
     }
 
+    @Nullable
+    public OpdFormProcessor getOpdFormProcessingClass(String eventType) {
+        return builder.opdFormProcessingMap.get(eventType);
+    }
+
     public int getMaxCheckInDurationInMinutes() {
         return builder.maxCheckInDurationInMinutes;
     }
@@ -75,6 +87,9 @@ public class OpdConfiguration {
 
         @Nullable
         private Class<? extends OpdRegisterSwitcher> opdRegisterSwitcher;
+
+        @NonNull
+        private HashMap<String, OpdFormProcessor> opdFormProcessingMap = new HashMap<>();
 
         private boolean isBottomNavigationEnabled;
 
@@ -112,6 +127,11 @@ public class OpdConfiguration {
 
         public Builder setMaxCheckInDurationInMinutes(int durationInMinutes) {
             this.maxCheckInDurationInMinutes = durationInMinutes;
+            return this;
+        }
+
+        public Builder addOpdFormProcessingClass(String eventType, OpdFormProcessor opdFormProcessor) {
+            this.opdFormProcessingMap.put(eventType, opdFormProcessor);
             return this;
         }
 

@@ -23,6 +23,7 @@ import org.smartregister.opd.utils.ConfigurationInstancesHelper;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
+import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.repository.EventClientRepository;
 
 import java.util.ArrayList;
@@ -99,7 +100,7 @@ public class OpdProfileInteractor implements OpdProfileActivityContract.Interact
         String joinedIds = "'" + baseEntityId + "'";
         query = query.replace("%s", joinedIds);
 
-        CommonRepository commonRepository = OpdLibrary.getInstance().context().commonrepository(OpdDbConstants.Table.EC_CLIENT);
+        CommonRepository commonRepository = OpdLibrary.getInstance().context().commonrepository(OpdUtils.metadata().getTableName());
         Cursor cursor = commonRepository.rawCustomQueryForAdapter(query);
 
         if (cursor != null && cursor.moveToFirst()) {

@@ -8,6 +8,12 @@ public class OpdConstants extends AllConstants {
     public static final String CLIENT_TYPE = "client";
     public static final String CONFIG = "opd_register";
     public static final String TYPE_OF_TEXT_LABEL = "The type of test conducted";
+    public static final String DIAGNOSTIC_TEST_RESULT = "diagnostic_test_result";
+    public static final String DIAGNOSTIC_TEST = "diagnostic_test";
+    public static final String REPEATING_GROUP_MAP = "repeatingGroupMap";
+    public static final String BIND_TYPE = "bind_type";
+    public static final String VISIT_ID = "visit_id";
+    public static final String VISIT_DATE = "visit_date";
 
     public interface StepTitle {
         String TEST_CONDUCTED = "Test Conducted";
@@ -60,17 +66,52 @@ public class OpdConstants extends AllConstants {
 
         interface OpdVisit {
             String VISIT_DATE = "visit_date";
+
             String TEST_NAME = "test_name";
             String TEST_RESULT = "test_result";
-            String DIAGNOSIS = "diagnosis";
-            String DIAGNOSIS_TYPE = "diagnosis_type";
-            String DISEASE_CODE = "disease_code";
-            String TREATMENT = "treatment";
 
+            String TEST_TYPE = "test_type";
+            String TEST_TYPE_LABEL = "test_type_label";
+
+            String TESTS = "tests";
+            String TESTS_LABEL = "tests_label";
+
+            String DIAGNOSIS = "diagnosis";
             String DIAGNOSIS_LABEL = "diagnosis_label";
+
+            String DIAGNOSIS_SAME = "diagnosis_same";
+            String DIAGNOSIS_SAME_LABEL = "diagnosis_same_label";
+
+            String DIAGNOSIS_TYPE = "diagnosis_type";
             String DIAGNOSIS_TYPE_LABEL = "diagnosis_type_label";
+
+            String DISEASE_CODE = "disease_code";
             String DISEASE_CODE_LABEL = "disease_code_label";
+
+            String TREATMENT = "treatment";
             String TREATMENT_LABEL = "treatment_label";
+
+            String TREATMENT_TYPE = "treatment_type";
+            String TREATMENT_TYPE_LABEL = "treatment_type_label";
+
+            String TREATMENT_TYPE_SPECIFY = "treatment_type_specify";
+            String TREATMENT_TYPE_SPECIFY_LABEL = "treatment_type_specify_label";
+
+            String DISCHARGED_ALIVE = "discharged_alive";
+            String DISCHARGED_ALIVE_LABEL = "discharged_alive_label";
+
+            String DISCHARGED_HOME = "discharged_home";
+            String DISCHARGED_HOME_LABEL = "discharged_home_label";
+
+            String REFERRAL = "referral";
+            String REFERRAL_LABEL = "referral_label";
+
+            String REFERRAL_LOCATION = "referral_location";
+            String REFERRAL_LOCATION_LABEL = "referral_location_label";
+
+            String REFERRAL_LOCATION_SPECIFY = "referral_location_specify";
+            String REFERRAL_LOCATION_SPECIFY_LABEL = "referral_location_specify_label";
+
         }
 
     }
@@ -100,6 +141,37 @@ public class OpdConstants extends AllConstants {
     public interface OpdMultiDrugPicker {
         String CONFIRMED_ID = "consumed-id";
         String PRESUMED_ID = "presumed-id";
+    }
+
+    public interface ColumnMapKey {
+        String REGISTER_ID = "register_id";
+        String REGISTER_TYPE = "register_type";
+    }
+
+    public interface DateFormat {
+        String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
+        String d_MMM_yyyy = "d MMM yyyy";
+        String  d_MMM_yyyy_hh_mm_ss = "d MMM yyyy HH:mm:ss";
+        String YYYY_MM_DD = "yyyy-MM-dd";
+    }
+
+    public interface Form {
+        String OPD_DIAGNOSIS_AND_TREAT = "opd_diagnose_and_treat";
+        String OPD_CHECK_IN = "opd_checkin";
+    }
+
+    public interface FormValue {
+        String IS_DOB_UNKNOWN = "isDobUnknown";
+        String IS_ENROLLED_IN_MESSAGES = "isEnrolledInSmsMessages";
+        String OTHER = "other";
+    }
+
+    public interface RegisterType {
+        String OPD = "opd";
+    }
+
+    public interface ClientMapKey {
+        String GENDER = "gender";
     }
 
     public static class JSON_FORM_KEY {
@@ -153,6 +225,13 @@ public class OpdConstants extends AllConstants {
 
         public static final String DIAGNOSTIC_TEST_RESULT_GLUCOSE = "diagnostic_test_result_glucose";
         public static final String DIAGNOSTIC_TEST_RESULT_SPINNER_BLOOD_TYPE = "diagnostic_test_result_spinner_blood_type";
+        public static final String FREQUENCY = "frequency";
+        public static final String HOME_FACILITY = "Home_Facility";
+        public static final String SPECIAL_INSTRUCTIONS = "special_instructions";
+        public static final String TREATMENT_TYPE = "treatment_type";
+        public static final String TREATMENT_TYPE_SPECIFY = "treatment_type_specify";
+        public static final String DIAGNOSIS_SAME = "diagnosis_same";
+        public static final String VILLAGE = "village";
         public static String TESTS_REPEATING_GROUP = "tests_repeating_group";
     }
 
@@ -171,6 +250,7 @@ public class OpdConstants extends AllConstants {
 
         public static final String ZEIR_ID = "zeir_id";
         public static final String ID = "id";
+        public static final String TYPE_OF_TREATMENT_LABEL = "The type of treatment provided";
     }
 
     public static class OPENMRS {
@@ -216,36 +296,9 @@ public class OpdConstants extends AllConstants {
         public static final String TEST_CONDUCTED = "OPD Test Conducted";
         public static final String SERVICE_DETAIL = "OPD Service Detail";
         public static final String VISIT = "OPD Visit";
+        public static final String PREGNANCY_STATUS = "OPD Pregnancy Status";
+        public static final String MEDICAL_CONDITIONS_AND_HIV_DETAILS = "OPD Medical Conditions And HIV Details";
+        public static final String OUTCOME = "OPD Outcome";
         public static final String CLOSE_OPD_VISIT = "OPD Close Visit";
-    }
-
-    public interface ColumnMapKey {
-        String REGISTER_ID = "register_id";
-        String REGISTER_TYPE = "register_type";
-    }
-
-    public interface DateFormat {
-        String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
-        String d_MMM_yyyy = "d MMM yyyy";
-        String YYYY_MM_DD = "yyyy-MM-dd";
-    }
-
-    public interface Form {
-        String OPD_DIAGNOSIS_AND_TREAT = "opd_diagnose_and_treat";
-        String OPD_CHECK_IN = "opd_checkin";
-    }
-
-    public interface FormValue {
-        String IS_DOB_UNKNOWN = "isDobUnknown";
-        String IS_ENROLLED_IN_MESSAGES = "isEnrolledInSmsMessages";
-        String OTHER = "other";
-    }
-
-    public interface RegisterType {
-        String OPD = "opd";
-    }
-
-    public interface ClientMapKey {
-        String GENDER = "gender";
     }
 }

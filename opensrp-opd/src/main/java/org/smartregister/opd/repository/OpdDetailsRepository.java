@@ -14,7 +14,6 @@ import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.opd.utils.OpdDbConstants.Column.OpdDetails;
 import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.repository.BaseRepository;
-import org.smartregister.repository.Repository;
 
 import java.util.List;
 
@@ -78,6 +77,11 @@ public class OpdDetailsRepository extends BaseRepository implements OpdDetailsDa
         long recordId = database.insertWithOnConflict(OpdDbConstants.Table.OPD_DETAILS, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
 
         return recordId != -1;
+    }
+
+    @Override
+    public boolean save(org.smartregister.opd.pojo.OpdDetails opdDetails) {
+        throw new NotImplementedException("not implemented");
     }
 
     @Nullable

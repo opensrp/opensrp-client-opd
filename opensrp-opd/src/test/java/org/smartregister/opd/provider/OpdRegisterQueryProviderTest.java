@@ -26,6 +26,6 @@ public class OpdRegisterQueryProviderTest extends OpdRegisterQueryProviderContra
     @NonNull
     @Override
     public String mainSelectWhereIDsIn() {
-        return "";
+        return "select * from ec_client where baseEntityId IN (%s)";
     }
 }

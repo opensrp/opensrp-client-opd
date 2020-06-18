@@ -148,6 +148,7 @@ public abstract class BaseOpdRegisterActivity extends BaseRegisterActivity imple
             }
             startActivityForResult(intent, OpdJsonFormUtils.REQUEST_CODE_GET_JSON);
 
+
         } else {
             Timber.e(new Exception(), "FormActivity cannot be started because OpdMetadata is NULL");
         }

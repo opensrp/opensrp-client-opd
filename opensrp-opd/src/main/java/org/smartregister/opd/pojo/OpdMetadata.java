@@ -3,9 +3,14 @@ package org.smartregister.opd.pojo;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.smartregister.opd.activity.BaseOpdFormActivity;
+import org.smartregister.opd.activity.BaseOpdProfileActivity;
 import org.smartregister.opd.utils.DefaultOpdLocationUtils;
+import org.smartregister.opd.utils.OpdConstants;
+import org.smartregister.opd.utils.OpdDbConstants;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 public class OpdMetadata {
 
@@ -19,15 +24,20 @@ public class OpdMetadata {
 
     private String config;
 
-    private Class opdFormActivity;
+    private Class<? extends BaseOpdFormActivity> opdFormActivity;
 
-    private Class profileActivity;
+    private Class<? extends BaseOpdProfileActivity> profileActivity;
 
     private boolean formWizardValidateRequiredFieldsBefore;
 
     private ArrayList<String> locationLevels;
 
     private ArrayList<String> healthFacilityLevels;
+
+    private Set<String> fieldsWithLocationHierarchy;
+
+    private String lookUpQueryForOpdClient = String.format("select id as _id, %s, %s, %s, %s, %s, %s, %s, national_id from " + getTableName() + " where [condition] ", OpdConstants.KEY.RELATIONALID, OpdConstants.KEY.FIRST_NAME,
+            OpdConstants.KEY.LAST_NAME, OpdConstants.KEY.GENDER, OpdConstants.KEY.DOB, OpdConstants.KEY.BASE_ENTITY_ID, OpdDbConstants.KEY.OPENSRP_ID);
 
     public OpdMetadata(@NonNull String opdRegistrationFormName, @NonNull String tableName, @NonNull String registerEventType, @NonNull String updateEventType,
                        @NonNull String config, @NonNull Class opdFormActivity, @Nullable Class profileActivity, boolean formWizardValidateRequiredFieldsBefore) {
@@ -129,5 +139,21 @@ public class OpdMetadata {
 
     public void setHealthFacilityLevels(ArrayList<String> healthFacilityLevels) {
         this.healthFacilityLevels = healthFacilityLevels;
+    }
+
+    public String getLookUpQueryForOpdClient() {
+        return lookUpQueryForOpdClient;
+    }
+
+    public void setLookUpQueryForOpdClient(String lookUpQueryForOpdClient) {
+        this.lookUpQueryForOpdClient = lookUpQueryForOpdClient;
+    }
+
+    public Set<String> getFieldsWithLocationHierarchy() {
+        return fieldsWithLocationHierarchy;
+    }
+
+    public void setFieldsWithLocationHierarchy(Set<String> fieldsWithLocationHierarchy) {
+        this.fieldsWithLocationHierarchy = fieldsWithLocationHierarchy;
     }
 }

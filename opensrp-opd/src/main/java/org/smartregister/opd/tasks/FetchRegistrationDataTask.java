@@ -4,12 +4,12 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.smartregister.CoreLibrary;
 import org.smartregister.opd.contract.OpdProfileActivityContract;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.opd.utils.OpdReverseJsonFormUtils;
+import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.util.FormUtils;
 
 import java.lang.ref.WeakReference;
@@ -31,7 +31,7 @@ public class FetchRegistrationDataTask extends AsyncTask<String, Void, String> {
 
     @Nullable
     protected String doInBackground(String... params) {
-        Map<String, String> detailsMap = CoreLibrary.getInstance().context().detailsRepository().getAllDetailsForClient(params[0]);
+        Map<String, String> detailsMap = OpdUtils.getClientDemographicDetails(params[0]);
 
         OpdProfileActivityContract.View view = viewWeakReference.get();
 

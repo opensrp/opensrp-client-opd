@@ -1,6 +1,6 @@
 package org.smartregister.opd.pojo;
 
-public class OpdDiagnosis {
+public class OpdDiagnosisDetail {
     private String id;
     private String baseEntityId;
     private String diagnosis;
@@ -9,9 +9,17 @@ public class OpdDiagnosis {
     private String icd10Code;
     private String code;
     private String details;
-    private String createdAt;
-    private String updatedAt;
+    private String isDiagnosisSame;
     private String visitId;
+    private String createdAt;
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
 
     public String getId() {
         return id;
@@ -77,27 +85,19 @@ public class OpdDiagnosis {
         this.details = details;
     }
 
-    public String getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public String getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(String updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
     public String getVisitId() {
         return visitId;
     }
 
     public void setVisitId(String visitId) {
         this.visitId = visitId;
+    }
+
+    public String getIsDiagnosisSame() {
+        return isDiagnosisSame;
+    }
+
+    public void setIsDiagnosisSame(String isDiagnosisSame) {
+        this.isDiagnosisSame = isDiagnosisSame;
     }
 }

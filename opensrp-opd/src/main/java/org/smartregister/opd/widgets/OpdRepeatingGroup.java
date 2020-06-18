@@ -32,4 +32,9 @@ public class OpdRepeatingGroup extends RepeatingGroupFactory {
         }
         return viewList;
     }
+
+    @Override
+    protected int getLayout() {
+        return R.layout.opd_native_form_repeating_group;
+    }
 }

@@ -2,6 +2,7 @@ package org.smartregister.opd.utils;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.Html;
@@ -19,16 +20,15 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.smartregister.domain.db.Event;
-import org.smartregister.domain.db.Obs;
 import org.smartregister.opd.OpdLibrary;
-import org.smartregister.opd.pojo.CompositeObs;
 import org.smartregister.opd.pojo.OpdMetadata;
-import org.smartregister.repository.DetailsRepository;
 import org.smartregister.util.FormUtils;
 import org.smartregister.util.JsonFormUtils;
 import org.smartregister.util.Utils;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -45,7 +45,7 @@ import timber.log.Timber;
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-13
  */
 
-public class OpdUtils extends org.smartregister.util.Utils {
+public class OpdUtils extends Utils {
 
     private static final String OTHER_SUFFIX = ", other]";
     private static FormUtils formUtils;
@@ -134,11 +134,13 @@ public class OpdUtils extends org.smartregister.util.Utils {
 
     @Nullable
     public static String getIntentValue(@Nullable Intent data, @NonNull String key) {
-        if (data == null) {
-            return null;
-        }
+        return data == null ? null : data.hasExtra(key) ? data.getStringExtra(key) : null;
+    }
 
-        return data.hasExtra(key) ? data.getStringExtra(key) : null;
+    public static void saveImageAndCloseOutputStream(Bitmap image, File outputFile) throws FileNotFoundException {
+        FileOutputStream os = new FileOutputStream(outputFile);
+        Bitmap.CompressFormat compressFormat = Bitmap.CompressFormat.JPEG;
+        image.compress(compressFormat, 100, os);
     }
 
     @NonNull
@@ -160,19 +162,6 @@ public class OpdUtils extends org.smartregister.util.Utils {
             }
         }
         return date;
-    }
-
-    @NonNull
-    public static String generateNIds(int n) {
-        StringBuilder strIds = new StringBuilder();
-        for (int i = 0; i < n; i++) {
-            if ((i + 1) == n) {
-                strIds.append(JsonFormUtils.generateRandomUUIDString());
-            } else {
-                strIds.append(JsonFormUtils.generateRandomUUIDString()).append(",");
-            }
-        }
-        return strIds.toString();
     }
 
     @NotNull
@@ -264,81 +253,122 @@ public class OpdUtils extends org.smartregister.util.Utils {
         }
     }
 
-    public static int buildRepeatingGroupTests(@NonNull JSONObject step1JsonObject) throws JSONException {
+    public static HashMap<String, HashMap<String, String>> buildRepeatingGroupTests(@NonNull JSONObject stepJsonObject) throws JSONException {
         ArrayList<String> keysArrayList = new ArrayList<>();
-        JSONArray fields = step1JsonObject.optJSONArray(OpdJsonFormUtils.FIELDS);
+        JSONArray fields = stepJsonObject.optJSONArray(OpdJsonFormUtils.FIELDS);
         JSONObject jsonObject = JsonFormUtils.getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.TESTS_REPEATING_GROUP);
-        JSONArray jsonArray = jsonObject.optJSONArray(JsonFormConstants.VALUE);
-        int repeatedGroupNum = 0;
+        HashMap<String, HashMap<String, String>> repeatingGroupMap = new HashMap<>();
+        if (jsonObject != null) {
+            JSONArray jsonArray = jsonObject.optJSONArray(JsonFormConstants.VALUE);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject valueField = jsonArray.optJSONObject(i);
+                String fieldKey = valueField.optString(JsonFormConstants.KEY);
+                keysArrayList.add(fieldKey);
+            }
 
-        for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject valueField = jsonArray.optJSONObject(i);
-            String fieldKey = valueField.optString(JsonFormConstants.KEY);
-            keysArrayList.add(fieldKey);
-        }
+            for (int k = 0; k < fields.length(); k++) {
+                JSONObject valueField = fields.optJSONObject(k);
+                String fieldKey = valueField.optString(JsonFormConstants.KEY);
+                String fieldValue = valueField.optString(JsonFormConstants.VALUE);
 
-        for (int k = 0; k < fields.length(); k++) {
-            JSONObject valueField = fields.optJSONObject(k);
-            String fieldKey = valueField.optString(JsonFormConstants.KEY);
-            String fieldValue = valueField.optString(JsonFormConstants.VALUE);
-
-            if (fieldKey.contains("_")) {
-                fieldKey = fieldKey.substring(0, fieldKey.lastIndexOf("_"));
-                if (keysArrayList.contains(fieldKey) && StringUtils.isNotBlank(fieldValue)) {
-                    valueField.put(JsonFormConstants.KEY, fieldKey);
-                    repeatedGroupNum++;
+                if (fieldKey.contains("_")) {
+                    fieldKey = fieldKey.substring(0, fieldKey.lastIndexOf("_"));
+                    if (keysArrayList.contains(fieldKey) && StringUtils.isNotBlank(fieldValue) && !fieldValue.equals(OpdConstants.TYPE_OF_TEXT_LABEL)) {
+                        String fieldKeyId = valueField.optString(JsonFormConstants.KEY).substring(fieldKey.length() + 1);
+                        valueField.put(JsonFormConstants.KEY, fieldKey);
+                        HashMap<String, String> hashMap = repeatingGroupMap.get(fieldKeyId) == null ? new HashMap<>() : repeatingGroupMap.get(fieldKeyId);
+                        hashMap.put(fieldKey, fieldValue);
+                        repeatingGroupMap.put(fieldKeyId, hashMap);
+                    }
                 }
             }
         }
-        //divide by 2 to count number of test&&result pair
-        repeatedGroupNum = repeatedGroupNum / 2;
-        return repeatedGroupNum;
+        return repeatingGroupMap;
     }
 
-    public static List<CompositeObs> getAllObsObject(@NonNull Event event) {
-        List<Obs> obs = event.getObs();
-        List<CompositeObs> compositeObsArrayList = new ArrayList<>();
-        for (Obs observation : obs) {
-            CompositeObs compositeObs = new CompositeObs();
-            String key = observation.getFormSubmissionField();
-            compositeObs.setFormSubmissionFieldKey(key);
-            List<Object> values = observation.getValues();
-            String value = "";
-            if (values.size() > 0) {
-                String obsValue = (String) values.get(0);
-                if (StringUtils.isNotBlank(obsValue)) {
-                    value = obsValue;
-                }
-            }
-
-            List<Object> humanReadableValues = observation.getHumanReadableValues();
-            if (humanReadableValues.size() > 0) {
-                String humanReadableValue = (String) humanReadableValues.get(0);
-                if (StringUtils.isNotBlank(humanReadableValue)) {
-                    value = humanReadableValue;
-                }
-            }
-
-            compositeObs.setValue(value);
-            compositeObsArrayList.add(compositeObs);
+    public static Map<String, String> getClientDemographicDetails(@NonNull String baseEntityId) {
+        try {
+            return OpdLibrary.getInstance().context().getEventClientRepository()
+                    .rawQuery(OpdLibrary.getInstance().context().getEventClientRepository().getReadableDatabase(),
+                            "select * from " + metadata().getTableName() +
+                                    " where " + OpdDbConstants.Column.Client.BASE_ENTITY_ID + " = '" + baseEntityId + "' limit 1").get(0);
+        } catch (NullPointerException | IndexOutOfBoundsException e) {
+            Timber.e(e);
         }
-
-        return compositeObsArrayList;
+        return null;
     }
 
     public static HashMap<String, String> getInjectableFields(@NonNull String formName, @NonNull String caseId) {
-        DetailsRepository detailsRepository = OpdLibrary.getInstance().context().detailsRepository();
-        Map<String, String> detailsMap = detailsRepository.getAllDetailsForClient(caseId);
+        Map<String, String> detailsMap = getClientDemographicDetails(caseId);
         HashMap<String, String> injectedValues = new HashMap<>();
-        if (formName.equals(OpdConstants.Form.OPD_CHECK_IN)) {
-            injectedValues.put(OpdConstants.ClientMapKey.GENDER, detailsMap.get(OpdConstants.ClientMapKey.GENDER));
-            String strDob = detailsMap.get(OpdDbConstants.Column.Client.DOB);
-            String age = "";
-            if (StringUtils.isNotBlank(strDob)) {
-                age = String.valueOf(Utils.getAgeFromDate(strDob));
+        if (formName.equals(OpdConstants.Form.OPD_DIAGNOSIS_AND_TREAT)) {
+            if (detailsMap != null) {
+                injectedValues.put(OpdConstants.ClientMapKey.GENDER, detailsMap.get(OpdConstants.ClientMapKey.GENDER));
+                String strDob = detailsMap.get(OpdDbConstants.Column.Client.DOB);
+                String age = "";
+                if (StringUtils.isNotBlank(strDob)) {
+                    age = String.valueOf(Utils.getAgeFromDate(strDob));
+                }
+                injectedValues.put(OpdConstants.JSON_FORM_KEY.AGE, age);
             }
-            injectedValues.put(OpdConstants.JSON_FORM_KEY.AGE, age);
+            Map<String, String> opdCheckInMap = OpdLibrary.getInstance().getCheckInRepository().getLatestCheckIn(caseId);
+            if (!opdCheckInMap.isEmpty()) {
+                injectedValues.put("visit_id", opdCheckInMap.get(OpdDbConstants.Column.OpdCheckIn.VISIT_ID));
+            }
         }
         return injectedValues;
+    }
+
+    @NotNull
+    public static String cleanStringArray(@Nullable String stringArray) {
+        if (StringUtils.isNotBlank(stringArray)) {
+            return stringArray.replace("[", "")
+                    .replace("]", "").replaceAll("\"", "");
+        }
+        return "";
+    }
+
+    @NonNull
+    public static String cleanTestName(@NonNull String testName) {
+        String result = "";
+        if ("specify".equals(testName) || "other".equals(testName) || "status".equals(testName)) {
+            result = "";
+        } else {
+            result = testName + " ";
+        }
+        return result;
+    }
+
+    public static String createTestName(@NonNull String key) {
+        String result = removeHyphen(key
+                .replace(OpdConstants.DIAGNOSTIC_TEST_RESULT, ""))
+                .trim();
+        if (StringUtils.isNotBlank(result)) {
+            return result;
+        } else {
+            return "status";
+        }
+    }
+
+    public static String removeHyphen(@Nullable String s) {
+        if (StringUtils.isNotBlank(s)) {
+            return s.replaceAll("_", " ");
+        }
+        return "";
+    }
+
+    public static JSONArray addOpenMrsEntityId(@NonNull String diagnosisType, @NonNull JSONArray jsonArray) {
+        try {
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.optJSONObject(i);
+                jsonObject.put(JsonFormConstants.OPENMRS_ENTITY_ID, jsonObject.optJSONObject(JsonFormConstants.MultiSelectUtils.PROPERTY)
+                        .optString(diagnosisType.concat("-id")));
+            }
+
+            return jsonArray;
+        } catch (JSONException e) {
+            Timber.e(e);
+        }
+        return jsonArray;
     }
 }

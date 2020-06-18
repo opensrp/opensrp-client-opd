@@ -7,29 +7,25 @@ import android.support.annotation.VisibleForTesting;
 
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 
-import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.smartregister.AllConstants;
 import org.smartregister.Context;
 import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.domain.tag.FormTag;
 import org.smartregister.opd.configuration.OpdConfiguration;
+import org.smartregister.opd.configuration.OpdFormProcessor;
 import org.smartregister.opd.domain.YamlConfig;
 import org.smartregister.opd.domain.YamlConfigItem;
 import org.smartregister.opd.helper.OpdRulesEngineHelper;
-import org.smartregister.opd.pojo.OpdCheckIn;
 import org.smartregister.opd.pojo.OpdDetails;
-import org.smartregister.opd.pojo.OpdDiagnosisAndTreatmentForm;
 import org.smartregister.opd.pojo.OpdVisit;
 import org.smartregister.opd.repository.OpdCheckInRepository;
 import org.smartregister.opd.repository.OpdDetailsRepository;
 import org.smartregister.opd.repository.OpdDiagnosisAndTreatmentFormRepository;
-import org.smartregister.opd.repository.OpdDiagnosisRepository;
-import org.smartregister.opd.repository.OpdServiceDetailRepository;
+import org.smartregister.opd.repository.OpdDiagnosisDetailRepository;
 import org.smartregister.opd.repository.OpdTestConductedRepository;
-import org.smartregister.opd.repository.OpdTreatmentRepository;
+import org.smartregister.opd.repository.OpdTreatmentDetailRepository;
 import org.smartregister.opd.repository.OpdVisitRepository;
 import org.smartregister.opd.repository.OpdVisitSummaryRepository;
 import org.smartregister.opd.utils.FilePath;
@@ -50,13 +46,12 @@ import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import id.zelory.compressor.Compressor;
-import timber.log.Timber;
 
 import static org.smartregister.opd.utils.OpdJsonFormUtils.METADATA;
 
@@ -77,9 +72,8 @@ public class OpdLibrary {
     private OpdVisitRepository visitRepository;
     private OpdDetailsRepository opdDetailsRepository;
     private OpdDiagnosisAndTreatmentFormRepository opdDiagnosisAndTreatmentFormRepository;
-    private OpdServiceDetailRepository opdServiceDetailRepository;
-    private OpdDiagnosisRepository opdDiagnosisRepository;
-    private OpdTreatmentRepository opdTreatmentRepository;
+    private OpdDiagnosisDetailRepository opdDiagnosisDetailRepository;
+    private OpdTreatmentDetailRepository opdTreatmentDetailRepository;
     private OpdTestConductedRepository opdTestConductedRepository;
     private OpdVisitSummaryRepository opdVisitSummaryRepository;
 
@@ -168,11 +162,11 @@ public class OpdLibrary {
     }
 
     @NonNull
-    public OpdDiagnosisRepository getOpdDiagnosisRepository() {
-        if (opdDiagnosisRepository == null) {
-            opdDiagnosisRepository = new OpdDiagnosisRepository();
+    public OpdDiagnosisDetailRepository getOpdDiagnosisDetailRepository() {
+        if (opdDiagnosisDetailRepository == null) {
+            opdDiagnosisDetailRepository = new OpdDiagnosisDetailRepository();
         }
-        return opdDiagnosisRepository;
+        return opdDiagnosisDetailRepository;
     }
 
     @NonNull
@@ -184,19 +178,11 @@ public class OpdLibrary {
     }
 
     @NonNull
-    public OpdTreatmentRepository getOpdTreatmentRepository() {
-        if (opdTreatmentRepository == null) {
-            opdTreatmentRepository = new OpdTreatmentRepository();
+    public OpdTreatmentDetailRepository getOpdTreatmentDetailRepository() {
+        if (opdTreatmentDetailRepository == null) {
+            opdTreatmentDetailRepository = new OpdTreatmentDetailRepository();
         }
-        return opdTreatmentRepository;
-    }
-
-    @NonNull
-    public OpdServiceDetailRepository getOpdServiceDetailRepository() {
-        if (opdServiceDetailRepository == null) {
-            opdServiceDetailRepository = new OpdServiceDetailRepository();
-        }
-        return opdServiceDetailRepository;
+        return opdTreatmentDetailRepository;
     }
 
     @NonNull
@@ -280,12 +266,19 @@ public class OpdLibrary {
         JSONObject stepOne = jsonFormObject.getJSONObject(OpdJsonFormUtils.STEP1);
         JSONArray fieldsArray = stepOne.getJSONArray(OpdJsonFormUtils.FIELDS);
 
+        HashMap<String, String> injectedFields = new HashMap<>();
+        injectedFields.put("visit_id", JsonFormUtils.generateRandomUUIDString());
+        injectedFields.put("visit_date", OpdUtils.convertDate(new Date(), OpdDbConstants.DATE_FORMAT));
+
+        OpdJsonFormUtils.populateInjectedFields(jsonFormObject, injectedFields);
+
         FormTag formTag = OpdJsonFormUtils.formTag(OpdUtils.getAllSharedPreferences());
 
         String baseEntityId = OpdUtils.getIntentValue(data, OpdConstants.IntentKey.BASE_ENTITY_ID);
         String entityTable = OpdUtils.getIntentValue(data, OpdConstants.IntentKey.ENTITY_TABLE);
         Event opdCheckinEvent = OpdJsonFormUtils.createEvent(fieldsArray, jsonFormObject.getJSONObject(METADATA)
-                , formTag, baseEntityId, eventType, entityTable);
+                , formTag, baseEntityId, eventType, entityTable)
+                .withChildLocationId(OpdLibrary.getInstance().context().allSharedPreferences().fetchCurrentLocality());
 
         AllSharedPreferences allSharedPreferences = OpdUtils.getAllSharedPreferences();
         String providerId = allSharedPreferences.fetchRegisteredANM();
@@ -299,130 +292,15 @@ public class OpdLibrary {
         opdCheckinEvent.setClientDatabaseVersion(OpdLibrary.getInstance().getDatabaseVersion());
         opdCheckinEvent.setClientApplicationVersion(OpdLibrary.getInstance().getApplicationVersion());
 
-        // Create the visit Id
-        opdCheckinEvent.addDetails(OpdConstants.Event.CheckIn.Detail.VISIT_ID, JsonFormUtils.generateRandomUUIDString());
-        opdCheckinEvent.addDetails(OpdConstants.Event.CheckIn.Detail.VISIT_DATE, OpdUtils.convertDate(new Date(), OpdDbConstants.DATE_FORMAT));
-
         return opdCheckinEvent;
     }
 
     public List<Event> processOpdDiagnosisAndTreatmentForm(@NonNull String jsonString, @NonNull Intent data) throws JSONException {
         JSONObject jsonFormObject = new JSONObject(jsonString);
-
-        String entityId = OpdUtils.getIntentValue(data, OpdConstants.IntentKey.BASE_ENTITY_ID);
-
-        OpdCheckIn opdCheckIn = OpdLibrary.getInstance().getCheckInRepository().getLatestCheckIn(entityId);
-        FormTag formTag = OpdJsonFormUtils.formTag(OpdUtils.getAllSharedPreferences());
-
-        if (opdCheckIn != null) {
-            String visitId = opdCheckIn.getVisitId();
-            String steps = jsonFormObject.optString(JsonFormConstants.COUNT);
-            int numOfSteps = Integer.valueOf(steps);
-            List<Event> eventList = new ArrayList<>();
-
-            for (int j = 0; j < numOfSteps; j++) {
-                JSONObject step = jsonFormObject.optJSONObject(JsonFormConstants.STEP.concat(String.valueOf(j + 1)));
-                String title = step.optString(JsonFormConstants.STEP_TITLE);
-                JSONArray fields = step.getJSONArray(OpdJsonFormUtils.FIELDS);
-                String valueIds;
-                JSONObject jsonObject;
-                JSONArray valueJsonArray = null;
-                if (OpdConstants.StepTitle.TEST_CONDUCTED.equals(title)) {
-                    int repeatedGroupNum = OpdUtils.buildRepeatingGroupTests(step);
-                    valueIds = OpdUtils.generateNIds(repeatedGroupNum);
-
-                } else if (OpdConstants.StepTitle.DIAGNOSIS.equals(title)) {
-                    jsonObject = JsonFormUtils.getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.DISEASE_CODE);
-                    JSONObject jsonDiagnosisType = JsonFormUtils.getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.DIAGNOSIS_TYPE);
-                    String diagnosisType = jsonDiagnosisType.optString(OpdConstants.KEY.VALUE);
-                    String value = jsonObject.optString(OpdConstants.KEY.VALUE);
-                    if (StringUtils.isBlank(value) || (new JSONArray(value).length() == 0)) {
-                        valueIds = OpdUtils.generateNIds(1);
-                    } else {
-                        valueJsonArray = new JSONArray(value);
-                        JSONArray jsonArrayWithOpenMrsIds = addOpenMrsEntityId(diagnosisType.toLowerCase(), valueJsonArray);
-                        jsonObject.put(OpdConstants.KEY.VALUE, jsonArrayWithOpenMrsIds);
-                        valueIds = OpdUtils.generateNIds(valueJsonArray.length());
-                    }
-                } else if (OpdConstants.StepTitle.TREATMENT.equals(title)) {
-                    jsonObject = JsonFormUtils.getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.MEDICINE);
-                    jsonObject.put(AllConstants.TYPE, AllConstants.MULTI_SELECT_LIST);
-                    String value = jsonObject.optString(OpdConstants.KEY.VALUE);
-                    if (StringUtils.isBlank(value) || (new JSONArray(value).length() == 0)) {
-                        valueIds = OpdUtils.generateNIds(1);
-                    } else {
-                        valueJsonArray = new JSONArray(value);
-                        valueIds = OpdUtils.generateNIds(valueJsonArray.length());
-                    }
-                } else {
-                    valueIds = OpdUtils.generateNIds(1);
-                }
-                Event baseEvent = JsonFormUtils.createEvent(fields, jsonFormObject.getJSONObject(METADATA),
-                        formTag, entityId, getDiagnosisAndTreatmentEventArray()[j], getDiagnosisAndTreatmentTableArray()[j]);
-                OpdJsonFormUtils.tagSyncMetadata(baseEvent);
-                baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_ID, visitId);
-                baseEvent.addDetails(OpdConstants.JSON_FORM_KEY.ID, valueIds);
-                if (valueJsonArray != null) {
-                    baseEvent.addDetails(OpdConstants.KEY.VALUE, valueJsonArray.toString());
-                }
-
-                eventList.add(baseEvent);
-            }
-            //remove any saved sessions
-            OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm = new OpdDiagnosisAndTreatmentForm(entityId);
-            OpdLibrary.getInstance().getOpdDiagnosisAndTreatmentFormRepository().delete(opdDiagnosisAndTreatmentForm);
-
-            Event closeOpdVisit = JsonFormUtils.createEvent(new JSONArray(), new JSONObject(),
-                    formTag, entityId, OpdConstants.EventType.CLOSE_OPD_VISIT, "");
-            OpdJsonFormUtils.tagSyncMetadata(closeOpdVisit);
-            closeOpdVisit.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_ID, visitId);
-            closeOpdVisit.addDetails(OpdConstants.JSON_FORM_KEY.VISIT_END_DATE, OpdUtils.convertDate(new Date(), OpdConstants.DateFormat.YYYY_MM_DD_HH_MM_SS));
-            eventList.add(closeOpdVisit);
-
-            return eventList;
-        } else {
-            Timber.e("Corresponding OpdCheckIn for EntityId %s is missing", entityId);
-            return null;
-        }
-
-    }
-
-    protected JSONArray addOpenMrsEntityId(String diagnosisType, JSONArray jsonArray) {
-        try {
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonObject = jsonArray.optJSONObject(i);
-                jsonObject.put(JsonFormConstants.OPENMRS_ENTITY_ID, jsonObject.optJSONObject(JsonFormConstants.MultiSelectUtils.PROPERTY)
-                        .optString(diagnosisType.concat("-id")));
-            }
-
-            return jsonArray;
-        } catch (JSONException e) {
-            Timber.e(e);
-        }
-        return jsonArray;
-    }
-
-    protected String[] getDiagnosisAndTreatmentEventArray() {
-        return new String[]{OpdConstants.EventType.TEST_CONDUCTED, OpdConstants.EventType.DIAGNOSIS,
-                OpdConstants.EventType.TREATMENT, OpdConstants.EventType.SERVICE_DETAIL};
-    }
-
-    protected String[] getDiagnosisAndTreatmentTableArray() {
-        return new String[]{OpdDbConstants.Table.OPD_TEST_CONDUCTED, OpdDbConstants.Table.OPD_DIAGNOSIS,
-                OpdDbConstants.Table.OPD_TREATMENT, OpdDbConstants.Table.OPD_SERVICE_DETAIL};
-    }
-
-    public String opdLookUpQuery() {
-        String lookUpQueryForChild = "select id as _id, %s, %s, %s, %s, %s, %s, zeir_id as %s, null as national_id from ec_child where [condition] ";
-        lookUpQueryForChild = String.format(lookUpQueryForChild, OpdConstants.KEY.RELATIONALID, OpdConstants.KEY.FIRST_NAME,
-                OpdConstants.KEY.LAST_NAME, OpdConstants.KEY.GENDER, OpdConstants.KEY.DOB, OpdConstants.KEY.BASE_ENTITY_ID, OpdDbConstants.KEY.OPENSRP_ID);
-        String lookUpQueryForMother = "select id as _id, %s, %s, %s, %s, %s, %s, register_id as %s, nrc_number as national_id from ec_mother where [condition] ";
-        lookUpQueryForMother = String.format(lookUpQueryForMother, OpdConstants.KEY.RELATIONALID, OpdConstants.KEY.FIRST_NAME,
-                OpdConstants.KEY.LAST_NAME, OpdConstants.KEY.GENDER, OpdConstants.KEY.DOB, OpdConstants.KEY.BASE_ENTITY_ID, OpdDbConstants.KEY.OPENSRP_ID);
-        String lookUpQueryForOpdClient = "select id as _id, %s, %s, %s, %s, %s, %s, %s, national_id from ec_client where [condition] ";
-        lookUpQueryForOpdClient = String.format(lookUpQueryForOpdClient, OpdConstants.KEY.RELATIONALID, OpdConstants.KEY.FIRST_NAME,
-                OpdConstants.KEY.LAST_NAME, OpdConstants.KEY.GENDER, OpdConstants.KEY.DOB, OpdConstants.KEY.BASE_ENTITY_ID, OpdDbConstants.KEY.OPENSRP_ID);
-        return lookUpQueryForChild + " union all " + lookUpQueryForMother + " union all " + lookUpQueryForOpdClient;
+        OpdFormProcessor<List<Event>> opdFormProcessor = OpdLibrary.getInstance()
+                .getOpdConfiguration()
+                .getOpdFormProcessingClass(jsonFormObject.optString(JsonFormConstants.ENCOUNTER_TYPE));
+        return opdFormProcessor.processForm(jsonFormObject, data);
     }
 
     /**

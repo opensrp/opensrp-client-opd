@@ -1,8 +1,12 @@
 ---
 sub_group: "{visit_date}"
 fields:
-  - template: "{test_name}: {test_result}"
-    relevance: "test_name != '' && test_result != ''"
+  - template: "{test_type_label}: {test_type}"
+    relevance: "test_type != ''"
+    isHtml: true
+
+  - template: "{tests_label}: {tests}"
+    relevance: "tests != ''"
     isHtml: true
 
   - template: "{diagnosis_label}: {diagnosis}"
@@ -14,6 +18,37 @@ fields:
   - template: "{disease_code_label}: {disease_code}"
     relevance: "disease_code != ''"
 
+  - template: "{diagnosis_same_label}: {diagnosis_same}"
+    relevance: "diagnosis_same != ''"
+
+  - template: "{treatment_type_label}: {treatment_type}"
+    relevance: "treatment_type != ''"
+    isHtml: true
+
+  - template: "{treatment_type_specify_label}: {treatment_type_specify}"
+    relevance: "treatment_type_specify != ''"
+    isHtml: true
+
   - template: "{treatment_label}: {treatment}"
     relevance: "treatment != ''"
+    isHtml: true
+
+  - template: "{discharged_alive_label}: {discharged_alive}"
+    relevance: "discharged_alive != ''"
+    isHtml: true
+
+  - template: "{discharged_home_label}: {discharged_home}"
+    relevance: "discharged_home != ''"
+    isHtml: true
+
+  - template: "{referral_label}: {referral}"
+    relevance: "referral != ''"
+    isHtml: true
+
+  - template: "{referral_location_label}: {referral_location}"
+    relevance: "referral_location != ''"
+    isHtml: true
+
+  - template: "{referral_location_label}: {referral_location_specify}"
+    relevance: "referral_location_specify != ''"
     isHtml: true

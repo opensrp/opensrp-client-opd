@@ -5,14 +5,16 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.google.common.reflect.TypeToken;
+import com.vijay.jsonwizard.constants.JsonFormConstants;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.domain.Photo;
+import org.smartregister.domain.form.FormLocation;
 import org.smartregister.location.helper.LocationHelper;
-import org.smartregister.opd.enums.LocationHierarchy;
+import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.pojo.OpdMetadata;
 import org.smartregister.util.AssetHandler;
 import org.smartregister.util.FormUtils;
@@ -37,7 +39,7 @@ public class OpdReverseJsonFormUtils {
                 JSONObject form = formUtils.getFormJson(opdMetadata.getOpdRegistrationFormName());
                 Timber.d("Original Form %s", form);
                 if (form != null) {
-                    OpdJsonFormUtils.addRegLocHierarchyQuestions(form, OpdConstants.JSON_FORM_KEY.ADDRESS_WIDGET_KEY, LocationHierarchy.ENTIRE_TREE);
+                    OpdJsonFormUtils.addRegLocHierarchyQuestions(form);
                     form.put(OpdConstants.JSON_FORM_KEY.ENTITY_ID, detailsMap.get(OpdConstants.KEY.ID));
 
                     form.put(OpdConstants.JSON_FORM_KEY.ENCOUNTER_TYPE, opdMetadata.getUpdateEventType());
@@ -86,7 +88,10 @@ public class OpdReverseJsonFormUtils {
                         .toLowerCase(), false).replace("-", ""));
             }
         } else if (jsonObject.getString(OpdJsonFormUtils.KEY).equalsIgnoreCase(OpdConstants.JSON_FORM_KEY.HOME_ADDRESS)) {
-            reverseHomeAddress(jsonObject, opdDetails.get(OpdConstants.JSON_FORM_KEY.HOME_ADDRESS));
+            String homeAddress = opdDetails.get(OpdConstants.JSON_FORM_KEY.HOME_ADDRESS);
+            jsonObject.put(OpdJsonFormUtils.VALUE, homeAddress);
+        } else if (jsonObject.getString(OpdJsonFormUtils.KEY).equalsIgnoreCase(OpdConstants.JSON_FORM_KEY.VILLAGE)) {
+            reverseVillage(jsonObject, opdDetails.get(OpdConstants.JSON_FORM_KEY.VILLAGE));
         } else if (jsonObject.getString(OpdJsonFormUtils.KEY).equalsIgnoreCase(OpdConstants.JSON_FORM_KEY.REMINDERS)) {
             reverseReminders(opdDetails, jsonObject);
         } else {
@@ -131,22 +136,26 @@ public class OpdReverseJsonFormUtils {
         }
     }
 
-    private static void reverseHomeAddress(@NonNull JSONObject jsonObject, @Nullable String entity) throws JSONException {
+    private static void reverseVillage(@NonNull JSONObject jsonObject, @Nullable String entity) throws JSONException {
         List<String> entityHierarchy = null;
         if (entity != null) {
-            if (entity.equalsIgnoreCase(OpdConstants.FormValue.OTHER)) {
+            if (OpdConstants.FormValue.OTHER.equalsIgnoreCase(entity)) {
                 entityHierarchy = new ArrayList<>();
                 entityHierarchy.add(entity);
             } else {
                 String locationId = LocationHelper.getInstance().getOpenMrsLocationId(entity);
-                entityHierarchy = LocationHelper.getInstance().getOpenMrsLocationHierarchy(locationId, true);
+                entityHierarchy = LocationHelper.getInstance().getOpenMrsLocationHierarchy(locationId, false);
             }
         }
-
+        ArrayList<String> allLevels = OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata().getHealthFacilityLevels();
+        List<FormLocation> entireTree = LocationHelper.getInstance().generateLocationHierarchyTree(true, allLevels);
+        String entireTreeString = AssetHandler.javaToJsonString(entireTree, new TypeToken<List<FormLocation>>() {
+        }.getType());
         String facilityHierarchyString = AssetHandler.javaToJsonString(entityHierarchy, new TypeToken<List<String>>() {
         }.getType());
         if (StringUtils.isNotBlank(facilityHierarchyString)) {
-            jsonObject.put(OpdJsonFormUtils.VALUE, facilityHierarchyString);
+            jsonObject.put(JsonFormConstants.VALUE, facilityHierarchyString);
+            jsonObject.put(JsonFormConstants.TREE, new JSONArray(entireTreeString));
         }
     }
 

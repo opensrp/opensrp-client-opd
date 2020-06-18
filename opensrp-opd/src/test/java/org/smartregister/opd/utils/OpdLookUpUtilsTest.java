@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -16,7 +17,9 @@ import org.smartregister.Context;
 import org.smartregister.commonregistry.CommonPersonObject;
 import org.smartregister.opd.BuildConfig;
 import org.smartregister.opd.OpdLibrary;
+import org.smartregister.opd.activity.BaseOpdFormActivity;
 import org.smartregister.opd.configuration.OpdConfiguration;
+import org.smartregister.opd.pojo.OpdMetadata;
 import org.smartregister.repository.Repository;
 
 import java.util.ArrayList;
@@ -33,19 +36,28 @@ public class OpdLookUpUtilsTest {
 
 
     @Before
-    public void setUp(){
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
     }
 
     @Test
-    public void testLookUpQuery() throws Exception {
+    public void testLookUpQueryShouldReturnQueryString() throws Exception {
         PowerMockito.mockStatic(OpdLibrary.class);
+        OpdMetadata opdMetadata = new OpdMetadata(OpdConstants.JSON_FORM_KEY.NAME
+                , OpdDbConstants.KEY.TABLE
+                , OpdConstants.EventType.OPD_REGISTRATION
+                , OpdConstants.EventType.UPDATE_OPD_REGISTRATION
+                , OpdConstants.CONFIG
+                , BaseOpdFormActivity.class
+                , null
+                , true);
+        OpdConfiguration op = Mockito.mock(OpdConfiguration.class);
+        PowerMockito.when(op.getOpdMetadata()).thenReturn(opdMetadata);
+        PowerMockito.when(opdLibrary.getOpdConfiguration()).thenReturn(op);
         PowerMockito.when(OpdLibrary.getInstance()).thenReturn(opdLibrary);
-        PowerMockito.when(opdLibrary.opdLookUpQuery()).thenReturn("");
-
         Map<String, String> entityMap = new HashMap<>();
         String result = Whitebox.invokeMethod(OpdLookUpUtils.class, "lookUpQuery", entityMap);
-        Assert.assertEquals(";", result);
+        Assert.assertEquals("select id as _id, relationalid, first_name, last_name, gender, dob, base_entity_id, opensrp_id, national_id from null where  ;", result);
     }
 
     @Test
@@ -98,8 +110,8 @@ public class OpdLookUpUtilsTest {
     }
 
     @After
-    public void tearDown(){
-        ReflectionHelpers.setStaticField(OpdLibrary.class,"instance", null);
+    public void tearDown() {
+        ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", null);
     }
 
 }

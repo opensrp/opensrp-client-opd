@@ -6,6 +6,8 @@ import android.content.Intent;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.domain.Form;
 
+import net.sqlcipher.database.SQLiteDatabase;
+
 import org.jeasy.rules.api.Facts;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,19 +22,16 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.util.ReflectionHelpers;
-import org.smartregister.domain.db.Event;
-import org.smartregister.domain.db.Obs;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.activity.BaseOpdFormActivity;
 import org.smartregister.opd.configuration.OpdConfiguration;
-import org.smartregister.opd.pojo.CompositeObs;
 import org.smartregister.opd.pojo.OpdMetadata;
-import org.smartregister.repository.DetailsRepository;
+import org.smartregister.opd.repository.OpdCheckInRepository;
+import org.smartregister.repository.EventClientRepository;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -56,6 +55,15 @@ public class OpdUtilsTest {
     private OpdConfiguration opdConfiguration;
 
     @Mock
+    private SQLiteDatabase sqLiteDatabase;
+
+    @Mock
+    private OpdCheckInRepository opdCheckInRepository;
+
+    @Mock
+    private EventClientRepository eventClientRepository;
+
+    @Mock
     private OpdMetadata opdMetadata;
 
 
@@ -77,15 +85,6 @@ public class OpdUtilsTest {
     public void convertStringToDate() {
         Date date = OpdUtils.convertStringToDate(OpdConstants.DateFormat.YYYY_MM_DD_HH_MM_SS, "2019-10-28 18:09:49");
         assertEquals("2019-10-28 18:09:49", OpdUtils.convertDate(date, OpdConstants.DateFormat.YYYY_MM_DD_HH_MM_SS));
-    }
-
-    @Test
-    public void generateNIds() {
-        String result = OpdUtils.generateNIds(0);
-        assertEquals(result, "");
-
-        String result1 = OpdUtils.generateNIds(1);
-        assertEquals(result1.split(",").length, 1);
     }
 
     @Test
@@ -166,57 +165,42 @@ public class OpdUtilsTest {
                 "{\"key\":\"diagnostic_test_128040f1b4034311b34b6ea65a81d3aa\",\"values\":[\"Ultra sound\"],\"value\":\"Ultra sound\"}," +
                 "{\"key\":\"diagnostic_result_specify_128040f1b4034311b34b6ea65a81d3aa\",\"value\":\"wer\"}]}";
         JSONObject step1JsonObject = new JSONObject(strStep1JsonObject);
-        int repeatingGroupNum = OpdUtils.buildRepeatingGroupTests(step1JsonObject);
-        assertEquals(1, repeatingGroupNum);
-    }
-
-    @Test
-    public void getAllObsObject() {
-        Event event = new Event();
-        Obs obs = new Obs();
-        obs.setFormSubmissionField(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER);
-        obs.setValue("positive");
-        obs.addToHumanReadableValuesList("");
-        obs.setFieldDataType("text");
-        obs.setFieldCode(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER);
-        event.addObs(obs);
-
-        Obs obs1 = new Obs();
-        obs1.setFormSubmissionField(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST);
-        obs1.setValue("malaria");
-        obs1.setFieldDataType("text");
-        obs1.addToHumanReadableValuesList("");
-        obs1.setFieldCode(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST);
-        event.addObs(obs1);
-
-        List<CompositeObs> compositeObsList = OpdUtils.getAllObsObject(event);
-        assertEquals(2, compositeObsList.size());
-        assertEquals("positive", compositeObsList.get(0).getValue());
-        assertEquals(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_RESULT_SPINNER, compositeObsList.get(0).getFormSubmissionFieldKey());
-
-        assertEquals("malaria", compositeObsList.get(1).getValue());
-        assertEquals(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST, compositeObsList.get(1).getFormSubmissionFieldKey());
-
+        HashMap<String, HashMap<String, String>> repeatingGroupNum = OpdUtils.buildRepeatingGroupTests(step1JsonObject);
+        assertEquals(1, repeatingGroupNum.size());
     }
 
     @Test
     public void testGetInjectableFieldsShouldPopulateMapCorrectly() {
         String baseEntityId = "234-234";
+        String visitId = "343-ertret-3";
         ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", opdLibrary);
         org.smartregister.Context context = Mockito.mock(org.smartregister.Context.class);
+        Mockito.doReturn(opdConfiguration).when(opdLibrary).getOpdConfiguration();
+        opdMetadata.setTableName("ec_client");
+        Mockito.doReturn(opdMetadata).when(opdConfiguration).getOpdMetadata();
+        Mockito.when(opdLibrary.getCheckInRepository()).thenReturn(opdCheckInRepository);
         Mockito.when(opdLibrary.context()).thenReturn(context);
-        DetailsRepository detailsRepository = Mockito.mock(DetailsRepository.class);
-        Mockito.when(context.detailsRepository()).thenReturn(detailsRepository);
-        Map<String, String> detailsMap = new HashMap<>();
+        Mockito.doReturn(sqLiteDatabase).when(eventClientRepository).getReadableDatabase();
+        Mockito.when(context.getEventClientRepository()).thenReturn(eventClientRepository);
+        ArrayList<HashMap<String, String>> maps = new ArrayList<>();
+        HashMap<String, String> detailsMap = new HashMap<>();
         detailsMap.put(OpdConstants.ClientMapKey.GENDER, "Female");
         detailsMap.put(OpdDbConstants.Column.Client.DOB, "");
-        Mockito.when(detailsRepository.getAllDetailsForClient(baseEntityId)).thenReturn(detailsMap);
-        String formName = OpdConstants.Form.OPD_CHECK_IN;
+        maps.add(detailsMap);
+
+        HashMap<String, String> checkInDetailsMap = new HashMap<>();
+        checkInDetailsMap.put(OpdDbConstants.Column.OpdCheckIn.VISIT_ID, visitId);
+        Mockito.when(opdCheckInRepository.getLatestCheckIn(baseEntityId)).thenReturn(checkInDetailsMap);
+
+        Mockito.when(eventClientRepository.rawQuery(sqLiteDatabase, "select * from " + opdMetadata.getTableName() +
+                " where " + OpdDbConstants.Column.Client.BASE_ENTITY_ID + " = '" + baseEntityId + "' limit 1")).thenReturn(maps);
+
+        String formName = OpdConstants.Form.OPD_DIAGNOSIS_AND_TREAT;
         HashMap<String, String> hashMap = OpdUtils.getInjectableFields(formName, baseEntityId);
         assertEquals(hashMap.get(OpdConstants.JSON_FORM_KEY.AGE), "");
         assertEquals(hashMap.get(OpdConstants.ClientMapKey.GENDER), "Female");
+        assertEquals(hashMap.get(OpdDbConstants.Column.OpdCheckIn.VISIT_ID), visitId);
 
         ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", null);
-
     }
 }
