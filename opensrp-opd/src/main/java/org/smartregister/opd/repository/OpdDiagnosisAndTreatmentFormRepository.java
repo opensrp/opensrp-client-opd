@@ -12,7 +12,6 @@ import org.smartregister.opd.dao.OpdDiagnosisAndTreatmentFormDao;
 import org.smartregister.opd.pojo.OpdDiagnosisAndTreatmentForm;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.repository.BaseRepository;
-import org.smartregister.repository.Repository;
 
 import java.util.List;
 
@@ -47,13 +46,13 @@ public class OpdDiagnosisAndTreatmentFormRepository extends BaseRepository imple
         contentValues.put(OpdDbConstants.Column.OpdDiagnosisAndTreatmentForm.FORM, opdDiagnosisAndTreatmentForm.getForm());
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();
         contentValues.put(OpdDbConstants.Column.OpdDiagnosisAndTreatmentForm.CREATED_AT, opdDiagnosisAndTreatmentForm.getCreatedAt());
-        long rows = sqLiteDatabase.insert(OpdDbConstants.Table.OPD_DIAGNOSIS_AND_TREATMENT_FORM, null, contentValues);
+        long rows = sqLiteDatabase.insertWithOnConflict(OpdDbConstants.Table.OPD_DIAGNOSIS_AND_TREATMENT_FORM, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
         return rows != -1;
     }
 
     @Override
     public boolean save(OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm) {
-        return saveOrUpdate(opdDiagnosisAndTreatmentForm);
+        throw new NotImplementedException("not implemented");
     }
 
     @Nullable

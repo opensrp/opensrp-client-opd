@@ -81,7 +81,7 @@ public class OpdDetailsRepository extends BaseRepository implements OpdDetailsDa
 
     @Override
     public boolean save(org.smartregister.opd.pojo.OpdDetails opdDetails) {
-        return saveOrUpdate(opdDetails);
+        throw new NotImplementedException("not implemented");
     }
 
     @Nullable
