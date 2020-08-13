@@ -309,7 +309,7 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
         }
 
         for (Event event : events) {
-            if (OpdConstants.EventType.OPD_CLOSE.equals(event.getEventType())) {
+            if (OpdConstants.EventType.OPD_CLOSE.equals(event.getEventType()) || OpdConstants.EventType.DEATH.equals(event.getEventType())) {
                 ((Activity) getProfileView()).finish();
                 break;
             }
