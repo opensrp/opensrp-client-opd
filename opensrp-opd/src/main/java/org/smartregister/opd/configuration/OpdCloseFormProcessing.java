@@ -3,6 +3,7 @@ package org.smartregister.opd.configuration;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -54,16 +55,18 @@ public class OpdCloseFormProcessing implements OpdFormProcessor<List<Event>> {
     protected void processWomanDiedEvent(JSONArray fieldsArray, Event event) throws JSONException {
         if ("died".equals(getFieldValue(fieldsArray, "opd_close_reason"))) {
             event.setEventType(OpdConstants.EventType.DEATH);
-            createDeathEventObject(event);
+            createDeathEventObject(event, fieldsArray);
         }
     }
 
-    private void createDeathEventObject(Event event) throws JSONException {
+    private void createDeathEventObject(Event event, JSONArray fieldsArray) throws JSONException {
         JSONObject eventJson = new JSONObject(JsonFormUtils.gson.toJson(event));
 
         EventClientRepository db = OpdLibrary.getInstance().eventClientRepository();
 
         JSONObject client = db.getClientByBaseEntityId(eventJson.getString(ClientProcessor.baseEntityIdJSONKey));
+        String dateOfDeath = JsonFormUtils.getFieldValue(fieldsArray, "date_of_death");
+        client.put(OpdConstants.JSON_FORM_KEY.DEATH_DATE, StringUtils.isNotBlank(dateOfDeath) ? dateOfDeath : OpdUtils.getTodaysDate());
         client.put(FormEntityConstants.Person.deathdate_estimated.name(), false);
         client.put(OpdConstants.JSON_FORM_KEY.DEATH_DATE_APPROX, false);
 
