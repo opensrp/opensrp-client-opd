@@ -304,7 +304,7 @@ public class OpdLibrary {
         return opdCheckinEvent;
     }
 
-    public List<Event> processOpdDiagnosisAndTreatmentForm(@NonNull String jsonString, @NonNull Intent data) throws JSONException {
+    public List<Event> processOpdForm(@NonNull String jsonString, @NonNull Intent data) throws JSONException {
         JSONObject jsonFormObject = new JSONObject(jsonString);
         OpdFormProcessor<List<Event>> opdFormProcessor = OpdLibrary.getInstance()
                 .getOpdConfiguration()

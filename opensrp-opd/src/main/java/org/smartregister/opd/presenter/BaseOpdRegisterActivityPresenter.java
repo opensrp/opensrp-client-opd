@@ -116,7 +116,7 @@ public abstract class BaseOpdRegisterActivityPresenter implements OpdRegisterAct
             }
         } else if (eventType.equals(OpdConstants.EventType.DIAGNOSIS_AND_TREAT)) {
             try {
-                List<Event> opdDiagnosisAndTreatment = OpdLibrary.getInstance().processOpdDiagnosisAndTreatmentForm(jsonString, data);
+                List<Event> opdDiagnosisAndTreatment = OpdLibrary.getInstance().processOpdForm(jsonString, data);
                 interactor.saveEvents(opdDiagnosisAndTreatment, this);
             } catch (JSONException e) {
                 Timber.e(e);

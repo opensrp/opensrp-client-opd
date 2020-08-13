@@ -53,6 +53,7 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
 
     private CommonPersonObjectClient commonPersonObjectClient;
     private Button switchRegBtn;
+    private String registerType;
 
     @Override
     protected void initializePresenter() {
@@ -111,15 +112,15 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
         // When user click home menu item then quit this activity.
         if (itemId == android.R.id.home) {
             finish();
-        } else if (itemId == R.id.pnc_menu_item_close_client) {
-            openOpdCloseForm();
+        } else if (itemId == R.id.opd_menu_item_close_client) {
+            openCloseForm();
         }
 
         return super.onOptionsItemSelected(item);
     }
 
     @Override
-    public void openOpdCloseForm() {
+    public void openCloseForm() {
         if (commonPersonObjectClient != null) {
             ((OpdProfileActivityPresenter) presenter).startForm(OpdConstants.Form.OPD_CLOSE, commonPersonObjectClient);
         }
@@ -129,6 +130,10 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_opd_profile_activity, menu);
+        MenuItem closeMenu = menu.findItem(R.id.opd_menu_item_close_client);
+        if (closeMenu != null && OpdConstants.RegisterType.OPD.equalsIgnoreCase(getRegisterType())) {
+            closeMenu.setEnabled(true);
+        }
         return true;
     }
 
@@ -145,9 +150,9 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
 
         // Disable the registration info button if the client is not in OPD
         if (commonPersonObjectClient != null) {
-            String register_type = commonPersonObjectClient.getDetails().get(OpdConstants.ColumnMapKey.REGISTER_TYPE);
+            registerType = commonPersonObjectClient.getDetails().get(OpdConstants.ColumnMapKey.REGISTER_TYPE);
             View view = findViewById(R.id.btn_profile_registration_info);
-            view.setEnabled(OpdConstants.RegisterType.OPD.equalsIgnoreCase(register_type));
+            view.setEnabled(OpdConstants.RegisterType.OPD.equalsIgnoreCase(registerType));
         }
     }
 
@@ -256,8 +261,7 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
                     showProgressDialog(R.string.saving_dialog_title);
 
                     ((OpdProfileActivityPresenter) presenter).saveUpdateRegistrationForm(jsonString, registerParam);
-                }
-                else if (encounterType.equals(OpdConstants.EventType.OPD_CLOSE)) {
+                } else if (encounterType.equals(OpdConstants.EventType.OPD_CLOSE)) {
                     showProgressDialog(R.string.saving_dialog_title);
                     ((OpdProfileActivityPresenter) this.presenter).saveCloseForm(encounterType, data);
                 }
@@ -304,5 +308,13 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
     @Override
     public void setClient(@NonNull CommonPersonObjectClient client) {
         this.commonPersonObjectClient = client;
+    }
+
+    public String getRegisterType() {
+        return registerType;
+    }
+
+    public void setRegisterType(String registerType) {
+        this.registerType = registerType;
     }
 }

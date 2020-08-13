@@ -3,8 +3,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/pnc_menu_item_close_client"
+        android:id="@+id/opd_menu_item_close_client"
         android:title="@string/opd_close"
         app:showAsAction="always"
+        android:enabled="false"
         tools:ignore="HardcodedText" />
 </menu>

@@ -210,7 +210,7 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
             }
         } else if (eventType.equals(OpdConstants.EventType.DIAGNOSIS_AND_TREAT)) {
             try {
-                List<Event> opdDiagnosisAndTreatment = OpdLibrary.getInstance().processOpdDiagnosisAndTreatmentForm(jsonString, data);
+                List<Event> opdDiagnosisAndTreatment = OpdLibrary.getInstance().processOpdForm(jsonString, data);
                 opdEventUtils.saveEvents(opdDiagnosisAndTreatment, this);
             } catch (JSONException e) {
                 Timber.e(e);
@@ -293,7 +293,7 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
         }
 
         try {
-            List<Event> pncFormEvent = OpdLibrary.getInstance().processOpdDiagnosisAndTreatmentForm(encounterType, data);
+            List<Event> pncFormEvent = OpdLibrary.getInstance().processOpdForm(jsonString, data);
             mProfileInteractor.saveEvents(pncFormEvent, this);
         } catch (JSONException e) {
             Timber.e(e);

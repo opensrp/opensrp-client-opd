@@ -87,7 +87,7 @@
         }
       },
       {
-        "key": "mother_status",
+        "key": "client_status",
         "type": "hidden",
         "openmrs_entity_parent": "",
         "openmrs_entity": "",
@@ -112,7 +112,7 @@
           "err": "Please enter the date of death"
         },
         "relevance": {
-          "step1:mother_status": {
+          "step1:client_status": {
             "type": "string",
             "ex": "equalTo(., \"dead\")"
           }
@@ -145,7 +145,7 @@
           "err": "Please enter the place of death"
         },
         "relevance": {
-          "step1:mother_status": {
+          "step1:client_status": {
             "type": "string",
             "ex": "equalTo(., \"dead\")"
           }
@@ -187,7 +187,7 @@
           "err": "Please enter the cause of death"
         },
         "relevance": {
-          "step1:mother_status": {
+          "step1:client_status": {
             "type": "string",
             "ex": "equalTo(., \"dead\")"
           }
@@ -223,7 +223,7 @@
           "No": "1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
         },
         "relevance": {
-          "step1:mother_status": {
+          "step1:client_status": {
             "type": "string",
             "ex": "equalTo(., \"dead\")"
           }

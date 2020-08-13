@@ -66,7 +66,7 @@ public interface OpdProfileActivityContract {
 
         void openCheckInForm();
 
-        void openOpdCloseForm();
+        void openCloseForm();
 
         void startFormActivity(@NonNull JSONObject form, @NonNull HashMap<String, String> intentKeys);
 

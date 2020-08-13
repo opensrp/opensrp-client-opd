@@ -1,6 +1,6 @@
 ---
-name: step1_mother_status
-description: The mother is alive or dead per visit
+name: step1_client_status
+description: The client is alive or dead per visit
 priority: 1
 condition: "true"
 actions:
