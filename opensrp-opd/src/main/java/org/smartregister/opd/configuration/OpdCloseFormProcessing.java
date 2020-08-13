@@ -65,6 +65,9 @@ public class OpdCloseFormProcessing implements OpdFormProcessor<List<Event>> {
         EventClientRepository db = OpdLibrary.getInstance().eventClientRepository();
 
         JSONObject client = db.getClientByBaseEntityId(eventJson.getString(ClientProcessor.baseEntityIdJSONKey));
+        JSONObject attributes = client.getJSONObject(OpdConstants.JSON_FORM_KEY.ATTRIBUTES);
+        attributes.put(OpdConstants.KEY.DATE_REMOVED, OpdUtils.getTodaysDate());
+        client.put(OpdConstants.JSON_FORM_KEY.ATTRIBUTES, attributes);
         String dateOfDeath = JsonFormUtils.getFieldValue(fieldsArray, "date_of_death");
         client.put(OpdConstants.JSON_FORM_KEY.DEATH_DATE, StringUtils.isNotBlank(dateOfDeath) ? dateOfDeath : OpdUtils.getTodaysDate());
         client.put(FormEntityConstants.Person.deathdate_estimated.name(), false);
