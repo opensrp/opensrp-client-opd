@@ -34,6 +34,7 @@ import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.repository.AllSharedPreferences;
+import org.smartregister.repository.EventClientRepository;
 import org.smartregister.repository.Repository;
 import org.smartregister.repository.UniqueIdRepository;
 import org.smartregister.sync.ClientProcessorForJava;
@@ -76,6 +77,7 @@ public class OpdLibrary {
     private OpdTreatmentDetailRepository opdTreatmentDetailRepository;
     private OpdTestConductedRepository opdTestConductedRepository;
     private OpdVisitSummaryRepository opdVisitSummaryRepository;
+    private EventClientRepository eventClientRepository;
 
     private Compressor compressor;
     private int applicationVersion;
@@ -191,6 +193,13 @@ public class OpdLibrary {
             opdVisitSummaryRepository = new OpdVisitSummaryRepository();
         }
         return opdVisitSummaryRepository;
+    }
+
+    public EventClientRepository eventClientRepository() {
+        if (eventClientRepository == null) {
+            eventClientRepository = new EventClientRepository();
+        }
+        return eventClientRepository;
     }
 
     @NonNull

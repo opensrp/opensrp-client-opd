@@ -31,8 +31,13 @@ public class OpdConfiguration {
         if (builder.opdRegisterProviderMetadata == null) {
             builder.opdRegisterProviderMetadata = BaseOpdRegisterProviderMetadata.class;
         }
+
         if (!builder.opdFormProcessingMap.containsKey(OpdConstants.EventType.DIAGNOSIS_AND_TREAT)) {
             builder.opdFormProcessingMap.put(OpdConstants.EventType.DIAGNOSIS_AND_TREAT, new OpdDiagnoseAndTreatFormProcessor());
+        }
+
+        if (!builder.opdFormProcessingMap.containsKey(OpdConstants.EventType.OPD_CLOSE)) {
+            builder.opdFormProcessingMap.put(OpdConstants.EventType.OPD_CLOSE, new OpdCloseFormProcessing());
         }
     }
 
