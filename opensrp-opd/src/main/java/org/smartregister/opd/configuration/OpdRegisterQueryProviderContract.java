@@ -88,7 +88,7 @@ public abstract class OpdRegisterQueryProviderContract {
             QueryTable tableCol = tableCols[i];
 
             OpdRegisterQueryBuilder countQueryBuilder = new OpdRegisterQueryBuilder();
-            countQueryBuilder.SelectInitiateMainTable(tableCol.getTableName(), tableCol.getColNames());
+            countQueryBuilder.selectInitiateMainTable(tableCol.getTableName(), tableCol.getColNames());
             countQueryBuilder.mainCondition(tableCol.getMainCondition());
 
             String idCol = "_id";
@@ -136,7 +136,7 @@ public abstract class OpdRegisterQueryProviderContract {
             QueryTable tableCol = tableCols[i];
 
             OpdRegisterQueryBuilder countQueryBuilder = new OpdRegisterQueryBuilder();
-            countQueryBuilder.SelectInitiateMainTable(tableCol.getTableName(), tableCol.getColNames());
+            countQueryBuilder.selectInitiateMainTable(tableCol.getTableName(), tableCol.getColNames());
             countQueryBuilder.mainCondition(tableCol.getMainCondition());
 
             if (query.length() != 0 || i != 0) {
