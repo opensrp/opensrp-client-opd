@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -110,9 +111,25 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
         // When user click home menu item then quit this activity.
         if (itemId == android.R.id.home) {
             finish();
+        } else if (itemId == R.id.pnc_menu_item_close_client) {
+            openOpdCloseForm();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void openOpdCloseForm() {
+        if (commonPersonObjectClient != null) {
+            ((OpdProfileActivityPresenter) presenter).startForm(OpdConstants.Form.OPD_CLOSE, commonPersonObjectClient);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_opd_profile_activity, menu);
+        return true;
     }
 
     @Override
@@ -215,11 +232,6 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        return true;
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == OpdJsonFormUtils.REQUEST_CODE_GET_JSON && resultCode == RESULT_OK) {
             try {
@@ -244,6 +256,10 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
                     showProgressDialog(R.string.saving_dialog_title);
 
                     ((OpdProfileActivityPresenter) presenter).saveUpdateRegistrationForm(jsonString, registerParam);
+                }
+                else if (encounterType.equals(OpdConstants.EventType.OPD_CLOSE)) {
+                    showProgressDialog(R.string.saving_dialog_title);
+                    ((OpdProfileActivityPresenter) this.presenter).saveCloseForm(encounterType, data);
                 }
 
             } catch (JSONException e) {

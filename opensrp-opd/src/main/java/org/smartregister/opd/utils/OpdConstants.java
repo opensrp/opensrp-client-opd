@@ -158,6 +158,7 @@ public class OpdConstants extends AllConstants {
     public interface Form {
         String OPD_DIAGNOSIS_AND_TREAT = "opd_diagnose_and_treat";
         String OPD_CHECK_IN = "opd_checkin";
+        String OPD_CLOSE = "opd_close";
     }
 
     public interface FormValue {

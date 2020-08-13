@@ -85,4 +85,6 @@
     <string name="opd_referred_label">Was client referred?</string>
     <string name="opd_referred_to_label">Where were they referred to?</string>
 
+    <string name="opd_close">OPD Close</string>
+
 </resources>

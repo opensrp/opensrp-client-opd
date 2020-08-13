@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.smartregister.CoreLibrary;
 import org.smartregister.clientandeventmodel.Client;
 import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.commonregistry.CommonPersonObject;
@@ -24,13 +25,20 @@ import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.opd.utils.OpdUtils;
+import org.smartregister.repository.BaseRepository;
 import org.smartregister.repository.EventClientRepository;
+import org.smartregister.sync.ClientProcessorForJava;
+import org.smartregister.sync.helper.ECSyncHelper;
+import org.smartregister.util.JsonFormUtils;
+import org.smartregister.view.activity.DrishtiApplication;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import timber.log.Timber;
+
+import static org.smartregister.util.Utils.getAllSharedPreferences;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-27
@@ -197,5 +205,55 @@ public class OpdProfileInteractor implements OpdProfileActivityContract.Interact
         if (!isChangingConfiguration) {
             mProfilePresenter = null;
         }
+    }
+
+    @Override
+    public void saveEvents(List<Event> opdFormEvent, OpdProfileActivityContract.InteractorCallBack callBack) {
+        Runnable runnable = () -> {
+            for (Event event : opdFormEvent) {
+                saveEventInDb(event);
+            }
+
+            processLatestUnprocessedEvents();
+
+            appExecutors.mainThread().execute(() -> callBack.onEventSaved(opdFormEvent));
+        };
+
+        appExecutors.diskIO().execute(runnable);
+    }
+
+    private void saveEventInDb(@NonNull Event event) {
+        try {
+            CoreLibrary.getInstance()
+                    .context()
+                    .getEventClientRepository()
+                    .addEvent(event.getBaseEntityId()
+                            , new JSONObject(JsonFormUtils.gson.toJson(event)));
+        } catch (JSONException e) {
+            Timber.e(e);
+        }
+    }
+
+    private void processLatestUnprocessedEvents() {
+        // Process this event
+        long lastSyncTimeStamp = getAllSharedPreferences().fetchLastUpdatedAtDate(0);
+        Date lastSyncDate = new Date(lastSyncTimeStamp);
+
+        try {
+            getClientProcessorForJava().processClient(getSyncHelper().getEvents(lastSyncDate, BaseRepository.TYPE_Unprocessed));
+            getAllSharedPreferences().saveLastUpdatedAtDate(new Date().getTime());
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+    }
+
+    @NonNull
+    public ECSyncHelper getSyncHelper() {
+        return OpdLibrary.getInstance().getEcSyncHelper();
+    }
+
+    @NonNull
+    public ClientProcessorForJava getClientProcessorForJava() {
+        return DrishtiApplication.getInstance().getClientProcessor();
     }
 }
