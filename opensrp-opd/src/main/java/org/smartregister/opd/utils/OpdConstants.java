@@ -175,6 +175,7 @@ public class OpdConstants extends AllConstants {
     }
 
     public static class JSON_FORM_KEY {
+        public static final String DEATH_DATE_APPROX = "deathdateApprox";
         public static final String OPTIONS = "options";
         public static final String LAST_INTERACTED_WITH = "last_interacted_with";
         public static final String DOB = "dob";
@@ -272,6 +273,8 @@ public class OpdConstants extends AllConstants {
         public static final String NATIONAL_ID = "national_id";
         public static final String GENDER = "gender";
         public static final String ID = "id";
+        public static final String DOD = "dod";
+        public static final String DATE_REMOVED = "date_removed";
     }
 
     public static class ENTITY {
@@ -300,5 +303,7 @@ public class OpdConstants extends AllConstants {
         public static final String MEDICAL_CONDITIONS_AND_HIV_DETAILS = "OPD Medical Conditions And HIV Details";
         public static final String OUTCOME = "OPD Outcome";
         public static final String CLOSE_OPD_VISIT = "OPD Close Visit";
+        public static final String OPD_CLOSE = "OPD Close";
+        public static final String DEATH = "Death";
     }
 }
