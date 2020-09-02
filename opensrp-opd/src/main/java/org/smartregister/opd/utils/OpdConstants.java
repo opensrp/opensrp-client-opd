@@ -234,6 +234,9 @@ public class OpdConstants extends AllConstants {
         public static final String TREATMENT_TYPE_SPECIFY = "treatment_type_specify";
         public static final String DIAGNOSIS_SAME = "diagnosis_same";
         public static final String VILLAGE = "village";
+        public static final String ATTRIBUTES = "attributes";
+        public static final String DATE_REMOVED = "date_removed";
+        public static final String DATE_OF_DEATH = "date_of_death";
         public static String TESTS_REPEATING_GROUP = "tests_repeating_group";
         public static final String DEATH_DATE = "deathdate";
     }
