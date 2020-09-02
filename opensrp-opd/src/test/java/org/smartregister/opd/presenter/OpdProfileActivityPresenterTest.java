@@ -218,14 +218,14 @@ public class OpdProfileActivityPresenterTest extends BaseTest {
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
                 return null;
             }
-        }).when(opdLibrary).processOpdDiagnosisAndTreatmentForm(Mockito.anyString(), Mockito.nullable(Intent.class));
+        }).when(opdLibrary).processOpdForm(Mockito.anyString(), Mockito.nullable(Intent.class));
 
         Intent intent = new Intent();
         intent.putExtra(OpdConstants.JSON_FORM_EXTRA.JSON, jsonString);
 
         presenter.saveVisitOrDiagnosisForm(OpdConstants.EventType.DIAGNOSIS_AND_TREAT, intent);
 
-        Mockito.verify(opdLibrary, Mockito.times(1)).processOpdDiagnosisAndTreatmentForm(Mockito.eq(jsonString)
+        Mockito.verify(opdLibrary, Mockito.times(1)).processOpdForm(Mockito.eq(jsonString)
                 , Mockito.any(Intent.class));
         ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", null);
     }

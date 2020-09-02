@@ -151,13 +151,14 @@ public class OpdConstants extends AllConstants {
     public interface DateFormat {
         String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
         String d_MMM_yyyy = "d MMM yyyy";
-        String  d_MMM_yyyy_hh_mm_ss = "d MMM yyyy HH:mm:ss";
+        String d_MMM_yyyy_hh_mm_ss = "d MMM yyyy HH:mm:ss";
         String YYYY_MM_DD = "yyyy-MM-dd";
     }
 
     public interface Form {
         String OPD_DIAGNOSIS_AND_TREAT = "opd_diagnose_and_treat";
         String OPD_CHECK_IN = "opd_checkin";
+        String OPD_CLOSE = "opd_close";
     }
 
     public interface FormValue {
@@ -175,6 +176,7 @@ public class OpdConstants extends AllConstants {
     }
 
     public static class JSON_FORM_KEY {
+        public static final String DEATH_DATE_APPROX = "deathdateApprox";
         public static final String OPTIONS = "options";
         public static final String LAST_INTERACTED_WITH = "last_interacted_with";
         public static final String DOB = "dob";
@@ -232,7 +234,12 @@ public class OpdConstants extends AllConstants {
         public static final String TREATMENT_TYPE_SPECIFY = "treatment_type_specify";
         public static final String DIAGNOSIS_SAME = "diagnosis_same";
         public static final String VILLAGE = "village";
+        public static final String ATTRIBUTES = "attributes";
+        public static final String DATE_REMOVED = "date_removed";
+        public static final String DATE_OF_DEATH = "date_of_death";
+        public static final String OPD_CLOSE_REASON = "opd_close_reason";
         public static String TESTS_REPEATING_GROUP = "tests_repeating_group";
+        public static final String DEATH_DATE = "deathdate";
     }
 
     public static class JsonFormNameUtils {
@@ -272,6 +279,9 @@ public class OpdConstants extends AllConstants {
         public static final String NATIONAL_ID = "national_id";
         public static final String GENDER = "gender";
         public static final String ID = "id";
+        public static final String DOD = "dod";
+        public static final String DATE_REMOVED = "date_removed";
+        public static final String DIED = "died";
     }
 
     public static class ENTITY {
@@ -300,5 +310,7 @@ public class OpdConstants extends AllConstants {
         public static final String MEDICAL_CONDITIONS_AND_HIV_DETAILS = "OPD Medical Conditions And HIV Details";
         public static final String OUTCOME = "OPD Outcome";
         public static final String CLOSE_OPD_VISIT = "OPD Close Visit";
+        public static final String OPD_CLOSE = "OPD Close";
+        public static final String DEATH = "Death";
     }
 }

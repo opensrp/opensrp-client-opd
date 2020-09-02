@@ -17,6 +17,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.CoreLibrary;
+import org.smartregister.commonregistry.AllCommonsRepository;
 import org.smartregister.commonregistry.CommonFtsObject;
 import org.smartregister.commonregistry.CommonRepository;
 import org.smartregister.domain.db.Event;
@@ -85,6 +86,8 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
             eventTypes.add(OpdConstants.EventType.OUTCOME);
             eventTypes.add(OpdConstants.EventType.MEDICAL_CONDITIONS_AND_HIV_DETAILS);
             eventTypes.add(OpdConstants.EventType.PREGNANCY_STATUS);
+            eventTypes.add(OpdConstants.EventType.OPD_CLOSE);
+            eventTypes.add(OpdConstants.EventType.DEATH);
         }
 
         return eventTypes;
@@ -145,6 +148,36 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
             } catch (Exception e) {
                 Timber.e(e);
             }
+        } else if (event.getEventType().equals(OpdConstants.EventType.OPD_CLOSE)) {
+            processEvent(eventClient.getEvent(), eventClient.getClient(), clientClassification);
+            CoreLibrary.getInstance().context().getEventClientRepository().markEventAsProcessed(eventClient.getEvent().getFormSubmissionId());
+            unsyncEvents.add(event);
+        } else if (event.getEventType().equals(OpdConstants.EventType.DEATH)) {
+            processDeathEvent(eventClient);
+            processEvent(eventClient.getEvent(), eventClient.getClient(), clientClassification);
+            CoreLibrary.getInstance().context().getEventClientRepository().markEventAsProcessed(eventClient.getEvent().getFormSubmissionId());
+            unsyncEvents.add(event);
+        }
+    }
+
+    private void processDeathEvent(@NonNull EventClient eventClient) {
+        Event event = eventClient.getEvent();
+        String entityId = event.getBaseEntityId();
+
+        HashMap<String, String> keyValues = new HashMap<>();
+        generateKeyValuesFromEvent(event, keyValues);
+
+        String encounterDateField = keyValues.get(OpdConstants.JSON_FORM_KEY.DATE_OF_DEATH);
+
+        ContentValues values = new ContentValues();
+        values.put(OpdConstants.KEY.DOD, encounterDateField);
+        values.put(OpdConstants.KEY.DATE_REMOVED, OpdUtils.getTodaysDate());
+
+        //Update REGISTER and FTS Tables
+        AllCommonsRepository allCommonsRepository = OpdLibrary.getInstance().context().allCommonsRepositoryobjects(OpdDbConstants.Table.EC_CLIENT);
+        if (allCommonsRepository != null) {
+            allCommonsRepository.update(OpdDbConstants.Table.EC_CLIENT, values, entityId);
+            allCommonsRepository.updateSearch(entityId);
         }
     }
 

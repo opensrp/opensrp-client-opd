@@ -24,6 +24,7 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.reflect.Whitebox;
 import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.CoreLibrary;
+import org.smartregister.commonregistry.AllCommonsRepository;
 import org.smartregister.commonregistry.CommonFtsObject;
 import org.smartregister.commonregistry.CommonRepository;
 import org.smartregister.domain.db.Client;
@@ -53,31 +54,48 @@ import org.smartregister.repository.Repository;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 
 public class OpdMiniClientProcessorForJavaTest extends BaseRobolectricUnitTest {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
+
     private OpdMiniClientProcessorForJava opdMiniClientProcessorForJava;
+
     @Mock
     private OpdLibrary opdLibrary;
+
     @Mock
     private OpdTreatmentDetailRepository opdTreatmentDetailRepository;
+
     @Mock
     private OpdTestConductedRepository opdTestConductedRepository;
+
     @Mock
     private OpdDiagnosisDetailRepository opdDiagnosisDetailRepository;
+
     @Mock
     private OpdDetailsRepository opdDetailsRepository;
+
     @Captor
     private ArgumentCaptor<OpdTreatmentDetail> opdTreatmentArgumentCaptor;
+
     @Captor
     private ArgumentCaptor<OpdDiagnosisDetail> opdDiagnosisArgumentCaptor;
+
     @Captor
     private ArgumentCaptor<OpdDetails> opdDetailsArgumentCaptor;
+
     @Captor
     private ArgumentCaptor<OpdTestConducted> opdTestConductedArgumentCaptor;
+
+
+    @Mock
+    private org.smartregister.Context opensrpContext;
+
+    @Mock
+    private AllCommonsRepository allCommonsRepository;
+
     private Event event;
     private String baseEntityId = "2323-scvdp-sd";
     private String visitId = "23we-sfdddp-sd";
@@ -192,17 +210,6 @@ public class OpdMiniClientProcessorForJavaTest extends BaseRobolectricUnitTest {
         Assert.assertEquals("TB Screening", opdTestConductedArgumentCaptor.getValue().getTestType());
         Assert.assertEquals("visitId", opdTestConductedArgumentCaptor.getValue().getVisitId());
         Assert.assertNotNull(opdTestConductedArgumentCaptor.getValue().getCreatedAt());
-    }
-
-
-    @Test
-    public void getEventTypesShouldReturnAtLeast6EventTypesAllStartingWithOpd() {
-        HashSet<String> eventTypes = opdMiniClientProcessorForJava.getEventTypes();
-
-        Assert.assertTrue(eventTypes.size() >= 6);
-        for (String eventType : eventTypes) {
-            Assert.assertTrue(eventType.startsWith("OPD"));
-        }
     }
 
     @Test
@@ -436,5 +443,42 @@ public class OpdMiniClientProcessorForJavaTest extends BaseRobolectricUnitTest {
         OpdDetails opdDetails = Whitebox.invokeMethod(opdMiniClientProcessorForJava, "generateOpdDetailsFromCheckInEvent", event, visitId, visitDate);
         Assert.assertNotNull(opdDetails);
         Assert.assertTrue(opdDetails.isPendingDiagnoseAndTreat());
+    }
+
+    @Test
+    public void testProcessDeathEventShouldUpdateClientAndFtsTable() throws Exception {
+        String baseEntityId = "2323-230we23";
+
+        Obs obsVisitId = new Obs();
+        obsVisitId.setFormSubmissionField(OpdConstants.JSON_FORM_KEY.DATE_OF_DEATH);
+        obsVisitId.setValue("2020-06-06");
+        obsVisitId.setFieldDataType("text");
+        obsVisitId.setHumanReadableValue("");
+        obsVisitId.setFieldCode(OpdConstants.JSON_FORM_KEY.DATE_OF_DEATH);
+
+        Event event = new Event();
+        event.setBaseEntityId(baseEntityId);
+        Client client = new Client(baseEntityId);
+
+        EventClient eventClient = new EventClient(event, client);
+        Mockito.doReturn(allCommonsRepository)
+                .when(opensrpContext)
+                .allCommonsRepositoryobjects(OpdDbConstants.Table.EC_CLIENT);
+
+        Mockito.doReturn(opensrpContext).when(opdLibrary).context();
+
+        ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", opdLibrary);
+
+
+        Whitebox.invokeMethod(opdMiniClientProcessorForJava,
+                "processDeathEvent", eventClient);
+
+        Mockito.verify(allCommonsRepository, Mockito.times(1))
+                .update(Mockito.eq(OpdDbConstants.Table.EC_CLIENT),
+                        Mockito.any(ContentValues.class),
+                        Mockito.eq(baseEntityId));
+
+        Mockito.verify(allCommonsRepository, Mockito.times(1))
+                .updateSearch(Mockito.eq(baseEntityId));
     }
 }

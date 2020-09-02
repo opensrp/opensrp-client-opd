@@ -1,5 +1,6 @@
 package org.smartregister.opd.presenter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -209,7 +210,7 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
             }
         } else if (eventType.equals(OpdConstants.EventType.DIAGNOSIS_AND_TREAT)) {
             try {
-                List<Event> opdDiagnosisAndTreatment = OpdLibrary.getInstance().processOpdDiagnosisAndTreatmentForm(jsonString, data);
+                List<Event> opdDiagnosisAndTreatment = OpdLibrary.getInstance().processOpdForm(jsonString, data);
                 opdEventUtils.saveEvents(opdDiagnosisAndTreatment, this);
             } catch (JSONException e) {
                 Timber.e(e);
@@ -281,4 +282,37 @@ public class OpdProfileActivityPresenter implements OpdProfileActivityContract.P
         }
     }
 
+    public void saveCloseForm(String encounterType, Intent data) {
+        String jsonString = null;
+        if (data != null) {
+            jsonString = data.getStringExtra(OpdConstants.JSON_FORM_EXTRA.JSON);
+        }
+
+        if (jsonString == null) {
+            return;
+        }
+
+        try {
+            List<Event> pncFormEvent = OpdLibrary.getInstance().processOpdForm(jsonString, data);
+            mProfileInteractor.saveEvents(pncFormEvent, this);
+        } catch (JSONException e) {
+            Timber.e(e);
+        }
+    }
+
+    @Override
+    public void onEventSaved(List<Event> events) {
+        OpdProfileActivityContract.View view = getProfileView();
+
+        if (view != null) {
+            view.hideProgressDialog();
+        }
+
+        for (Event event : events) {
+            if (OpdConstants.EventType.OPD_CLOSE.equals(event.getEventType()) || OpdConstants.EventType.DEATH.equals(event.getEventType())) {
+                ((Activity) getProfileView()).finish();
+                break;
+            }
+        }
+    }
 }

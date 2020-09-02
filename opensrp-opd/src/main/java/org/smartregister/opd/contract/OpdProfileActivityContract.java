@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 
 import org.json.JSONObject;
+import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.domain.tag.FormTag;
 import org.smartregister.opd.listener.OnSendActionToFragment;
@@ -16,6 +17,7 @@ import org.smartregister.opd.pojo.RegisterParams;
 import org.smartregister.view.contract.BaseProfileContract;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -64,6 +66,8 @@ public interface OpdProfileActivityContract {
 
         void openCheckInForm();
 
+        void openCloseForm();
+
         void startFormActivity(@NonNull JSONObject form, @NonNull HashMap<String, String> intentKeys);
 
         OnSendActionToFragment getActionListenerForVisitFragment();
@@ -96,6 +100,8 @@ public interface OpdProfileActivityContract {
         CommonPersonObjectClient retrieveUpdatedClient(@NonNull String baseEntityId);
 
         void onDestroy(boolean isChangingConfiguration);
+
+        void saveEvents(List<Event> opdFormEvent, OpdProfileActivityContract.InteractorCallBack callback);
     }
 
     interface InteractorCallBack {
@@ -103,6 +109,8 @@ public interface OpdProfileActivityContract {
         void onRegistrationSaved(@Nullable CommonPersonObjectClient client, boolean isEdit);
 
         void onFetchedSavedDiagnosisAndTreatmentForm(@Nullable OpdDiagnosisAndTreatmentForm diagnosisAndTreatmentForm, @NonNull String caseId, @NonNull String entityTable);
+
+        void onEventSaved(List<Event> events);
 
     }
 }

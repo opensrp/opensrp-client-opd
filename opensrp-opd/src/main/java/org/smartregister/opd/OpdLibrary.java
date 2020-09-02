@@ -34,6 +34,7 @@ import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.repository.AllSharedPreferences;
+import org.smartregister.repository.EventClientRepository;
 import org.smartregister.repository.Repository;
 import org.smartregister.repository.UniqueIdRepository;
 import org.smartregister.sync.ClientProcessorForJava;
@@ -76,6 +77,7 @@ public class OpdLibrary {
     private OpdTreatmentDetailRepository opdTreatmentDetailRepository;
     private OpdTestConductedRepository opdTestConductedRepository;
     private OpdVisitSummaryRepository opdVisitSummaryRepository;
+    private EventClientRepository eventClientRepository;
 
     private Compressor compressor;
     private int applicationVersion;
@@ -193,6 +195,13 @@ public class OpdLibrary {
         return opdVisitSummaryRepository;
     }
 
+    public EventClientRepository eventClientRepository() {
+        if (eventClientRepository == null) {
+            eventClientRepository = new EventClientRepository();
+        }
+        return eventClientRepository;
+    }
+
     @NonNull
     public Repository getRepository() {
         return repository;
@@ -295,7 +304,7 @@ public class OpdLibrary {
         return opdCheckinEvent;
     }
 
-    public List<Event> processOpdDiagnosisAndTreatmentForm(@NonNull String jsonString, @NonNull Intent data) throws JSONException {
+    public List<Event> processOpdForm(@NonNull String jsonString, @NonNull Intent data) throws JSONException {
         JSONObject jsonFormObject = new JSONObject(jsonString);
         OpdFormProcessor<List<Event>> opdFormProcessor = OpdLibrary.getInstance()
                 .getOpdConfiguration()

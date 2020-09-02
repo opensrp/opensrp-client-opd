@@ -1,0 +1,11 @@
+---
+name: step1_client_status
+description: The client is alive or dead per visit
+priority: 1
+condition: "true"
+actions:
+  - 'calculation = step1_opd_close_reason.equals("died") ? "dead" : "alive"'
+
+
+
+
