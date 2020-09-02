@@ -39,7 +39,6 @@ import org.smartregister.sync.MiniClientProcessorForJava;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -168,7 +167,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         HashMap<String, String> keyValues = new HashMap<>();
         generateKeyValuesFromEvent(event, keyValues);
 
-        String encounterDateField = keyValues.get("date_of_death");
+        String encounterDateField = keyValues.get(OpdConstants.JSON_FORM_KEY.DATE_OF_DEATH);
 
         ContentValues values = new ContentValues();
         values.put(OpdConstants.KEY.DOD, encounterDateField);
@@ -178,7 +177,7 @@ public class OpdMiniClientProcessorForJava extends ClientProcessorForJava implem
         AllCommonsRepository allCommonsRepository = OpdLibrary.getInstance().context().allCommonsRepositoryobjects(OpdDbConstants.Table.EC_CLIENT);
         if (allCommonsRepository != null) {
             allCommonsRepository.update(OpdDbConstants.Table.EC_CLIENT, values, entityId);
-            OpdLibrary.getInstance().context().allCommonsRepositoryobjects(OpdDbConstants.Table.EC_CLIENT).updateSearch(Arrays.asList(new String[]{entityId}));
+            allCommonsRepository.updateSearch(entityId);
         }
     }
 
