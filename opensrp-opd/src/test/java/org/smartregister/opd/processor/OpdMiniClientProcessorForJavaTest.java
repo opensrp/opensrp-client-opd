@@ -53,7 +53,6 @@ import org.smartregister.repository.Repository;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 
 public class OpdMiniClientProcessorForJavaTest extends BaseRobolectricUnitTest {
 
@@ -192,17 +191,6 @@ public class OpdMiniClientProcessorForJavaTest extends BaseRobolectricUnitTest {
         Assert.assertEquals("TB Screening", opdTestConductedArgumentCaptor.getValue().getTestType());
         Assert.assertEquals("visitId", opdTestConductedArgumentCaptor.getValue().getVisitId());
         Assert.assertNotNull(opdTestConductedArgumentCaptor.getValue().getCreatedAt());
-    }
-
-
-    @Test
-    public void getEventTypesShouldReturnAtLeast6EventTypesAllStartingWithOpd() {
-        HashSet<String> eventTypes = opdMiniClientProcessorForJava.getEventTypes();
-
-        Assert.assertTrue(eventTypes.size() >= 6);
-        for (String eventType : eventTypes) {
-            Assert.assertTrue(eventType.startsWith("OPD"));
-        }
     }
 
     @Test

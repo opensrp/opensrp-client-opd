@@ -56,7 +56,6 @@ public class OpdCloseFormProcessingTest {
         String jsonString = "{\"encounter_type\":\"Opd Close\",\"entity_id\":\"\",\"metadata\":{\"encounter_location\":\"\"},\"step1\":{\"title\":\"Opd Close\",\"fields\":[{\"key\":\"opd_close_reason\",\"value\":\"died\"},{\"key\":\"date_of_death\",\"value\":\"09-08-2020\"},{\"key\":\"place_of death\",\"value\":\"Community\"},{\"key\":\"death_cause\",\"value\":\"Unknown\"}]}}";
 
         JSONObject clientObject = new JSONObject();
-        JSONObject attributes = new JSONObject();
         clientObject.put(OpdConstants.JSON_FORM_KEY.ATTRIBUTES, clientObject);
 
         Context context = mock(Context.class);
