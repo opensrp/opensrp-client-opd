@@ -24,11 +24,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static org.smartregister.opd.utils.OpdConstants.EventType.OPD_CLOSE;
-import static org.smartregister.opd.utils.OpdJsonFormUtils.METADATA;
-import static org.smartregister.util.JsonFormUtils.generateRandomUUIDString;
-import static org.smartregister.util.JsonFormUtils.getFieldValue;
-
 public class OpdCloseFormProcessing implements OpdFormProcessor<List<Event>> {
 
     @Override
@@ -39,11 +34,11 @@ public class OpdCloseFormProcessing implements OpdFormProcessor<List<Event>> {
         JSONArray fieldsArray = OpdUtils.generateFieldsFromJsonForm(jsonObject);
         FormTag formTag = OpdJsonFormUtils.formTag(Utils.getAllSharedPreferences());
 
-        JSONObject metadata = jsonObject.getJSONObject(METADATA);
+        JSONObject metadata = jsonObject.getJSONObject(OpdJsonFormUtils.METADATA);
 
         String baseEntityId = OpdUtils.getIntentValue(data, OpdConstants.IntentKey.BASE_ENTITY_ID);
         String entityTable = OpdUtils.getIntentValue(data, OpdConstants.IntentKey.ENTITY_TABLE);
-        Event closeOpdEvent = JsonFormUtils.createEvent(fieldsArray, metadata, formTag, baseEntityId, OPD_CLOSE, entityTable);
+        Event closeOpdEvent = JsonFormUtils.createEvent(fieldsArray, metadata, formTag, baseEntityId, OpdConstants.EventType.OPD_CLOSE, entityTable);
         OpdJsonFormUtils.tagSyncMetadata(closeOpdEvent);
         eventList.add(closeOpdEvent);
 
@@ -53,7 +48,7 @@ public class OpdCloseFormProcessing implements OpdFormProcessor<List<Event>> {
     }
 
     protected void processWomanDiedEvent(JSONArray fieldsArray, Event event) throws JSONException {
-        if (OpdConstants.KEY.DIED.equals(getFieldValue(fieldsArray, OpdConstants.JSON_FORM_KEY.OPD_CLOSE_REASON))) {
+        if (OpdConstants.KEY.DIED.equals(JsonFormUtils.getFieldValue(fieldsArray, OpdConstants.JSON_FORM_KEY.OPD_CLOSE_REASON))) {
             event.setEventType(OpdConstants.EventType.DEATH);
             createDeathEventObject(event, fieldsArray);
         }
@@ -80,7 +75,7 @@ public class OpdCloseFormProcessing implements OpdFormProcessor<List<Event>> {
         Event updateClientDetailsEvent = (Event) new Event().withBaseEntityId(event.getBaseEntityId())
                 .withEventDate(DateTime.now().toDate()).withEventType(OpdUtils.metadata().getUpdateEventType()).withLocationId(event.getLocationId())
                 .withProviderId(event.getLocationId()).withEntityType(event.getEntityType())
-                .withFormSubmissionId(generateRandomUUIDString()).withDateCreated(new Date());
+                .withFormSubmissionId(JsonFormUtils.generateRandomUUIDString()).withDateCreated(new Date());
 
         JSONObject eventJsonUpdateClientEvent = new JSONObject(JsonFormUtils.gson.toJson(updateClientDetailsEvent));
 
