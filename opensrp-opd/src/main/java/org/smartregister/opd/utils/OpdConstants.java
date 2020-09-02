@@ -151,7 +151,7 @@ public class OpdConstants extends AllConstants {
     public interface DateFormat {
         String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
         String d_MMM_yyyy = "d MMM yyyy";
-        String  d_MMM_yyyy_hh_mm_ss = "d MMM yyyy HH:mm:ss";
+        String d_MMM_yyyy_hh_mm_ss = "d MMM yyyy HH:mm:ss";
         String YYYY_MM_DD = "yyyy-MM-dd";
     }
 
@@ -237,9 +237,9 @@ public class OpdConstants extends AllConstants {
         public static final String ATTRIBUTES = "attributes";
         public static final String DATE_REMOVED = "date_removed";
         public static final String DATE_OF_DEATH = "date_of_death";
+        public static final String OPD_CLOSE_REASON = "opd_close_reason";
         public static String TESTS_REPEATING_GROUP = "tests_repeating_group";
         public static final String DEATH_DATE = "deathdate";
-        public static final String ATTRIBUTES = "attributes";
     }
 
     public static class JsonFormNameUtils {
@@ -281,6 +281,7 @@ public class OpdConstants extends AllConstants {
         public static final String ID = "id";
         public static final String DOD = "dod";
         public static final String DATE_REMOVED = "date_removed";
+        public static final String DIED = "died";
     }
 
     public static class ENTITY {

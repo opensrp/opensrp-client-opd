@@ -53,7 +53,7 @@ public class OpdCloseFormProcessing implements OpdFormProcessor<List<Event>> {
     }
 
     protected void processWomanDiedEvent(JSONArray fieldsArray, Event event) throws JSONException {
-        if ("died".equals(getFieldValue(fieldsArray, "opd_close_reason"))) {
+        if (OpdConstants.KEY.DIED.equals(getFieldValue(fieldsArray, OpdConstants.JSON_FORM_KEY.OPD_CLOSE_REASON))) {
             event.setEventType(OpdConstants.EventType.DEATH);
             createDeathEventObject(event, fieldsArray);
         }
