@@ -31,7 +31,7 @@ public class OpdCloseFormProcessing implements OpdFormProcessor<List<Event>> {
 
         ArrayList<Event> eventList = new ArrayList<>();
 
-        JSONArray fieldsArray = OpdUtils.generateFieldsFromJsonForm(jsonObject);
+        JSONArray fieldsArray = OpdJsonFormUtils.getMultiStepFormFields(jsonObject);
         FormTag formTag = OpdJsonFormUtils.formTag(Utils.getAllSharedPreferences());
 
         JSONObject metadata = jsonObject.getJSONObject(OpdJsonFormUtils.METADATA);

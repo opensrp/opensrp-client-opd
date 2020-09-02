@@ -37,7 +37,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -375,25 +374,6 @@ public class OpdUtils extends Utils {
         return jsonArray;
     }
 
-    @NonNull
-    public static JSONArray generateFieldsFromJsonForm(@NonNull JSONObject jsonFormObject) throws JSONException {
-        JSONArray jsonArray = new JSONArray();
-
-        Iterator<String> formKeys = jsonFormObject.keys();
-
-        while (formKeys.hasNext()) {
-            String formKey = formKeys.next();
-            if (formKey != null && formKey.startsWith("step")) {
-                JSONObject stepJSONObject = jsonFormObject.getJSONObject(formKey);
-                JSONArray fieldsArray = stepJSONObject.getJSONArray(OpdJsonFormUtils.FIELDS);
-                for (int i = 0; i < fieldsArray.length(); i++) {
-                    jsonArray.put(fieldsArray.get(i));
-                }
-            }
-        }
-
-        return jsonArray;
-    }
 
     public static String getTodaysDate() {
         return convertDateFormat(DateTime.now());
