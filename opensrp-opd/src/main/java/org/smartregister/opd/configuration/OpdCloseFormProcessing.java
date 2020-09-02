@@ -72,7 +72,6 @@ public class OpdCloseFormProcessing implements OpdFormProcessor<List<Event>> {
 
         JSONObject attributes = client.getJSONObject(OpdConstants.JSON_FORM_KEY.ATTRIBUTES);
         attributes.put(OpdConstants.JSON_FORM_KEY.DATE_REMOVED, OpdUtils.getTodaysDate());
-        client.put(OpdConstants.JSON_FORM_KEY.ATTRIBUTES, attributes);
 
         db.addorUpdateClient(event.getBaseEntityId(), client);
 

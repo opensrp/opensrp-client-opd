@@ -239,6 +239,7 @@ public class OpdConstants extends AllConstants {
         public static final String DATE_OF_DEATH = "date_of_death";
         public static String TESTS_REPEATING_GROUP = "tests_repeating_group";
         public static final String DEATH_DATE = "deathdate";
+        public static final String ATTRIBUTES = "attributes";
     }
 
     public static class JsonFormNameUtils {
