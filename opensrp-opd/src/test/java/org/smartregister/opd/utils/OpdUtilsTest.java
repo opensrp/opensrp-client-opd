@@ -9,6 +9,7 @@ import com.vijay.jsonwizard.domain.Form;
 import net.sqlcipher.database.SQLiteDatabase;
 
 import org.jeasy.rules.api.Facts;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -202,5 +203,16 @@ public class OpdUtilsTest {
         assertEquals(hashMap.get(OpdDbConstants.Column.OpdCheckIn.VISIT_ID), visitId);
 
         ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", null);
+    }
+
+    @Test
+    public void testAddOpenMrsEntityIdShouldAddIdIfPresent() throws JSONException {
+        String diseaseStr = "{\"openmrsentity\":\"\",\"property\":{\"presumed-id\":\"233AAAAAA\",\"code\":\"code_1\",\"confirmed-id\":null},\"openmrsentityid\":\"\",\"text\":\"Polio* (1)\",\"openmrsentityparent\":\"\",\"key\":\"code_1\"}";
+        JSONObject jsonObject = new JSONObject(diseaseStr);
+        JSONArray jsonArray = new JSONArray();
+        jsonArray.put(jsonObject);
+        JSONArray resultArray = OpdUtils.addOpenMrsEntityId("presumed", jsonArray);
+        JSONObject resultObject = resultArray.getJSONObject(0);
+        assertEquals("233AAAAAA", resultObject.optString(JsonFormConstants.OPENMRS_ENTITY_ID));
     }
 }

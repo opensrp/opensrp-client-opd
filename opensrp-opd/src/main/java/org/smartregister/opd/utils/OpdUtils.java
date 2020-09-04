@@ -277,7 +277,6 @@ public class OpdUtils extends Utils {
                     fieldKey = fieldKey.substring(0, fieldKey.lastIndexOf("_"));
                     if (keysArrayList.contains(fieldKey) && StringUtils.isNotBlank(fieldValue) && !fieldValue.equals(OpdConstants.TYPE_OF_TEXT_LABEL)) {
                         String fieldKeyId = valueField.optString(JsonFormConstants.KEY).substring(fieldKey.length() + 1);
-                        valueField.put(JsonFormConstants.KEY, fieldKey);
                         HashMap<String, String> hashMap = repeatingGroupMap.get(fieldKeyId) == null ? new HashMap<>() : repeatingGroupMap.get(fieldKeyId);
                         hashMap.put(fieldKey, fieldValue);
                         repeatingGroupMap.put(fieldKeyId, hashMap);
@@ -359,7 +358,8 @@ public class OpdUtils extends Utils {
         return "";
     }
 
-    public static JSONArray addOpenMrsEntityId(@NonNull String diagnosisType, @NonNull JSONArray jsonArray) {
+    public static JSONArray addOpenMrsEntityId(@NonNull String diagnosisType,
+                                               @NonNull JSONArray jsonArray) {
         try {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.optJSONObject(i);

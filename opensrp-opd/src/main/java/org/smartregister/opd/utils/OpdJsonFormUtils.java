@@ -464,7 +464,7 @@ public class OpdJsonFormUtils extends JsonFormUtils {
             Client baseClient = JsonFormUtils.createBaseClient(fields, formTag, entityId);
 
             Event baseEvent = JsonFormUtils.createEvent(fields, getJSONObject(jsonForm, METADATA),
-                    formTag, entityId, OpdUtils.metadata().getRegisterEventType(), OpdUtils.metadata().getTableName());
+                    formTag, entityId, jsonForm.optString(OpdJsonFormUtils.ENCOUNTER_TYPE), OpdUtils.metadata().getTableName());
 
             tagSyncMetadata(baseEvent);
 
