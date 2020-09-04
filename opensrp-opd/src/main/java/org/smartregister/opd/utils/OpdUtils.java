@@ -358,7 +358,8 @@ public class OpdUtils extends Utils {
         return "";
     }
 
-    public static JSONArray addOpenMrsEntityId(@NonNull String diagnosisType, @NonNull JSONArray jsonArray) {
+    public static JSONArray addOpenMrsEntityId(@NonNull String diagnosisType,
+                                               @NonNull JSONArray jsonArray) {
         try {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.optJSONObject(i);
