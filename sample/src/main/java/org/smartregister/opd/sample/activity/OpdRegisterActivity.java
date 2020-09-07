@@ -27,6 +27,8 @@ import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.view.fragment.BaseRegisterFragment;
 
+import java.util.Map;
+
 import timber.log.Timber;
 
 /**
@@ -59,6 +61,11 @@ public class OpdRegisterActivity extends BaseOpdRegisterActivity {
     @Override
     protected void onResumption() {
         super.onResumption();
+    }
+
+    @Override
+    public void startFormActivity(String s, String s1, Map<String, String> map) {
+
     }
 
     @Override

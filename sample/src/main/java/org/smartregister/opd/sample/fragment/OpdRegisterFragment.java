@@ -22,7 +22,7 @@ public class OpdRegisterFragment extends BaseOpdRegisterFragment {
     protected void startRegistration() {
         OpdMetadata opdMetadata = OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata();
         if (getActivity() instanceof  OpdRegisterActivity && opdMetadata != null) {
-            ((OpdRegisterActivity) getActivity()).startFormActivity(opdMetadata.getOpdRegistrationFormName(), null, null);
+            ((OpdRegisterActivity) getActivity()).startFormActivity(opdMetadata.getOpdRegistrationFormName(), null, "");
         }
     }
 
