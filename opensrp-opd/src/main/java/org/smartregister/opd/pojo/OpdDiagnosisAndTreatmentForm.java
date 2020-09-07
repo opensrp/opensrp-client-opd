@@ -1,6 +1,6 @@
 package org.smartregister.opd.pojo;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 public class OpdDiagnosisAndTreatmentForm {
     private int id;

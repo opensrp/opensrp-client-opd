@@ -1,7 +1,7 @@
 package org.smartregister.opd.contract;
 
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import org.json.JSONArray;
 import org.smartregister.configurableviews.model.Field;

@@ -1,7 +1,7 @@
 package org.smartregister.opd.domain;
 
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-27
