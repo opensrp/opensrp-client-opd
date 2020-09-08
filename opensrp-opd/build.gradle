@@ -170,6 +170,7 @@ dependencies {
         exclude group: 'com.android.support'
     }
     testImplementation "org.robolectric:shadows-multidex:$robolectricVersion"
+    testImplementation "org.robolectric:shadows-support-v4:3.3.2"
 
     testImplementation 'com.ibm.fhir:fhir-model:4.2.3'
 
