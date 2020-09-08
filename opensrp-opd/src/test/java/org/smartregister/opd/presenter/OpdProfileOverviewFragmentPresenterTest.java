@@ -24,7 +24,6 @@ import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.configuration.OpdConfiguration;
 import org.smartregister.opd.contract.OpdProfileOverviewFragmentContract;
 import org.smartregister.opd.domain.YamlConfigWrapper;
-import org.smartregister.opd.pojo.OpdCheckIn;
 import org.smartregister.opd.pojo.OpdDetails;
 import org.smartregister.opd.pojo.OpdVisit;
 import org.smartregister.opd.utils.OpdConstants;
@@ -63,6 +62,7 @@ public class OpdProfileOverviewFragmentPresenterTest extends BaseTest {
     @After
     public void tearDown() throws Exception {
         ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", null);
+        ReflectionHelpers.setField(presenter, "model", null);
     }
 
     @Test
