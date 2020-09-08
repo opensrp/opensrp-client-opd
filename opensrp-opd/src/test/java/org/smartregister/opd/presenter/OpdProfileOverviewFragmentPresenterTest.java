@@ -19,21 +19,19 @@ import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.Context;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.opd.BaseTest;
-import org.smartregister.opd.BuildConfig;
 import org.smartregister.opd.OpdLibrary;
-import org.smartregister.opd.configuration.OpdConfiguration;
 import org.smartregister.opd.contract.OpdProfileOverviewFragmentContract;
 import org.smartregister.opd.domain.YamlConfigWrapper;
 import org.smartregister.opd.pojo.OpdDetails;
 import org.smartregister.opd.pojo.OpdVisit;
 import org.smartregister.opd.utils.OpdConstants;
-import org.smartregister.repository.Repository;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-11-18
@@ -47,12 +45,16 @@ public class OpdProfileOverviewFragmentPresenterTest extends BaseTest {
     private OpdProfileOverviewFragmentPresenter presenter;
 
     @Mock
+    private OpdLibrary opdLibrary;
+
+    @Mock
     private OpdProfileOverviewFragmentContract.View view;
 
     private OpdProfileOverviewFragmentContract.Model model;
 
     @Before
     public void setUp() throws Exception {
+        ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", opdLibrary);
         presenter = Mockito.spy(new OpdProfileOverviewFragmentPresenter(view));
         OpdProfileOverviewFragmentContract.Model model = ReflectionHelpers.getField(presenter, "model");
         this.model = Mockito.spy(model);
@@ -104,6 +106,10 @@ public class OpdProfileOverviewFragmentPresenterTest extends BaseTest {
         CommonPersonObjectClient client = new CommonPersonObjectClient("id", details, "John Doe");
         client.setColumnmaps(details);
 
+        Mockito.doReturn(true).when(opdLibrary)
+                .canPatientCheckInInsteadOfDiagnoseAndTreat(Mockito.eq(null),
+                        Mockito.eq(null));
+
         Context mockContext = Mockito.mock(Context.class);
         Mockito.doReturn(RuntimeEnvironment.systemContext).when(mockContext).applicationContext();
         Mockito.doAnswer(new Answer() {
@@ -112,7 +118,6 @@ public class OpdProfileOverviewFragmentPresenterTest extends BaseTest {
                 return RuntimeEnvironment.application.getString((int) invocationOnMock.getArgument(0));
             }
         }).when(view).getString(Mockito.anyInt());
-        OpdLibrary.init(mockContext, Mockito.mock(Repository.class), Mockito.mock(OpdConfiguration.class), BuildConfig.VERSION_CODE, 1);
         presenter.setClient(client);
         presenter.loadOverviewDataAndDisplay(null, null, null, onFinishedCallback);
         Mockito.verify(onFinishedCallback, Mockito.times(1)).onFinished(callbackArgumentCaptor.capture(), listArgumentCaptor.capture());
@@ -133,6 +138,10 @@ public class OpdProfileOverviewFragmentPresenterTest extends BaseTest {
         CommonPersonObjectClient client = new CommonPersonObjectClient("id", details, "Jane Doe");
         client.setColumnmaps(details);
 
+        Mockito.doReturn(true).when(opdLibrary)
+                .canPatientCheckInInsteadOfDiagnoseAndTreat(Mockito.eq(null),
+                        Mockito.eq(null));
+
         Context mockContext = Mockito.mock(Context.class);
         Mockito.doReturn(RuntimeEnvironment.systemContext).when(mockContext).applicationContext();
         Mockito.doAnswer(new Answer() {
@@ -141,7 +150,6 @@ public class OpdProfileOverviewFragmentPresenterTest extends BaseTest {
                 return RuntimeEnvironment.application.getString((int) invocationOnMock.getArgument(0));
             }
         }).when(view).getString(Mockito.anyInt());
-        OpdLibrary.init(mockContext, Mockito.mock(Repository.class), Mockito.mock(OpdConfiguration.class), BuildConfig.VERSION_CODE, 1);
         presenter.setClient(client);
         presenter.loadOverviewDataAndDisplay(null, null, null, onFinishedCallback);
         Mockito.verify(onFinishedCallback, Mockito.times(1)).onFinished(callbackArgumentCaptor.capture(), listArgumentCaptor.capture());
@@ -172,6 +180,10 @@ public class OpdProfileOverviewFragmentPresenterTest extends BaseTest {
         CommonPersonObjectClient client = new CommonPersonObjectClient("id", details, "Jane Doe");
         client.setColumnmaps(details);
 
+        Mockito.doReturn(true).when(opdLibrary)
+                .canPatientCheckInInsteadOfDiagnoseAndTreat(Mockito.eq(null),
+                        Mockito.eq(opdDetails));
+
         Context mockContext = Mockito.mock(Context.class);
         Mockito.doReturn(RuntimeEnvironment.systemContext).when(mockContext).applicationContext();
         Mockito.doAnswer(new Answer() {
@@ -180,17 +192,17 @@ public class OpdProfileOverviewFragmentPresenterTest extends BaseTest {
                 return RuntimeEnvironment.application.getString((int) invocationOnMock.getArgument(0));
             }
         }).when(view).getString(Mockito.anyInt());
-        OpdLibrary.init(mockContext, Mockito.mock(Repository.class), Mockito.mock(OpdConfiguration.class), BuildConfig.VERSION_CODE, 1);
         presenter.setClient(client);
         presenter.loadOverviewDataAndDisplay(checkInHashMap, null, opdDetails, onFinishedCallback);
         Mockito.verify(onFinishedCallback, Mockito.times(1)).onFinished(callbackArgumentCaptor.capture(), listArgumentCaptor.capture());
 
         assertEquals(1, callbackArgumentCaptor.getValue().asMap().size());
-        assertEquals(false, callbackArgumentCaptor.getValue().get(OpdConstants.FactKey.ProfileOverview.PENDING_DIAGNOSE_AND_TREAT));
+        assertFalse(callbackArgumentCaptor.getValue().get(OpdConstants.FactKey.ProfileOverview.PENDING_DIAGNOSE_AND_TREAT));
     }
 
     @Test
     public void loadOverviewDataAndDisplayShouldLoadPregnancyStatusAndCurrentCheckDetailsForFemaleWithVisitsAndCheckedIn() {
+
         OpdProfileOverviewFragmentContract.Presenter.OnFinishedCallback onFinishedCallback = Mockito.mock(OpdProfileOverviewFragmentContract.Presenter.OnFinishedCallback.class);
         ArgumentCaptor<Facts> callbackArgumentCaptor = ArgumentCaptor.forClass(Facts.class);
         ArgumentCaptor<List<YamlConfigWrapper>> listArgumentCaptor = ArgumentCaptor.forClass(List.class);
@@ -218,6 +230,9 @@ public class OpdProfileOverviewFragmentPresenterTest extends BaseTest {
         CommonPersonObjectClient client = new CommonPersonObjectClient("id", details, "Jane Doe");
         client.setColumnmaps(details);
 
+        Mockito.doReturn(true).when(opdLibrary)
+                .isClientCurrentlyCheckedIn(Mockito.eq(opdVisit), Mockito.eq(opdDetails));
+
         Context mockContext = Mockito.mock(Context.class);
         Mockito.doReturn(RuntimeEnvironment.systemContext).when(mockContext).applicationContext();
         Mockito.doAnswer(new Answer() {
@@ -226,7 +241,6 @@ public class OpdProfileOverviewFragmentPresenterTest extends BaseTest {
                 return RuntimeEnvironment.application.getString((int) invocationOnMock.getArgument(0));
             }
         }).when(view).getString(Mockito.anyInt());
-        OpdLibrary.init(mockContext, Mockito.mock(Repository.class), Mockito.mock(OpdConfiguration.class), BuildConfig.VERSION_CODE, 1);
         presenter.setClient(client);
         presenter.loadOverviewDataAndDisplay(checkInHashMap, opdVisit, opdDetails, onFinishedCallback);
         Mockito.verify(onFinishedCallback, Mockito.times(1)).onFinished(callbackArgumentCaptor.capture(), listArgumentCaptor.capture());
@@ -267,6 +281,9 @@ public class OpdProfileOverviewFragmentPresenterTest extends BaseTest {
         CommonPersonObjectClient client = new CommonPersonObjectClient("id", details, "John Doe");
         client.setColumnmaps(details);
 
+        Mockito.doReturn(true).when(opdLibrary)
+                .isClientCurrentlyCheckedIn(Mockito.eq(opdVisit), Mockito.eq(opdDetails));
+
         Context mockContext = Mockito.mock(Context.class);
         Mockito.doReturn(RuntimeEnvironment.systemContext).when(mockContext).applicationContext();
         Mockito.doAnswer(new Answer() {
@@ -276,7 +293,6 @@ public class OpdProfileOverviewFragmentPresenterTest extends BaseTest {
             }
         }).when(view).getString(Mockito.anyInt());
 
-        OpdLibrary.init(mockContext, Mockito.mock(Repository.class), Mockito.mock(OpdConfiguration.class), BuildConfig.VERSION_CODE, 1);
         presenter.setClient(client);
         presenter.loadOverviewDataAndDisplay(checkInHashMap, opdVisit, opdDetails, onFinishedCallback);
         Mockito.verify(onFinishedCallback, Mockito.times(1)).onFinished(callbackArgumentCaptor.capture(), listArgumentCaptor.capture());
