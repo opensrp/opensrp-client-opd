@@ -1,22 +1,28 @@
 package org.smartregister.opd.fragment;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentHostCallback;
-import androidx.appcompat.app.AlertDialog;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentHostCallback;
+
 import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.MockitoAnnotations;
+import org.robolectric.Robolectric;
 import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
-import org.smartregister.opd.BuildConfig;
+import org.smartregister.opd.BaseRobolectricUnitTest;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.activity.BaseOpdFormActivity;
 import org.smartregister.opd.activity.BaseOpdProfileActivity;
@@ -24,15 +30,27 @@ import org.smartregister.opd.configuration.BaseOpdRegisterProviderMetadata;
 import org.smartregister.opd.configuration.OpdConfiguration;
 import org.smartregister.opd.configuration.OpdRegisterQueryProviderContract;
 import org.smartregister.opd.pojo.OpdMetadata;
-import org.smartregister.repository.Repository;
+import org.smartregister.opd.utils.OpdConstants;
+
+import java.util.HashMap;
 
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-10-17
  */
 
-@RunWith(MockitoJUnitRunner.class)
-public class BaseOpdFormFragmentTest {
+public class BaseOpdFormFragmentTest extends BaseRobolectricUnitTest {
+
+    private BaseOpdFormFragment formFragment;
+
+    @Mock
+    private OpdLibrary opdLibrary;
+
+    @Before
+    public void setUp() {
+        MockitoAnnotations.initMocks(this);
+        formFragment = Mockito.spy(BaseOpdFormFragment.class);
+    }
 
     @After
     public void tearDown() {
@@ -53,15 +71,21 @@ public class BaseOpdFormFragmentTest {
                         , false))
                 .build();
 
-        OpdLibrary.init(Mockito.mock(org.smartregister.Context.class), Mockito.mock(Repository.class), opdConfiguration, BuildConfig.VERSION_CODE, 1);
+        Activity activity = Robolectric.setupActivity(FragmentActivity.class);
+
+        Mockito.doReturn(activity).when(formFragment).getActivity();
+
+        Mockito.doReturn(opdConfiguration).when(opdLibrary).getOpdConfiguration();
+
+        ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", opdLibrary);
+
         CommonPersonObjectClient client = Mockito.mock(CommonPersonObjectClient.class);
 
-        BaseOpdFormFragment baseOpdFormFragment = new BaseOpdFormFragment();
 
         FragmentHostCallback host = Mockito.mock(FragmentHostCallback.class);
 
-        ReflectionHelpers.setField(baseOpdFormFragment, "mHost", host);
-        baseOpdFormFragment.startActivityOnLookUp(client);
+        ReflectionHelpers.setField(formFragment, "mHost", host);
+        formFragment.startActivityOnLookUp(client);
 
         Mockito.verify(host, Mockito.times(1))
                 .onStartActivityFromFragment(Mockito.any(Fragment.class)
@@ -74,23 +98,53 @@ public class BaseOpdFormFragmentTest {
     public void onItemClickShouldCallStartActivityOnLookupWithTheCorrectClient() {
         CommonPersonObjectClient client = Mockito.mock(CommonPersonObjectClient.class);
 
-        BaseOpdFormFragment baseOpdFormFragment = Mockito.spy(new BaseOpdFormFragment());
-        Mockito.doNothing().when(baseOpdFormFragment).startActivityOnLookUp(Mockito.any(CommonPersonObjectClient.class));
+        Mockito.doNothing().when(formFragment).startActivityOnLookUp(Mockito.any(CommonPersonObjectClient.class));
 
         AlertDialog alertDialog = Mockito.mock(AlertDialog.class);
         Mockito.doReturn(true).when(alertDialog).isShowing();
         Mockito.doNothing().when(alertDialog).dismiss();
-        ReflectionHelpers.setField(baseOpdFormFragment, "alertDialog", alertDialog);
+        ReflectionHelpers.setField(formFragment, "alertDialog", alertDialog);
 
         View clickedView = Mockito.mock(View.class);
         Mockito.doReturn(client).when(clickedView).getTag();
 
         // The actual method call
-        baseOpdFormFragment.onItemClick(clickedView);
+        formFragment.onItemClick(clickedView);
 
         // Verification
-        Mockito.verify(baseOpdFormFragment, Mockito.times(1))
+        Mockito.verify(formFragment, Mockito.times(1))
                 .startActivityOnLookUp(Mockito.eq(client));
+    }
+
+    @Test
+    public void testFinishWithResultShouldAddParcelableDataToIntentBeforeActivityFinish() {
+        String baseEntityId = "342-rw3424";
+        String table = "ec_client";
+        HashMap<String, String> parcelableData = new HashMap<>();
+        parcelableData.put(OpdConstants.IntentKey.BASE_ENTITY_ID, baseEntityId);
+        parcelableData.put(OpdConstants.IntentKey.ENTITY_TABLE, table);
+
+        BaseOpdFormActivity baseOpdFormActivity = Mockito.spy(Robolectric
+                .buildActivity(BaseOpdFormActivity.class, null).get());
+
+        Mockito.doReturn(parcelableData).when(baseOpdFormActivity).getParcelableData();
+
+        Mockito.doReturn(baseOpdFormActivity).when(formFragment).getActivity();
+
+        Intent intent = new Intent();
+
+        formFragment.finishWithResult(intent);
+
+        Assert.assertEquals(baseEntityId, intent.getStringExtra(OpdConstants.IntentKey.BASE_ENTITY_ID));
+        Assert.assertEquals(table, intent.getStringExtra(OpdConstants.IntentKey.ENTITY_TABLE));
+
+        Mockito.verify(baseOpdFormActivity, Mockito.times(1))
+                .setResult(Mockito.eq(Activity.RESULT_OK), Mockito.eq(intent));
+
+        Mockito.verify(baseOpdFormActivity, Mockito.times(1))
+                .finish();
+
+
     }
 
     static class OpdRegisterQueryProvider extends OpdRegisterQueryProviderContract {
