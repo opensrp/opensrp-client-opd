@@ -24,6 +24,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.internal.WhiteboxImpl;
 import org.robolectric.util.ReflectionHelpers;
+import org.smartregister.AllConstants;
 import org.smartregister.Context;
 import org.smartregister.CoreLibrary;
 import org.smartregister.SyncConfiguration;
@@ -279,7 +280,7 @@ public class OpdJsonFormUtilsTest {
         PowerMockito.when(allSharedPreferences, "fetchCurrentLocality").thenReturn("Place");
         Assert.assertNotNull(LocationHelper.getInstance());
         String result = OpdJsonFormUtils.getLocationId("Country", allSharedPreferences);
-        Assert.assertEquals("Place", result);
+        Assert.assertEquals(AllConstants.ADVANCED_DATA_CAPTURE_STRATEGY_PREFIX + "place", result);
     }
 
     @Test
@@ -328,7 +329,7 @@ public class OpdJsonFormUtilsTest {
     public void testProcessGenderCheckNullOnGenderJsonObject() {
         JSONArray jsonArray = new JSONArray();
         OpdJsonFormUtils.processGender(jsonArray);
-        Assert.assertEquals(jsonArray.length(), 0);
+        Assert.assertEquals(0, jsonArray.length());
     }
 
     @Test
@@ -338,7 +339,7 @@ public class OpdJsonFormUtilsTest {
         jsonObject.put(OpdConstants.KEY.KEY, OpdConstants.SEX);
         jsonArray.put(jsonObject);
         OpdJsonFormUtils.processGender(jsonArray);
-        Assert.assertEquals(jsonArray.getJSONObject(0).length(), 1);
+        Assert.assertEquals(1, jsonArray.getJSONObject(0).length());
     }
 
     @Test
@@ -356,14 +357,14 @@ public class OpdJsonFormUtilsTest {
         LocationHelper.init(defaultLocations,
                 "Country");
         OpdJsonFormUtils.processLocationFields(jsonArray);
-        Assert.assertEquals(jsonArray.getJSONObject(0).getString(JsonFormConstants.VALUE), "test");
+        Assert.assertEquals(AllConstants.ADVANCED_DATA_CAPTURE_STRATEGY_PREFIX + "test", jsonArray.getJSONObject(0).getString(JsonFormConstants.VALUE));
     }
 
     @Test
     public void testLastInteractedWithEmpty() {
         JSONArray jsonArray = new JSONArray();
         OpdJsonFormUtils.lastInteractedWith(jsonArray);
-        Assert.assertEquals(jsonArray.length(), 1);
+        Assert.assertEquals(1, jsonArray.length());
     }
 
     @Test

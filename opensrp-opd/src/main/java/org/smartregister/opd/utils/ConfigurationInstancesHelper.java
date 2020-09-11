@@ -1,6 +1,6 @@
 package org.smartregister.opd.utils;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import org.smartregister.opd.exception.NewInstanceException;
 

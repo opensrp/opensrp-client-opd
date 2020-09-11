@@ -1,6 +1,6 @@
 package org.smartregister.opd.listener;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;

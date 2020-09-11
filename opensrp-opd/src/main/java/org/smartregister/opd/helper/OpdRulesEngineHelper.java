@@ -1,6 +1,6 @@
 package org.smartregister.opd.helper;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.vijay.jsonwizard.rules.RuleConstant;
 import com.vijay.jsonwizard.rules.RulesEngineHelper;

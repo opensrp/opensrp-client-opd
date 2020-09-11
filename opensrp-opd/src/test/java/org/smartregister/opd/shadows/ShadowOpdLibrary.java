@@ -1,6 +1,6 @@
 package org.smartregister.opd.shadows;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import org.robolectric.annotation.Implements;
 import org.smartregister.opd.OpdLibrary;

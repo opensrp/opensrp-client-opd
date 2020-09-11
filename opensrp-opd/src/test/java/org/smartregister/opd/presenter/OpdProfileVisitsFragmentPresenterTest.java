@@ -1,6 +1,6 @@
 package org.smartregister.opd.presenter;
 
-import android.support.v4.util.Pair;
+import androidx.core.util.Pair;
 
 import org.jeasy.rules.api.Facts;
 import org.junit.Before;

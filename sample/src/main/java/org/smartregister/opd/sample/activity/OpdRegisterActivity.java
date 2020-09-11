@@ -2,9 +2,9 @@ package org.smartregister.opd.sample.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.domain.Form;
@@ -26,6 +26,8 @@ import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.view.fragment.BaseRegisterFragment;
+
+import java.util.Map;
 
 import timber.log.Timber;
 
@@ -59,6 +61,11 @@ public class OpdRegisterActivity extends BaseOpdRegisterActivity {
     @Override
     protected void onResumption() {
         super.onResumption();
+    }
+
+    @Override
+    public void startFormActivity(String s, String s1, Map<String, String> map) {
+
     }
 
     @Override

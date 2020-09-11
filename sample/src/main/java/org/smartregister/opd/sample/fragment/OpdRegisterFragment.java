@@ -1,6 +1,6 @@
 package org.smartregister.opd.sample.fragment;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
 
@@ -22,7 +22,7 @@ public class OpdRegisterFragment extends BaseOpdRegisterFragment {
     protected void startRegistration() {
         OpdMetadata opdMetadata = OpdLibrary.getInstance().getOpdConfiguration().getOpdMetadata();
         if (getActivity() instanceof  OpdRegisterActivity && opdMetadata != null) {
-            ((OpdRegisterActivity) getActivity()).startFormActivity(opdMetadata.getOpdRegistrationFormName(), null, null);
+            ((OpdRegisterActivity) getActivity()).startFormActivity(opdMetadata.getOpdRegistrationFormName(), null, "");
         }
     }
 

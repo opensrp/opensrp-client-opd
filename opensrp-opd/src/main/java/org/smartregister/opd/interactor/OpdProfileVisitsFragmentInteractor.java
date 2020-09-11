@@ -1,7 +1,7 @@
 package org.smartregister.opd.interactor;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.contract.OpdProfileVisitsFragmentContract;

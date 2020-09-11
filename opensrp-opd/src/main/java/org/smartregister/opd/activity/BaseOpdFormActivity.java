@@ -3,9 +3,10 @@ package org.smartregister.opd.activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.Toolbar;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 
 import com.vijay.jsonwizard.activities.JsonWizardFormActivity;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
@@ -104,33 +105,6 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
             toolbar.setContentInsetStartWithNavigation(0);
         }
         super.setSupportActionBar(toolbar);
-    }
-
-    @Override
-    public void writeValue(String stepName, String key, String value, String openMrsEntityParent, String openMrsEntity,
-                           String openMrsEntityId, boolean popup) throws JSONException {
-        super.writeValue(stepName, key, value, openMrsEntityParent, openMrsEntity, openMrsEntityId, popup);
-    }
-
-    @Override
-    public void writeValue(String stepName, String parentKey, String childObjectKey, String childKey, String value,
-                           String openMrsEntityParent, String openMrsEntity, String openMrsEntityId, boolean popup)
-            throws JSONException {
-        super.writeValue(stepName, parentKey, childObjectKey, childKey, value, openMrsEntityParent, openMrsEntity,
-                openMrsEntityId, popup);
-    }
-
-    @Override
-    public void writeValue(String stepName, String key, String value, String openMrsEntityParent, String openMrsEntity,
-                           String openMrsEntityId) throws JSONException {
-        super.writeValue(stepName, key, value, openMrsEntityParent, openMrsEntity, openMrsEntityId);
-    }
-
-    @Override
-    public void writeValue(String stepName, String parentKey, String childObjectKey, String childKey, String value,
-                           String openMrsEntityParent, String openMrsEntity, String openMrsEntityId) throws JSONException {
-        super.writeValue(stepName, parentKey, childObjectKey, childKey, value, openMrsEntityParent, openMrsEntity,
-                openMrsEntityId);
     }
 
     /**

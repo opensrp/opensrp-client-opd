@@ -1,6 +1,6 @@
 package org.smartregister.opd.presenter;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
 import org.smartregister.opd.pojo.RegisterParams;
