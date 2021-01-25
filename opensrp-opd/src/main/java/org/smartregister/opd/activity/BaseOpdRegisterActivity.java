@@ -2,13 +2,13 @@ package org.smartregister.opd.activity;
 
 
 import android.content.Intent;
-import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import androidx.fragment.app.Fragment;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.domain.Form;
 
@@ -36,11 +36,6 @@ import timber.log.Timber;
  */
 
 public abstract class BaseOpdRegisterActivity extends BaseRegisterActivity implements OpdRegisterActivityContract.View {
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
 
     @Override
     protected void registerBottomNavigation() {
@@ -73,11 +68,6 @@ public abstract class BaseOpdRegisterActivity extends BaseRegisterActivity imple
     @Override
     protected Fragment[] getOtherFragments() {
         return new Fragment[0];
-    }
-
-    @Override
-    protected void onResumption() {
-        super.onResumption();
     }
 
     @Override

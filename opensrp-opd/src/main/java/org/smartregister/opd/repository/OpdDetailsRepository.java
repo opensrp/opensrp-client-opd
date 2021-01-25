@@ -23,7 +23,7 @@ import java.util.List;
 
 public class OpdDetailsRepository extends BaseRepository implements OpdDetailsDao {
 
-    private String[] columns = new String[]{
+    protected String[] columns = new String[]{
             OpdDetails.ID,
             OpdDetails.BASE_ENTITY_ID,
             OpdDetails.PENDING_DIAGNOSE_AND_TREAT,

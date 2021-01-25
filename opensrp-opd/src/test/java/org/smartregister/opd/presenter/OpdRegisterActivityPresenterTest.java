@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.smartregister.opd.BaseTest;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
 
@@ -24,6 +25,7 @@ public class OpdRegisterActivityPresenterTest extends BaseTest {
 
     @Before
     public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
         presenter = new TestOpdRegisterActivityPresenter(view, model);
     }
 
