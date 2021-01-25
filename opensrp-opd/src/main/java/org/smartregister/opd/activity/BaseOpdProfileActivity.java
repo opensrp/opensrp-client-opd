@@ -270,6 +270,8 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
                         showProgressDialog(R.string.saving_dialog_title);
                         ((OpdProfileActivityPresenter) this.presenter).saveCloseForm(encounterType, data);
                         break;
+                    default:
+                        break;
                 }
 
             } catch (JSONException e) {
