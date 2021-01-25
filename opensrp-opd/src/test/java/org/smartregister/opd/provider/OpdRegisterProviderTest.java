@@ -3,12 +3,13 @@ package org.smartregister.opd.provider;
 import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import org.junit.After;
 import org.junit.Before;
@@ -21,7 +22,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.CoreLibrary;
-import org.smartregister.SyncConfiguration;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.opd.BaseTest;
 import org.smartregister.opd.BuildConfig;
@@ -32,6 +32,7 @@ import org.smartregister.opd.configuration.OpdConfiguration;
 import org.smartregister.opd.configuration.OpdRegisterQueryProviderContract;
 import org.smartregister.opd.configuration.OpdRegisterRowOptions;
 import org.smartregister.opd.holders.OpdRegisterViewHolder;
+import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.repository.Repository;
 import org.smartregister.util.Utils;
 import org.smartregister.view.contract.SmartRegisterClient;
@@ -64,6 +65,9 @@ public class OpdRegisterProviderTest extends BaseTest {
     @Mock
     private LayoutInflater inflator;
 
+    @Mock
+    private CoreLibrary coreLibrary;
+
     @Before
     public void setUp() throws Exception {
         opdRegisterProviderMetadata = Mockito.spy(new BaseOpdRegisterProviderMetadata());
@@ -83,11 +87,20 @@ public class OpdRegisterProviderTest extends BaseTest {
     @After
     public void tearDown() throws Exception {
         ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", null);
+        ReflectionHelpers.setStaticField(CoreLibrary.class, "instance", null);
     }
 
     @Test
     public void populatePatientColumnShouldCallProviderMetadataForDataValues() {
-        CoreLibrary.init(PowerMockito.mock(org.smartregister.Context.class), PowerMockito.mock(SyncConfiguration.class));
+
+        org.smartregister.Context opensrpContext = PowerMockito.mock(org.smartregister.Context.class);
+
+        Mockito.doReturn(PowerMockito.mock(AllSharedPreferences.class)).when(opensrpContext).allSharedPreferences();
+
+        Mockito.doReturn(opensrpContext).when(coreLibrary).context();
+
+        ReflectionHelpers.setStaticField(CoreLibrary.class, "instance", coreLibrary);
+
         PowerMockito.mockStatic(Utils.class);
         CommonPersonObjectClient client = Mockito.mock(CommonPersonObjectClient.class);
 
