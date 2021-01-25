@@ -2,9 +2,6 @@ package org.smartregister.opd.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.viewpager.widget.ViewPager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -12,6 +9,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.viewpager.widget.ViewPager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -246,24 +247,31 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
                 JSONObject form = new JSONObject(jsonString);
                 String encounterType = form.getString(OpdJsonFormUtils.ENCOUNTER_TYPE);
 
-                if (encounterType.equals(OpdConstants.EventType.CHECK_IN)) {
-                    showProgressDialog(R.string.saving_dialog_title);
-                    ((OpdProfileActivityPresenter) presenter).saveVisitOrDiagnosisForm(encounterType, data);
-                } else if (encounterType.equals(OpdConstants.EventType.DIAGNOSIS_AND_TREAT)) {
-                    showProgressDialog(R.string.saving_dialog_title);
-                    ((OpdProfileActivityPresenter) presenter).saveVisitOrDiagnosisForm(encounterType, data);
-                } else if (encounterType.equals(OpdConstants.EventType.UPDATE_OPD_REGISTRATION)) {
-                    showProgressDialog(R.string.saving_dialog_title);
+                switch (encounterType) {
+                    case OpdConstants.EventType.CHECK_IN:
+                        showProgressDialog(R.string.saving_dialog_title);
+                        ((OpdProfileActivityPresenter) presenter).saveVisitOrDiagnosisForm(encounterType, data);
+                        break;
+                    case OpdConstants.EventType.DIAGNOSIS_AND_TREAT:
+                        showProgressDialog(R.string.saving_dialog_title);
+                        ((OpdProfileActivityPresenter) presenter).saveVisitOrDiagnosisForm(encounterType, data);
+                        break;
+                    case OpdConstants.EventType.UPDATE_OPD_REGISTRATION:
+                        showProgressDialog(R.string.saving_dialog_title);
 
-                    RegisterParams registerParam = new RegisterParams();
-                    registerParam.setEditMode(true);
-                    registerParam.setFormTag(OpdJsonFormUtils.formTag(OpdUtils.context().allSharedPreferences()));
-                    showProgressDialog(R.string.saving_dialog_title);
+                        RegisterParams registerParam = new RegisterParams();
+                        registerParam.setEditMode(true);
+                        registerParam.setFormTag(OpdJsonFormUtils.formTag(OpdUtils.context().allSharedPreferences()));
+                        showProgressDialog(R.string.saving_dialog_title);
 
-                    ((OpdProfileActivityPresenter) presenter).saveUpdateRegistrationForm(jsonString, registerParam);
-                } else if (encounterType.equals(OpdConstants.EventType.OPD_CLOSE)) {
-                    showProgressDialog(R.string.saving_dialog_title);
-                    ((OpdProfileActivityPresenter) this.presenter).saveCloseForm(encounterType, data);
+                        ((OpdProfileActivityPresenter) presenter).saveUpdateRegistrationForm(jsonString, registerParam);
+                        break;
+                    case OpdConstants.EventType.OPD_CLOSE:
+                        showProgressDialog(R.string.saving_dialog_title);
+                        ((OpdProfileActivityPresenter) this.presenter).saveCloseForm(encounterType, data);
+                        break;
+                    default:
+                        break;
                 }
 
             } catch (JSONException e) {

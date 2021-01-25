@@ -2,8 +2,9 @@ package org.smartregister.opd.widgets;
 
 import android.content.Context;
 import android.content.Intent;
-import androidx.annotation.NonNull;
 import android.view.View;
+
+import androidx.annotation.NonNull;
 
 import com.google.android.gms.vision.barcode.Barcode;
 import com.rengwuxian.materialedittext.MaterialEditText;
@@ -44,7 +45,7 @@ public class OpdBarcodeFactory extends BarcodeFactory {
 
     @Override
     public List<View> getViewsFromJson(@NonNull String stepName, @NonNull Context context, @NonNull JsonFormFragment formFragment, @NonNull JSONObject jsonObject,
-                                       @NonNull CommonListener listener, boolean popup) {
+                                       @NonNull CommonListener listener, boolean popup) throws Exception {
         List<View> viewList = super.getViewsFromJson(stepName, context, formFragment, jsonObject, listener, popup);
         this.jsonFormFragment = formFragment;
         try {

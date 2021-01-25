@@ -24,10 +24,8 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.internal.WhiteboxImpl;
 import org.robolectric.util.ReflectionHelpers;
-import org.smartregister.AllConstants;
 import org.smartregister.Context;
 import org.smartregister.CoreLibrary;
-import org.smartregister.SyncConfiguration;
 import org.smartregister.clientandeventmodel.Client;
 import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.domain.ProfileImage;
@@ -44,6 +42,7 @@ import org.smartregister.repository.ImageRepository;
 import org.smartregister.repository.Repository;
 import org.smartregister.sync.helper.ECSyncHelper;
 import org.smartregister.util.JsonFormUtils;
+import org.smartregister.util.Utils;
 import org.smartregister.view.activity.DrishtiApplication;
 
 import java.io.File;
@@ -75,6 +74,9 @@ public class OpdJsonFormUtilsTest {
 
     @Mock
     private LocationHelper locationHelper;
+
+    @Mock
+    private CoreLibrary coreLibrary;
 
 
     @Before
@@ -253,9 +255,15 @@ public class OpdJsonFormUtilsTest {
                 .build();
         OpdLibrary.init(PowerMockito.mock(Context.class), PowerMockito.mock(Repository.class), opdConfiguration,
                 BuildConfig.VERSION_CODE, 1);
-        CoreLibrary.init(PowerMockito.mock(Context.class), PowerMockito.mock(SyncConfiguration.class));
 
-        PowerMockito.when(OpdUtils.class, "getAllSharedPreferences").thenReturn(PowerMockito.mock(AllSharedPreferences.class));
+
+        Context opensrpContext = PowerMockito.mock(Context.class);
+
+        Mockito.doReturn(PowerMockito.mock(AllSharedPreferences.class)).when(opensrpContext).allSharedPreferences();
+
+        Mockito.doReturn(opensrpContext).when(coreLibrary).context();
+
+        ReflectionHelpers.setStaticField(CoreLibrary.class, "instance", coreLibrary);
 
         Event event = OpdJsonFormUtils.tagSyncMetadata(new Event());
         Assert.assertNotNull(event);
@@ -270,7 +278,14 @@ public class OpdJsonFormUtilsTest {
                 .build();
         OpdLibrary.init(PowerMockito.mock(Context.class), PowerMockito.mock(Repository.class), opdConfiguration,
                 BuildConfig.VERSION_CODE, 1);
-        CoreLibrary.init(PowerMockito.mock(Context.class), PowerMockito.mock(SyncConfiguration.class));
+
+        Context opensrpContext = PowerMockito.mock(Context.class);
+
+        Mockito.doReturn(PowerMockito.mock(AllSharedPreferences.class)).when(opensrpContext).allSharedPreferences();
+
+        Mockito.doReturn(opensrpContext).when(coreLibrary).context();
+
+        ReflectionHelpers.setStaticField(CoreLibrary.class, "instance", coreLibrary);
 
         ArrayList<String> defaultLocations = new ArrayList<>();
         defaultLocations.add("Country");
@@ -280,7 +295,7 @@ public class OpdJsonFormUtilsTest {
         PowerMockito.when(allSharedPreferences, "fetchCurrentLocality").thenReturn("Place");
         Assert.assertNotNull(LocationHelper.getInstance());
         String result = OpdJsonFormUtils.getLocationId("Country", allSharedPreferences);
-        Assert.assertEquals(AllConstants.ADVANCED_DATA_CAPTURE_STRATEGY_PREFIX + "place", result);
+        Assert.assertEquals("Place", result);
     }
 
     @Test
@@ -353,11 +368,19 @@ public class OpdJsonFormUtilsTest {
         jsonArray.put(jsonObject);
         ArrayList<String> defaultLocations = new ArrayList<>();
         defaultLocations.add("Country");
-        CoreLibrary.init(PowerMockito.mock(Context.class), PowerMockito.mock(SyncConfiguration.class));
+
+        Context opensrpContext = PowerMockito.mock(Context.class);
+
+        Mockito.doReturn(PowerMockito.mock(AllSharedPreferences.class)).when(opensrpContext).allSharedPreferences();
+
+        Mockito.doReturn(opensrpContext).when(coreLibrary).context();
+
+        ReflectionHelpers.setStaticField(CoreLibrary.class, "instance", coreLibrary);
+
         LocationHelper.init(defaultLocations,
                 "Country");
         OpdJsonFormUtils.processLocationFields(jsonArray);
-        Assert.assertEquals(AllConstants.ADVANCED_DATA_CAPTURE_STRATEGY_PREFIX + "test", jsonArray.getJSONObject(0).getString(JsonFormConstants.VALUE));
+        Assert.assertEquals("test", jsonArray.getJSONObject(0).getString(JsonFormConstants.VALUE));
     }
 
     @Test
@@ -392,13 +415,10 @@ public class OpdJsonFormUtilsTest {
         jsonArrayFields.put(jsonObjectAgeEntered);
         jsonArrayFields.put(jsonObjectDob);
 
-        String expected = "[{\"options\":[{\"value\":\"true\"}],\"key\":\"dob_unknown\"},{\"value\":\"34\",\"key\":\"age_entered\"}," +
-                "{\"value\":\"01-01-1986\",\"key\":\"dob_entered\"},{\"openmrs_entity\":\"person\"," +
-                "\"openmrs_entity_id\":\"birthdate_estimated\",\"value\":1,\"key\":\"birthdate_estimated\"}]";
-
         OpdJsonFormUtils.dobUnknownUpdateFromAge(jsonArrayFields);
+        JSONObject field = JsonFormUtils.getFieldJSONObject(jsonArrayFields, OpdConstants.JSON_FORM_KEY.DOB_ENTERED);
 
-        Assert.assertEquals(expected, jsonArrayFields.toString());
+        Assert.assertEquals(Utils.getDob(34), field.getString(JsonFormUtils.VALUE));
     }
 
     @Test
