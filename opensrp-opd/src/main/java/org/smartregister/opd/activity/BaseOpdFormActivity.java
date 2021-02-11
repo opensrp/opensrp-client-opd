@@ -2,6 +2,7 @@ package org.smartregister.opd.activity;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.res.Configuration;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -43,7 +44,9 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
     protected void attachBaseContext(android.content.Context base) {
 
         String language = LangUtils.getLanguage(base);
-        super.attachBaseContext(LangUtils.setAppLocale(base, language));
+        Configuration newConfiguration = LangUtils.setAppLocale(base, language);
+        super.attachBaseContext(base);
+        applyOverrideConfiguration(newConfiguration);
     }
 
     @Override
