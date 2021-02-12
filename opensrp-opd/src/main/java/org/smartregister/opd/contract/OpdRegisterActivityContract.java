@@ -1,6 +1,7 @@
 package org.smartregister.opd.contract;
 
 import android.content.Intent;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -13,6 +14,7 @@ import org.smartregister.opd.pojo.OpdDiagnosisAndTreatmentForm;
 import org.smartregister.opd.pojo.OpdEventClient;
 import org.smartregister.opd.pojo.RegisterParams;
 import org.smartregister.view.contract.BaseRegisterContract;
+import org.smartregister.view.contract.ConfigurableRegisterActivityContract;
 
 import java.util.HashMap;
 import java.util.List;
@@ -72,13 +74,11 @@ public interface OpdRegisterActivityContract {
 
     }
 
-    interface Interactor {
+    interface Interactor extends ConfigurableRegisterActivityContract.Interactor {
 
         void fetchSavedDiagnosisAndTreatmentForm(@NonNull String baseEntityId, @Nullable String entityTable, @NonNull InteractorCallBack interactorCallBack);
 
         void getNextUniqueId(Triple<String, String, String> triple, OpdRegisterActivityContract.InteractorCallBack callBack);
-
-        void onDestroy(boolean isChangingConfiguration);
 
         void saveRegistration(List<OpdEventClient> opdEventClientList, String jsonString, RegisterParams registerParams, OpdRegisterActivityContract.InteractorCallBack callBack);
 

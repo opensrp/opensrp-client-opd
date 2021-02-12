@@ -9,6 +9,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.CoreLibrary;
+import org.smartregister.clientandeventmodel.Client;
 import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.contract.OpdRegisterActivityContract;
@@ -22,9 +23,11 @@ import org.smartregister.sync.ClientProcessorForJava;
 import org.smartregister.sync.helper.ECSyncHelper;
 import org.smartregister.util.JsonFormUtils;
 import org.smartregister.view.activity.DrishtiApplication;
+import org.smartregister.view.contract.ConfigurableRegisterActivityContract;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import timber.log.Timber;
@@ -74,6 +77,21 @@ public class BaseOpdRegisterActivityInteractor implements OpdRegisterActivityCon
     @Override
     public void onDestroy(boolean isChangingConfiguration) {
         // Do nothing for now, this will be handled by the class that extends this to nullify the presenter
+    }
+
+    @Override
+    public void getNextUniqueId(Triple<String, String, String> triple, ConfigurableRegisterActivityContract.InteractorCallBack interactorCallBack) {
+        // Abstract method implementation
+    }
+
+    @Override
+    public void saveRegistration(@Nullable HashMap<Client, List<Event>> hashMap, String s, @NonNull org.smartregister.view.contract.RegisterParams registerParams, ConfigurableRegisterActivityContract.InteractorCallBack interactorCallBack) {
+        // Abstract method implementation
+    }
+
+    @Override
+    public void saveEvents(@NonNull List<Event> list, @NonNull ConfigurableRegisterActivityContract.InteractorCallBack interactorCallBack) {
+        // Abstract method implementation
     }
 
     @Override

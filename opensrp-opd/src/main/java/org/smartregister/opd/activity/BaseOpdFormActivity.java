@@ -2,6 +2,7 @@ package org.smartregister.opd.activity;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.res.Configuration;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -23,6 +24,7 @@ import org.smartregister.opd.utils.AppExecutors;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.opd.utils.OpdUtils;
+import org.smartregister.util.LangUtils;
 import org.smartregister.util.Utils;
 
 import java.util.HashMap;
@@ -37,6 +39,15 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
     private JSONObject form;
 
     private HashMap<String, String> parcelableData = new HashMap<>();
+
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+
+        String language = LangUtils.getLanguage(base);
+        Configuration newConfiguration = LangUtils.setAppLocale(base, language);
+        super.attachBaseContext(base);
+        applyOverrideConfiguration(newConfiguration);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
