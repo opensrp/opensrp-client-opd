@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.robolectric.util.ReflectionHelpers;
@@ -37,6 +38,7 @@ public class OpdProfileVisitsFragmentPresenterTest extends BaseTest {
 
     @Before
     public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
         presenter = Mockito.spy(new OpdProfileVisitsFragmentPresenter(view));
     }
 

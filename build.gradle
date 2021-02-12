@@ -10,7 +10,6 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.0.1'
-        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.1'
         classpath 'com.palantir:jacoco-coverage:0.4.0'
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.11.0"
         classpath 'org.smartregister:gradle-jarjar-plugin:1.0.0-SNAPSHOT'
@@ -31,6 +30,7 @@ configure(allprojects) { project ->
             mavenCentral()
             maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
             mavenLocal()
+            maven{  url "https://plugins.gradle.org/m2/" }
         }
     }
 }
@@ -68,7 +68,7 @@ subprojects {
     ext.androidAnnotationsAPIVersion = '3.0.1'
 
     ext.jacocoVersion = "0.8.5"
-    ext.coverallsVersion = "2.8.3"
+    ext.coverallsVersion = "2.10.2"
 
     // Improve build server performance by allowing disabling of pre-dexing
     // (see http://tools.android.com/tech-docs/new-build-system/tips#TOC-Improving-Build-Server-performance.)
