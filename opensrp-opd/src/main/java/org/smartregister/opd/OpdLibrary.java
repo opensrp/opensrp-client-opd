@@ -29,6 +29,8 @@ import org.smartregister.opd.repository.OpdTestConductedRepository;
 import org.smartregister.opd.repository.OpdTreatmentDetailRepository;
 import org.smartregister.opd.repository.OpdVisitRepository;
 import org.smartregister.opd.repository.OpdVisitSummaryRepository;
+import org.smartregister.opd.repository.VisitDetailsRepository;
+import org.smartregister.opd.repository.VisitRepository;
 import org.smartregister.opd.utils.FilePath;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;
@@ -84,6 +86,9 @@ public class OpdLibrary {
     private Compressor compressor;
     private int applicationVersion;
     private int databaseVersion;
+
+    private VisitRepository opdVisitRepository;
+    private VisitDetailsRepository visitDetailsRepository;
 
     private Yaml yaml;
 
@@ -383,5 +388,20 @@ public class OpdLibrary {
     public AppProperties getProperties() {
         return CoreLibrary.getInstance().context().getAppProperties();
     }
+
+    public VisitRepository visitRepository() {
+        if (visitRepository == null) {
+            opdVisitRepository = new VisitRepository();
+        }
+        return opdVisitRepository;
+    }
+
+    public VisitDetailsRepository visitDetailsRepository() {
+        if (visitDetailsRepository == null) {
+            visitDetailsRepository = new VisitDetailsRepository();
+        }
+        return visitDetailsRepository;
+    }
+
 
 }
