@@ -314,6 +314,8 @@ public class OpdConstants extends AllConstants {
         public static final String DEATH = "Death";
     }
 
+
+    //New OPD Module WorkFlow
     public interface DateTimeFormat {
         String HH_MM_AMPM = "h:mm a";
         String YYYY_MM_dd_HH_mm_ss = "yyyy-MM-dd HH:mm:ss";

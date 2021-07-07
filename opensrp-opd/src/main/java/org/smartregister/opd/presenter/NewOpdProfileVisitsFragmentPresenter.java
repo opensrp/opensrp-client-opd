@@ -16,6 +16,7 @@ import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.util.CallableInteractor;
 import org.smartregister.util.CallableInteractorCallBack;
 import org.smartregister.util.GenericInteractor;
+import org.smartregister.util.NativeFormProcessor;
 import org.smartregister.util.Utils;
 import org.smartregister.view.ListContract;
 import org.smartregister.view.presenter.ListPresenter;
@@ -66,7 +67,7 @@ public class NewOpdProfileVisitsFragmentPresenter extends ListPresenter<ProfileH
     public JSONObject readFormAndAddValues(JSONObject jsonObject, String formSubmissionId) throws JSONException {
         if (StringUtils.isEmpty(formSubmissionId)) return jsonObject;
 
-        NativeFormProcessor processor = NativeFormProcessor.createInstance(jsonObject);
+        NativeFormProcessor processor = OpdLibrary.getInstance().getFormProcessorFactory().createInstance(jsonObject);
 
         // read values
         String eventJson = VisitDao.fetchEventByFormSubmissionId(formSubmissionId);
@@ -119,7 +120,7 @@ public class NewOpdProfileVisitsFragmentPresenter extends ListPresenter<ProfileH
 
                 Callable<Void> callable = () -> {
                     //JSONObject jsonObject = new JSONObject(jsonString);
-                    NativeFormProcessor processor = NativeFormProcessor.createInstance(jsonObject);
+                    NativeFormProcessor processor = OpdLibrary.getInstance().getFormProcessorFactory().createInstance(jsonObject);
                     String entityId = jsonObject.getString(OpdConstants.Properties.BASE_ENTITY_ID);
                     String formSubmissionId = jsonObject.has(OpdConstants.Properties.FORM_SUBMISSION_ID) ?
                             jsonObject.getString(OpdConstants.Properties.FORM_SUBMISSION_ID) : null;

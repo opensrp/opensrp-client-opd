@@ -44,6 +44,7 @@ import org.smartregister.sync.ClientProcessorForJava;
 import org.smartregister.sync.helper.ECSyncHelper;
 import org.smartregister.util.AppProperties;
 import org.smartregister.util.JsonFormUtils;
+import org.smartregister.util.NativeFormProcessor;
 import org.smartregister.view.activity.DrishtiApplication;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
@@ -89,6 +90,7 @@ public class OpdLibrary {
 
     private VisitRepository opdVisitRepository;
     private VisitDetailsRepository visitDetailsRepository;
+    private NativeFormProcessorFactory formProcessorFactory;
 
     private Yaml yaml;
 
@@ -111,6 +113,14 @@ public class OpdLibrary {
         if (instance == null) {
             instance = new OpdLibrary(context, opdConfiguration, repository, applicationVersion, databaseVersion);
         }
+    }
+
+    public static void initializeFormFactory(NativeFormProcessorFactory nativeFormProcessorFactory){
+        instance.formProcessorFactory = nativeFormProcessorFactory;
+    }
+
+    public NativeFormProcessorFactory getFormProcessorFactory(){
+        return instance.formProcessorFactory;
     }
 
     public static OpdLibrary getInstance() {
@@ -404,4 +414,9 @@ public class OpdLibrary {
     }
 
 
+    public interface NativeFormProcessorFactory {
+        NativeFormProcessor createInstance(String jsonString);
+        NativeFormProcessor createInstance(JSONObject jsonObject);
+        NativeFormProcessor createInstanceFromAsset(String filePath);
+    }
 }
