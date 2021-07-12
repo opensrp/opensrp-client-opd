@@ -96,7 +96,8 @@ public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<Profil
             JSONObject jsonObject = new JSONObject(jsonString);
             NativeFormProcessor processor = OpdLibrary.getInstance().getFormProcessorFactory().createInstance(jsonObject);
             String entityId = jsonObject.getString(OpdConstants.Properties.BASE_ENTITY_ID);
-            String formSubmissionId = jsonObject.getString(OpdConstants.Properties.FORM_SUBMISSION_ID);
+            String formSubmissionId = jsonObject.has(OpdConstants.Properties.FORM_SUBMISSION_ID) ?
+                    jsonObject.getString(OpdConstants.Properties.FORM_SUBMISSION_ID) : null;
 
             String eventType = jsonObject.getString(ENCOUNTER_TYPE);
 

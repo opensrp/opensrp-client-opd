@@ -1,12 +1,19 @@
 package org.smartregister.opd.utils;
 
+import android.content.ContentValues;
+
+import androidx.annotation.NonNull;
+
 import org.apache.commons.lang3.StringUtils;
+import org.smartregister.commonregistry.CommonFtsObject;
+import org.smartregister.commonregistry.CommonRepository;
+import org.smartregister.domain.Event;
 import org.smartregister.domain.db.EventClient;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
+import org.smartregister.opd.exception.CheckInEventProcessException;
 import org.smartregister.opd.model.Visit;
 import org.smartregister.opd.model.VisitDetail;
-
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -88,8 +95,61 @@ public class VisitUtils {
                     }
                 }
             }
+            // Update the last interacted with of the user
+            updateLastInteractedWith(baseEvent.getEvent(), visit.getVisitId());
+            abortTransaction();
+
         } catch (Exception e) {
             Timber.e(e);
+        }
+    }
+
+    public static void updateLastInteractedWith(@NonNull Event event, @NonNull String visitId) throws
+            CheckInEventProcessException {
+        String tableName = OpdUtils.metadata().getTableName();
+
+        String lastInteractedWithDate = String.valueOf(new Date().getTime());
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("last_interacted_with", lastInteractedWithDate);
+
+        int recordsUpdated = OpdLibrary.getInstance().getRepository().getWritableDatabase()
+                .update(tableName, contentValues, "base_entity_id = ?", new String[]{event.getBaseEntityId()});
+
+        if (recordsUpdated < 1) {
+            abortTransaction();
+            throw new CheckInEventProcessException(String.format("Updating last interacted with for visit %s for base_entity_id %s in table %s failed"
+                    , visitId
+                    , event.getBaseEntityId()
+                    , tableName));
+        }
+
+        // Update FTS
+        CommonRepository commonrepository = OpdLibrary.getInstance().context().commonrepository(tableName);
+
+        ContentValues contentValues1 = new ContentValues();
+        contentValues1.put("last_interacted_with", lastInteractedWithDate);
+
+        boolean isUpdated = false;
+
+        if (commonrepository.isFts()) {
+            recordsUpdated = OpdLibrary.getInstance().getRepository().getWritableDatabase()
+                    .update(CommonFtsObject.searchTableName(tableName), contentValues, CommonFtsObject.idColumn + " = ?", new String[]{event.getBaseEntityId()});
+            isUpdated = recordsUpdated > 0;
+        }
+
+        if (!isUpdated) {
+            abortTransaction();
+            throw new CheckInEventProcessException(String.format("Updating last interacted with for visit %s for base_entity_id %s in table %s failed"
+                    , visitId
+                    , event.getBaseEntityId()
+                    , tableName));
+        }
+    }
+
+    public static void abortTransaction() {
+        if (OpdLibrary.getInstance().getRepository().getWritableDatabase().inTransaction()) {
+            OpdLibrary.getInstance().getRepository().getWritableDatabase().endTransaction();
         }
     }
 

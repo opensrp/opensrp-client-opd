@@ -415,8 +415,8 @@ public class OpdLibrary {
 
 
     public interface NativeFormProcessorFactory {
-        NativeFormProcessor createInstance(String jsonString);
+        NativeFormProcessor createInstance(String jsonString) throws JSONException ;
         NativeFormProcessor createInstance(JSONObject jsonObject);
-        NativeFormProcessor createInstanceFromAsset(String filePath);
+        NativeFormProcessor createInstanceFromAsset(String filePath) throws JSONException ;
     }
 }

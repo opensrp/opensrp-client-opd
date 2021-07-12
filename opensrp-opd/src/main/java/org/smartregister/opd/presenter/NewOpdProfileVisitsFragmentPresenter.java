@@ -113,10 +113,7 @@ public class NewOpdProfileVisitsFragmentPresenter extends ListPresenter<ProfileH
         try {
             JSONObject jsonObject = new JSONObject(jsonString);
             String title = jsonObject.getString(ENCOUNTER_TYPE);
-
-            // TODO
-            if (title.equals(OpdConstants.OpdModuleEvents.OPD_CHECK_IN)) {
-                CallableInteractor myInteractor = getCallableInteractor();
+             CallableInteractor myInteractor = getCallableInteractor();
 
                 Callable<Void> callable = () -> {
                     //JSONObject jsonObject = new JSONObject(jsonString);
@@ -159,7 +156,6 @@ public class NewOpdProfileVisitsFragmentPresenter extends ListPresenter<ProfileH
                         view.setLoadingState(false);
                     }
                 });
-            }
 
         } catch (Exception ex) {
             Timber.e(ex.getMessage());
