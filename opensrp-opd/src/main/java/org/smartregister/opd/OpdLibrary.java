@@ -400,7 +400,7 @@ public class OpdLibrary {
     }
 
     public VisitRepository visitRepository() {
-        if (visitRepository == null) {
+        if (opdVisitRepository == null) {
             opdVisitRepository = new VisitRepository();
         }
         return opdVisitRepository;
