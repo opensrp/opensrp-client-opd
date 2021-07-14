@@ -284,6 +284,8 @@ public class OpdConstants extends AllConstants {
         public static final String DOD = "dod";
         public static final String DATE_REMOVED = "date_removed";
         public static final String DIED = "died";
+        public static final String REFERRAL_FACILITY = "referral_facility_specify";
+        public static final String REFERRAL_LOCATION = "referral_location_med";
     }
 
     public static class ENTITY {

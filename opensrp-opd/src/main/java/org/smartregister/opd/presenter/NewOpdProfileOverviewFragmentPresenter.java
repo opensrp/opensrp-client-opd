@@ -13,6 +13,7 @@ import org.smartregister.opd.dao.VisitDao;
 import org.smartregister.opd.domain.ProfileAction;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;
+import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.util.CallableInteractor;
 import org.smartregister.util.CallableInteractorCallBack;
 import org.smartregister.util.GenericInteractor;
@@ -68,6 +69,7 @@ public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<Profil
         if (getView() != null) {
             getView().attachGlobals(jsonObject);
         }
+        attachLocationHierarchy(jsonObject);
 
         if (StringUtils.isEmpty(formSubmissionId)) return jsonObject;
 
@@ -83,6 +85,18 @@ public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<Profil
         jsonObject.put(OpdConstants.Properties.FORM_SUBMISSION_ID, formSubmissionId);
 
         return jsonObject;
+    }
+
+    private void attachLocationHierarchy(JSONObject jsonObject) {
+        try {
+            if (jsonObject.getString(ENCOUNTER_TYPE).equals(OpdConstants.OpdModuleEvents.OPD_PHARMACY)
+                    || jsonObject.getString(ENCOUNTER_TYPE).equals(OpdConstants.OpdModuleEvents.OPD_FINAL_OUTCOME)) {
+                OpdJsonFormUtils.addRegLocHierarchyQuestions(jsonObject);
+            }
+        } catch (Exception e) {
+            Timber.e(e, "NewOpdProfileOverviewFragmentPresenter -> attachLocationHierarchy()");
+        }
+
     }
 
     protected void attachAgeAndGender(JSONObject jsonObject) {
