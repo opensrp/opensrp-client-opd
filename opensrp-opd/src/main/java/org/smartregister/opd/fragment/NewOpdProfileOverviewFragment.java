@@ -13,6 +13,7 @@ import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.domain.Form;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.opd.OpdLibrary;
@@ -127,7 +128,30 @@ public class NewOpdProfileOverviewFragment extends BaseListFragment<ProfileActio
             formGlobalValues.clear();
             for (String globalKey : globalKeys) {
                 if (savedValues.containsKey(globalKey)) {
-                    formGlobalValues.put(globalKey, savedValues.get(globalKey));
+                    if (globalKey.equalsIgnoreCase(OpdConstants.JSON_FORM_KEY.MEDICINE) && !savedValues.get(globalKey).isEmpty()) {
+                        String value = savedValues.get(globalKey);
+                        String medicineString = "";
+                        try {
+                            if (value != null && value.startsWith("[")) {
+                                JSONArray medicines = new JSONArray(value);
+                                for (int i= 0; i<medicines.length(); i++) {
+                                    JSONObject medicine = medicines.getJSONObject(i);
+                                    if (i != 0)
+                                        medicineString = medicineString.concat(", ");
+                                    medicineString = medicineString.concat(medicine.getString("text"));
+                                }
+                            } else {
+                                JSONObject medicine = new JSONObject(value);
+                                medicineString = medicineString.concat(medicine.getString("text"));
+                            }
+                            formGlobalValues.put(globalKey, medicineString);
+                        } catch (Exception e) {
+                            Timber.e(e, "loadGlobals()");
+                            formGlobalValues.put(globalKey, savedValues.get(globalKey));
+                        }
+                    } else {
+                        formGlobalValues.put(globalKey, savedValues.get(globalKey));
+                    }
                 } else {
                     formGlobalValues.put(globalKey, "");
                 }
