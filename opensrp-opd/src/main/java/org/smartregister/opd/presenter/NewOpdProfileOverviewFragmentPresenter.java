@@ -90,6 +90,7 @@ public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<Profil
     private void attachLocationHierarchy(JSONObject jsonObject) {
         try {
             if (jsonObject.getString(ENCOUNTER_TYPE).equals(OpdConstants.OpdModuleEvents.OPD_PHARMACY)
+                    || jsonObject.getString(ENCOUNTER_TYPE).equals(OpdConstants.OpdModuleEvents.OPD_LABORATORY)
                     || jsonObject.getString(ENCOUNTER_TYPE).equals(OpdConstants.OpdModuleEvents.OPD_FINAL_OUTCOME)) {
                 OpdJsonFormUtils.addRegLocHierarchyQuestions(jsonObject);
             }
