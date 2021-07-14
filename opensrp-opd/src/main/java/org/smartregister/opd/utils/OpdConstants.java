@@ -224,6 +224,8 @@ public class OpdConstants extends AllConstants {
         public static final String OPD_EDIT_FORM_TITLE = "Update Opd Registration";
         public static final String FORM_TITLE = "title";
         public static final String OPENSRP_ID = "opensrp_id";
+        public static final String FIELDS = "fields";
+        public static final String VALUE = "value";
 
         public static final String DIAGNOSTIC_TEST_RESULT_GLUCOSE = "diagnostic_test_result_glucose";
         public static final String DIAGNOSTIC_TEST_RESULT_SPINNER_BLOOD_TYPE = "diagnostic_test_result_spinner_blood_type";
@@ -391,5 +393,9 @@ public class OpdConstants extends AllConstants {
 
     public static class PROPERTY {
         public static final String USE_NEW_OPD_MODULE = "use.new.opd.module";
+    }
+
+    public static class FileUtils {
+        public static final String OPD_GLOBALS = "opd-globals.yml";
     }
 }

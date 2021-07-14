@@ -9,11 +9,13 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.domain.Form;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
+import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
 import org.smartregister.opd.adapter.ProfileActionFragmentAdapter;
 import org.smartregister.opd.contract.OpdProfileFragmentContract;
@@ -27,10 +29,14 @@ import org.smartregister.util.AppExecutors;
 import org.smartregister.view.adapter.ListableAdapter;
 import org.smartregister.view.fragment.BaseListFragment;
 import org.smartregister.view.viewholder.ListableViewHolder;
+import org.yaml.snakeyaml.Yaml;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import timber.log.Timber;
@@ -38,6 +44,9 @@ import timber.log.Timber;
 public class NewOpdProfileOverviewFragment extends BaseListFragment<ProfileAction> implements OnSendActionToFragment, OpdProfileFragmentContract.View<ProfileAction>, FormProcessor.Requester {
 
     private String baseEntityID;
+    private CommonPersonObjectClient commonPersonObjectClient;
+    private final Map<String, String> formGlobalValues = new HashMap<>();
+    private final Set<String> globalKeys = new HashSet<>();
 
     public static NewOpdProfileOverviewFragment newInstance(Bundle bundle) {
         NewOpdProfileOverviewFragment fragment = new NewOpdProfileOverviewFragment();
@@ -48,13 +57,14 @@ public class NewOpdProfileOverviewFragment extends BaseListFragment<ProfileActio
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         if (getArguments() != null) {
-            CommonPersonObjectClient commonPersonObjectClient = (CommonPersonObjectClient) getArguments()
+            commonPersonObjectClient = (CommonPersonObjectClient) getArguments()
                     .getSerializable(OpdConstants.IntentKey.CLIENT_OBJECT);
 
             if (commonPersonObjectClient != null) {
                 baseEntityID = commonPersonObjectClient.getCaseId();
             }
         }
+        getGlobalKeysFromConfig();
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -64,6 +74,8 @@ public class NewOpdProfileOverviewFragment extends BaseListFragment<ProfileActio
         return () -> {
 
             Map<String, List<ProfileAction.ProfileActionVisit>> mapVisit = VisitDao.getVisitsToday(baseEntityID);
+
+            loadGlobals(mapVisit);
 
             List<ProfileAction> profileActions = new ArrayList<>();
             profileActions.add(
@@ -100,6 +112,27 @@ public class NewOpdProfileOverviewFragment extends BaseListFragment<ProfileActio
             );
             return profileActions;
         };
+    }
+
+    private void loadGlobals(Map<String, List<ProfileAction.ProfileActionVisit>> mapVisit) {
+        if (mapVisit.size() > 0) {
+            HashMap<String, String> savedValues = new HashMap<>();
+
+            for (String key : mapVisit.keySet()) {
+                String visitId = mapVisit.get(key).get(0).getVisitID();
+                Map<String, String> values = VisitDao.getSavedKeysForVisit(visitId);
+                savedValues.putAll(values);
+            }
+
+            formGlobalValues.clear();
+            for (String globalKey : globalKeys) {
+                if (savedValues.containsKey(globalKey)) {
+                    formGlobalValues.put(globalKey, savedValues.get(globalKey));
+                } else {
+                    formGlobalValues.put(globalKey, "");
+                }
+            }
+        }
     }
 
     @Override
@@ -211,4 +244,32 @@ public class NewOpdProfileOverviewFragment extends BaseListFragment<ProfileActio
         // reload this list from the database
         loadPresenter().fetchList(this.onStartCallable(this.getArguments()), this.fetchRequestType());
     }
+
+    @Override
+    public CommonPersonObjectClient getCommonPersonObject() {
+        return this.commonPersonObjectClient;
+    }
+
+    @Override
+    public void attachGlobals(JSONObject jsonObject) {
+        try {
+            jsonObject.put(JsonFormConstants.JSON_FORM_KEY.GLOBAL, new JSONObject(formGlobalValues));
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+    }
+
+    public void getGlobalKeysFromConfig() {
+        try {
+            Iterable<Object> opdGlobals = OpdLibrary.getInstance().readYaml(OpdConstants.FileUtils.OPD_GLOBALS, new Yaml());
+            for (Object ruleObject : opdGlobals) {
+                Map<String, Object> map = ((Map<String, Object>) ruleObject);
+                globalKeys.addAll((List<String>) map.get(JsonFormConstants.FIELDS));
+            }
+        } catch (Exception e) {
+            Timber.e(e);
+
+        }
+    }
+
 }

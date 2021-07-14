@@ -1,5 +1,7 @@
 package org.smartregister.opd.dao;
 
+import com.google.zxing.common.StringUtils;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.dao.AbstractDao;
@@ -7,6 +9,7 @@ import org.smartregister.opd.R;
 import org.smartregister.opd.domain.ProfileAction;
 import org.smartregister.opd.domain.ProfileHistory;
 import org.smartregister.opd.utils.OpdConstants;
+import org.smartregister.util.StringUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -119,6 +122,32 @@ public class VisitDao extends AbstractDao {
         };
 
         return readData(sql, dataMap);
+    }
+
+    public static Map<String, String> getSavedKeysForVisit(String visitId) {
+        Map<String, String> visitMap = new HashMap<>();
+        String sql = "SELECT visit_key, details,  human_readable_details FROM opd_client_visit_details WHERE visit_id = '" + visitId + "'";
+
+        DataMap<Void> dataMap = cursor -> {
+
+
+            String key = getCursorValue(cursor, "visit_key");
+            String value = "";
+            String humanReadableValue = getCursorValue(cursor, "human_readable_details");
+            if (humanReadableValue == null || humanReadableValue.isEmpty()) {
+                value = getCursorValue(cursor, "details");
+            } else {
+                value = humanReadableValue;
+            }
+            if (visitMap.containsKey(key)) {
+                String oldValue = visitMap.get(key);
+                value = oldValue + ", " + value;
+            }
+            visitMap.put(key, value);
+            return null;
+        };
+        readData(sql, dataMap);
+        return visitMap;
     }
 }
 

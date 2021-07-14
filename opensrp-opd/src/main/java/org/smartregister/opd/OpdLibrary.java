@@ -277,6 +277,13 @@ public class OpdLibrary {
     }
 
     @NonNull
+    public Iterable<Object> readYaml(@NonNull String filename, Yaml yaml) throws IOException {
+        InputStreamReader inputStreamReader = new InputStreamReader(
+                context.applicationContext().getAssets().open((FilePath.FOLDER.CONFIG_FOLDER_PATH + filename)));
+        return yaml.loadAll(inputStreamReader);
+    }
+
+    @NonNull
     public OpdRulesEngineHelper getOpdRulesEngineHelper() {
         if (opdRulesEngineHelper == null) {
             opdRulesEngineHelper = new OpdRulesEngineHelper();

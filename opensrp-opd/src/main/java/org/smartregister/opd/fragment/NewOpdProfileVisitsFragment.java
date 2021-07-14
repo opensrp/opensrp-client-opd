@@ -165,4 +165,15 @@ public class NewOpdProfileVisitsFragment extends BaseListFragment<ProfileHistory
     public void reloadFromSource() {
         loadPresenter().fetchList(this.onStartCallable(this.getArguments()), this.fetchRequestType());
     }
+
+    @Override
+    public CommonPersonObjectClient getCommonPersonObject() {
+            // Do nothing for now
+        return null;
+    }
+
+    @Override
+    public void attachGlobals(JSONObject jsonObject) {
+        // Do nothing for now
+    }
 }

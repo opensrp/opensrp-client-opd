@@ -3,13 +3,16 @@ package org.smartregister.opd.presenter;
 import android.content.Context;
 
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.contract.OpdProfileFragmentContract;
 import org.smartregister.opd.dao.VisitDao;
 import org.smartregister.opd.domain.ProfileAction;
 import org.smartregister.opd.utils.OpdConstants;
+import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.util.CallableInteractor;
 import org.smartregister.util.CallableInteractorCallBack;
 import org.smartregister.util.GenericInteractor;
@@ -17,11 +20,14 @@ import org.smartregister.util.NativeFormProcessor;
 import org.smartregister.util.Utils;
 import org.smartregister.view.ListContract;
 import org.smartregister.view.presenter.ListPresenter;
-
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import timber.log.Timber;
+
+import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_EXTRA.STEP1;
 import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_KEY.ENCOUNTER_TYPE;
+import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_KEY.FIELDS;
 
 
 public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<ProfileAction> implements OpdProfileFragmentContract.Presenter<ProfileAction> {
@@ -58,6 +64,11 @@ public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<Profil
     }
 
     public JSONObject readFormAndAddValues(JSONObject jsonObject, String formSubmissionId) throws JSONException {
+        attachAgeAndGender(jsonObject);
+        if (getView() != null) {
+            getView().attachGlobals(jsonObject);
+        }
+
         if (StringUtils.isEmpty(formSubmissionId)) return jsonObject;
 
         NativeFormProcessor processor = OpdLibrary.getInstance().getFormProcessorFactory().createInstance(jsonObject);
@@ -72,6 +83,30 @@ public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<Profil
         jsonObject.put(OpdConstants.Properties.FORM_SUBMISSION_ID, formSubmissionId);
 
         return jsonObject;
+    }
+
+    protected void attachAgeAndGender(JSONObject jsonObject) {
+        try {
+            String encounterType = jsonObject.getString(ENCOUNTER_TYPE);
+            if (getView() == null)
+                return;
+            CommonPersonObjectClient commonPersonObject = getView().getCommonPersonObject();
+            if (commonPersonObject != null && encounterType.equals(OpdConstants.OpdModuleEvents.OPD_DIAGNOSIS)) {
+                String gender = commonPersonObject.getColumnmaps().get(OpdDbConstants.Column.Client.GENDER);
+                String age = String.valueOf(Utils.getAgeFromDate(commonPersonObject.getColumnmaps().get(OpdDbConstants.Column.Client.DOB)));
+                JSONArray fields = jsonObject.getJSONObject(STEP1).getJSONArray(FIELDS);
+                for (int i = 0; i < fields.length(); i++) {
+                    JSONObject field = fields.getJSONObject(i);
+                    if (field.getString(OpdConstants.KEY.KEY).equals(OpdConstants.JSON_FORM_KEY.AGE)) {
+                        field.put(OpdConstants.JSON_FORM_KEY.VALUE, age);
+                    } else if (field.getString(OpdConstants.KEY.KEY).equals(OpdConstants.JSON_FORM_KEY.GENDER)) {
+                        field.put(OpdConstants.JSON_FORM_KEY.VALUE, gender);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Timber.e(e);
+        }
     }
 
     @Override
