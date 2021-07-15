@@ -79,6 +79,14 @@ public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<Profil
         JSONObject savedEvent = VisitDao.fetchEventAsJson(formSubmissionId);
         Map<String, Object> values = processor.getFormResults(savedEvent);
 
+        // little hack for pesky multi_select_list
+        if (values.containsKey("disease_code_primary"))
+            values.put("disease_code_primary", values.get("disease_code_primary"));
+
+        // little hack for pesky multi_select_list
+        if (values.containsKey("disease_code_final_diagn"))
+            values.put("disease_code_final_diagn", values.get("disease_code_object_final"));
+
         // inject values
         processor.populateValues(values);
 
