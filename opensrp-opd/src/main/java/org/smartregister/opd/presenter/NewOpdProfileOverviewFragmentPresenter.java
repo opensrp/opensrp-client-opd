@@ -2,6 +2,8 @@ package org.smartregister.opd.presenter;
 
 import android.content.Context;
 
+import com.vijay.jsonwizard.constants.JsonFormConstants;
+
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,6 +16,7 @@ import org.smartregister.opd.domain.ProfileAction;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
+import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.util.CallableInteractor;
 import org.smartregister.util.CallableInteractorCallBack;
 import org.smartregister.util.GenericInteractor;
@@ -21,6 +24,8 @@ import org.smartregister.util.NativeFormProcessor;
 import org.smartregister.util.Utils;
 import org.smartregister.view.ListContract;
 import org.smartregister.view.presenter.ListPresenter;
+
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -29,6 +34,7 @@ import timber.log.Timber;
 import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_EXTRA.STEP1;
 import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_KEY.ENCOUNTER_TYPE;
 import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_KEY.FIELDS;
+import static org.smartregister.util.JsonFormUtils.gson;
 
 
 public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<ProfileAction> implements OpdProfileFragmentContract.Presenter<ProfileAction> {
@@ -152,12 +158,31 @@ public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<Profil
 
         Callable<Void> callable = () -> {
             JSONObject jsonObject = new JSONObject(jsonString);
+            String eventType = jsonObject.getString(ENCOUNTER_TYPE);
+
+            if (eventType.equalsIgnoreCase(OpdConstants.OpdModuleEvents.OPD_LABORATORY)) {
+                JSONObject step = jsonObject.getJSONObject(STEP1);
+                JSONArray fields = step.optJSONArray(OpdJsonFormUtils.FIELDS);
+                HashMap<String, HashMap<String, String>> buildRepeatingGroupTests = OpdUtils.buildRepeatingGroupTests(step);
+                if (!buildRepeatingGroupTests.isEmpty()) {
+                    String strTest = gson.toJson(buildRepeatingGroupTests);
+                    JSONObject repeatingGroupObj = new JSONObject();
+                    repeatingGroupObj.put(JsonFormConstants.KEY, OpdConstants.REPEATING_GROUP_MAP);
+                    repeatingGroupObj.put(JsonFormConstants.VALUE, strTest);
+                    repeatingGroupObj.put(JsonFormConstants.TYPE, JsonFormConstants.HIDDEN);
+                    if (fields != null) {
+                        fields.put(repeatingGroupObj);
+                        step.put(OpdJsonFormUtils.FIELDS, fields);
+                        jsonObject.put(STEP1, step);
+                    }
+                }
+            }
+
             NativeFormProcessor processor = OpdLibrary.getInstance().getFormProcessorFactory().createInstance(jsonObject);
             String entityId = jsonObject.getString(OpdConstants.Properties.BASE_ENTITY_ID);
             String formSubmissionId = jsonObject.has(OpdConstants.Properties.FORM_SUBMISSION_ID) ?
                     jsonObject.getString(OpdConstants.Properties.FORM_SUBMISSION_ID) : null;
 
-            String eventType = jsonObject.getString(ENCOUNTER_TYPE);
 
             // update metadata
             processor.withBindType("ec_client")
