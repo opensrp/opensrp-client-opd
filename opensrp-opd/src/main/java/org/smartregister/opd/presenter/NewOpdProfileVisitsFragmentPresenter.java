@@ -1,6 +1,9 @@
 package org.smartregister.opd.presenter;
 
 import android.content.Context;
+import android.text.TextUtils;
+
+import androidx.annotation.NonNull;
 
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 
@@ -12,6 +15,7 @@ import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.contract.OpdProfileFragmentContract;
 import org.smartregister.opd.dao.VisitDao;
 import org.smartregister.opd.domain.ProfileHistory;
+import org.smartregister.opd.pojo.OpdVisitSummary;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.util.CallableInteractor;
 import org.smartregister.util.CallableInteractorCallBack;
@@ -23,6 +27,8 @@ import org.smartregister.view.presenter.ListPresenter;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -80,6 +86,13 @@ public class NewOpdProfileVisitsFragmentPresenter extends ListPresenter<ProfileH
         Map<String, Object> values = processor.getFormResults(savedEvent);
         jsonObject.put(OpdConstants.Properties.FORM_SUBMISSION_ID, formSubmissionId);
 
+        // little hack for pesky multi_select_list
+        if (values.containsKey("disease_code_primary"))
+            values.put("disease_code_primary", values.get("disease_code_object"));
+
+        // little hack for pesky multi_select_list
+        if (values.containsKey("disease_code_final_diagn"))
+            values.put("disease_code_final_diagn", values.get("disease_code_object_final"));
 
         // inject values
         processor.populateValues(values, jsonObject1 -> {
