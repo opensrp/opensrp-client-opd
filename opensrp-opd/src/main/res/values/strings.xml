@@ -93,7 +93,7 @@
     <string name="opd_check_in">CHECK IN</string>
     <string name="vital_danger_signs">VITAL/DANGER SIGNS</string>
     <string name="opd_diagnosis">DIAGNOSIS</string>
-    <string name="lab_reports">LAB REPORTS</string>
+    <string name="lab_reports">LABORATORY TESTS AND RESULTS</string>
     <string name="opd_treatment">TREATMENT</string>
     <string name="pharmacy">PHARMACY</string>
     <string name="final_outcome">FINAL OUTCOME</string>
