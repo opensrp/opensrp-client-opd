@@ -213,7 +213,7 @@ public class VisitUtils {
             case OpdConstants.OpdModuleEvents.OPD_SERVICE_CHARGE:
                 return context().getStringResource(R.string.service_fee);
             default:
-                throw new IllegalArgumentException("Unknown VisitType");
+                return null;
         }
     }
 

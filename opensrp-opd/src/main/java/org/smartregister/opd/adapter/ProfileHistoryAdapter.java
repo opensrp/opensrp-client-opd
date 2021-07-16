@@ -55,14 +55,20 @@ public class ProfileHistoryAdapter extends GroupedListableAdapter<ProfileHistory
         @SuppressLint("SetTextI18n")
         @Override
         public void bindView(ProfileHistory history, ListContract.View<ProfileHistory> view) {
-            tvEvent.setText(history.getEventTime() + " " + VisitUtils.getTranslatedVisitTypeName(history.getEventType()));
-            tvEdit.setOnClickListener(v -> view.onListItemClicked(history, v.getId()));
+            String visitType = VisitUtils.getTranslatedVisitTypeName(history.getEventType());
+            if (visitType != null) {
+                itemView.setVisibility(View.VISIBLE);
+                tvEvent.setText(history.getEventTime() + " " + visitType);
+                tvEdit.setOnClickListener(v -> view.onListItemClicked(history, v.getId()));
 
-
-            //This might Change Depending on View Functionality
-            if(history.getEventDate() != context().getStringResource(R.string.today)){
-                tvEdit.setText(context().getStringResource(R.string.view));
+                //This might Change Depending on View Functionality
+                if(history.getEventDate() != context().getStringResource(R.string.today)){
+                    tvEdit.setText(context().getStringResource(R.string.view));
+                }
+            }  else {
+                itemView.setVisibility(View.GONE);
             }
+
         }
 
         @Override
