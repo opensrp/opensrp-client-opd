@@ -4,7 +4,6 @@ import android.content.Context;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.smartregister.commonregistry.CommonPersonObject;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.util.CallableInteractor;
 import org.smartregister.view.ListContract;
@@ -18,7 +17,7 @@ public interface OpdProfileFragmentContract {
 
         CommonPersonObjectClient getCommonPersonObject();
 
-        void attachGlobals(JSONObject jsonObject);
+        void attachGlobals(JSONObject jsonObject, String formSubmissionId);
     }
 
 

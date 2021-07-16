@@ -73,7 +73,7 @@ public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<Profil
     public JSONObject readFormAndAddValues(JSONObject jsonObject, String formSubmissionId) throws JSONException {
         attachAgeAndGender(jsonObject);
         if (getView() != null) {
-            getView().attachGlobals(jsonObject);
+            getView().attachGlobals(jsonObject, formSubmissionId);
         }
         attachLocationHierarchy(jsonObject);
 

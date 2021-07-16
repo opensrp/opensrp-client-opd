@@ -149,5 +149,24 @@ public class VisitDao extends AbstractDao {
         readData(sql, dataMap);
         return visitMap;
     }
+
+    public static String getDateStringForId(String formSubmissionId) {
+        SimpleDateFormat sdfDate = new SimpleDateFormat(OpdConstants.DateTimeFormat.dd_MMM_yyyy, Locale.US);
+        String todayDate = sdfDate.format(new Date());
+//        SimpleDateFormat sdfTime = new SimpleDateFormat(OpdConstants.DateTimeFormat.hh_mm, Locale.US);
+
+        String sql = "SELECT created_At FROM opd_client_visits where form_submission_id = '" + formSubmissionId + "'";
+        List<String> returnDate = new ArrayList<>();
+
+        DataMap<Void> dataMap = cursor -> {
+
+            Date visitCreateDate = new Date(Long.parseLong(getCursorValue(cursor, "created_at")));
+            String date = sdfDate.format(visitCreateDate);
+            returnDate.add(date.equals(todayDate) ? context().getStringResource(R.string.today) : date);
+            return null;
+        };
+        readData(sql, dataMap);
+        return returnDate.get(0);
+    }
 }
 

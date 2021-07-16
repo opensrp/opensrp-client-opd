@@ -261,7 +261,7 @@ public class NewOpdProfileOverviewFragment extends BaseListFragment<ProfileActio
     }
 
     @Override
-    public void attachGlobals(JSONObject jsonObject) {
+    public void attachGlobals(JSONObject jsonObject, String formSubmissionId) {
         try {
             jsonObject.put(JsonFormConstants.JSON_FORM_KEY.GLOBAL, new JSONObject(formGlobalValues));
         } catch (Exception e) {

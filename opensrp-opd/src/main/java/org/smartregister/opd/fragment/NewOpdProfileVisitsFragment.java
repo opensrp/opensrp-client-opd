@@ -9,11 +9,13 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.domain.Form;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
+import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
 import org.smartregister.opd.adapter.GroupedListableAdapter;
 import org.smartregister.opd.adapter.ProfileHistoryAdapter;
@@ -25,9 +27,16 @@ import org.smartregister.opd.listener.OnSendActionToFragment;
 import org.smartregister.opd.presenter.NewOpdProfileVisitsFragmentPresenter;
 import org.smartregister.opd.utils.FormProcessor;
 import org.smartregister.opd.utils.OpdConstants;
+import org.smartregister.opd.utils.OpdJsonFormUtils;
+import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.view.fragment.BaseListFragment;
+import org.yaml.snakeyaml.Yaml;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import timber.log.Timber;
@@ -35,6 +44,9 @@ import timber.log.Timber;
 public class NewOpdProfileVisitsFragment extends BaseListFragment<ProfileHistory> implements OnSendActionToFragment, OpdProfileFragmentContract.View<ProfileHistory>, FormProcessor.Requester {
 
     private String baseEntityID;
+    private CommonPersonObjectClient commonPersonObjectClient;
+    private final Map<String, Map<String, String>> formGlobalValuesMap = new HashMap<>();
+    private final Set<String> globalKeys = new HashSet<>();
 
     public static NewOpdProfileVisitsFragment newInstance(Bundle bundle) {
         NewOpdProfileVisitsFragment fragment = new NewOpdProfileVisitsFragment();
@@ -45,13 +57,14 @@ public class NewOpdProfileVisitsFragment extends BaseListFragment<ProfileHistory
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         if (getArguments() != null) {
-            CommonPersonObjectClient commonPersonObjectClient = (CommonPersonObjectClient) getArguments()
+            commonPersonObjectClient = (CommonPersonObjectClient) getArguments()
                     .getSerializable(OpdConstants.IntentKey.CLIENT_OBJECT);
 
             if (commonPersonObjectClient != null) {
                 baseEntityID = commonPersonObjectClient.getCaseId();
             }
         }
+        getGlobalKeysFromConfig();
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -59,7 +72,50 @@ public class NewOpdProfileVisitsFragment extends BaseListFragment<ProfileHistory
     @NotNull
     @Override
     protected Callable<List<ProfileHistory>> onStartCallable(@Nullable @org.jetbrains.annotations.Nullable Bundle bundle) {
-        return () -> VisitDao.getVisitHistory(baseEntityID);
+        return () -> {
+            List<ProfileHistory> history = VisitDao.getVisitHistory(baseEntityID);
+            populateGlobalsList(history);
+            return history;
+        };
+    }
+
+    private void populateGlobalsList(List<ProfileHistory> historyList) {
+        if (historyList.size() > 0) {
+            formGlobalValuesMap.clear();
+            HashMap<String, List<String>> dateToIdMap = OpdUtils.getDateToEventIdMap(historyList);
+            Map<String, String> formGlobalValues = new HashMap<>();
+
+            for (String key : dateToIdMap.keySet()) {
+                List<String> visitIds = dateToIdMap.get(key);
+                if (visitIds != null) {
+                    HashMap<String, String> savedValues = new HashMap<>();
+                    for (String visitId : visitIds) {
+                        Map<String, String> values = VisitDao.getSavedKeysForVisit(visitId);
+                        savedValues.putAll(values);
+                    }
+
+                    formGlobalValues.clear();
+                    for (String globalKey : globalKeys) {
+                        if (savedValues.containsKey(globalKey)) {
+                            if (globalKey.equalsIgnoreCase(OpdConstants.JSON_FORM_KEY.MEDICINE) && !savedValues.get(globalKey).isEmpty()) {
+                                String medidcineString = OpdJsonFormUtils.getMedicineNoteString(savedValues.get(globalKey));
+                                formGlobalValues.put(globalKey, medidcineString);
+                            } else {
+                                formGlobalValues.put(globalKey, savedValues.get(globalKey));
+                            }
+                        } else {
+                            formGlobalValues.put(globalKey, "");
+                        }
+                    }
+                    if (savedValues.containsKey(OpdConstants.REPEATING_GROUP_MAP)) {
+                        String testResults = OpdJsonFormUtils.getLabResultsStringFromMap(savedValues);
+                        formGlobalValues.put("diagnostic_test_lab_results", testResults);
+                    }
+
+                }
+                formGlobalValuesMap.put(key, formGlobalValues);
+            }
+        }
     }
 
     @Override
@@ -168,12 +224,30 @@ public class NewOpdProfileVisitsFragment extends BaseListFragment<ProfileHistory
 
     @Override
     public CommonPersonObjectClient getCommonPersonObject() {
-            // Do nothing for now
-        return null;
+        return this.commonPersonObjectClient;
     }
 
     @Override
-    public void attachGlobals(JSONObject jsonObject) {
-        // Do nothing for now
+    public void attachGlobals(JSONObject jsonObject, String formSubmissionId) {
+        try {
+            String valuesKey = VisitDao.getDateStringForId(formSubmissionId);
+            HashMap<String, String> formGlobalValues = new HashMap<>(formGlobalValuesMap.get(valuesKey));
+            jsonObject.put(JsonFormConstants.JSON_FORM_KEY.GLOBAL, new JSONObject(formGlobalValues));
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+    }
+
+    public void getGlobalKeysFromConfig() {
+        try {
+            Iterable<Object> opdGlobals = OpdLibrary.getInstance().readYaml(OpdConstants.FileUtils.OPD_GLOBALS, new Yaml());
+            for (Object ruleObject : opdGlobals) {
+                Map<String, Object> map = ((Map<String, Object>) ruleObject);
+                globalKeys.addAll((List<String>) map.get(JsonFormConstants.FIELDS));
+            }
+        } catch (Exception e) {
+            Timber.e(e);
+
+        }
     }
 }
