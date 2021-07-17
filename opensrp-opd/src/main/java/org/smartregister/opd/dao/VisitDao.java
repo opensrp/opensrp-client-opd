@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import static org.smartregister.opd.utils.OpdUtils.context;
 
@@ -26,7 +27,8 @@ public class VisitDao extends AbstractDao {
      * @return
      */
     public static Map<String, List<ProfileAction.ProfileActionVisit>> getVisitsToday(String baseEntityId) {
-        String todayDate = new SimpleDateFormat(OpdConstants.DateTimeFormat.yyyy_MM_dd, Locale.ENGLISH).format(new Date());
+        SimpleDateFormat sdfDate = new SimpleDateFormat(OpdConstants.DateTimeFormat.yyyy_MM_dd, Locale.ENGLISH);
+        String todayDate = sdfDate.format(new Date());
 
         String sql = "SELECT * FROM opd_client_visits where visit_group = '"
                 + todayDate +
@@ -34,6 +36,7 @@ public class VisitDao extends AbstractDao {
         Map<String, List<ProfileAction.ProfileActionVisit>> visitMap = new HashMap<>();
 
         SimpleDateFormat sdfTime = new SimpleDateFormat(OpdConstants.DateTimeFormat.hh_mm, Locale.ENGLISH);
+        sdfTime.setTimeZone(TimeZone.getTimeZone("GMT"));
 
         DataMap<Void> dataMap = cursor -> {
             String visitType = getCursorValue(cursor, "visit_type");
@@ -59,7 +62,9 @@ public class VisitDao extends AbstractDao {
 
 
     public static Boolean getSeenToday(String baseEntityId) {
-        String todayDate = new SimpleDateFormat(OpdConstants.DateTimeFormat.yyyy_MM_dd, Locale.ENGLISH).format(new Date());
+        SimpleDateFormat sdfDate = new SimpleDateFormat(OpdConstants.DateTimeFormat.yyyy_MM_dd, Locale.ENGLISH);
+        String todayDate = sdfDate.format(new Date());
+
 
         String sql = "SELECT * FROM opd_client_visits where visit_group = '"
                 + todayDate +
@@ -100,7 +105,9 @@ public class VisitDao extends AbstractDao {
 
         SimpleDateFormat sdfDate = new SimpleDateFormat(OpdConstants.DateTimeFormat.dd_MMM_yyyy, Locale.ENGLISH);
         String todayDate = sdfDate.format(new Date());
+
         SimpleDateFormat sdfTime = new SimpleDateFormat(OpdConstants.DateTimeFormat.hh_mm, Locale.ENGLISH);
+        sdfTime.setTimeZone(TimeZone.getTimeZone("GMT"));
 
         String sql = "SELECT * FROM opd_client_visits where base_entity_id = '" + baseEntityId + "' order by created_at desc , updated_at desc";
 
@@ -110,6 +117,7 @@ public class VisitDao extends AbstractDao {
 
             Date visitCreateDate = new Date(Long.parseLong(getCursorValue(cursor, "created_at")));
             history.setID(getCursorValue(cursor, "form_submission_id"));
+            sdfDate.setTimeZone(TimeZone.getTimeZone("GMT"));
             String date = sdfDate.format(visitCreateDate);
             history.setEventDate(date.equals(todayDate) ? context().getStringResource(R.string.today) : date);
             history.setEventTime(sdfTime.format(visitCreateDate));
@@ -150,7 +158,6 @@ public class VisitDao extends AbstractDao {
     public static String getDateStringForId(String formSubmissionId) {
         SimpleDateFormat sdfDate = new SimpleDateFormat(OpdConstants.DateTimeFormat.dd_MMM_yyyy, Locale.ENGLISH);
         String todayDate = sdfDate.format(new Date());
-//        SimpleDateFormat sdfTime = new SimpleDateFormat(OpdConstants.DateTimeFormat.hh_mm, Locale.US);
 
         String sql = "SELECT created_At FROM opd_client_visits where form_submission_id = '" + formSubmissionId + "'";
         List<String> returnDate = new ArrayList<>();
@@ -158,6 +165,7 @@ public class VisitDao extends AbstractDao {
         DataMap<Void> dataMap = cursor -> {
 
             Date visitCreateDate = new Date(Long.parseLong(getCursorValue(cursor, "created_at")));
+            sdfDate.setTimeZone(TimeZone.getTimeZone("GMT"));
             String date = sdfDate.format(visitCreateDate);
             returnDate.add(date.equals(todayDate) ? context().getStringResource(R.string.today) : date);
             return null;

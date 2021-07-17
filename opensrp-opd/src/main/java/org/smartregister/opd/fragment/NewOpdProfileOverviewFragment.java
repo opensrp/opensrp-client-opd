@@ -282,4 +282,9 @@ public class NewOpdProfileOverviewFragment extends BaseListFragment<ProfileActio
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        reloadFromSource();
+    }
 }
