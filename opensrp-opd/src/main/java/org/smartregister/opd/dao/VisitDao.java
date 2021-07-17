@@ -1,7 +1,5 @@
 package org.smartregister.opd.dao;
 
-import com.google.zxing.common.StringUtils;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.dao.AbstractDao;
@@ -9,7 +7,6 @@ import org.smartregister.opd.R;
 import org.smartregister.opd.domain.ProfileAction;
 import org.smartregister.opd.domain.ProfileHistory;
 import org.smartregister.opd.utils.OpdConstants;
-import org.smartregister.util.StringUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,14 +26,14 @@ public class VisitDao extends AbstractDao {
      * @return
      */
     public static Map<String, List<ProfileAction.ProfileActionVisit>> getVisitsToday(String baseEntityId) {
-        String todayDate = new SimpleDateFormat(OpdConstants.DateTimeFormat.yyyy_MM_dd, Locale.US).format(new Date());
+        String todayDate = new SimpleDateFormat(OpdConstants.DateTimeFormat.yyyy_MM_dd, Locale.ENGLISH).format(new Date());
 
         String sql = "SELECT * FROM opd_client_visits where visit_group = '"
                 + todayDate +
                 "' and base_entity_id = '" + baseEntityId + "' order by created_at desc , updated_at desc";
         Map<String, List<ProfileAction.ProfileActionVisit>> visitMap = new HashMap<>();
 
-        SimpleDateFormat sdfTime = new SimpleDateFormat(OpdConstants.DateTimeFormat.hh_mm, Locale.US);
+        SimpleDateFormat sdfTime = new SimpleDateFormat(OpdConstants.DateTimeFormat.hh_mm, Locale.ENGLISH);
 
         DataMap<Void> dataMap = cursor -> {
             String visitType = getCursorValue(cursor, "visit_type");
@@ -62,14 +59,14 @@ public class VisitDao extends AbstractDao {
 
 
     public static Boolean getSeenToday(String baseEntityId) {
-        String todayDate = new SimpleDateFormat(OpdConstants.DateTimeFormat.yyyy_MM_dd, Locale.US).format(new Date());
+        String todayDate = new SimpleDateFormat(OpdConstants.DateTimeFormat.yyyy_MM_dd, Locale.ENGLISH).format(new Date());
 
         String sql = "SELECT * FROM opd_client_visits where visit_group = '"
                 + todayDate +
                 "' and base_entity_id = '" + baseEntityId + "' order by created_at desc , updated_at desc";
         Map<String, List<ProfileAction.ProfileActionVisit>> visitMap = new HashMap<>();
 
-        SimpleDateFormat sdfTime = new SimpleDateFormat(OpdConstants.DateTimeFormat.hh_mm, Locale.US);
+        SimpleDateFormat sdfTime = new SimpleDateFormat(OpdConstants.DateTimeFormat.hh_mm, Locale.ENGLISH);
 
         DataMap<Void> dataMap = cursor -> {
             String visitType = getCursorValue(cursor, "visit_type");
@@ -101,9 +98,9 @@ public class VisitDao extends AbstractDao {
 
     public static List<ProfileHistory> getVisitHistory(String baseEntityId) {
 
-        SimpleDateFormat sdfDate = new SimpleDateFormat(OpdConstants.DateTimeFormat.dd_MMM_yyyy, Locale.US);
+        SimpleDateFormat sdfDate = new SimpleDateFormat(OpdConstants.DateTimeFormat.dd_MMM_yyyy, Locale.ENGLISH);
         String todayDate = sdfDate.format(new Date());
-        SimpleDateFormat sdfTime = new SimpleDateFormat(OpdConstants.DateTimeFormat.hh_mm, Locale.US);
+        SimpleDateFormat sdfTime = new SimpleDateFormat(OpdConstants.DateTimeFormat.hh_mm, Locale.ENGLISH);
 
         String sql = "SELECT * FROM opd_client_visits where base_entity_id = '" + baseEntityId + "' order by created_at desc , updated_at desc";
 
@@ -151,7 +148,7 @@ public class VisitDao extends AbstractDao {
     }
 
     public static String getDateStringForId(String formSubmissionId) {
-        SimpleDateFormat sdfDate = new SimpleDateFormat(OpdConstants.DateTimeFormat.dd_MMM_yyyy, Locale.US);
+        SimpleDateFormat sdfDate = new SimpleDateFormat(OpdConstants.DateTimeFormat.dd_MMM_yyyy, Locale.ENGLISH);
         String todayDate = sdfDate.format(new Date());
 //        SimpleDateFormat sdfTime = new SimpleDateFormat(OpdConstants.DateTimeFormat.hh_mm, Locale.US);
 

@@ -85,11 +85,10 @@ public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<Profil
         JSONObject savedEvent = VisitDao.fetchEventAsJson(formSubmissionId);
         Map<String, Object> values = processor.getFormResults(savedEvent);
 
-        // little hack for pesky multi_select_list
+        // multi_select_list
         if (values.containsKey("disease_code_primary"))
-            values.put("disease_code_primary", values.get("disease_code_primary"));
+            values.put("disease_code_primary", values.get("disease_code_object"));
 
-        // little hack for pesky multi_select_list
         if (values.containsKey("disease_code_final_diagn"))
             values.put("disease_code_final_diagn", values.get("disease_code_object_final"));
 
@@ -160,22 +159,9 @@ public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<Profil
             JSONObject jsonObject = new JSONObject(jsonString);
             String eventType = jsonObject.getString(ENCOUNTER_TYPE);
 
+            // inject map value for repeating groups
             if (eventType.equalsIgnoreCase(OpdConstants.OpdModuleEvents.OPD_LABORATORY)) {
-                JSONObject step = jsonObject.getJSONObject(STEP1);
-                JSONArray fields = step.optJSONArray(OpdJsonFormUtils.FIELDS);
-                HashMap<String, HashMap<String, String>> buildRepeatingGroupTests = OpdUtils.buildRepeatingGroupTests(step);
-                if (!buildRepeatingGroupTests.isEmpty()) {
-                    String strTest = gson.toJson(buildRepeatingGroupTests);
-                    JSONObject repeatingGroupObj = new JSONObject();
-                    repeatingGroupObj.put(JsonFormConstants.KEY, OpdConstants.REPEATING_GROUP_MAP);
-                    repeatingGroupObj.put(JsonFormConstants.VALUE, strTest);
-                    repeatingGroupObj.put(JsonFormConstants.TYPE, JsonFormConstants.HIDDEN);
-                    if (fields != null) {
-                        fields.put(repeatingGroupObj);
-                        step.put(OpdJsonFormUtils.FIELDS, fields);
-                        jsonObject.put(STEP1, step);
-                    }
-                }
+                injectGroupMap(jsonObject);
             }
 
             NativeFormProcessor processor = OpdLibrary.getInstance().getFormProcessorFactory().createInstance(jsonObject);
@@ -216,6 +202,24 @@ public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<Profil
                 view.setLoadingState(false);
             }
         });
+    }
+
+    private void injectGroupMap(JSONObject jsonObject) throws JSONException {
+        JSONObject step = jsonObject.getJSONObject(STEP1);
+        JSONArray fields = step.optJSONArray(OpdJsonFormUtils.FIELDS);
+        HashMap<String, HashMap<String, String>> buildRepeatingGroupTests = OpdUtils.buildRepeatingGroupTests(step);
+        if (!buildRepeatingGroupTests.isEmpty()) {
+            String strTest = gson.toJson(buildRepeatingGroupTests);
+            JSONObject repeatingGroupObj = new JSONObject();
+            repeatingGroupObj.put(JsonFormConstants.KEY, OpdConstants.REPEATING_GROUP_MAP);
+            repeatingGroupObj.put(JsonFormConstants.VALUE, strTest);
+            repeatingGroupObj.put(JsonFormConstants.TYPE, JsonFormConstants.HIDDEN);
+            if (fields != null) {
+                fields.put(repeatingGroupObj);
+                step.put(OpdJsonFormUtils.FIELDS, fields);
+                jsonObject.put(STEP1, step);
+            }
+        }
     }
 
     @Override

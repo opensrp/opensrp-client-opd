@@ -31,7 +31,7 @@ import static org.smartregister.opd.utils.OpdUtils.context;
 
 public class VisitUtils {
     private static String[] default_obs = {"start", "end", "deviceid", "subscriberid", "simserial", "phonenumber"};
-    private static final SimpleDateFormat sdf = new SimpleDateFormat(OpdConstants.DateTimeFormat.yyyy_MM_dd, Locale.US);
+    private static final SimpleDateFormat sdf = new SimpleDateFormat(OpdConstants.DateTimeFormat.yyyy_MM_dd, Locale.ENGLISH);
 
 
     public static Visit eventToVisit(org.smartregister.domain.Event event) {
@@ -180,11 +180,11 @@ public class VisitUtils {
     }
 
     public static SimpleDateFormat getSourceDateFormat() {
-        return new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        return new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
     }
 
     public static SimpleDateFormat getSaveDateFormat() {
-        return new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        return new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
     }
 
     public static String cleanString(String dirtyString) {
