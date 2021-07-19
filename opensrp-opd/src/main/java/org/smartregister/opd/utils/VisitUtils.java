@@ -34,7 +34,7 @@ public class VisitUtils {
     private static final SimpleDateFormat sdf = new SimpleDateFormat(OpdConstants.DateTimeFormat.yyyy_MM_dd, Locale.ENGLISH);
 
 
-    public static Visit eventToVisit(org.smartregister.domain.Event event) {
+    public static Visit eventToVisit(Event event) {
         List<String> exceptions = Arrays.asList(default_obs);
 
         Visit visit = new Visit();
