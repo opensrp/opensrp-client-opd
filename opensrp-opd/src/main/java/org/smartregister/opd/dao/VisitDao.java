@@ -71,7 +71,7 @@ public class VisitDao extends AbstractDao {
                 "' and base_entity_id = '" + baseEntityId + "' order by created_at desc , updated_at desc";
         Map<String, List<ProfileAction.ProfileActionVisit>> visitMap = new HashMap<>();
 
-        SimpleDateFormat sdfTime = new SimpleDateFormat(OpdConstants.DateTimeFormat.hh_mm, Locale.ENGLISH);
+//        SimpleDateFormat sdfTime = new SimpleDateFormat(OpdConstants.DateTimeFormat.hh_mm, Locale.ENGLISH);
 
         DataMap<Void> dataMap = cursor -> {
             String visitType = getCursorValue(cursor, "visit_type");

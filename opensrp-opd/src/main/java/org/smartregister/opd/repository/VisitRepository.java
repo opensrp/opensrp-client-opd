@@ -242,8 +242,9 @@ public class VisitRepository extends BaseRepository {
         return getLatestVisit(baseEntityID, visitType, null);
     }
 
-    public Visit getLatestVisit(String baseEntityID, String visitType, SQLiteDatabase sqLiteDatabase) {
-        if (sqLiteDatabase == null) {
+    public Visit getLatestVisit(String baseEntityID, String visitType, SQLiteDatabase database) {
+        SQLiteDatabase sqLiteDatabase = database;
+        if (database == null) {
             sqLiteDatabase = getReadableDatabase();
         }
         List<Visit> visits = new ArrayList<>();
@@ -269,7 +270,7 @@ public class VisitRepository extends BaseRepository {
                 return null;
             }
 
-            cursor = database.query(OpdConstants.TABLE_NAME.ALL_CLIENTS, new String[]{dateColumn}, BASE_ENTITY_ID + " = ? " + COLLATE_NOCASE, new String[]{baseEntityID}, null, null, null);
+            cursor = database.query(OpdConstants.TableNameConstants.ALL_CLIENTS, new String[]{dateColumn}, BASE_ENTITY_ID + " = ? " + COLLATE_NOCASE, new String[]{baseEntityID}, null, null, null);
 
             if (cursor != null && cursor.getCount() > 0 && cursor.moveToFirst()) {
                 String date = cursor.getString(cursor.getColumnIndex(dateColumn));

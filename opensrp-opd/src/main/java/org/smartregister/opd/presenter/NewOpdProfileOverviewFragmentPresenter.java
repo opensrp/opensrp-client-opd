@@ -102,9 +102,9 @@ public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<Profil
 
     private void attachLocationHierarchy(JSONObject jsonObject) {
         try {
-            if (jsonObject.getString(ENCOUNTER_TYPE).equals(OpdConstants.OpdModuleEvents.OPD_PHARMACY)
-                    || jsonObject.getString(ENCOUNTER_TYPE).equals(OpdConstants.OpdModuleEvents.OPD_LABORATORY)
-                    || jsonObject.getString(ENCOUNTER_TYPE).equals(OpdConstants.OpdModuleEvents.OPD_FINAL_OUTCOME)) {
+            if (jsonObject.getString(ENCOUNTER_TYPE).equals(OpdConstants.OpdModuleEventConstants.OPD_PHARMACY)
+                    || jsonObject.getString(ENCOUNTER_TYPE).equals(OpdConstants.OpdModuleEventConstants.OPD_LABORATORY)
+                    || jsonObject.getString(ENCOUNTER_TYPE).equals(OpdConstants.OpdModuleEventConstants.OPD_FINAL_OUTCOME)) {
                 OpdJsonFormUtils.addRegLocHierarchyQuestions(jsonObject);
             }
         } catch (Exception e) {
@@ -119,7 +119,7 @@ public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<Profil
             if (getView() == null)
                 return;
             CommonPersonObjectClient commonPersonObject = getView().getCommonPersonObject();
-            if (commonPersonObject != null && encounterType.equals(OpdConstants.OpdModuleEvents.OPD_DIAGNOSIS)) {
+            if (commonPersonObject != null && encounterType.equals(OpdConstants.OpdModuleEventConstants.OPD_DIAGNOSIS)) {
                 String gender = commonPersonObject.getColumnmaps().get(OpdDbConstants.Column.Client.GENDER);
                 String age = String.valueOf(Utils.getAgeFromDate(commonPersonObject.getColumnmaps().get(OpdDbConstants.Column.Client.DOB)));
                 JSONArray fields = jsonObject.getJSONObject(STEP1).getJSONArray(FIELDS);
@@ -160,7 +160,7 @@ public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<Profil
             String eventType = jsonObject.getString(ENCOUNTER_TYPE);
 
             // inject map value for repeating groups
-            if (eventType.equalsIgnoreCase(OpdConstants.OpdModuleEvents.OPD_LABORATORY)) {
+            if (eventType.equalsIgnoreCase(OpdConstants.OpdModuleEventConstants.OPD_LABORATORY)) {
                 injectGroupMap(jsonObject);
             }
 

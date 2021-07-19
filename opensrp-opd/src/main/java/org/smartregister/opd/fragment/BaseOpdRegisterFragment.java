@@ -309,7 +309,7 @@ public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment imple
     }
 
     protected int getToolBarTitle() {
-        if (OpdLibrary.getInstance().getProperties().hasProperty(OpdConstants.PROPERTY.USE_NEW_OPD_MODULE)) {
+        if (OpdLibrary.getInstance().getProperties().hasProperty(OpdConstants.PropertyConstants.USE_NEW_OPD_MODULE)) {
             return R.string.new_opd_register_title_name;
         }
         return R.string.opd_register_title_name;
@@ -395,7 +395,7 @@ public abstract class BaseOpdRegisterFragment extends BaseRegisterFragment imple
     @Override
     public String getDueOnlyText() {
 
-        if (OpdLibrary.getInstance().getProperties().hasProperty(OpdConstants.PROPERTY.USE_NEW_OPD_MODULE)) {
+        if (OpdLibrary.getInstance().getProperties().hasProperty(OpdConstants.PropertyConstants.USE_NEW_OPD_MODULE)) {
             return getString(R.string.seen);
         }
         return getString(R.string.due_only);

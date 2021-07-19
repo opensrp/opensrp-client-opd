@@ -8,8 +8,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.domain.Form;
@@ -83,35 +81,35 @@ public class NewOpdProfileOverviewFragment extends BaseListFragment<ProfileActio
             List<ProfileAction> profileActions = new ArrayList<>();
             profileActions.add(
                     new ProfileAction(getString(R.string.opd_check_in), 0)
-                            .setVisits(mapVisit.get(OpdConstants.OpdModuleEvents.OPD_CHECK_IN))
+                            .setVisits(mapVisit.get(OpdConstants.OpdModuleEventConstants.OPD_CHECK_IN))
             );
             profileActions.add(
                     new ProfileAction(getString(R.string.vital_danger_signs), 1)
-                            .setVisits(mapVisit.get(OpdConstants.OpdModuleEvents.OPD_VITAL_DANGER_SIGNS_CHECK))
+                            .setVisits(mapVisit.get(OpdConstants.OpdModuleEventConstants.OPD_VITAL_DANGER_SIGNS_CHECK))
             );
             profileActions.add(
                     new ProfileAction(getString(R.string.opd_diagnosis), 2)
-                            .setVisits(mapVisit.get(OpdConstants.OpdModuleEvents.OPD_DIAGNOSIS))
+                            .setVisits(mapVisit.get(OpdConstants.OpdModuleEventConstants.OPD_DIAGNOSIS))
             );
             profileActions.add(
                     new ProfileAction(getString(R.string.lab_reports), 3)
-                            .setVisits(mapVisit.get(OpdConstants.OpdModuleEvents.OPD_LABORATORY))
+                            .setVisits(mapVisit.get(OpdConstants.OpdModuleEventConstants.OPD_LABORATORY))
             );
             profileActions.add(
                     new ProfileAction(getString(R.string.opd_treatment), 4)
-                            .setVisits(mapVisit.get(OpdConstants.OpdModuleEvents.OPD_TREATMENT))
+                            .setVisits(mapVisit.get(OpdConstants.OpdModuleEventConstants.OPD_TREATMENT))
             );
             profileActions.add(
                     new ProfileAction(getString(R.string.pharmacy), 5)
-                            .setVisits(mapVisit.get(OpdConstants.OpdModuleEvents.OPD_PHARMACY))
+                            .setVisits(mapVisit.get(OpdConstants.OpdModuleEventConstants.OPD_PHARMACY))
             );
             profileActions.add(
                     new ProfileAction(getString(R.string.final_outcome), 6)
-                            .setVisits(mapVisit.get(OpdConstants.OpdModuleEvents.OPD_FINAL_OUTCOME))
+                            .setVisits(mapVisit.get(OpdConstants.OpdModuleEventConstants.OPD_FINAL_OUTCOME))
             );
             profileActions.add(
                     new ProfileAction(getString(R.string.service_fee), 7)
-                            .setVisits(mapVisit.get(OpdConstants.OpdModuleEvents.OPD_SERVICE_CHARGE))
+                            .setVisits(mapVisit.get(OpdConstants.OpdModuleEventConstants.OPD_SERVICE_CHARGE))
             );
             return profileActions;
         };

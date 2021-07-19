@@ -139,28 +139,28 @@ public class NewOpdProfileVisitsFragment extends BaseListFragment<ProfileHistory
 
         String formName;
         switch (profileHistory.getEventType()) {
-            case OpdConstants.OpdModuleEvents.OPD_CHECK_IN:
+            case OpdConstants.OpdModuleEventConstants.OPD_CHECK_IN:
                 formName = OpdConstants.JsonForm.OPD_CHECKIN;
                 break;
-            case OpdConstants.OpdModuleEvents.OPD_VITAL_DANGER_SIGNS_CHECK:
+            case OpdConstants.OpdModuleEventConstants.OPD_VITAL_DANGER_SIGNS_CHECK:
                 formName = OpdConstants.JsonForm.VITAL_DANGER_SIGNS;
                 break;
-            case OpdConstants.OpdModuleEvents.OPD_DIAGNOSIS:
+            case OpdConstants.OpdModuleEventConstants.OPD_DIAGNOSIS:
                 formName = OpdConstants.JsonForm.DIAGNOSIS;
                 break;
-            case OpdConstants.OpdModuleEvents.OPD_TREATMENT:
+            case OpdConstants.OpdModuleEventConstants.OPD_TREATMENT:
                 formName = OpdConstants.JsonForm.TREATMENT;
                 break;
-            case OpdConstants.OpdModuleEvents.OPD_LABORATORY:
+            case OpdConstants.OpdModuleEventConstants.OPD_LABORATORY:
                 formName = OpdConstants.JsonForm.LAB_RESULTS;
                 break;
-            case OpdConstants.OpdModuleEvents.OPD_PHARMACY:
+            case OpdConstants.OpdModuleEventConstants.OPD_PHARMACY:
                 formName = OpdConstants.JsonForm.PHARMACY;
                 break;
-            case OpdConstants.OpdModuleEvents.OPD_FINAL_OUTCOME:
+            case OpdConstants.OpdModuleEventConstants.OPD_FINAL_OUTCOME:
                 formName = OpdConstants.JsonForm.FINAL_OUTCOME;
                 break;
-            case OpdConstants.OpdModuleEvents.OPD_SERVICE_CHARGE:
+            case OpdConstants.OpdModuleEventConstants.OPD_SERVICE_CHARGE:
                 formName = OpdConstants.JsonForm.SERVICE_FEE;
                 break;
             default:
