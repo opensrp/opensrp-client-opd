@@ -62,8 +62,11 @@ public class ProfileHistoryAdapter extends GroupedListableAdapter<ProfileHistory
                 tvEdit.setOnClickListener(v -> view.onListItemClicked(history, v.getId()));
 
                 //This might Change Depending on View Functionality
-                if(history.getEventDate() != context().getStringResource(R.string.today)){
+                if(!history.getEventDate().equals(context().getStringResource(R.string.today))){
                     tvEdit.setText(context().getStringResource(R.string.view));
+                }
+                else {
+                    tvEdit.setText(context().getStringResource(R.string.edit));
                 }
             }  else {
                 itemView.setVisibility(View.GONE);

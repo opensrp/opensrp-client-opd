@@ -8,6 +8,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.domain.Form;
@@ -42,7 +44,7 @@ import java.util.concurrent.Callable;
 
 import timber.log.Timber;
 
-public class NewOpdProfileOverviewFragment extends BaseListFragment<ProfileAction> implements OnSendActionToFragment, OpdProfileFragmentContract.View<ProfileAction>, FormProcessor.Requester {
+public class NewOpdProfileOverviewFragment extends BaseListFragment<ProfileAction> implements OnSendActionToFragment, OpdProfileFragmentContract.View<ProfileAction>, FormProcessor.Requester , OnViewStateChanged {
 
     private String baseEntityID;
     private CommonPersonObjectClient commonPersonObjectClient;
@@ -283,8 +285,7 @@ public class NewOpdProfileOverviewFragment extends BaseListFragment<ProfileActio
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onViewVisible() {
         reloadFromSource();
     }
 }

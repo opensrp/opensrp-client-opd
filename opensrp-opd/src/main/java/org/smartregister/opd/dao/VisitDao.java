@@ -105,6 +105,7 @@ public class VisitDao extends AbstractDao {
 
         SimpleDateFormat sdfDate = new SimpleDateFormat(OpdConstants.DateTimeFormat.dd_MMM_yyyy, Locale.ENGLISH);
         String todayDate = sdfDate.format(new Date());
+        sdfDate.setTimeZone(TimeZone.getTimeZone("GMT"));
 
         SimpleDateFormat sdfTime = new SimpleDateFormat(OpdConstants.DateTimeFormat.hh_mm, Locale.ENGLISH);
         sdfTime.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -117,7 +118,6 @@ public class VisitDao extends AbstractDao {
 
             Date visitCreateDate = new Date(Long.parseLong(getCursorValue(cursor, "created_at")));
             history.setID(getCursorValue(cursor, "form_submission_id"));
-            sdfDate.setTimeZone(TimeZone.getTimeZone("GMT"));
             String date = sdfDate.format(visitCreateDate);
             history.setEventDate(date.equals(todayDate) ? context().getStringResource(R.string.today) : date);
             history.setEventTime(sdfTime.format(visitCreateDate));
