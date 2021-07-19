@@ -41,7 +41,7 @@ import java.util.concurrent.Callable;
 
 import timber.log.Timber;
 
-public class NewOpdProfileVisitsFragment extends BaseListFragment<ProfileHistory> implements OnSendActionToFragment, OpdProfileFragmentContract.View<ProfileHistory>, FormProcessor.Requester {
+public class NewOpdProfileVisitsFragment extends BaseListFragment<ProfileHistory> implements OnSendActionToFragment, OpdProfileFragmentContract.View<ProfileHistory>, FormProcessor.Requester, OnViewStateChanged {
 
     private String baseEntityID;
     private CommonPersonObjectClient commonPersonObjectClient;
@@ -249,5 +249,10 @@ public class NewOpdProfileVisitsFragment extends BaseListFragment<ProfileHistory
             Timber.e(e);
 
         }
+    }
+
+    @Override
+    public void onViewVisible() {
+        reloadFromSource();
     }
 }

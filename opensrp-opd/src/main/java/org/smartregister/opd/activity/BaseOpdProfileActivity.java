@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
 import org.json.JSONException;
@@ -24,6 +25,7 @@ import org.smartregister.opd.configuration.OpdRegisterSwitcher;
 import org.smartregister.opd.contract.OpdProfileActivityContract;
 import org.smartregister.opd.fragment.NewOpdProfileOverviewFragment;
 import org.smartregister.opd.fragment.NewOpdProfileVisitsFragment;
+import org.smartregister.opd.fragment.OnViewStateChanged;
 import org.smartregister.opd.fragment.OpdProfileOverviewFragment;
 import org.smartregister.opd.fragment.OpdProfileVisitsFragment;
 import org.smartregister.opd.listener.OnSendActionToFragment;
@@ -340,6 +342,24 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
         adapter.addFragment(profileVisitsFragment, this.getString(R.string.history));
 
         viewPager.setAdapter(adapter);
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                // do nothing
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                Fragment visible = adapter.getItem(position);
+                if(visible instanceof OnViewStateChanged)
+                    ((OnViewStateChanged) visible).onViewVisible();
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                // do nothing
+            }
+        });
         return viewPager;
     }
 
