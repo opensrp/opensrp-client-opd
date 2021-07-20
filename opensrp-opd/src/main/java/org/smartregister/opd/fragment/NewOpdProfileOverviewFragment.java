@@ -115,7 +115,7 @@ public class NewOpdProfileOverviewFragment extends BaseListFragment<ProfileActio
         };
     }
 
-    private void loadGlobals(Map<String, List<ProfileAction.ProfileActionVisit>> mapVisit) {
+    protected void loadGlobals(Map<String, List<ProfileAction.ProfileActionVisit>> mapVisit) {
         if (mapVisit.size() > 0) {
             HashMap<String, String> savedValues = new HashMap<>();
 
