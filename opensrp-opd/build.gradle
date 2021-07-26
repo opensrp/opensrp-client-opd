@@ -94,7 +94,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     implementation 'androidx.multidex:multidex:2.0.0'
 
-    api('org.smartregister:opensrp-client-core:4.3.12-SNAPSHOT@aar') {
+    api('org.smartregister:opensrp-client-core:4.3.14-SNAPSHOT@aar') {
         transitive = true
         exclude group: 'com.github.bmelnychuk', module: 'atv'
         exclude group: 'com.google.guava', module: 'guava'
