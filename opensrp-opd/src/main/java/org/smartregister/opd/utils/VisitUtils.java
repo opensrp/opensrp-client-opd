@@ -34,7 +34,7 @@ public class VisitUtils {
     private static final SimpleDateFormat sdf = new SimpleDateFormat(OpdConstants.DateTimeFormat.yyyy_MM_dd, Locale.ENGLISH);
 
 
-    public static Visit eventToVisit(org.smartregister.domain.Event event) {
+    public static Visit eventToVisit(Event event) {
         List<String> exceptions = Arrays.asList(default_obs);
 
         Visit visit = new Visit();
@@ -196,21 +196,21 @@ public class VisitUtils {
 
     public static String getTranslatedVisitTypeName(String name) {
         switch (name) {
-            case OpdConstants.OpdModuleEvents.OPD_CHECK_IN:
+            case OpdConstants.OpdModuleEventConstants.OPD_CHECK_IN:
                 return context().getStringResource(R.string.opd_check_in);
-            case OpdConstants.OpdModuleEvents.OPD_VITAL_DANGER_SIGNS_CHECK:
+            case OpdConstants.OpdModuleEventConstants.OPD_VITAL_DANGER_SIGNS_CHECK:
                 return context().getStringResource(R.string.vital_danger_signs);
-            case OpdConstants.OpdModuleEvents.OPD_DIAGNOSIS:
+            case OpdConstants.OpdModuleEventConstants.OPD_DIAGNOSIS:
                 return context().getStringResource(R.string.opd_diagnosis);
-            case OpdConstants.OpdModuleEvents.OPD_TREATMENT:
+            case OpdConstants.OpdModuleEventConstants.OPD_TREATMENT:
                 return context().getStringResource(R.string.opd_treatment);
-            case OpdConstants.OpdModuleEvents.OPD_LABORATORY:
+            case OpdConstants.OpdModuleEventConstants.OPD_LABORATORY:
                 return context().getStringResource(R.string.lab_reports);
-            case OpdConstants.OpdModuleEvents.OPD_PHARMACY:
+            case OpdConstants.OpdModuleEventConstants.OPD_PHARMACY:
                 return context().getStringResource(R.string.pharmacy);
-            case OpdConstants.OpdModuleEvents.OPD_FINAL_OUTCOME:
+            case OpdConstants.OpdModuleEventConstants.OPD_FINAL_OUTCOME:
                 return context().getStringResource(R.string.final_outcome);
-            case OpdConstants.OpdModuleEvents.OPD_SERVICE_CHARGE:
+            case OpdConstants.OpdModuleEventConstants.OPD_SERVICE_CHARGE:
                 return context().getStringResource(R.string.service_fee);
             default:
                 return null;

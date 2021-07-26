@@ -544,7 +544,7 @@ public class OpdJsonFormUtils extends JsonFormUtils {
                 medicineString = medicineString.concat(medicine.getString("text"));
             }
         } catch (Exception e) {
-            Timber.e(e, "loadGlobals()");
+            Timber.e(e, "getMedicineNoteString()");
         }
         return medicineString;
     }

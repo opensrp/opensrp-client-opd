@@ -14,6 +14,10 @@ public class OpdConstants extends AllConstants {
     public static final String BIND_TYPE = "bind_type";
     public static final String VISIT_ID = "visit_id";
     public static final String VISIT_DATE = "visit_date";
+    public static final String METADATA = "metadata";
+
+    public static final String DETAILS = "details";
+    public static final String RELATIONSHIPS = "relationships";
 
     public interface StepTitle {
         String TEST_CONDUCTED = "Test Conducted";
@@ -333,7 +337,7 @@ public class OpdConstants extends AllConstants {
     }
 
 
-    public static class OpdModuleEvents {
+    public static class OpdModuleEventConstants {
         public static final String OPD_REGISTRATION = "OPD_Registration";
         public static final String OPD_CHECK_IN = "OPD_Check_in";
         public static final String OPD_VITAL_DANGER_SIGNS_CHECK = "OPD_Vital_Danger_signs_check";
@@ -346,13 +350,6 @@ public class OpdConstants extends AllConstants {
         public static final String OPD_VISIT_GROUP = "opd_visit_group";
 
     }
-
-
-    public static final String METADATA = "metadata";
-
-    public static final String DETAILS = "details";
-    public static final String RELATIONSHIPS = "relationships";
-
 
     public interface Properties {
         String TASK_IDENTIFIER = "taskIdentifier";
@@ -389,12 +386,12 @@ public class OpdConstants extends AllConstants {
         String SERVICE_FEE = "json.form/opd_service_fee.json";
     }
 
-    public static class TABLE_NAME {
+    public static class TableNameConstants {
         public static final String ALL_CLIENTS = "ec_client";
     }
 
 
-    public static class PROPERTY {
+    public static class PropertyConstants {
         public static final String USE_NEW_OPD_MODULE = "use.new.opd.module";
     }
 
