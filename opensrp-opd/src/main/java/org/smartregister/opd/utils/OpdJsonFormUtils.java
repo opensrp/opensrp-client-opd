@@ -548,4 +548,38 @@ public class OpdJsonFormUtils extends JsonFormUtils {
         }
         return medicineString;
     }
+
+    public static HashMap<String,String> getLabRepeatingGroupValues(HashMap<String, String> savedValues) {
+        try {
+            HashMap<String,String> saveValuesMap = new HashMap<>();
+
+            String testResults = "";
+            String strRepeatingGroupMap = savedValues.get(OpdConstants.REPEATING_GROUP_MAP);
+            if (StringUtils.isNotBlank(strRepeatingGroupMap)) {
+                JSONObject jsonObject = new JSONObject(strRepeatingGroupMap);
+                Iterator<String> repeatingGroupKeys = jsonObject.keys();
+                while (repeatingGroupKeys.hasNext()) {
+                    JSONObject jsonTestObject = jsonObject.optJSONObject(repeatingGroupKeys.next());
+                    Iterator<String> testStringIterator = jsonTestObject.keys();
+                    String testName = "";
+                    String value = "";
+                    while (testStringIterator.hasNext()) {
+                        String resultKey = testStringIterator.next();
+                        if (OpdConstants.DIAGNOSTIC_TEST.equals(resultKey)) {
+                            testName = StringUtil.humanize(jsonTestObject.optString(resultKey));
+                            savedValues.put(OpdConstants.DIAGNOSTIC_TEST, testName);
+                        }
+                        if (resultKey.startsWith(OpdConstants.DIAGNOSTIC_TEST_RESULT)) {
+                             value = StringUtil.humanize(jsonTestObject.optString(resultKey));
+                            savedValues.put(OpdConstants.DIAGNOSTIC_TEST_RESULT, value);
+                        }
+                    }
+                }
+            }
+            return saveValuesMap;
+        } catch (Exception e) {
+            Timber.e(e, "OpdJsonFormUtils -> getLabResultsStringFromMap()");
+            return new HashMap<>();
+        }
+    }
 }

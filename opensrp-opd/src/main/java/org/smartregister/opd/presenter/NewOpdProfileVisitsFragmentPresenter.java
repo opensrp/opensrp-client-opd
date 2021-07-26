@@ -18,10 +18,12 @@ import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.opd.utils.OpdUtils;
+import org.smartregister.opd.utils.RepeatingGroupsValueSource;
 import org.smartregister.util.CallableInteractor;
 import org.smartregister.util.CallableInteractorCallBack;
 import org.smartregister.util.GenericInteractor;
 import org.smartregister.util.NativeFormProcessor;
+import org.smartregister.util.NativeFormProcessorFieldSource;
 import org.smartregister.util.Utils;
 import org.smartregister.view.ListContract;
 import org.smartregister.view.presenter.ListPresenter;
@@ -104,15 +106,39 @@ public class NewOpdProfileVisitsFragmentPresenter extends ListPresenter<ProfileH
             values.put("disease_code_final_diagn", values.get("disease_code_object_final"));
 
         // inject values
-        processor.populateValues(values, jsonObject1 -> {
+      /*  processor.populateValues(values, jsonObject1 -> {
             try {
                 jsonObject1.put(JsonFormConstants.READ_ONLY, readonly);
             } catch (JSONException e) {
                 Timber.e(e);
             }
-        });
+        }, customElementLoaders(processor));*/
+
+
+        // inject values
+        processor.populateValues(values, jsonObject1 -> {
+            try {
+                String key = ((jsonObject1.has(JsonFormConstants.KEY)) ? jsonObject1.getString(JsonFormConstants.KEY) : "");
+                //Repeating Group
+                if ((key.contains("test_ordered_avail")) || readonly) {
+                    jsonObject1.put(JsonFormConstants.READ_ONLY, true);
+                }
+
+               //jsonObject1.put(JsonFormConstants.READ_ONLY, readonly);
+            } catch (JSONException e) {
+                Timber.e(e);
+            }
+        }, customElementLoaders(processor));
 
         return jsonObject;
+    }
+
+    private Map<String, NativeFormProcessorFieldSource> customElementLoaders(NativeFormProcessor processor) {
+        Map<String, NativeFormProcessorFieldSource> elements = new HashMap<>();
+
+        elements.put(JsonFormConstants.REPEATING_GROUP, new RepeatingGroupsValueSource(processor));
+
+        return elements;
     }
 
     protected void attachAgeAndGender(JSONObject jsonObject) {
@@ -171,56 +197,55 @@ public class NewOpdProfileVisitsFragmentPresenter extends ListPresenter<ProfileH
         try {
             JSONObject jsonObject = new JSONObject(jsonString);
             String title = jsonObject.getString(ENCOUNTER_TYPE);
-             CallableInteractor myInteractor = getCallableInteractor();
+            CallableInteractor myInteractor = getCallableInteractor();
 
-                Callable<Void> callable = () -> {
-                    //JSONObject jsonObject = new JSONObject(jsonString);
-                    String eventType = jsonObject.getString(ENCOUNTER_TYPE);
+            Callable<Void> callable = () -> {
+                //JSONObject jsonObject = new JSONObject(jsonString);
+                String eventType = jsonObject.getString(ENCOUNTER_TYPE);
 
-                    // inject map value for repeating groups
-                    if (eventType.equalsIgnoreCase(OpdConstants.OpdModuleEvents.OPD_LABORATORY)) {
-                        injectGroupMap(jsonObject);
-                    }
+                // inject map value for repeating groups
+                if (eventType.equalsIgnoreCase(OpdConstants.OpdModuleEvents.OPD_LABORATORY)) {
+                    injectGroupMap(jsonObject);
+                }
 
 
+                NativeFormProcessor processor = OpdLibrary.getInstance().getFormProcessorFactory().createInstance(jsonObject);
+                String entityId = jsonObject.getString(OpdConstants.Properties.BASE_ENTITY_ID);
+                String formSubmissionId = jsonObject.has(OpdConstants.Properties.FORM_SUBMISSION_ID) ?
+                        jsonObject.getString(OpdConstants.Properties.FORM_SUBMISSION_ID) : null;
 
-                    NativeFormProcessor processor = OpdLibrary.getInstance().getFormProcessorFactory().createInstance(jsonObject);
-                    String entityId = jsonObject.getString(OpdConstants.Properties.BASE_ENTITY_ID);
-                    String formSubmissionId = jsonObject.has(OpdConstants.Properties.FORM_SUBMISSION_ID) ?
-                            jsonObject.getString(OpdConstants.Properties.FORM_SUBMISSION_ID) : null;
+                // update metadata
+                processor.withBindType("ec_client")
+                        .withEncounterType(title)
+                        .withFormSubmissionId(formSubmissionId)
+                        .withEntityId(entityId)
+                        .tagEventMetadata()
+                        // create and save event to db
+                        .saveEvent()
+                        // execute client processing
+                        .clientProcessForm();
 
-                    // update metadata
-                    processor.withBindType("ec_client")
-                            .withEncounterType(title)
-                            .withFormSubmissionId(formSubmissionId)
-                            .withEntityId(entityId)
-                            .tagEventMetadata()
-                            // create and save event to db
-                            .saveEvent()
-                            // execute client processing
-                            .clientProcessForm();
+                return null;
+            };
 
-                    return null;
-                };
-
-                myInteractor.execute(callable, new CallableInteractorCallBack<Void>() {
-                    @Override
-                    public void onResult(Void aVoid) {
-                        OpdProfileFragmentContract.View<ProfileHistory> view = getView();
-                        if (view != null) {
-                            view.reloadFromSource();
-                            view.setLoadingState(false);
-                        }
-                    }
-
-                    @Override
-                    public void onError(Exception ex) {
-                        OpdProfileFragmentContract.View<ProfileHistory> view = getView();
-                        if (view == null) return;
-                        view.onFetchError(ex);
+            myInteractor.execute(callable, new CallableInteractorCallBack<Void>() {
+                @Override
+                public void onResult(Void aVoid) {
+                    OpdProfileFragmentContract.View<ProfileHistory> view = getView();
+                    if (view != null) {
+                        view.reloadFromSource();
                         view.setLoadingState(false);
                     }
-                });
+                }
+
+                @Override
+                public void onError(Exception ex) {
+                    OpdProfileFragmentContract.View<ProfileHistory> view = getView();
+                    if (view == null) return;
+                    view.onFetchError(ex);
+                    view.setLoadingState(false);
+                }
+            });
 
         } catch (Exception ex) {
             Timber.e(ex.getMessage());

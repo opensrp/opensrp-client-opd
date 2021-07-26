@@ -17,10 +17,12 @@ import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdDbConstants;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.opd.utils.OpdUtils;
+import org.smartregister.opd.utils.RepeatingGroupsValueSource;
 import org.smartregister.util.CallableInteractor;
 import org.smartregister.util.CallableInteractorCallBack;
 import org.smartregister.util.GenericInteractor;
 import org.smartregister.util.NativeFormProcessor;
+import org.smartregister.util.NativeFormProcessorFieldSource;
 import org.smartregister.util.Utils;
 import org.smartregister.view.ListContract;
 import org.smartregister.view.presenter.ListPresenter;
@@ -93,7 +95,17 @@ public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<Profil
             values.put("disease_code_final_diagn", values.get("disease_code_object_final"));
 
         // inject values
-        processor.populateValues(values);
+        processor.populateValues(values, jsonObject1 -> {
+            try {
+                String key = ((jsonObject1.has(JsonFormConstants.KEY)) ? jsonObject1.getString(JsonFormConstants.KEY) : "");
+                //Repeating Group
+                if (key.contains("test_ordered_avail")) {
+                    jsonObject1.put(JsonFormConstants.READ_ONLY, true);
+                }
+            } catch (JSONException e) {
+                Timber.e(e);
+            }
+        }, customElementLoaders(processor));
 
         jsonObject.put(OpdConstants.Properties.FORM_SUBMISSION_ID, formSubmissionId);
 
@@ -144,6 +156,31 @@ public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<Profil
         JSONObject jsonObject = new JSONObject(jsonForm);
         jsonObject.put(OpdConstants.Properties.BASE_ENTITY_ID, baseEntityID);
         return jsonObject;
+    }
+
+    private Map<String, NativeFormProcessorFieldSource> customElementLoaders(NativeFormProcessor processor) {
+        Map<String, NativeFormProcessorFieldSource> elements = new HashMap<>();
+
+        elements.put(JsonFormConstants.REPEATING_GROUP, new RepeatingGroupsValueSource(processor));
+        /**
+         elements.put(JsonFormConstants.REPEATING_GROUP, new NativeFormProcessorFieldSource() {
+        @Override public <T> void populateValue(String stepName, JSONObject step, JSONObject fieldJson, Map<String, T> dictionary) {
+        RepeatingGroupGenerator repeatingGroupGenerator = new RepeatingGroupGenerator(json.optJSONObject("step4"), stepName,
+        "baby_alive_group",
+        outcomeColumnMap(),
+        PncDbConstants.KEY.BASE_ENTITY_ID,
+        storedValues(entityId));
+        repeatingGroupGenerator
+        .setFieldsWithoutSpecialViewValidation
+        (new HashSet<>(
+        Arrays.asList("birth_weight_entered", "birth_height_entered",
+        "birth_record_date", "baby_gender", "baby_first_name",
+        "baby_last_name", "baby_dob")));
+        repeatingGroupGenerator.init();
+        }
+        });
+         **/
+        return elements;
     }
 
     @Override
