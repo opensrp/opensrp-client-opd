@@ -79,7 +79,7 @@ public class NewOpdProfileVisitsFragment extends BaseListFragment<ProfileHistory
         };
     }
 
-    private void populateGlobalsList(List<ProfileHistory> historyList) {
+    protected void populateGlobalsList(List<ProfileHistory> historyList) {
         if (historyList.size() > 0) {
             formGlobalValuesMap.clear();
             HashMap<String, List<String>> dateToIdMap = OpdUtils.getDateToEventIdMap(historyList);
@@ -137,37 +137,32 @@ public class NewOpdProfileVisitsFragment extends BaseListFragment<ProfileHistory
     public void onListItemClicked(ProfileHistory profileHistory, int layoutID) {
         if (layoutID != R.id.tv_edit) return;
 
-        String formName;
+        String formName = getFormName(profileHistory);
+
+        loadPresenter().openForm(getContext(), formName, baseEntityID, profileHistory.getID());
+    }
+
+    protected String getFormName(ProfileHistory profileHistory) {
         switch (profileHistory.getEventType()) {
             case OpdConstants.OpdModuleEventConstants.OPD_CHECK_IN:
-                formName = OpdConstants.JsonForm.OPD_CHECKIN;
-                break;
+                return OpdConstants.JsonForm.OPD_CHECKIN;
             case OpdConstants.OpdModuleEventConstants.OPD_VITAL_DANGER_SIGNS_CHECK:
-                formName = OpdConstants.JsonForm.VITAL_DANGER_SIGNS;
-                break;
+                return OpdConstants.JsonForm.VITAL_DANGER_SIGNS;
             case OpdConstants.OpdModuleEventConstants.OPD_DIAGNOSIS:
-                formName = OpdConstants.JsonForm.DIAGNOSIS;
-                break;
+                return OpdConstants.JsonForm.DIAGNOSIS;
             case OpdConstants.OpdModuleEventConstants.OPD_TREATMENT:
-                formName = OpdConstants.JsonForm.TREATMENT;
-                break;
+                return OpdConstants.JsonForm.TREATMENT;
             case OpdConstants.OpdModuleEventConstants.OPD_LABORATORY:
-                formName = OpdConstants.JsonForm.LAB_RESULTS;
-                break;
+                return OpdConstants.JsonForm.LAB_RESULTS;
             case OpdConstants.OpdModuleEventConstants.OPD_PHARMACY:
-                formName = OpdConstants.JsonForm.PHARMACY;
-                break;
+                return OpdConstants.JsonForm.PHARMACY;
             case OpdConstants.OpdModuleEventConstants.OPD_FINAL_OUTCOME:
-                formName = OpdConstants.JsonForm.FINAL_OUTCOME;
-                break;
+                return OpdConstants.JsonForm.FINAL_OUTCOME;
             case OpdConstants.OpdModuleEventConstants.OPD_SERVICE_CHARGE:
-                formName = OpdConstants.JsonForm.SERVICE_FEE;
-                break;
+                return OpdConstants.JsonForm.SERVICE_FEE;
             default:
                 throw new IllegalArgumentException("Unknown Form");
         }
-
-        loadPresenter().openForm(getContext(), formName, baseEntityID, profileHistory.getID());
     }
 
     @Override
