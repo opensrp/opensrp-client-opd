@@ -149,7 +149,7 @@ public class NewOpdProfileVisitsFragmentTest extends BaseTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testGetFormNameError() { ;
+    public void testGetFormNameError() {
         fragment.getFormName(new ProfileHistory().setEventType(""));
     }
 
