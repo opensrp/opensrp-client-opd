@@ -553,7 +553,6 @@ public class OpdJsonFormUtils extends JsonFormUtils {
         try {
             HashMap<String,String> saveValuesMap = new HashMap<>();
 
-            String testResults = "";
             String strRepeatingGroupMap = savedValues.get(OpdConstants.REPEATING_GROUP_MAP);
             if (StringUtils.isNotBlank(strRepeatingGroupMap)) {
                 JSONObject jsonObject = new JSONObject(strRepeatingGroupMap);

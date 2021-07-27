@@ -47,14 +47,14 @@ public class RepeatingGroupsValueSource implements NativeFormProcessorFieldSourc
             String key = field.optString(JsonFormConstants.KEY);
             if (key.equals(repeatingGroupKey)) {
                 JSONArray repeatingGrpValues = field.optJSONArray(JsonFormConstants.VALUE);
-                readGroupValue(stepName, field, repeatingGrpValues, stepFields, i, loaded);
+                readGroupValue(stepName, repeatingGrpValues, stepFields, i, loaded);
                 break;
             }
         }
     }
 
 
-    private <T> void readGroupValue(String stepName, JSONObject field, JSONArray repeatingGrpValues, JSONArray stepFields, int pos, Map<String, Map<String, T>> loaded) throws JSONException {
+    private <T> void readGroupValue(String stepName, JSONArray repeatingGrpValues, JSONArray stepFields, int pos, Map<String, Map<String, T>> loaded) throws JSONException {
         int mPos = pos;
         for (Map.Entry<String, Map<String, T>> entry : loaded.entrySet()) {
 
@@ -67,7 +67,7 @@ public class RepeatingGroupsValueSource implements NativeFormProcessorFieldSourc
                     String jsonKey = repeatingGrpField.optString(JsonFormConstants.TYPE).equals(JsonFormConstants.LABEL) ? JsonFormConstants.TEXT : JsonFormConstants.VALUE;
                     repeatingGrpField.put(jsonKey, entry.getValue().get(repeatingGrpFieldKey));
 
-                    updateFieldProperties(stepName, field, entry.getKey(), repeatingGrpField, repeatingGrpFieldKey);
+                    updateFieldProperties(stepName, entry.getKey(), repeatingGrpField, repeatingGrpFieldKey);
 
                     updateField(repeatingGrpField, entry.getValue());
                     repeatingGrpField.put(JsonFormConstants.KEY, repeatingGrpFieldKey + "_" + entry.getKey());
@@ -77,7 +77,7 @@ public class RepeatingGroupsValueSource implements NativeFormProcessorFieldSourc
         }
     }
 
-    private void updateFieldProperties(String stepName, JSONObject parentField, @NonNull String fieldGroupId, @NonNull JSONObject repeatingGrpField, @NonNull String repeatingGrpFieldKey) throws JSONException {
+    private void updateFieldProperties(String stepName, @NonNull String fieldGroupId, @NonNull JSONObject repeatingGrpField, @NonNull String repeatingGrpFieldKey) throws JSONException {
 
         if (repeatingGrpField.has(JsonFormConstants.RELEVANCE) || repeatingGrpField.has(JsonFormConstants.CALCULATION))
             generateDynamicRules(stepName, repeatingGrpField, fieldGroupId);

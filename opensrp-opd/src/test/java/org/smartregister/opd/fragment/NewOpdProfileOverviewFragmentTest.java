@@ -1,10 +1,8 @@
 package org.smartregister.opd.fragment;
 
-import android.app.Activity;
 import android.app.Application;
 import android.os.Build;
 
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentHostCallback;
 
 import org.junit.Assert;
@@ -19,7 +17,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 import org.powermock.modules.junit4.rule.PowerMockRule;
-import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;

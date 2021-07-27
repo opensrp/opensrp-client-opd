@@ -9,17 +9,10 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.smartregister.opd.repository.OpdVisitRepository;
-import org.smartregister.opd.repository.VisitDetailsRepository;
-import org.smartregister.repository.EventClientRepository;
 import org.smartregister.repository.Repository;
 
-import java.text.ParseException;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
-import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.doReturn;
 
 public class VisitDaoTest extends VisitDao{

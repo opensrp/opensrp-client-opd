@@ -10,7 +10,6 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.opd.BaseTest;
-import org.smartregister.opd.fragment.NewOpdProfileOverviewFragment;
 import org.smartregister.opd.fragment.NewOpdProfileVisitsFragment;
 import org.smartregister.util.JsonFormUtils;
 
