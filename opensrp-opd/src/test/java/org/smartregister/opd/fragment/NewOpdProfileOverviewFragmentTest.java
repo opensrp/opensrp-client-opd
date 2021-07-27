@@ -1,37 +1,61 @@
 package org.smartregister.opd.fragment;
 
+import android.app.Activity;
+import android.app.Application;
+import android.os.Build;
+
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentHostCallback;
+
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.modules.junit4.PowerMockRunnerDelegate;
+import org.powermock.modules.junit4.rule.PowerMockRule;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.RuntimeEnvironment;
+import org.robolectric.annotation.Config;
 import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.opd.BaseTest;
+import org.smartregister.opd.R;
 import org.smartregister.opd.dao.VisitDao;
 import org.smartregister.opd.domain.ProfileAction;
+import org.smartregister.opd.utils.OpdConstants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 @RunWith(PowerMockRunner.class)
+@PowerMockRunnerDelegate(RobolectricTestRunner.class)
+@Config(sdk = Build.VERSION_CODES.P)
+@PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
 @PrepareForTest(VisitDao.class)
 public class NewOpdProfileOverviewFragmentTest extends BaseTest {
 
     private NewOpdProfileOverviewFragment fragment;
 
+    @Rule
+    public PowerMockRule rule = new PowerMockRule();
+
     @Before
     public void setUp() {
         fragment = Mockito.spy(NewOpdProfileOverviewFragment.newInstance(null));
+        PowerMockito.mockStatic(VisitDao.class);
     }
 
     @Test
     public void testLoadGlobals() throws Exception {
-        PowerMockito.mockStatic(VisitDao.class);
         HashSet<String> globalKeys = new HashSet<>();
         globalKeys.add("opd_danger_signs_value");
         globalKeys.add("respiratory_rate");
@@ -76,9 +100,71 @@ public class NewOpdProfileOverviewFragmentTest extends BaseTest {
         mapVisits.put("OPD_treatment", visits);
 
         fragment.loadGlobals(mapVisits);
-        HashMap<String, String > formGlobalValues = ReflectionHelpers.getField(fragment, "formGlobalValues");
+        HashMap<String, String> formGlobalValues = ReflectionHelpers.getField(fragment, "formGlobalValues");
         Assert.assertEquals(formGlobalValues.size(), globalKeys.size());
 
+    }
+
+
+    @Test
+    public void testGetFormName() {
+        Application app = RuntimeEnvironment.application;
+        ProfileAction action;
+        String formName;
+
+        action = new ProfileAction(app.getString(R.string.opd_check_in), 0);
+        formName = fragment.getFormName(action);
+        Assert.assertEquals(formName, OpdConstants.JsonForm.OPD_CHECKIN);
+
+
+        action = new ProfileAction(app.getString(R.string.vital_danger_signs), 1);
+        formName = fragment.getFormName(action);
+        Assert.assertEquals(formName, OpdConstants.JsonForm.VITAL_DANGER_SIGNS);
+
+        action = new ProfileAction(app.getString(R.string.opd_diagnosis), 2);
+        formName = fragment.getFormName(action);
+        Assert.assertEquals(formName, OpdConstants.JsonForm.DIAGNOSIS);
+
+        action = new ProfileAction(app.getString(R.string.lab_reports), 3);
+        formName = fragment.getFormName(action);
+        Assert.assertEquals(formName, OpdConstants.JsonForm.LAB_RESULTS);
+
+        action = new ProfileAction(app.getString(R.string.opd_treatment), 4);
+        formName = fragment.getFormName(action);
+        Assert.assertEquals(formName, OpdConstants.JsonForm.TREATMENT);
+
+        action = new ProfileAction(app.getString(R.string.pharmacy), 5);
+        formName = fragment.getFormName(action);
+        Assert.assertEquals(formName, OpdConstants.JsonForm.PHARMACY);
+
+        action = new ProfileAction(app.getString(R.string.final_outcome), 6);
+        formName = fragment.getFormName(action);
+        Assert.assertEquals(formName, OpdConstants.JsonForm.FINAL_OUTCOME);
+
+        action = new ProfileAction(app.getString(R.string.service_fee), 7);
+        formName = fragment.getFormName(action);
+        Assert.assertEquals(formName, OpdConstants.JsonForm.SERVICE_FEE);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetFormNameError() {
+        ProfileAction action;
+        action = new ProfileAction("", 99);
+        fragment.getFormName(action);
+    }
+
+    @Test
+    public void testOnStartCallable() throws Exception {
+        FragmentHostCallback host = Mockito.mock(FragmentHostCallback.class);
+        ReflectionHelpers.setField(host, "mContext", RuntimeEnvironment.application);
+
+        ReflectionHelpers.setField(fragment, "mHost", host);
+
+        PowerMockito.doReturn(new HashMap<String, List<ProfileAction.ProfileActionVisit>>()).when(VisitDao.class, "getVisitsToday", Mockito.anyString());
+
+        Callable<List<ProfileAction>> callable = fragment.onStartCallable(null);
+        List<ProfileAction> actions = callable.call();
+        Assert.assertEquals(actions.size(), 8);
     }
 
 }
