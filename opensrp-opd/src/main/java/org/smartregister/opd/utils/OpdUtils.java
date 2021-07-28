@@ -47,6 +47,9 @@ import java.util.Map;
 
 import timber.log.Timber;
 
+import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_EXTRA.STEP1;
+import static org.smartregister.util.JsonFormUtils.gson;
+
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-13
  */
@@ -415,5 +418,23 @@ public class OpdUtils extends Utils {
             map.put(date, visitIds);
         }
         return map;
+    }
+
+    public static void injectGroupMap(JSONObject jsonObject) throws JSONException {
+        JSONObject step = jsonObject.getJSONObject(STEP1);
+        JSONArray fields = step.optJSONArray(OpdJsonFormUtils.FIELDS);
+        HashMap<String, HashMap<String, String>> buildRepeatingGroupTests = buildRepeatingGroupTests(step);
+        if (!buildRepeatingGroupTests.isEmpty()) {
+            String strTest = gson.toJson(buildRepeatingGroupTests);
+            JSONObject repeatingGroupObj = new JSONObject();
+            repeatingGroupObj.put(JsonFormConstants.KEY, OpdConstants.REPEATING_GROUP_MAP);
+            repeatingGroupObj.put(JsonFormConstants.VALUE, strTest);
+            repeatingGroupObj.put(JsonFormConstants.TYPE, JsonFormConstants.HIDDEN);
+            if (fields != null) {
+                fields.put(repeatingGroupObj);
+                step.put(OpdJsonFormUtils.FIELDS, fields);
+                jsonObject.put(STEP1, step);
+            }
+        }
     }
 }

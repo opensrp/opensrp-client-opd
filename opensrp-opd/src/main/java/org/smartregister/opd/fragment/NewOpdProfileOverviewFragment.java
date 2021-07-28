@@ -170,36 +170,31 @@ public class NewOpdProfileOverviewFragment extends BaseListFragment<ProfileActio
 
         String eventId = (report.getSelectedAction() != null) ? report.getSelectedAction().getVisitID() : null;
 
-        String formName;
+        String formName = getFormName(report);
+        loadPresenter().openForm(getContext(), formName, baseEntityID, eventId);
+    }
+
+    protected String getFormName(ProfileAction report) {
         switch (report.getKey()) {
             case 0:
-                formName = OpdConstants.JsonForm.OPD_CHECKIN;
-                break;
+                return OpdConstants.JsonForm.OPD_CHECKIN;
             case 1:
-                formName = OpdConstants.JsonForm.VITAL_DANGER_SIGNS;
-                break;
+                return OpdConstants.JsonForm.VITAL_DANGER_SIGNS;
             case 2:
-                formName = OpdConstants.JsonForm.DIAGNOSIS;
-                break;
+                return OpdConstants.JsonForm.DIAGNOSIS;
             case 3:
-                formName = OpdConstants.JsonForm.LAB_RESULTS;
-                break;
+                return OpdConstants.JsonForm.LAB_RESULTS;
             case 4:
-                formName = OpdConstants.JsonForm.TREATMENT;
-                break;
+                return OpdConstants.JsonForm.TREATMENT;
             case 5:
-                formName = OpdConstants.JsonForm.PHARMACY;
-                break;
+                return OpdConstants.JsonForm.PHARMACY;
             case 6:
-                formName = OpdConstants.JsonForm.FINAL_OUTCOME;
-                break;
+                return OpdConstants.JsonForm.FINAL_OUTCOME;
             case 7:
-                formName = OpdConstants.JsonForm.SERVICE_FEE;
-                break;
+                return OpdConstants.JsonForm.SERVICE_FEE;
             default:
                 throw new IllegalArgumentException("Unknown Form");
         }
-        loadPresenter().openForm(getContext(), formName, baseEntityID, eventId);
     }
 
     @Override

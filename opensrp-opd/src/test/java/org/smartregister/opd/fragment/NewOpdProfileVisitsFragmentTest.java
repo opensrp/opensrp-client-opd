@@ -1,9 +1,6 @@
 package org.smartregister.opd.fragment;
 
-import android.app.Application;
 import android.os.Build;
-
-import androidx.fragment.app.FragmentHostCallback;
 
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 
@@ -21,42 +18,42 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.robolectric.RobolectricTestRunner;
-import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.opd.BaseTest;
-import org.smartregister.opd.R;
 import org.smartregister.opd.dao.VisitDao;
-import org.smartregister.opd.domain.ProfileAction;
-import org.smartregister.opd.presenter.NewOpdProfileOverviewFragmentPresenter;
+import org.smartregister.opd.domain.ProfileHistory;
+import org.smartregister.opd.presenter.NewOpdProfileVisitsFragmentPresenter;
 import org.smartregister.opd.utils.OpdConstants;
+import org.smartregister.opd.utils.OpdUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.Callable;
+import java.util.Map;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockRunnerDelegate(RobolectricTestRunner.class)
 @Config(sdk = Build.VERSION_CODES.P)
 @PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
-@PrepareForTest(VisitDao.class)
-public class NewOpdProfileOverviewFragmentTest extends BaseTest {
+@PrepareForTest({VisitDao.class, OpdUtils.class})
+public class NewOpdProfileVisitsFragmentTest extends BaseTest {
 
-    private NewOpdProfileOverviewFragment fragment;
+    private NewOpdProfileVisitsFragment fragment;
 
     @Rule
     public PowerMockRule rule = new PowerMockRule();
 
     @Before
     public void setUp() {
-        fragment = Mockito.spy(NewOpdProfileOverviewFragment.newInstance(null));
+        fragment = Mockito.spy(NewOpdProfileVisitsFragment.newInstance(null));
         PowerMockito.mockStatic(VisitDao.class);
+        PowerMockito.mockStatic(OpdUtils.class);
     }
 
     @Test
-    public void testLoadGlobals() throws Exception {
+    public void testPopulateGlobalsList() throws Exception {
         HashSet<String> globalKeys = new HashSet<>();
         globalKeys.add("opd_danger_signs_value");
         globalKeys.add("respiratory_rate");
@@ -80,6 +77,16 @@ public class NewOpdProfileOverviewFragmentTest extends BaseTest {
         globalKeys.add("medical_conditions");
         ReflectionHelpers.setField(fragment, "globalKeys", globalKeys);
 
+        HashMap<String, List<String>> dateToIdMap = new HashMap<>();
+        ArrayList<String> ids = new ArrayList<>();
+        ids.add("1");
+        ids.add("2");
+        ids.add("3");
+        ids.add("4");
+        ids.add("5");
+        dateToIdMap.put("Today", ids);
+        PowerMockito.doReturn(dateToIdMap).when(OpdUtils.class, "getDateToEventIdMap", Mockito.any());
+
         HashMap<String, String> savedValues = new HashMap<>();
         savedValues.put("tests_repeating_group_count", "3");
         savedValues.put("medicine_object", "\"[{\"key\":\"AA007840\",\"text\":\"Atenolol 50mg\",\"openmrs_entity\":\"\",\"openmrs_entity_id\":\"\",\"openmrs_entity_parent\":\"\",\"property\":{\"pack_size\":null,\"product_code\":\"AA007840\",\"dispensing_unit\":\"Tablet\",\"meta\":{\"duration\":\"78\",\"dosage\":\"12\",\"frequency\":\"3456\",\"info\":\"Dose: 12, Duration: 78, Frequency: 3456\"}}},{\"key\":\"FF006300\",\"text\":\"Bandage, WOW 10cm x 4m long, when stretched\",\"openmrs_entity\":\"\",\"openmrs_entity_id\":\"\",\"openmrs_entity_parent\":\"\",\"property\":{\"pack_size\":null,\"product_code\":\"FF006300\",\"dispensing_unit\":\"each\",\"meta\":{\"duration\":\"33\",\"dosage\":\"11\",\"frequency\":\"2244\",\"info\":\"Dose: 11, Duration: 33, Frequency: 2244\"}}}]");
@@ -93,65 +100,57 @@ public class NewOpdProfileOverviewFragmentTest extends BaseTest {
         savedValues.put("diagnostic_test_result_24f8d3b0a73a49e9894c83d6d545b39f", "Negative");
         PowerMockito.doReturn(savedValues).when(VisitDao.class, "getSavedKeysForVisit", Mockito.anyString());
 
-        HashMap<String, List<ProfileAction.ProfileActionVisit>> mapVisits = new HashMap<>();
-        ArrayList<ProfileAction.ProfileActionVisit> visits = new ArrayList<>();
-        ProfileAction.ProfileActionVisit visit = new ProfileAction.ProfileActionVisit();
-        visit.setVisitID("abc123");
-        visits.add(visit);
-        mapVisits.put("OPD_treatment", visits);
+        ArrayList<ProfileHistory> history = new ArrayList<>();
+        history.add(new ProfileHistory());
+        fragment.populateGlobalsList(history);
 
-        fragment.loadGlobals(mapVisits);
-        HashMap<String, String> formGlobalValues = ReflectionHelpers.getField(fragment, "formGlobalValues");
-        Assert.assertEquals(formGlobalValues.size(), globalKeys.size());
+        Map<String, Map<String, String>> formGlobalValuesMap = ReflectionHelpers.getField(fragment, "formGlobalValuesMap");
+        Assert.assertEquals(formGlobalValuesMap.get("Today").size(), globalKeys.size());
 
     }
 
 
     @Test
     public void testGetFormName() {
-        Application app = RuntimeEnvironment.application;
-        ProfileAction action;
+        ProfileHistory history;
         String formName;
 
-        action = new ProfileAction(app.getString(R.string.opd_check_in), 0);
-        formName = fragment.getFormName(action);
+        history = new ProfileHistory().setEventType(OpdConstants.OpdModuleEventConstants.OPD_CHECK_IN);
+        formName = fragment.getFormName(history);
         Assert.assertEquals(formName, OpdConstants.JsonForm.OPD_CHECKIN);
 
-
-        action = new ProfileAction(app.getString(R.string.vital_danger_signs), 1);
-        formName = fragment.getFormName(action);
+        history = new ProfileHistory().setEventType(OpdConstants.OpdModuleEventConstants.OPD_VITAL_DANGER_SIGNS_CHECK);
+        formName = fragment.getFormName(history);
         Assert.assertEquals(formName, OpdConstants.JsonForm.VITAL_DANGER_SIGNS);
 
-        action = new ProfileAction(app.getString(R.string.opd_diagnosis), 2);
-        formName = fragment.getFormName(action);
+        history = new ProfileHistory().setEventType(OpdConstants.OpdModuleEventConstants.OPD_DIAGNOSIS);
+        formName = fragment.getFormName(history);
         Assert.assertEquals(formName, OpdConstants.JsonForm.DIAGNOSIS);
 
-        action = new ProfileAction(app.getString(R.string.lab_reports), 3);
-        formName = fragment.getFormName(action);
-        Assert.assertEquals(formName, OpdConstants.JsonForm.LAB_RESULTS);
-
-        action = new ProfileAction(app.getString(R.string.opd_treatment), 4);
-        formName = fragment.getFormName(action);
+        history = new ProfileHistory().setEventType(OpdConstants.OpdModuleEventConstants.OPD_TREATMENT);
+        formName = fragment.getFormName(history);
         Assert.assertEquals(formName, OpdConstants.JsonForm.TREATMENT);
 
-        action = new ProfileAction(app.getString(R.string.pharmacy), 5);
-        formName = fragment.getFormName(action);
+        history = new ProfileHistory().setEventType(OpdConstants.OpdModuleEventConstants.OPD_LABORATORY);
+        formName = fragment.getFormName(history);
+        Assert.assertEquals(formName, OpdConstants.JsonForm.LAB_RESULTS);
+
+        history = new ProfileHistory().setEventType(OpdConstants.OpdModuleEventConstants.OPD_PHARMACY);
+        formName = fragment.getFormName(history);
         Assert.assertEquals(formName, OpdConstants.JsonForm.PHARMACY);
 
-        action = new ProfileAction(app.getString(R.string.final_outcome), 6);
-        formName = fragment.getFormName(action);
+        history = new ProfileHistory().setEventType(OpdConstants.OpdModuleEventConstants.OPD_FINAL_OUTCOME);
+        formName = fragment.getFormName(history);
         Assert.assertEquals(formName, OpdConstants.JsonForm.FINAL_OUTCOME);
 
-        action = new ProfileAction(app.getString(R.string.service_fee), 7);
-        formName = fragment.getFormName(action);
+        history = new ProfileHistory().setEventType(OpdConstants.OpdModuleEventConstants.OPD_SERVICE_CHARGE);
+        formName = fragment.getFormName(history);
         Assert.assertEquals(formName, OpdConstants.JsonForm.SERVICE_FEE);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetFormNameError() {
-        ProfileAction action;
-        action = new ProfileAction("", 99);
-        fragment.getFormName(action);
+        fragment.getFormName(new ProfileHistory().setEventType(""));
     }
 
 
@@ -159,30 +158,21 @@ public class NewOpdProfileOverviewFragmentTest extends BaseTest {
     public void testLoadPresenter() {
         ReflectionHelpers.setField(fragment, "presenter", null);
         fragment.loadPresenter();
-        NewOpdProfileOverviewFragmentPresenter presenter = ReflectionHelpers.getField(fragment, "presenter");
+        NewOpdProfileVisitsFragmentPresenter presenter = ReflectionHelpers.getField(fragment, "presenter");
         Assert.assertNotNull(presenter);
-
     }
 
     @Test
-    public void testAttachGlobals() {
+    public void testAttachGlobals() throws Exception {
+        Map<String, Map<String, String>> formGlobalValuesMap = new HashMap<>();
+        formGlobalValuesMap.put("Today", new HashMap<>());
+        ReflectionHelpers.setField(fragment, "formGlobalValuesMap", formGlobalValuesMap);
+
+        PowerMockito.doReturn("Today").when(VisitDao.class, "getDateStringForId", Mockito.any());
         JSONObject form = new JSONObject();
         fragment.attachGlobals(form, "");
         Assert.assertTrue(form.has(JsonFormConstants.JSON_FORM_KEY.GLOBAL));
     }
 
-    @Test
-    public void testOnStartCallable() throws Exception {
-        FragmentHostCallback host = Mockito.mock(FragmentHostCallback.class);
-        ReflectionHelpers.setField(host, "mContext", RuntimeEnvironment.application);
-
-        ReflectionHelpers.setField(fragment, "mHost", host);
-
-        PowerMockito.doReturn(new HashMap<String, List<ProfileAction.ProfileActionVisit>>()).when(VisitDao.class, "getVisitsToday", Mockito.anyString());
-
-        Callable<List<ProfileAction>> callable = fragment.onStartCallable(null);
-        List<ProfileAction> actions = callable.call();
-        Assert.assertEquals(actions.size(), 8);
-    }
 
 }

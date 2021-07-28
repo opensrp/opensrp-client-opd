@@ -1,7 +1,5 @@
 package org.smartregister.opd.presenter;
 
-import android.os.Bundle;
-
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;

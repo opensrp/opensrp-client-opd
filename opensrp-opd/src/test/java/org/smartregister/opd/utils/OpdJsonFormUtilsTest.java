@@ -51,10 +51,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import id.zelory.compressor.Compressor;
 
-@PrepareForTest({OpdUtils.class, OpdLibrary.class})
+@PrepareForTest({OpdUtils.class, OpdLibrary.class,LocationHelper.class})
 @RunWith(PowerMockRunner.class)
 public class OpdJsonFormUtilsTest {
 
@@ -531,15 +532,82 @@ public class OpdJsonFormUtilsTest {
     @Test
     public void testGetLabResultsStringFromMap() throws Exception {
         HashMap<String, String> savedValues = new HashMap<>();
-        savedValues.put("tests_repeating_group_count","3");
-        savedValues.put("diagnostic_test_ba1ed23029a44fd980784093a5c6f746","ultra_sound");
-        savedValues.put("diagnostic_test_24f8d3b0a73a49e9894c83d6d545b39f","pregnancy_test");
-        savedValues.put("repeatingGroupMap","{\"24f8d3b0a73a49e9894c83d6d545b39f\":{\"diagnostic_test_result\":\"Negative\",\"diagnostic_test\":\"pregnancy_test\"},\"ba1ed23029a44fd980784093a5c6f746\":{\"diagnostic_test\":\"ultra_sound\",\"diagnostic_test_result_specify\":\"Ultra\"}}");
-        savedValues.put("treatment_type","Medicine, Suturing, Wound dressing, Foreign body removal");
-        savedValues.put("diagnostic_test_result_specify_ba1ed23029a44fd980784093a5c6f746","Ultra");
-        savedValues.put("diagnostic_test_result_24f8d3b0a73a49e9894c83d6d545b39f","Negative");
+        savedValues.put("tests_repeating_group_count", "3");
+        savedValues.put("diagnostic_test_ba1ed23029a44fd980784093a5c6f746", "ultra_sound");
+        savedValues.put("diagnostic_test_24f8d3b0a73a49e9894c83d6d545b39f", "pregnancy_test");
+        savedValues.put("repeatingGroupMap", "{\"24f8d3b0a73a49e9894c83d6d545b39f\":{\"diagnostic_test_result\":\"Negative\",\"diagnostic_test\":\"pregnancy_test\"},\"ba1ed23029a44fd980784093a5c6f746\":{\"diagnostic_test\":\"ultra_sound\",\"diagnostic_test_result_specify\":\"Ultra\"}}");
+        savedValues.put("treatment_type", "Medicine, Suturing, Wound dressing, Foreign body removal");
+        savedValues.put("diagnostic_test_result_specify_ba1ed23029a44fd980784093a5c6f746", "Ultra");
+        savedValues.put("diagnostic_test_result_24f8d3b0a73a49e9894c83d6d545b39f", "Negative");
         String result = OpdJsonFormUtils.getLabResultsStringFromMap(savedValues);
         String output = "Pregnancy test: { Status result: Negative, }, Ultra sound: , Specify result: Ultra}";
         Assert.assertEquals(result, output);
     }
+
+    @Test
+    public void testAttachLocationHierarchy() throws Exception {
+        String form = "{\n  \"count\": \"1\",\n  \"encounter_type\": \"OPD_Laboratory\",\n  \"step1\": {\n    \"title\": \"Lab\",\n    \"fields\": [\n      {\n        \"key\": \"referral_lab\",\n        \"openmrs_entity_parent\": \"\",\n        \"openmrs_entity\": \"concept\",\n        \"openmrs_entity_id\": \"161360AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\",\n        \"label\": \"Was the client referred?\",\n        \"label_text_style\": \"bold\",\n        \"type\": \"native_radio\",\n        \"options\": [\n          {\n            \"key\": \"yes\",\n            \"text\": \"Yes\",\n            \"openmrs_entity_parent\": \"\",\n            \"openmrs_entity\": \"concept\",\n            \"openmrs_entity_id\": \"1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"\n          },\n          {\n            \"key\": \"no\",\n            \"text\": \"No\",\n            \"openmrs_entity_parent\": \"\",\n            \"openmrs_entity\": \"concept\",\n            \"openmrs_entity_id\": \"1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"\n          }\n        ]\n      },\n      {\n        \"key\": \"referral_location_med_lab\",\n        \"openmrs_entity_parent\": \"\",\n        \"openmrs_entity\": \"concept\",\n        \"openmrs_entity_id\": \"1272AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\",\n        \"hint\": \"Where were they referred to?\",\n        \"label_text_style\": \"bold\",\n        \"type\": \"tree\"\n      },\n      {\n        \"key\": \"visit_id\",\n        \"openmrs_entity_parent\": \"\",\n        \"openmrs_entity\": \"\",\n        \"openmrs_entity_id\": \"\",\n        \"type\": \"hidden\"\n      },\n      {\n        \"key\": \"visit_date\",\n        \"openmrs_entity_parent\": \"\",\n        \"openmrs_entity\": \"\",\n        \"openmrs_entity_id\": \"\",\n        \"type\": \"hidden\"\n      }\n    ]\n  },\n  \"baseEntityId\": \"d8c3e0bd-bfd1-448c-9236-ff887f56820d\"\n}";
+        JSONObject formObject = new JSONObject(form);
+        PowerMockito.mockStatic(OpdUtils.class);
+        PowerMockito.mockStatic(LocationHelper.class);
+        OpdMetadata mockOPdData = Mockito.spy(opdMetadata);
+        PowerMockito.doReturn(mockOPdData).when(OpdUtils.class, "metadata");
+        Set<String> key = new HashSet<>();
+        key.add("referral_location_med_lab");
+        PowerMockito.when(mockOPdData.getFieldsWithLocationHierarchy()).thenReturn(key);
+
+        LocationHelper locationHelper = Mockito.mock(LocationHelper.class);
+        PowerMockito.when(LocationHelper.getInstance()).thenReturn(locationHelper);
+
+        List<String> allLevels = new ArrayList<>();
+        allLevels.add("Country");
+        allLevels.add("Province");
+        allLevels.add("District");
+        allLevels.add("Facility");
+        allLevels.add("Village");
+        PowerMockito.doReturn(allLevels).when(mockOPdData).getLocationLevels();
+
+        List<String> healthFacilities = new ArrayList<>();
+        healthFacilities.add("Country");
+        healthFacilities.add("Province");
+        healthFacilities.add("District");
+        healthFacilities.add("Facility");
+        healthFacilities.add("Village");
+        PowerMockito.doReturn(healthFacilities).when(mockOPdData).getHealthFacilityLevels();
+
+        List<String> defaultLocation = new ArrayList<>();
+        defaultLocation.add("MOH MALAWI Govt");
+        defaultLocation.add("Central West Zone");
+        defaultLocation.add("Central West Zone");
+        defaultLocation.add("Ntcheu-DHO");
+        PowerMockito.doReturn(defaultLocation).when(locationHelper).generateDefaultLocationHierarchy(allLevels);
+
+
+        List<String> defaultFacility = new ArrayList<>();
+        defaultFacility.add("MOH MALAWI Govt");
+        defaultFacility.add("Central West Zon");
+        defaultFacility.add("Ntcheu-DHO");
+        defaultFacility.add("Bilila Health Centre");
+        PowerMockito.doReturn(defaultFacility).when(locationHelper).generateDefaultLocationHierarchy(healthFacilities);
+
+        FormLocation formLocationA = new FormLocation();
+        formLocationA.key = "MOH MALAWI Govt";
+        formLocationA.name = "MOH MALAWI Govt";
+
+        FormLocation formLocationB = new FormLocation();
+        formLocationB.key = "Central West Zon";
+        formLocationB.name = "Central West Zon";
+        ArrayList<FormLocation> nodes = new ArrayList<>();
+        nodes.add(formLocationA);
+        formLocationA.nodes = nodes;
+
+        OpdJsonFormUtils.addRegLocHierarchyQuestions(formObject);
+        JSONObject step1 = formObject.getJSONObject("step1");
+        JSONArray fields = step1.getJSONArray("fields");
+        JSONObject hierarchy = fields.optJSONObject( 1);
+
+        Assert.assertTrue(hierarchy.has("default"));
+
+    }
 }
+

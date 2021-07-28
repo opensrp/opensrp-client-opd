@@ -49,6 +49,7 @@ import static org.smartregister.opd.utils.OpdConstants.KEY.KEY;
 import static org.smartregister.util.JsonFormUtils.gson;
 
 
+
 public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<ProfileAction> implements OpdProfileFragmentContract.Presenter<ProfileAction> {
 
     private CallableInteractor callableInteractor;
@@ -208,7 +209,7 @@ public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<Profil
 
             // inject map value for repeating groups
             if (eventType.equalsIgnoreCase(OpdConstants.OpdModuleEventConstants.OPD_LABORATORY)) {
-                injectGroupMap(jsonObject);
+                OpdUtils.injectGroupMap(jsonObject);
             }
 
             NativeFormProcessor processor = OpdLibrary.getInstance().getFormProcessorFactory().createInstance(jsonObject);
