@@ -215,4 +215,322 @@ public class OpdUtilsTest {
         JSONObject resultObject = resultArray.getJSONObject(0);
         assertEquals("233AAAAAA", resultObject.optString(JsonFormConstants.OPENMRS_ENTITY_ID));
     }
+
+    @Test
+    public void testInjectValueMap() throws JSONException {
+        String form = "{\n" +
+                "  \"count\": \"1\",\n" +
+                "  \"encounter_type\": \"OPD_Laboratory\",\n" +
+                "  \"step1\": {\n" +
+                "    \"title\": \"Lab\",\n" +
+                "    \"fields\": [\n" +
+                "      {\n" +
+                "        \"key\": \"tests_repeating_group_count\",\n" +
+                "        \"openmrs_entity_parent\": \"\",\n" +
+                "        \"openmrs_entity\": \"\",\n" +
+                "        \"openmrs_entity_id\": \"\",\n" +
+                "        \"type\": \"\",\n" +
+                "        \"value\": 2,\n" +
+                "        \"text\": \"# of tests\"\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"key\": \"diagnostic_test_ebabd87976f3464e97052f7d77ac68a5\",\n" +
+                "        \"openmrs_entity_parent\": \"\",\n" +
+                "        \"openmrs_entity\": \"\",\n" +
+                "        \"openmrs_entity_id\": \"\",\n" +
+                "        \"hint\": \"The type of test conducted\",\n" +
+                "        \"type\": \"spinner\",\n" +
+                "        \"values\": [\n" +
+                "          \"Pregnancy Test\",\n" +
+                "          \"Ultra sound\",\n" +
+                "          \"Malaria - Microscopy\",\n" +
+                "          \"HIV test\",\n" +
+                "          \"Syphilis Test - VDRL\",\n" +
+                "          \"Hep B test\",\n" +
+                "          \"Hep C test\",\n" +
+                "          \"Blood Type test\",\n" +
+                "          \"TB Screening\",\n" +
+                "          \"Blood Glucose test (random plasma glucose test)\",\n" +
+                "          \"Midstream urine Gram-staining\",\n" +
+                "          \"Malaria - MRDT\",\n" +
+                "          \"TB Gene Xpert\",\n" +
+                "          \"TB smear microscopy\",\n" +
+                "          \"TB urine LAM\",\n" +
+                "          \"Urine dipstick\",\n" +
+                "          \"Hemocue (haemoglobinometer)\",\n" +
+                "          \"HIV Viral Load\",\n" +
+                "          \"HIV EID\",\n" +
+                "          \"HIV test - Rapid Test\",\n" +
+                "          \"Other(specify)\"\n" +
+                "        ],\n" +
+                "        \"keys\": [\n" +
+                "          \"pregnancy_test\",\n" +
+                "          \"ultra_sound\",\n" +
+                "          \"malaria_microscopy\",\n" +
+                "          \"hiv_test\",\n" +
+                "          \"syphilis_vdrl\",\n" +
+                "          \"hep_b\",\n" +
+                "          \"hep_c\",\n" +
+                "          \"blood_type\",\n" +
+                "          \"tb_screening\",\n" +
+                "          \"blood_glucose_random_plasma_glucose_test\",\n" +
+                "          \"midstream_urine_gram_staining\",\n" +
+                "          \"malaria_mrdt\",\n" +
+                "          \"tb_gene_xpert\",\n" +
+                "          \"tb_smear_microscopy\",\n" +
+                "          \"tb_urine_lam\",\n" +
+                "          \"urine_dipstick\",\n" +
+                "          \"hemocue_haemoglobinometer\",\n" +
+                "          \"hiv_viral_load\",\n" +
+                "          \"hiv_eid\",\n" +
+                "          \"hiv_test_rapid\",\n" +
+                "          \"other\"\n" +
+                "        ],\n" +
+                "        \"step\": \"step1\",\n" +
+                "        \"is-rule-check\": true,\n" +
+                "        \"value\": \"hep_b\"\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"key\": \"diagnostic_test_result_other_ebabd87976f3464e97052f7d77ac68a5\",\n" +
+                "        \"openmrs_entity_parent\": \"\",\n" +
+                "        \"openmrs_entity\": \"concept\",\n" +
+                "        \"openmrs_entity_id\": \"160218AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\",\n" +
+                "        \"type\": \"edit_text\",\n" +
+                "        \"hint\": \"Specify the result of the test\",\n" +
+                "        \"edit_type\": \"name\",\n" +
+                "        \"v_required\": {\n" +
+                "          \"value\": true,\n" +
+                "          \"err\": \"Please specify the result of the test\"\n" +
+                "        },\n" +
+                "        \"is_visible\": false\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"key\": \"diagnostic_test_result_ebabd87976f3464e97052f7d77ac68a5\",\n" +
+                "        \"openmrs_entity_parent\": \"\",\n" +
+                "        \"openmrs_entity\": \"\",\n" +
+                "        \"openmrs_entity_id\": \"\",\n" +
+                "        \"hint\": \"The result of the test conducted\",\n" +
+                "        \"type\": \"spinner\",\n" +
+                "        \"values\": [\n" +
+                "          \"Positive\",\n" +
+                "          \"Negative\",\n" +
+                "          \"Inconclusive\"\n" +
+                "        ],\n" +
+                "        \"is_visible\": true,\n" +
+                "        \"value\": \"Positive\"\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"key\": \"diagnostic_test_result_blood_type_ebabd87976f3464e97052f7d77ac68a5\",\n" +
+                "        \"openmrs_entity_parent\": \"\",\n" +
+                "        \"openmrs_entity\": \"\",\n" +
+                "        \"openmrs_entity_id\": \"\",\n" +
+                "        \"hint\": \"The result of the test conducted\",\n" +
+                "        \"type\": \"spinner\",\n" +
+                "        \"values\": [\n" +
+                "          \"A(Positive)\",\n" +
+                "          \"B(Positive)\",\n" +
+                "          \"AB(Positive)\",\n" +
+                "          \"O(Positive)\",\n" +
+                "          \"O(Negative)\",\n" +
+                "          \"A(Negative)\",\n" +
+                "          \"B(Negative)\",\n" +
+                "          \"AB(Negative)\"\n" +
+                "        ],\n" +
+                "        \"is_visible\": false\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"key\": \"diagnostic_test_result_tb_gene_xpert_ebabd87976f3464e97052f7d77ac68a5\",\n" +
+                "        \"openmrs_entity_parent\": \"\",\n" +
+                "        \"openmrs_entity\": \"\",\n" +
+                "        \"openmrs_entity_id\": \"\",\n" +
+                "        \"hint\": \"Test Result\",\n" +
+                "        \"type\": \"spinner\",\n" +
+                "        \"values\": [\n" +
+                "          \"MTB Detected & RR Not detected\",\n" +
+                "          \"RR Detected & MTB Not Detected\",\n" +
+                "          \"MTB Not Detected\",\n" +
+                "          \"Error/Indeterminate\"\n" +
+                "        ],\n" +
+                "        \"is_visible\": false\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"key\": \"diagnostic_test_result_tb_smear_microscopy_ebabd87976f3464e97052f7d77ac68a5\",\n" +
+                "        \"openmrs_entity_parent\": \"\",\n" +
+                "        \"openmrs_entity\": \"\",\n" +
+                "        \"openmrs_entity_id\": \"\",\n" +
+                "        \"hint\": \"Test Result\",\n" +
+                "        \"type\": \"spinner\",\n" +
+                "        \"values\": [\n" +
+                "          \"Negative\",\n" +
+                "          \"Scanty\",\n" +
+                "          \"1+\",\n" +
+                "          \"2+\",\n" +
+                "          \"3+\"\n" +
+                "        ],\n" +
+                "        \"keys\": [\n" +
+                "          \"negative\",\n" +
+                "          \"scanty\",\n" +
+                "          \"1+\",\n" +
+                "          \"2+\",\n" +
+                "          \"3+\"\n" +
+                "        ],\n" +
+                "        \"is_visible\": false\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"key\": \"diagnostic_test_result_urine_dipstick_nitrites_ebabd87976f3464e97052f7d77ac68a5\",\n" +
+                "        \"openmrs_entity_parent\": \"\",\n" +
+                "        \"openmrs_entity\": \"\",\n" +
+                "        \"openmrs_entity_id\": \"\",\n" +
+                "        \"hint\": \"Urine dipstick result - nitrites\",\n" +
+                "        \"type\": \"spinner\",\n" +
+                "        \"values\": [\n" +
+                "          \"None\",\n" +
+                "          \"+\",\n" +
+                "          \"++\",\n" +
+                "          \"+++\",\n" +
+                "          \"++++\"\n" +
+                "        ],\n" +
+                "        \"keys\": [\n" +
+                "          \"none\",\n" +
+                "          \"+\",\n" +
+                "          \"++\",\n" +
+                "          \"+++\",\n" +
+                "          \"++++\"\n" +
+                "        ],\n" +
+                "        \"is_visible\": false\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"key\": \"diagnostic_test_result_urine_dipstick_leukocytes_ebabd87976f3464e97052f7d77ac68a5\",\n" +
+                "        \"openmrs_entity_parent\": \"\",\n" +
+                "        \"openmrs_entity\": \"\",\n" +
+                "        \"openmrs_entity_id\": \"\",\n" +
+                "        \"hint\": \"Urine dipstick result - leukocytes\",\n" +
+                "        \"type\": \"spinner\",\n" +
+                "        \"values\": [\n" +
+                "          \"None\",\n" +
+                "          \"+\",\n" +
+                "          \"++\",\n" +
+                "          \"+++\",\n" +
+                "          \"++++\"\n" +
+                "        ],\n" +
+                "        \"keys\": [\n" +
+                "          \"none\",\n" +
+                "          \"+\",\n" +
+                "          \"++\",\n" +
+                "          \"+++\",\n" +
+                "          \"++++\"\n" +
+                "        ],\n" +
+                "        \"is_visible\": false\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"key\": \"diagnostic_test_result_urine_dipstick_protein_ebabd87976f3464e97052f7d77ac68a5\",\n" +
+                "        \"openmrs_entity_parent\": \"\",\n" +
+                "        \"openmrs_entity\": \"\",\n" +
+                "        \"openmrs_entity_id\": \"\",\n" +
+                "        \"hint\": \"Urine dipstick result - protein\",\n" +
+                "        \"type\": \"spinner\",\n" +
+                "        \"values\": [\n" +
+                "          \"None\",\n" +
+                "          \"+\",\n" +
+                "          \"++\",\n" +
+                "          \"+++\",\n" +
+                "          \"++++\"\n" +
+                "        ],\n" +
+                "        \"keys\": [\n" +
+                "          \"none\",\n" +
+                "          \"+\",\n" +
+                "          \"++\",\n" +
+                "          \"+++\",\n" +
+                "          \"++++\"\n" +
+                "        ],\n" +
+                "        \"is_visible\": false\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"key\": \"diagnostic_test_result_urine_dipstick_glucose_ebabd87976f3464e97052f7d77ac68a5\",\n" +
+                "        \"openmrs_entity_parent\": \"\",\n" +
+                "        \"openmrs_entity\": \"\",\n" +
+                "        \"openmrs_entity_id\": \"\",\n" +
+                "        \"hint\": \"Urine dipstick result - glucose\",\n" +
+                "        \"type\": \"spinner\",\n" +
+                "        \"values\": [\n" +
+                "          \"None\",\n" +
+                "          \"+\",\n" +
+                "          \"++\",\n" +
+                "          \"+++\",\n" +
+                "          \"++++\"\n" +
+                "        ],\n" +
+                "        \"keys\": [\n" +
+                "          \"none\",\n" +
+                "          \"+\",\n" +
+                "          \"++\",\n" +
+                "          \"+++\",\n" +
+                "          \"++++\"\n" +
+                "        ],\n" +
+                "        \"is_visible\": false\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"key\": \"diagnostic_test_result_hiv_viral_load_ebabd87976f3464e97052f7d77ac68a5\",\n" +
+                "        \"openmrs_entity_parent\": \"\",\n" +
+                "        \"openmrs_entity\": \"\",\n" +
+                "        \"openmrs_entity_id\": \"\",\n" +
+                "        \"hint\": \"HIV Viral Load\",\n" +
+                "        \"type\": \"spinner\",\n" +
+                "        \"values\": [\n" +
+                "          \"Detectable\",\n" +
+                "          \"Undetectable\"\n" +
+                "        ],\n" +
+                "        \"step\": \"step1\",\n" +
+                "        \"is-rule-check\": true,\n" +
+                "        \"is_visible\": false\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"key\": \"diagnostic_test_result_hiv_viral_load_no_ebabd87976f3464e97052f7d77ac68a5\",\n" +
+                "        \"openmrs_entity_parent\": \"\",\n" +
+                "        \"openmrs_entity\": \"\",\n" +
+                "        \"openmrs_entity_id\": \"\",\n" +
+                "        \"hint\": \"HIV Viral Load - Detectable\",\n" +
+                "        \"type\": \"edit_text\",\n" +
+                "        \"is_visible\": false\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"key\": \"diagnostic_test_result_glucose_ebabd87976f3464e97052f7d77ac68a5\",\n" +
+                "        \"openmrs_entity_parent\": \"\",\n" +
+                "        \"openmrs_entity\": \"\",\n" +
+                "        \"openmrs_entity_id\": \"\",\n" +
+                "        \"hint\": \"The result of the test conducted\",\n" +
+                "        \"type\": \"edit_text\",\n" +
+                "        \"edit_type\": \"number\",\n" +
+                "        \"v_regex\": {\n" +
+                "          \"value\": \"^[0-9]+(\\\\.)[0-9]+?$\",\n" +
+                "          \"err\": \"Please enter a valid result\"\n" +
+                "        },\n" +
+                "        \"is_visible\": false\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"key\": \"diagnostic_test_result_specify_ebabd87976f3464e97052f7d77ac68a5\",\n" +
+                "        \"openmrs_entity_parent\": \"\",\n" +
+                "        \"openmrs_entity\": \"\",\n" +
+                "        \"openmrs_entity_id\": \"\",\n" +
+                "        \"hint\": \"The result of the test conducted\",\n" +
+                "        \"type\": \"edit_text\",\n" +
+                "        \"is_visible\": false\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"key\": \"spacer_ebabd87976f3464e97052f7d77ac68a5\",\n" +
+                "        \"openmrs_entity_parent\": \"\",\n" +
+                "        \"openmrs_entity\": \"\",\n" +
+                "        \"openmrs_entity_id\": \"spacer\",\n" +
+                "        \"type\": \"spacer\",\n" +
+                "        \"spacer_height\": \"40sp\"\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  },\n" +
+                "  \"baseEntityId\": \"d8c3e0bd-bfd1-448c-9236-ff887f56820d\"\n" +
+                "}";
+        JSONObject formObject = new JSONObject(form);
+        OpdUtils.injectGroupMap(formObject);
+        JSONArray fields = formObject.getJSONObject("step1").getJSONArray("fields");
+        JSONObject repeatingGroup = fields.optJSONObject(fields.length() - 1);
+        assertTrue(repeatingGroup != null);
+    }
 }

@@ -40,7 +40,6 @@ import timber.log.Timber;
 import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_EXTRA.STEP1;
 import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_KEY.ENCOUNTER_TYPE;
 import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_KEY.FIELDS;
-import static org.smartregister.util.JsonFormUtils.gson;
 
 public class NewOpdProfileVisitsFragmentPresenter extends ListPresenter<ProfileHistory> implements OpdProfileFragmentContract.Presenter<ProfileHistory> {
 
@@ -205,7 +204,7 @@ public class NewOpdProfileVisitsFragmentPresenter extends ListPresenter<ProfileH
 
                 // inject map value for repeating groups
                 if (eventType.equalsIgnoreCase(OpdConstants.OpdModuleEventConstants.OPD_LABORATORY)) {
-                    injectGroupMap(jsonObject);
+                    OpdUtils.injectGroupMap(jsonObject);
                 }
 
 
@@ -251,24 +250,6 @@ public class NewOpdProfileVisitsFragmentPresenter extends ListPresenter<ProfileH
             Timber.e(ex.getMessage());
         }
 
-    }
-
-    private void injectGroupMap(JSONObject jsonObject) throws JSONException {
-        JSONObject step = jsonObject.getJSONObject(STEP1);
-        JSONArray fields = step.optJSONArray(OpdJsonFormUtils.FIELDS);
-        HashMap<String, HashMap<String, String>> buildRepeatingGroupTests = OpdUtils.buildRepeatingGroupTests(step);
-        if (!buildRepeatingGroupTests.isEmpty()) {
-            String strTest = gson.toJson(buildRepeatingGroupTests);
-            JSONObject repeatingGroupObj = new JSONObject();
-            repeatingGroupObj.put(JsonFormConstants.KEY, OpdConstants.REPEATING_GROUP_MAP);
-            repeatingGroupObj.put(JsonFormConstants.VALUE, strTest);
-            repeatingGroupObj.put(JsonFormConstants.TYPE, JsonFormConstants.HIDDEN);
-            if (fields != null) {
-                fields.put(repeatingGroupObj);
-                step.put(OpdJsonFormUtils.FIELDS, fields);
-                jsonObject.put(STEP1, step);
-            }
-        }
     }
 
     @Override
