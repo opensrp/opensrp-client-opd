@@ -8,6 +8,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.smartregister.AllConstants;
+import org.smartregister.NativeFormFieldProcessor;
+import org.smartregister.clientandeventmodel.Event;
+import org.smartregister.clientandeventmodel.Obs;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.contract.OpdProfileFragmentContract;
@@ -27,15 +31,21 @@ import org.smartregister.util.Utils;
 import org.smartregister.view.ListContract;
 import org.smartregister.view.presenter.ListPresenter;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
 import timber.log.Timber;
 
+import static com.vijay.jsonwizard.constants.JsonFormConstants.OPENMRS_ENTITY;
+import static com.vijay.jsonwizard.constants.JsonFormConstants.OPENMRS_ENTITY_ID;
+import static com.vijay.jsonwizard.constants.JsonFormConstants.OPENMRS_ENTITY_PARENT;
 import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_EXTRA.STEP1;
 import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_KEY.ENCOUNTER_TYPE;
 import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_KEY.FIELDS;
+import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_KEY.VALUE;
+import static org.smartregister.opd.utils.OpdConstants.KEY.KEY;
 import static org.smartregister.util.JsonFormUtils.gson;
 
 
@@ -137,10 +147,10 @@ public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<Profil
                 JSONArray fields = jsonObject.getJSONObject(STEP1).getJSONArray(FIELDS);
                 for (int i = 0; i < fields.length(); i++) {
                     JSONObject field = fields.getJSONObject(i);
-                    if (field.getString(OpdConstants.KEY.KEY).equals(OpdConstants.JSON_FORM_KEY.AGE)) {
-                        field.put(OpdConstants.JSON_FORM_KEY.VALUE, age);
-                    } else if (field.getString(OpdConstants.KEY.KEY).equals(OpdConstants.JSON_FORM_KEY.GENDER)) {
-                        field.put(OpdConstants.JSON_FORM_KEY.VALUE, gender);
+                    if (field.getString(KEY).equals(OpdConstants.JSON_FORM_KEY.AGE)) {
+                        field.put(VALUE, age);
+                    } else if (field.getString(KEY).equals(OpdConstants.JSON_FORM_KEY.GENDER)) {
+                        field.put(VALUE, gender);
                     }
                 }
             }
@@ -207,9 +217,12 @@ public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<Profil
                     jsonObject.getString(OpdConstants.Properties.FORM_SUBMISSION_ID) : null;
 
 
+
+
             // update metadata
             processor.withBindType("ec_client")
                     .withEncounterType(eventType)
+                    .withFieldProcessors(getFieldProcessorMap())
                     .withFormSubmissionId(formSubmissionId)
                     .withEntityId(entityId)
                     .tagEventMetadata()
@@ -239,6 +252,30 @@ public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<Profil
                 view.setLoadingState(false);
             }
         });
+    }
+
+    private Map<String, NativeFormFieldProcessor> getFieldProcessorMap(){
+        Map<String, NativeFormFieldProcessor> fieldProcessorMap = new HashMap<>();
+        fieldProcessorMap.put(OpdConstants.JsonFormWidget.MULTI_SELECT_DRUG_PICKER, (event, jsonObject1) -> {
+            JSONArray valuesJsonArray;
+            try {
+                valuesJsonArray = new JSONArray(jsonObject1.optString(VALUE));
+                for (int i = 0; i < valuesJsonArray.length(); i++) {
+                    JSONObject jsonValObject = valuesJsonArray.optJSONObject(i);
+                    String fieldType = jsonValObject.optString(OPENMRS_ENTITY);
+                    String fieldCode = jsonObject1.optString(OPENMRS_ENTITY_ID);
+                    String parentCode = jsonObject1.optString(OPENMRS_ENTITY_PARENT);
+                    String value = jsonValObject.optString(OPENMRS_ENTITY_ID);
+                    String humanReadableValues = jsonValObject.optString(AllConstants.TEXT);
+                    String formSubmissionField = jsonObject1.optString(KEY);
+                    event.addObs(new Obs(fieldType, AllConstants.TEXT, fieldCode, parentCode, Collections.singletonList(value),
+                            Collections.singletonList(humanReadableValues), "", formSubmissionField));
+                }
+            } catch (JSONException e) {
+                Timber.e(e);
+            }
+        });
+        return fieldProcessorMap;
     }
 
     private void injectGroupMap(JSONObject jsonObject) throws JSONException {

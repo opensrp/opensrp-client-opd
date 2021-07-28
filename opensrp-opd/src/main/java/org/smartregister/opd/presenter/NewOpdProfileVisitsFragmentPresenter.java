@@ -8,6 +8,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.smartregister.AllConstants;
+import org.smartregister.NativeFormFieldProcessor;
+import org.smartregister.clientandeventmodel.Obs;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.domain.Event;
 import org.smartregister.opd.OpdLibrary;
@@ -29,6 +32,7 @@ import org.smartregister.view.ListContract;
 import org.smartregister.view.presenter.ListPresenter;
 
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -37,9 +41,14 @@ import java.util.concurrent.Callable;
 
 import timber.log.Timber;
 
+import static com.vijay.jsonwizard.constants.JsonFormConstants.OPENMRS_ENTITY;
+import static com.vijay.jsonwizard.constants.JsonFormConstants.OPENMRS_ENTITY_ID;
+import static com.vijay.jsonwizard.constants.JsonFormConstants.OPENMRS_ENTITY_PARENT;
 import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_EXTRA.STEP1;
 import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_KEY.ENCOUNTER_TYPE;
 import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_KEY.FIELDS;
+import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_KEY.VALUE;
+import static org.smartregister.opd.utils.OpdConstants.KEY.KEY;
 import static org.smartregister.util.JsonFormUtils.gson;
 
 public class NewOpdProfileVisitsFragmentPresenter extends ListPresenter<ProfileHistory> implements OpdProfileFragmentContract.Presenter<ProfileHistory> {
@@ -219,6 +228,9 @@ public class NewOpdProfileVisitsFragmentPresenter extends ListPresenter<ProfileH
                         .withEncounterType(title)
                         .withFormSubmissionId(formSubmissionId)
                         .withEntityId(entityId)
+                        .withFieldProcessors(getFieldProcessorMap())
+
+                        // process the data
                         .tagEventMetadata()
                         // create and save event to db
                         .saveEvent()
@@ -251,6 +263,30 @@ public class NewOpdProfileVisitsFragmentPresenter extends ListPresenter<ProfileH
             Timber.e(ex.getMessage());
         }
 
+    }
+
+    private Map<String, NativeFormFieldProcessor> getFieldProcessorMap(){
+        Map<String, NativeFormFieldProcessor> fieldProcessorMap = new HashMap<>();
+        fieldProcessorMap.put(OpdConstants.JsonFormWidget.MULTI_SELECT_DRUG_PICKER, (event, jsonObject1) -> {
+            JSONArray valuesJsonArray;
+            try {
+                valuesJsonArray = new JSONArray(jsonObject1.optString(VALUE));
+                for (int i = 0; i < valuesJsonArray.length(); i++) {
+                    JSONObject jsonValObject = valuesJsonArray.optJSONObject(i);
+                    String fieldType = jsonValObject.optString(OPENMRS_ENTITY);
+                    String fieldCode = jsonObject1.optString(OPENMRS_ENTITY_ID);
+                    String parentCode = jsonObject1.optString(OPENMRS_ENTITY_PARENT);
+                    String value = jsonValObject.optString(OPENMRS_ENTITY_ID);
+                    String humanReadableValues = jsonValObject.optString(AllConstants.TEXT);
+                    String formSubmissionField = jsonObject1.optString(KEY);
+                    event.addObs(new Obs(fieldType, AllConstants.TEXT, fieldCode, parentCode, Collections.singletonList(value),
+                            Collections.singletonList(humanReadableValues), "", formSubmissionField));
+                }
+            } catch (JSONException e) {
+                Timber.e(e);
+            }
+        });
+        return fieldProcessorMap;
     }
 
     private void injectGroupMap(JSONObject jsonObject) throws JSONException {
