@@ -546,64 +546,7 @@ public class OpdJsonFormUtilsTest {
 
     @Test
     public void testAttachLocationHierarchy() throws Exception {
-        String form = "{\n" +
-                "  \"count\": \"1\",\n" +
-                "  \"encounter_type\": \"OPD_Laboratory\",\n" +
-                "  \"step1\": {\n" +
-                "    \"title\": \"Lab\",\n" +
-                "    \"fields\": [\n" +
-                "      {\n" +
-                "        \"key\": \"referral_lab\",\n" +
-                "        \"openmrs_entity_parent\": \"\",\n" +
-                "        \"openmrs_entity\": \"concept\",\n" +
-                "        \"openmrs_entity_id\": \"161360AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\",\n" +
-                "        \"label\": \"Was the client referred?\",\n" +
-                "        \"label_text_style\": \"bold\",\n" +
-                "        \"type\": \"native_radio\",\n" +
-                "        \"options\": [\n" +
-                "          {\n" +
-                "            \"key\": \"yes\",\n" +
-                "            \"text\": \"Yes\",\n" +
-                "            \"openmrs_entity_parent\": \"\",\n" +
-                "            \"openmrs_entity\": \"concept\",\n" +
-                "            \"openmrs_entity_id\": \"1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"\n" +
-                "          },\n" +
-                "          {\n" +
-                "            \"key\": \"no\",\n" +
-                "            \"text\": \"No\",\n" +
-                "            \"openmrs_entity_parent\": \"\",\n" +
-                "            \"openmrs_entity\": \"concept\",\n" +
-                "            \"openmrs_entity_id\": \"1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"\n" +
-                "          }\n" +
-                "        ]\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"key\": \"referral_location_med_lab\",\n" +
-                "        \"openmrs_entity_parent\": \"\",\n" +
-                "        \"openmrs_entity\": \"concept\",\n" +
-                "        \"openmrs_entity_id\": \"1272AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\",\n" +
-                "        \"hint\": \"Where were they referred to?\",\n" +
-                "        \"label_text_style\": \"bold\",\n" +
-                "        \"type\": \"tree\"\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"key\": \"visit_id\",\n" +
-                "        \"openmrs_entity_parent\": \"\",\n" +
-                "        \"openmrs_entity\": \"\",\n" +
-                "        \"openmrs_entity_id\": \"\",\n" +
-                "        \"type\": \"hidden\"\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"key\": \"visit_date\",\n" +
-                "        \"openmrs_entity_parent\": \"\",\n" +
-                "        \"openmrs_entity\": \"\",\n" +
-                "        \"openmrs_entity_id\": \"\",\n" +
-                "        \"type\": \"hidden\"\n" +
-                "      }\n" +
-                "    ]\n" +
-                "  },\n" +
-                "  \"baseEntityId\": \"d8c3e0bd-bfd1-448c-9236-ff887f56820d\"\n" +
-                "}";
+        String form = "{\n  \"count\": \"1\",\n  \"encounter_type\": \"OPD_Laboratory\",\n  \"step1\": {\n    \"title\": \"Lab\",\n    \"fields\": [\n      {\n        \"key\": \"referral_lab\",\n        \"openmrs_entity_parent\": \"\",\n        \"openmrs_entity\": \"concept\",\n        \"openmrs_entity_id\": \"161360AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\",\n        \"label\": \"Was the client referred?\",\n        \"label_text_style\": \"bold\",\n        \"type\": \"native_radio\",\n        \"options\": [\n          {\n            \"key\": \"yes\",\n            \"text\": \"Yes\",\n            \"openmrs_entity_parent\": \"\",\n            \"openmrs_entity\": \"concept\",\n            \"openmrs_entity_id\": \"1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"\n          },\n          {\n            \"key\": \"no\",\n            \"text\": \"No\",\n            \"openmrs_entity_parent\": \"\",\n            \"openmrs_entity\": \"concept\",\n            \"openmrs_entity_id\": \"1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"\n          }\n        ]\n      },\n      {\n        \"key\": \"referral_location_med_lab\",\n        \"openmrs_entity_parent\": \"\",\n        \"openmrs_entity\": \"concept\",\n        \"openmrs_entity_id\": \"1272AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\",\n        \"hint\": \"Where were they referred to?\",\n        \"label_text_style\": \"bold\",\n        \"type\": \"tree\"\n      },\n      {\n        \"key\": \"visit_id\",\n        \"openmrs_entity_parent\": \"\",\n        \"openmrs_entity\": \"\",\n        \"openmrs_entity_id\": \"\",\n        \"type\": \"hidden\"\n      },\n      {\n        \"key\": \"visit_date\",\n        \"openmrs_entity_parent\": \"\",\n        \"openmrs_entity\": \"\",\n        \"openmrs_entity_id\": \"\",\n        \"type\": \"hidden\"\n      }\n    ]\n  },\n  \"baseEntityId\": \"d8c3e0bd-bfd1-448c-9236-ff887f56820d\"\n}";
         JSONObject formObject = new JSONObject(form);
         PowerMockito.mockStatic(OpdUtils.class);
         PowerMockito.mockStatic(LocationHelper.class);
