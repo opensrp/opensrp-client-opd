@@ -195,6 +195,7 @@ public class OpdConstants extends AllConstants {
         public static final String SERVICE_FEE = "service_fee";
         public static final String VISIT_ID = "visitId";
         public static final String MEDICINE = "medicine";
+        public static final String MEDICINE_OBJECT = "medicine_object";
         public static final String DOSAGE = "dosage";
         public static final String DURATION = "duration";
         public static final String INFO = "info";

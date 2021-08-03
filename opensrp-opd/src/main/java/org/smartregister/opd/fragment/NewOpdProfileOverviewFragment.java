@@ -128,7 +128,7 @@ public class NewOpdProfileOverviewFragment extends BaseListFragment<ProfileActio
             formGlobalValues.clear();
             for (String globalKey : globalKeys) {
                 if (savedValues.containsKey(globalKey)) {
-                    if (globalKey.equalsIgnoreCase(OpdConstants.JSON_FORM_KEY.MEDICINE) && !savedValues.get(globalKey).isEmpty()) {
+                    if (globalKey.equalsIgnoreCase(OpdConstants.JSON_FORM_KEY.MEDICINE_OBJECT) && !savedValues.get(globalKey).isEmpty()) {
                         String medidcineString = OpdJsonFormUtils.getMedicineNoteString(savedValues.get(globalKey));
                         formGlobalValues.put(globalKey, medidcineString);
                     } else {
