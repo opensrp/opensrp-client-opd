@@ -15,6 +15,7 @@ import org.smartregister.opd.exception.CheckInEventProcessException;
 import org.smartregister.opd.model.Visit;
 import org.smartregister.opd.model.VisitDetail;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -153,7 +154,7 @@ public class VisitUtils {
         }
     }
 
-    public static String getDetailsValue(VisitDetail detail, String val) {
+   /* public static String getDetailsValue(VisitDetail detail, String val) {
         String clean_val = cleanString(val);
         if (detail.getVisitKey().contains("date")) {
             return getFormattedDate(getSourceDateFormat(), getSaveDateFormat(), clean_val);
@@ -161,8 +162,28 @@ public class VisitUtils {
 
         return clean_val;
     }
+*/
+    public static String getDetailsValue(VisitDetail detail, String val) {
+        String clean_val = cleanString(val);
+        if (detail.getVisitKey().contains("date") && StringUtils.isNotBlank(clean_val) && isValidDate(clean_val)) {
+            return getFormattedDate(getSourceDateFormat(), getSaveDateFormat(), clean_val);
+        }
 
-    public static String getFormattedDate(SimpleDateFormat source_sdf, SimpleDateFormat dest_sdf, String value) {
+        return clean_val;
+    }
+
+    public static boolean isValidDate(String inDate) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss:ms");
+        dateFormat.setLenient(false);
+        try {
+            dateFormat.parse(inDate.trim());
+        } catch (ParseException pe) {
+            return false;
+        }
+        return true;
+    }
+
+        public static String getFormattedDate(SimpleDateFormat source_sdf, SimpleDateFormat dest_sdf, String value) {
         try {
             Date date = source_sdf.parse(value);
             return dest_sdf.format(date);
