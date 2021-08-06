@@ -105,6 +105,12 @@ public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<Profil
         if (values.containsKey("disease_code_final_diagn"))
             values.put("disease_code_final_diagn", values.get("disease_code_object_final"));
 
+        if (values.containsKey("medicine"))
+            values.put("medicine", values.get("medicine_object"));
+
+        if (values.containsKey("medicine_pharmacy"))
+            values.put("medicine_pharmacy", values.get("medicine_pharmacy_object"));
+
         // inject values
         processor.populateValues(values, jsonObject1 -> {
             try {
