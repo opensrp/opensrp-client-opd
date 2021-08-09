@@ -85,7 +85,7 @@ public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements 
 
                 writeAdditionalDetails(duration, dosage, frequency, multiSelectItem);
 
-                writeToForm();
+                writeToForm(currentAdapterKey);
 
                 alertDialog.dismiss();
 
