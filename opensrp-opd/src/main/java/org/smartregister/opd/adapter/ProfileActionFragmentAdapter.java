@@ -46,15 +46,16 @@ public class ProfileActionFragmentAdapter extends ListableAdapter<ProfileAction,
         public void bindView(ProfileAction profileAction, ListContract.View<ProfileAction> view) {
             tvAction.setText(profileAction.getName());
 
-            currentView.setOnClickListener(v -> view.onListItemClicked(profileAction.setSelectedAction(null), v.getId()));
-
+          //  currentView.setOnClickListener(v -> view.onListItemClicked(profileAction.setSelectedAction(null), v.getId()));
+            tvAction.setOnClickListener(v -> view.onListItemClicked(profileAction.setSelectedAction(null), v.getId()));
             // add all the children
             if (profileAction.getVisits() != null) {
                 for (ProfileAction.ProfileActionVisit paVisit : profileAction.getVisits()) {
                     View childView = LayoutInflater.from(llHistory.getContext()).inflate(R.layout.profile_action_history, null, false);
                     TextView tvAction = childView.findViewById(R.id.tv_action);
                     tvAction.setText(paVisit.getVisitTime());
-
+                    tvAction.setOnClickListener(null);
+                    childView.findViewById(R.id.iv_history_Icon).setOnClickListener(null);
                     childView.findViewById(R.id.tv_edit).setOnClickListener(v -> view.onListItemClicked(profileAction.setSelectedAction(paVisit), v.getId()));
 
                     llHistory.addView(childView);

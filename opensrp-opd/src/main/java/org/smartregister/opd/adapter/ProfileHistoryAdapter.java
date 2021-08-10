@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -43,6 +44,7 @@ public class ProfileHistoryAdapter extends GroupedListableAdapter<ProfileHistory
         private TextView tvHeader;
         private TextView tvEvent;
         private TextView tvEdit;
+        private ImageView tvIcon;
 
         private ProfileHistoryViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -50,6 +52,7 @@ public class ProfileHistoryAdapter extends GroupedListableAdapter<ProfileHistory
             tvHeader = itemView.findViewById(R.id.tvHeader);
             tvEvent = itemView.findViewById(R.id.tv_action);
             tvEdit = itemView.findViewById(R.id.tv_edit);
+            tvIcon = itemView.findViewById(R.id.iv_history_Icon);
         }
 
         @SuppressLint("SetTextI18n")
@@ -60,6 +63,8 @@ public class ProfileHistoryAdapter extends GroupedListableAdapter<ProfileHistory
                 itemView.setVisibility(View.VISIBLE);
                 tvEvent.setText(history.getEventTime() + " " + visitType);
                 tvEdit.setOnClickListener(v -> view.onListItemClicked(history, v.getId()));
+                tvIcon.setOnClickListener(null);
+                tvEvent.setOnClickListener(null);
 
                 //This might Change Depending on View Functionality
                 if(!history.getEventDate().equals(context().getStringResource(R.string.today))){
