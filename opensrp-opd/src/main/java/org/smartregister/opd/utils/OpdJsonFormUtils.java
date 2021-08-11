@@ -42,6 +42,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import timber.log.Timber;
@@ -580,5 +581,19 @@ public class OpdJsonFormUtils extends JsonFormUtils {
             Timber.e(e, "OpdJsonFormUtils -> getLabResultsStringFromMap()");
             return new HashMap<>();
         }
+    }
+
+    public static void patchMultiSelectList(Map<String, Object> values) {
+        if (values.containsKey("disease_code_primary"))
+            values.put("disease_code_primary", values.get("disease_code_object"));
+
+        if (values.containsKey("disease_code_final_diagn"))
+            values.put("disease_code_final_diagn", values.get("disease_code_object_final"));
+
+        if (values.containsKey("medicine"))
+            values.put("medicine", values.get("medicine_object"));
+
+        if (values.containsKey("medicine_pharmacy"))
+            values.put("medicine_pharmacy", values.get("medicine_pharmacy_object"));
     }
 }

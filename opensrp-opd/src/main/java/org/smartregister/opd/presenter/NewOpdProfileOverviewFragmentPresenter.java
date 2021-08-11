@@ -10,7 +10,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.AllConstants;
 import org.smartregister.NativeFormFieldProcessor;
-import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.clientandeventmodel.Obs;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.opd.OpdLibrary;
@@ -46,7 +45,6 @@ import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_KEY.ENCOUNTER_T
 import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_KEY.FIELDS;
 import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_KEY.VALUE;
 import static org.smartregister.opd.utils.OpdConstants.KEY.KEY;
-import static org.smartregister.util.JsonFormUtils.gson;
 
 
 
@@ -99,17 +97,7 @@ public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<Profil
         Map<String, Object> values = processor.getFormResults(savedEvent);
 
         // multi_select_list
-        if (values.containsKey("disease_code_primary"))
-            values.put("disease_code_primary", values.get("disease_code_object"));
-
-        if (values.containsKey("disease_code_final_diagn"))
-            values.put("disease_code_final_diagn", values.get("disease_code_object_final"));
-
-        if (values.containsKey("medicine"))
-            values.put("medicine", values.get("medicine_object"));
-
-        if (values.containsKey("medicine_pharmacy"))
-            values.put("medicine_pharmacy", values.get("medicine_pharmacy_object"));
+        OpdJsonFormUtils.patchMultiSelectList(values);
 
         // inject values
         processor.populateValues(values, jsonObject1 -> {
@@ -179,7 +167,7 @@ public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<Profil
         Map<String, NativeFormProcessorFieldSource> elements = new HashMap<>();
 
         elements.put(JsonFormConstants.REPEATING_GROUP, new RepeatingGroupsValueSource(processor));
-        /**
+        /*
          elements.put(JsonFormConstants.REPEATING_GROUP, new NativeFormProcessorFieldSource() {
         @Override public <T> void populateValue(String stepName, JSONObject step, JSONObject fieldJson, Map<String, T> dictionary) {
         RepeatingGroupGenerator repeatingGroupGenerator = new RepeatingGroupGenerator(json.optJSONObject("step4"), stepName,
@@ -283,24 +271,6 @@ public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<Profil
             }
         });
         return fieldProcessorMap;
-    }
-
-    private void injectGroupMap(JSONObject jsonObject) throws JSONException {
-        JSONObject step = jsonObject.getJSONObject(STEP1);
-        JSONArray fields = step.optJSONArray(OpdJsonFormUtils.FIELDS);
-        HashMap<String, HashMap<String, String>> buildRepeatingGroupTests = OpdUtils.buildRepeatingGroupTests(step);
-        if (!buildRepeatingGroupTests.isEmpty()) {
-            String strTest = gson.toJson(buildRepeatingGroupTests);
-            JSONObject repeatingGroupObj = new JSONObject();
-            repeatingGroupObj.put(JsonFormConstants.KEY, OpdConstants.REPEATING_GROUP_MAP);
-            repeatingGroupObj.put(JsonFormConstants.VALUE, strTest);
-            repeatingGroupObj.put(JsonFormConstants.TYPE, JsonFormConstants.HIDDEN);
-            if (fields != null) {
-                fields.put(repeatingGroupObj);
-                step.put(OpdJsonFormUtils.FIELDS, fields);
-                jsonObject.put(STEP1, step);
-            }
-        }
     }
 
     @Override

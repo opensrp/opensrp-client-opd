@@ -49,7 +49,6 @@ import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_KEY.ENCOUNTER_T
 import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_KEY.FIELDS;
 import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_KEY.VALUE;
 import static org.smartregister.opd.utils.OpdConstants.KEY.KEY;
-import static org.smartregister.util.JsonFormUtils.gson;
 
 
 public class NewOpdProfileVisitsFragmentPresenter extends ListPresenter<ProfileHistory> implements OpdProfileFragmentContract.Presenter<ProfileHistory> {
@@ -108,20 +107,7 @@ public class NewOpdProfileVisitsFragmentPresenter extends ListPresenter<ProfileH
         jsonObject.put(OpdConstants.Properties.FORM_SUBMISSION_ID, formSubmissionId);
 
         // little hack for pesky multi_select_list
-        if (values.containsKey("disease_code_primary"))
-            values.put("disease_code_primary", values.get("disease_code_object"));
-
-        // little hack for pesky multi_select_list
-        if (values.containsKey("disease_code_final_diagn"))
-            values.put("disease_code_final_diagn", values.get("disease_code_object_final"));
-
-        // little hack for pesky multi_select_list
-        if (values.containsKey("medicine"))
-            values.put("medicine", values.get("medicine_object"));
-
-        // little hack for pesky multi_select_list
-        if (values.containsKey("medicine_pharmacy"))
-            values.put("medicine_pharmacy", values.get("medicine_pharmacy_object"));
+        OpdJsonFormUtils.patchMultiSelectList(values);
 
         // inject values
       /*  processor.populateValues(values, jsonObject1 -> {
@@ -171,10 +157,10 @@ public class NewOpdProfileVisitsFragmentPresenter extends ListPresenter<ProfileH
                 JSONArray fields = jsonObject.getJSONObject(STEP1).getJSONArray(FIELDS);
                 for (int i = 0; i < fields.length(); i++) {
                     JSONObject field = fields.getJSONObject(i);
-                    if (field.getString(OpdConstants.KEY.KEY).equals(OpdConstants.JSON_FORM_KEY.AGE)) {
-                        field.put(OpdConstants.JSON_FORM_KEY.VALUE, age);
-                    } else if (field.getString(OpdConstants.KEY.KEY).equals(OpdConstants.JSON_FORM_KEY.GENDER)) {
-                        field.put(OpdConstants.JSON_FORM_KEY.VALUE, gender);
+                    if (field.getString(KEY).equals(OpdConstants.JSON_FORM_KEY.AGE)) {
+                        field.put(VALUE, age);
+                    } else if (field.getString(KEY).equals(OpdConstants.JSON_FORM_KEY.GENDER)) {
+                        field.put(VALUE, gender);
                     }
                 }
             }
@@ -269,7 +255,7 @@ public class NewOpdProfileVisitsFragmentPresenter extends ListPresenter<ProfileH
             });
 
         } catch (Exception ex) {
-            Timber.e(ex.getMessage());
+            Timber.e(ex);
         }
 
     }
@@ -296,24 +282,6 @@ public class NewOpdProfileVisitsFragmentPresenter extends ListPresenter<ProfileH
             }
         });
         return fieldProcessorMap;
-    }
-
-    private void injectGroupMap(JSONObject jsonObject) throws JSONException {
-        JSONObject step = jsonObject.getJSONObject(STEP1);
-        JSONArray fields = step.optJSONArray(OpdJsonFormUtils.FIELDS);
-        HashMap<String, HashMap<String, String>> buildRepeatingGroupTests = OpdUtils.buildRepeatingGroupTests(step);
-        if (!buildRepeatingGroupTests.isEmpty()) {
-            String strTest = gson.toJson(buildRepeatingGroupTests);
-            JSONObject repeatingGroupObj = new JSONObject();
-            repeatingGroupObj.put(JsonFormConstants.KEY, OpdConstants.REPEATING_GROUP_MAP);
-            repeatingGroupObj.put(JsonFormConstants.VALUE, strTest);
-            repeatingGroupObj.put(JsonFormConstants.TYPE, JsonFormConstants.HIDDEN);
-            if (fields != null) {
-                fields.put(repeatingGroupObj);
-                step.put(OpdJsonFormUtils.FIELDS, fields);
-                jsonObject.put(STEP1, step);
-            }
-        }
     }
 
     @Override
