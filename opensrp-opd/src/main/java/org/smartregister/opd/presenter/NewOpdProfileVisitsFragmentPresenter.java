@@ -85,8 +85,8 @@ public class NewOpdProfileVisitsFragmentPresenter extends ListPresenter<ProfileH
     }
 
     public JSONObject readFormAndAddValues(JSONObject jsonObject, String formSubmissionId) throws JSONException {
-        attachAgeAndGender(jsonObject);
         if (getView() != null) {
+            OpdJsonFormUtils.attachAgeAndGender(jsonObject, getView().getCommonPersonObject());
             getView().attachGlobals(jsonObject, formSubmissionId);
         }
         attachLocationHierarchy(jsonObject);
@@ -143,30 +143,6 @@ public class NewOpdProfileVisitsFragmentPresenter extends ListPresenter<ProfileH
         elements.put(JsonFormConstants.REPEATING_GROUP, new RepeatingGroupsValueSource(processor));
 
         return elements;
-    }
-
-    protected void attachAgeAndGender(JSONObject jsonObject) {
-        try {
-            String encounterType = jsonObject.getString(ENCOUNTER_TYPE);
-            if (getView() == null)
-                return;
-            CommonPersonObjectClient commonPersonObject = getView().getCommonPersonObject();
-            if (commonPersonObject != null && encounterType.equals(OpdConstants.OpdModuleEventConstants.OPD_DIAGNOSIS)) {
-                String gender = commonPersonObject.getColumnmaps().get(OpdDbConstants.Column.Client.GENDER);
-                String age = String.valueOf(Utils.getAgeFromDate(commonPersonObject.getColumnmaps().get(OpdDbConstants.Column.Client.DOB)));
-                JSONArray fields = jsonObject.getJSONObject(STEP1).getJSONArray(FIELDS);
-                for (int i = 0; i < fields.length(); i++) {
-                    JSONObject field = fields.getJSONObject(i);
-                    if (field.getString(KEY).equals(OpdConstants.JSON_FORM_KEY.AGE)) {
-                        field.put(VALUE, age);
-                    } else if (field.getString(KEY).equals(OpdConstants.JSON_FORM_KEY.GENDER)) {
-                        field.put(VALUE, gender);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            Timber.e(e);
-        }
     }
 
     private void attachLocationHierarchy(JSONObject jsonObject) {

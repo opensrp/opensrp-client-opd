@@ -18,6 +18,7 @@ import org.json.JSONObject;
 import org.smartregister.clientandeventmodel.Client;
 import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.clientandeventmodel.FormEntityConstants;
+import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.domain.ProfileImage;
 import org.smartregister.domain.form.FormLocation;
 import org.smartregister.domain.tag.FormTag;
@@ -31,6 +32,7 @@ import org.smartregister.repository.UniqueIdRepository;
 import org.smartregister.util.AssetHandler;
 import org.smartregister.util.JsonFormUtils;
 import org.smartregister.util.StringUtil;
+import org.smartregister.util.Utils;
 import org.smartregister.view.activity.DrishtiApplication;
 
 import java.io.File;
@@ -550,7 +552,7 @@ public class OpdJsonFormUtils extends JsonFormUtils {
         return medicineString;
     }
 
-    public static HashMap<String,String> getLabRepeatingGroupValues(HashMap<String, String> savedValues) {
+/*    public static HashMap<String,String> getLabRepeatingGroupValues(HashMap<String, String> savedValues) {
         try {
             HashMap<String,String> saveValuesMap = new HashMap<>();
 
@@ -581,7 +583,7 @@ public class OpdJsonFormUtils extends JsonFormUtils {
             Timber.e(e, "OpdJsonFormUtils -> getLabResultsStringFromMap()");
             return new HashMap<>();
         }
-    }
+    }*/
 
     public static void patchMultiSelectList(Map<String, Object> values) {
         if (values.containsKey("disease_code_primary"))
@@ -595,5 +597,26 @@ public class OpdJsonFormUtils extends JsonFormUtils {
 
         if (values.containsKey("medicine_pharmacy"))
             values.put("medicine_pharmacy", values.get("medicine_pharmacy_object"));
+    }
+
+    public static void attachAgeAndGender(JSONObject jsonObject, CommonPersonObjectClient commonPersonObject) {
+        try {
+            String encounterType = jsonObject.getString(ENCOUNTER_TYPE);
+            if (commonPersonObject != null && encounterType.equals(OpdConstants.OpdModuleEventConstants.OPD_DIAGNOSIS)) {
+                String gender = commonPersonObject.getColumnmaps().get(OpdDbConstants.Column.Client.GENDER);
+                String age = String.valueOf(Utils.getAgeFromDate(commonPersonObject.getColumnmaps().get(OpdDbConstants.Column.Client.DOB)));
+                JSONArray fields = jsonObject.getJSONObject(STEP1).getJSONArray(FIELDS);
+                for (int i = 0; i < fields.length(); i++) {
+                    JSONObject field = fields.getJSONObject(i);
+                    if (field.getString(KEY).equals(OpdConstants.JSON_FORM_KEY.AGE)) {
+                        field.put(VALUE, age);
+                    } else if (field.getString(KEY).equals(OpdConstants.JSON_FORM_KEY.GENDER)) {
+                        field.put(VALUE, gender);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Timber.e(e);
+        }
     }
 }

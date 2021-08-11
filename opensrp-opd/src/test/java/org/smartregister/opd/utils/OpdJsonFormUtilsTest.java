@@ -28,6 +28,7 @@ import org.smartregister.Context;
 import org.smartregister.CoreLibrary;
 import org.smartregister.clientandeventmodel.Client;
 import org.smartregister.clientandeventmodel.Event;
+import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.domain.ProfileImage;
 import org.smartregister.domain.form.FormLocation;
 import org.smartregister.domain.tag.FormTag;
@@ -55,7 +56,7 @@ import java.util.Set;
 
 import id.zelory.compressor.Compressor;
 
-@PrepareForTest({OpdUtils.class, OpdLibrary.class,LocationHelper.class})
+@PrepareForTest({OpdUtils.class, OpdLibrary.class, LocationHelper.class})
 @RunWith(PowerMockRunner.class)
 public class OpdJsonFormUtilsTest {
 
@@ -604,10 +605,73 @@ public class OpdJsonFormUtilsTest {
         OpdJsonFormUtils.addRegLocHierarchyQuestions(formObject);
         JSONObject step1 = formObject.getJSONObject("step1");
         JSONArray fields = step1.getJSONArray("fields");
-        JSONObject hierarchy = fields.optJSONObject( 1);
+        JSONObject hierarchy = fields.optJSONObject(1);
 
         Assert.assertTrue(hierarchy.has("default"));
 
+    }
+
+    @Test
+    public void testAttachAgeAndGender() throws Exception {
+        String jsonString = "{\n" +
+                "  \"count\": \"1\",\n" +
+                "  \"encounter_type\": \"OPD_Diagnosis\",\n" +
+                "  \"entity_id\": \"\",\n" +
+                "  \"step1\": {\n" +
+                "    \"title\": \"Diagnosis\",\n" +
+                "    \"fields\": [\n" +
+                "      {\n" +
+                "        \"key\": \"danger_signs_opd_note\",\n" +
+                "        \"openmrs_entity_parent\": \"\",\n" +
+                "        \"openmrs_entity\": \"\",\n" +
+                "        \"openmrs_entity_id\": \"\",\n" +
+                "        \"type\": \"toaster_notes\",\n" +
+                "        \"text\": \"Danger Signs {danger_signs}\",\n" +
+                "        \"toaster_type\": \"problem\",\n" +
+                "        \"relevance\": {\n" +
+                "          \"rules-engine\": {\n" +
+                "            \"ex-rules\": {\n" +
+                "              \"rules-file\": \"opd/opd_diagnosis_relevance_rules.yml\"\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        \"calculation\": {\n" +
+                "          \"rules-engine\": {\n" +
+                "            \"ex-rules\": {\n" +
+                "              \"rules-file\": \"opd/opd_diagnosis_calculation.yml\"\n" +
+                "            }\n" +
+                "          }\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"key\": \"gender\",\n" +
+                "        \"openmrs_entity_parent\": \"\",\n" +
+                "        \"openmrs_entity\": \"\",\n" +
+                "        \"openmrs_entity_id\": \"\",\n" +
+                "        \"type\": \"hidden\"\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"key\": \"age\",\n" +
+                "        \"openmrs_entity_parent\": \"\",\n" +
+                "        \"openmrs_entity\": \"\",\n" +
+                "        \"openmrs_entity_id\": \"\",\n" +
+                "        \"type\": \"hidden\"\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  },\n" +
+                "  \"baseEntityId\": \"43f2675c-a1f3-4d24-9788-a83c68ed48e5\"\n" +
+                "}";
+        JSONObject json = new JSONObject(jsonString);
+        HashMap<String, String> map = new HashMap<>();
+        map.put("gender", "Female");
+        map.put("dob", "1960-01-01T17:00:00.000+05:00");
+        CommonPersonObjectClient commonPersonObject = new CommonPersonObjectClient("", map, "");
+        commonPersonObject.setColumnmaps(map);
+        OpdJsonFormUtils.attachAgeAndGender(json, commonPersonObject);
+        String gender = JsonFormUtils.getFieldValue(json.toString(), "gender");
+        String age = JsonFormUtils.getFieldValue(json.toString(), "age");
+        Assert.assertEquals(gender, "Female");
+        Assert.assertEquals(age, "61");
     }
 }
 
