@@ -673,5 +673,23 @@ public class OpdJsonFormUtilsTest {
         Assert.assertEquals(gender, "Female");
         Assert.assertEquals(age, "61");
     }
+
+    @Test
+    public void testPatchMultiSelectList() {
+        HashMap<String, Object> values = new HashMap<>();
+        values.put("disease_code_primary", "");
+        values.put("disease_code_final_diagn", "");
+        values.put("medicine", "");
+        values.put("medicine_pharmacy", "");
+        values.put("disease_code_object", "disease_code");
+        values.put("disease_code_object_final", "disease_code");
+        values.put("medicine_object", "medicine_code");
+        values.put("medicine_pharmacy_object", "medicine_code");
+        OpdJsonFormUtils.patchMultiSelectList(values);
+        Assert.assertEquals(values.get("disease_code_primary"), "disease_code");
+        Assert.assertEquals(values.get("disease_code_final_diagn"), "disease_code");
+        Assert.assertEquals(values.get("medicine"), "medicine_code");
+        Assert.assertEquals(values.get("medicine_pharmacy"), "medicine_code");
+    }
 }
 

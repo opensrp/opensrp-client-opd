@@ -1,26 +1,16 @@
 package org.smartregister.opd.fragment;
 
-import android.os.Build;
 
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 
 import org.json.JSONObject;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.modules.junit4.PowerMockRunnerDelegate;
-import org.powermock.modules.junit4.rule.PowerMockRule;
-import org.robolectric.RobolectricTestRunner;
-import org.robolectric.annotation.Config;
 import org.robolectric.util.ReflectionHelpers;
-import org.smartregister.opd.BaseTest;
+import org.smartregister.opd.BaseFragmentTest;
+import org.smartregister.opd.R;
 import org.smartregister.opd.dao.VisitDao;
 import org.smartregister.opd.domain.ProfileHistory;
 import org.smartregister.opd.presenter.NewOpdProfileVisitsFragmentPresenter;
@@ -33,23 +23,21 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-@RunWith(PowerMockRunner.class)
-@PowerMockRunnerDelegate(RobolectricTestRunner.class)
-@Config(sdk = Build.VERSION_CODES.P)
-@PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
-@PrepareForTest({VisitDao.class, OpdUtils.class})
-public class NewOpdProfileVisitsFragmentTest extends BaseTest {
+public class NewOpdProfileVisitsFragmentTest extends BaseFragmentTest {
 
     private NewOpdProfileVisitsFragment fragment;
-
-    @Rule
-    public PowerMockRule rule = new PowerMockRule();
-
-    @Before
+    
+    @Override
     public void setUp() {
+        super.setUp();
         fragment = Mockito.spy(NewOpdProfileVisitsFragment.newInstance(null));
-        PowerMockito.mockStatic(VisitDao.class);
-        PowerMockito.mockStatic(OpdUtils.class);
+    }
+
+    @Test
+    public void verifyViewIds() {
+        Assert.assertEquals(R.layout.new_opd_fragment_profile_overview, fragment.getRootLayout());
+        Assert.assertEquals(R.id.opd_profile_overview_recycler, fragment.getRecyclerViewID());
+        Assert.assertEquals(R.id.progress_bar, fragment.getProgressBarID());
     }
 
     @Test
