@@ -17,14 +17,14 @@ import timber.log.Timber;
 public class VisitDetailsRepository extends BaseRepository {
 
     public static final String VISIT_DETAILS_TABLE = "opd_client_visit_details";
-    private static final String VISIT_DETAILS_ID = "visit_details_id";
-    private static final String VISIT_ID = "visit_id";
-    private static final String VISIT_KEY = "visit_key";
-    private static final String PARENT_CODE = "parent_code";
-    private static final String DETAILS = "details";
-    private static final String HUMAN_READABLE = "human_readable_details";
-    private static final String UPDATED_AT = "updated_at";
-    private static final String CREATED_AT = "created_at";
+    public static final String VISIT_DETAILS_ID = "visit_details_id";
+    public static final String VISIT_ID = "visit_id";
+    public static final String VISIT_KEY = "visit_key";
+    public static final String PARENT_CODE = "parent_code";
+    public static final String DETAILS = "details";
+    public static final String HUMAN_READABLE = "human_readable_details";
+    public static final String UPDATED_AT = "updated_at";
+    public static final String CREATED_AT = "created_at";
 
     private static final String CREATE_VISIT_TABLE =
             "CREATE TABLE " + VISIT_DETAILS_TABLE + "("

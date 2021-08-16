@@ -19,6 +19,7 @@ import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
 import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.opd.utils.RepeatingGroupsValueSource;
+import org.smartregister.opd.utils.VisitUtils;
 import org.smartregister.util.CallableInteractor;
 import org.smartregister.util.CallableInteractorCallBack;
 import org.smartregister.util.GenericInteractor;
@@ -43,7 +44,6 @@ import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_KEY.VALUE;
 import static org.smartregister.opd.utils.OpdConstants.KEY.KEY;
 
 
-
 public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<ProfileAction> implements OpdProfileFragmentContract.Presenter<ProfileAction> {
 
     private CallableInteractor callableInteractor;
@@ -51,7 +51,7 @@ public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<Profil
     @Override
     public void openForm(Context context, String formName, String baseEntityID, String formSubmissionId) {
         CallableInteractor myInteractor = getCallableInteractor();
-        Callable<JSONObject> callable = () -> readFormAndAddValues(readFormAsJson(context, formName, baseEntityID), formSubmissionId);
+        Callable<JSONObject> callable = () -> readFormAndAddValues(readFormAsJson(context, formName, baseEntityID), formSubmissionId, baseEntityID);
         myInteractor.execute(callable, new CallableInteractorCallBack<JSONObject>() {
             @Override
             public void onResult(JSONObject jsonObject) {
@@ -77,14 +77,17 @@ public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<Profil
         });
     }
 
-    public JSONObject readFormAndAddValues(JSONObject jsonObject, String formSubmissionId) throws JSONException {
+    public JSONObject readFormAndAddValues(JSONObject jsonObject, String formSubmissionId, String baseEntityID) throws JSONException {
         if (getView() != null) {
             OpdJsonFormUtils.attachAgeAndGender(jsonObject, getView().getCommonPersonObject());
             getView().attachGlobals(jsonObject, formSubmissionId);
         }
         attachLocationHierarchy(jsonObject);
 
-        if (StringUtils.isEmpty(formSubmissionId)) return jsonObject;
+        if (StringUtils.isEmpty(formSubmissionId)) {
+            VisitUtils.addPreviousVisitHivStatus(jsonObject, baseEntityID);
+            return jsonObject;
+        }
 
         NativeFormProcessor processor = OpdLibrary.getInstance().getFormProcessorFactory().createInstance(jsonObject);
 
@@ -184,8 +187,6 @@ public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<Profil
                     jsonObject.getString(OpdConstants.Properties.FORM_SUBMISSION_ID) : null;
 
 
-
-
             // update metadata
             processor.withBindType("ec_client")
                     .withEncounterType(eventType)
@@ -221,7 +222,7 @@ public class NewOpdProfileOverviewFragmentPresenter extends ListPresenter<Profil
         });
     }
 
-    private Map<String, NativeFormFieldProcessor> getFieldProcessorMap(){
+    private Map<String, NativeFormFieldProcessor> getFieldProcessorMap() {
         Map<String, NativeFormFieldProcessor> fieldProcessorMap = new HashMap<>();
         fieldProcessorMap.put(OpdConstants.JsonFormWidget.MULTI_SELECT_DRUG_PICKER, (event, jsonObject1) -> {
             JSONArray valuesJsonArray;

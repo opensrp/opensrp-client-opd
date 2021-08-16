@@ -4,8 +4,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.dao.AbstractDao;
 import org.smartregister.opd.R;
+import org.smartregister.opd.domain.HIVStatus;
 import org.smartregister.opd.domain.ProfileAction;
 import org.smartregister.opd.domain.ProfileHistory;
+import org.smartregister.opd.model.VisitDetail;
 import org.smartregister.opd.utils.OpdConstants;
 
 import java.text.SimpleDateFormat;
@@ -17,7 +19,17 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
+import static org.smartregister.opd.repository.VisitDetailsRepository.CREATED_AT;
+import static org.smartregister.opd.repository.VisitDetailsRepository.DETAILS;
+import static org.smartregister.opd.repository.VisitDetailsRepository.HUMAN_READABLE;
+import static org.smartregister.opd.repository.VisitDetailsRepository.PARENT_CODE;
+import static org.smartregister.opd.repository.VisitDetailsRepository.UPDATED_AT;
+import static org.smartregister.opd.repository.VisitDetailsRepository.VISIT_DETAILS_ID;
+import static org.smartregister.opd.repository.VisitDetailsRepository.VISIT_ID;
+import static org.smartregister.opd.repository.VisitDetailsRepository.VISIT_KEY;
 import static org.smartregister.opd.utils.OpdUtils.context;
+
+import android.database.Cursor;
 
 public class VisitDao extends AbstractDao {
 
@@ -172,6 +184,78 @@ public class VisitDao extends AbstractDao {
         };
         readData(sql, dataMap);
         return returnDate.get(0);
+    }
+
+    public static HIVStatus getLastHIVStatusForClient(String baseEntityId) {
+        HIVStatus hivStatus = new HIVStatus();
+        String sql = "SELECT * FROM opd_client_visit_details " +
+                "WHERE visit_id IN (" +
+                  getVisitIdQuery(baseEntityId) +
+                ")";
+
+        DataMap<Void> dataMap = cursor -> {
+            String key = getCursorValue(cursor, "visit_key");
+            populateHivStatus(hivStatus, key, cursor);
+            return null;
+        };
+        readData(sql, dataMap);
+        return hivStatus;
+    }
+
+    private static void populateHivStatus(HIVStatus hivStatus, String key, Cursor cursor) {
+        switch (key) {
+            case "hiv_tested_date":
+                hivStatus.setLastDiagnosisDate(readCursorForVisitDetail(cursor));
+                break;
+            case "medical_conditions":
+                hivStatus.setMedicalCondition(readCursorForVisitDetail(cursor));
+                break;
+            case "hiv_prev_status":
+                hivStatus.setTestResult(readCursorForVisitDetail(cursor));
+                break;
+            case "hiv_diagnosis_date_unknown":
+                hivStatus.setLastDiagnosisDateUnknown(readCursorForVisitDetail(cursor));
+                break;
+            case "hiv_prev_pos_art":
+                hivStatus.setTakingART(readCursorForVisitDetail(cursor));
+                break;
+            default:
+                // Do nothing
+                break;
+        }
+
+    }
+
+    private static VisitDetail readCursorForVisitDetail(Cursor cursor) {
+        VisitDetail detail = new VisitDetail();
+        detail.setVisitDetailsId(getCursorValue(cursor, VISIT_DETAILS_ID));
+        detail.setVisitId(getCursorValue(cursor, VISIT_ID));
+        detail.setVisitKey(getCursorValue(cursor, VISIT_KEY));
+        detail.setParentCode(getCursorValue(cursor, PARENT_CODE));
+        detail.setDetails(getCursorValue(cursor, DETAILS));
+        detail.setHumanReadable(getCursorValue(cursor, HUMAN_READABLE));
+        detail.setUpdatedAt(new Date(Long.parseLong(getCursorValue(cursor, UPDATED_AT))));
+        detail.setCreatedAt(new Date(Long.parseLong(getCursorValue(cursor, CREATED_AT))));
+        return detail;
+    }
+
+    public static boolean hasPreviousHIVStatus(String baseEntityId) {
+        String sql = "SELECT * FROM opd_client_visit_details " +
+                "WHERE visit_id IN (" +
+                    getVisitIdQuery(baseEntityId) +
+                ") AND visit_key =='medical_conditions' AND human_readable_details = 'HIV'";
+
+        DataMap<Boolean> dataMap = cursor -> cursor.getCount() > 0;
+        return readData(sql, dataMap).get(0);
+    }
+
+    private static String getVisitIdQuery(String baseEntityId) {
+        return "SELECT visit_id " +
+                "FROM opd_client_visits " +
+                "WHERE base_entity_id = '" + baseEntityId + "' " +
+                "AND visit_type = 'OPD_Diagnosis'" +
+                "ORDER BY updated_at DESC " +
+                "LIMIT 1";
     }
 }
 

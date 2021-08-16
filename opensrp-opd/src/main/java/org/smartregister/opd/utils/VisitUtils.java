@@ -5,12 +5,16 @@ import android.content.ContentValues;
 import androidx.annotation.NonNull;
 
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.smartregister.commonregistry.CommonFtsObject;
 import org.smartregister.commonregistry.CommonRepository;
 import org.smartregister.domain.Event;
 import org.smartregister.domain.db.EventClient;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
+import org.smartregister.opd.dao.VisitDao;
+import org.smartregister.opd.domain.HIVStatus;
 import org.smartregister.opd.exception.CheckInEventProcessException;
 import org.smartregister.opd.model.Visit;
 import org.smartregister.opd.model.VisitDetail;
@@ -28,7 +32,11 @@ import java.util.UUID;
 
 import timber.log.Timber;
 
+import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_KEY.ENCOUNTER_TYPE;
 import static org.smartregister.opd.utils.OpdUtils.context;
+
+import com.vijay.jsonwizard.constants.JsonFormConstants;
+import com.vijay.jsonwizard.utils.FormUtils;
 
 public class VisitUtils {
     private static String[] default_obs = {"start", "end", "deviceid", "subscriberid", "simserial", "phonenumber"};
@@ -154,15 +162,15 @@ public class VisitUtils {
         }
     }
 
-   /* public static String getDetailsValue(VisitDetail detail, String val) {
-        String clean_val = cleanString(val);
-        if (detail.getVisitKey().contains("date")) {
-            return getFormattedDate(getSourceDateFormat(), getSaveDateFormat(), clean_val);
-        }
+    /* public static String getDetailsValue(VisitDetail detail, String val) {
+         String clean_val = cleanString(val);
+         if (detail.getVisitKey().contains("date")) {
+             return getFormattedDate(getSourceDateFormat(), getSaveDateFormat(), clean_val);
+         }
 
-        return clean_val;
-    }
-*/
+         return clean_val;
+     }
+ */
     public static String getDetailsValue(VisitDetail detail, String val) {
         String clean_val = cleanString(val);
         if (detail.getVisitKey().contains("date") && StringUtils.isNotBlank(clean_val) && isValidDate(clean_val)) {
@@ -183,7 +191,7 @@ public class VisitUtils {
         return true;
     }
 
-        public static String getFormattedDate(SimpleDateFormat source_sdf, SimpleDateFormat dest_sdf, String value) {
+    public static String getFormattedDate(SimpleDateFormat source_sdf, SimpleDateFormat dest_sdf, String value) {
         try {
             Date date = source_sdf.parse(value);
             return dest_sdf.format(date);
@@ -235,6 +243,35 @@ public class VisitUtils {
                 return context().getStringResource(R.string.service_fee);
             default:
                 return null;
+        }
+    }
+
+    public static void addPreviousVisitHivStatus(JSONObject jsonObject, String baseEntityID) {
+        try {
+            if (jsonObject.getString(ENCOUNTER_TYPE).equals(OpdConstants.OpdModuleEventConstants.OPD_DIAGNOSIS)
+                    && VisitDao.hasPreviousHIVStatus(baseEntityID)) {
+                HIVStatus hivStatus = VisitDao.getLastHIVStatusForClient(baseEntityID);
+                JSONArray fields = FormUtils.getMultiStepFormFields(jsonObject);
+                for (int i = 0; i < fields.length(); i++) {
+                    JSONObject field = fields.getJSONObject(i);
+                    String key = field.getString(JsonFormConstants.KEY);
+                    if (hivStatus.getLastDiagnosisDate() != null && key.equals(hivStatus.getLastDiagnosisDate().getVisitKey())) {
+                        field.put(JsonFormConstants.VALUE, hivStatus.getLastDiagnosisDate().getDetails());
+                    } else if (hivStatus.getLastDiagnosisDateUnknown() != null && key.equals(hivStatus.getLastDiagnosisDateUnknown().getVisitKey())) {
+                        field.put(JsonFormConstants.VALUE, new JSONArray().put("yes"));
+                    } else if (hivStatus.getTestResult() != null && key.equals(hivStatus.getTestResult().getVisitKey())) {
+                        field.put(JsonFormConstants.VALUE, (hivStatus.getTestResult().getHumanReadable().toLowerCase()));
+                    } else if (hivStatus.getTakingART() != null && key.equals(hivStatus.getTakingART().getVisitKey())) {
+                        field.put(JsonFormConstants.VALUE, (hivStatus.getTakingART().getHumanReadable().toLowerCase()));
+                    } else if (key.equals(hivStatus.getMedicalCondition().getVisitKey())) {
+                        field.put(JsonFormConstants.VALUE, new JSONArray().put("hiv"));
+                    }
+                    fields.put(i, field);
+                }
+            }
+        } catch (
+                Exception e) {
+            Timber.e(e, "NewOpdProfileOverviewFragmentPresenter -> addPreviousVisitHivStatus()");
         }
     }
 
