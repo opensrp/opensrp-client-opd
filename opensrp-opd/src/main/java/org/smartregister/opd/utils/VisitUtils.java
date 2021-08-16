@@ -120,10 +120,10 @@ public class VisitUtils {
         String lastInteractedWithDate = String.valueOf(new Date().getTime());
 
         ContentValues contentValues = new ContentValues();
-        contentValues.put("last_interacted_with", lastInteractedWithDate);
+        contentValues.put(OpdConstants.JSON_FORM_KEY.LAST_INTERACTED_WITH, lastInteractedWithDate);
 
         int recordsUpdated = OpdLibrary.getInstance().getRepository().getWritableDatabase()
-                .update(tableName, contentValues, "base_entity_id = ?", new String[]{event.getBaseEntityId()});
+                .update(tableName, contentValues, OpdConstants.KEY.BASE_ENTITY_ID + " = ?", new String[]{event.getBaseEntityId()});
 
         if (recordsUpdated < 1) {
             abortTransaction();
@@ -137,7 +137,7 @@ public class VisitUtils {
         CommonRepository commonrepository = OpdLibrary.getInstance().context().commonrepository(tableName);
 
         ContentValues contentValues1 = new ContentValues();
-        contentValues1.put("last_interacted_with", lastInteractedWithDate);
+        contentValues1.put(OpdConstants.JSON_FORM_KEY.LAST_INTERACTED_WITH, lastInteractedWithDate);
 
         boolean isUpdated = false;
 
@@ -191,17 +191,18 @@ public class VisitUtils {
         return true;
     }
 
-    public static String getFormattedDate(SimpleDateFormat source_sdf, SimpleDateFormat dest_sdf, String value) {
+    public static String getFormattedDate(SimpleDateFormat sourceDateFormat, SimpleDateFormat destDateFormat, String value) {
         try {
-            Date date = source_sdf.parse(value);
-            return dest_sdf.format(date);
-        } catch (Exception e) {
+            Date date = sourceDateFormat.parse(value);
+            return destDateFormat.format(date);
+        } catch (ParseException e) {
             try {
                 // fallback for long datetypes
                 Date date = new Date(Long.parseLong(value));
-                return dest_sdf.format(date);
+                return destDateFormat.format(date);
             } catch (NumberFormatException | NullPointerException nfe) {
                 Timber.e(e);
+                Timber.e(nfe);
             }
             Timber.e(e);
         }

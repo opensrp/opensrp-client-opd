@@ -13,6 +13,7 @@ import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.domain.Form;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.opd.OpdLibrary;
@@ -32,6 +33,7 @@ import org.smartregister.view.fragment.BaseListFragment;
 import org.smartregister.view.viewholder.ListableViewHolder;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -140,7 +142,7 @@ public class NewOpdProfileOverviewFragment extends BaseListFragment<ProfileActio
             }
             if (savedValues.containsKey(OpdConstants.REPEATING_GROUP_MAP)) {
                 String testResults = OpdJsonFormUtils.getLabResultsStringFromMap(savedValues);
-                formGlobalValues.put("diagnostic_test_lab_results", testResults);
+                formGlobalValues.put(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_LAB_RESULT, testResults);
             }
         }
     }
@@ -175,26 +177,36 @@ public class NewOpdProfileOverviewFragment extends BaseListFragment<ProfileActio
     }
 
     protected String getFormName(ProfileAction report) {
+        String formName;
         switch (report.getKey()) {
             case 0:
-                return OpdConstants.JsonForm.OPD_CHECKIN;
+                formName = OpdConstants.JsonForm.OPD_CHECKIN;
+                break;
             case 1:
-                return OpdConstants.JsonForm.VITAL_DANGER_SIGNS;
+                formName = OpdConstants.JsonForm.VITAL_DANGER_SIGNS;
+                break;
             case 2:
-                return OpdConstants.JsonForm.DIAGNOSIS;
+                formName = OpdConstants.JsonForm.DIAGNOSIS;
+                break;
             case 3:
-                return OpdConstants.JsonForm.LAB_RESULTS;
+                formName = OpdConstants.JsonForm.LAB_RESULTS;
+                break;
             case 4:
-                return OpdConstants.JsonForm.TREATMENT;
+                formName = OpdConstants.JsonForm.TREATMENT;
+                break;
             case 5:
-                return OpdConstants.JsonForm.PHARMACY;
+                formName = OpdConstants.JsonForm.PHARMACY;
+                break;
             case 6:
-                return OpdConstants.JsonForm.FINAL_OUTCOME;
+                formName = OpdConstants.JsonForm.FINAL_OUTCOME;
+                break;
             case 7:
-                return OpdConstants.JsonForm.SERVICE_FEE;
+                formName = OpdConstants.JsonForm.SERVICE_FEE;
+                break;
             default:
                 throw new IllegalArgumentException("Unknown Form");
         }
+        return formName;
     }
 
     @Override
@@ -208,7 +220,7 @@ public class NewOpdProfileOverviewFragment extends BaseListFragment<ProfileActio
 
     @Override
     public void onFetchError(Exception ex) {
-        Toast.makeText(getContext(), "An error occurred", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), getString(R.string.an_error_occured), Toast.LENGTH_SHORT).show();
         Timber.e(ex);
     }
 
@@ -259,7 +271,7 @@ public class NewOpdProfileOverviewFragment extends BaseListFragment<ProfileActio
     public void attachGlobals(JSONObject jsonObject, String formSubmissionId) {
         try {
             jsonObject.put(JsonFormConstants.JSON_FORM_KEY.GLOBAL, new JSONObject(formGlobalValues));
-        } catch (Exception e) {
+        } catch (JSONException e) {
             Timber.e(e);
         }
     }
@@ -271,7 +283,7 @@ public class NewOpdProfileOverviewFragment extends BaseListFragment<ProfileActio
                 Map<String, Object> map = ((Map<String, Object>) ruleObject);
                 globalKeys.addAll((List<String>) map.get(JsonFormConstants.FIELDS));
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             Timber.e(e);
 
         }

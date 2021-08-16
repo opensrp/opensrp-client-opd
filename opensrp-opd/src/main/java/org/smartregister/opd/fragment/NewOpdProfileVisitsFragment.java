@@ -13,6 +13,7 @@ import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.domain.Form;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.opd.OpdLibrary;
@@ -32,6 +33,7 @@ import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.view.fragment.BaseListFragment;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -228,7 +230,7 @@ public class NewOpdProfileVisitsFragment extends BaseListFragment<ProfileHistory
             String valuesKey = VisitDao.getDateStringForId(formSubmissionId);
             HashMap<String, String> formGlobalValues = new HashMap<>(formGlobalValuesMap.get(valuesKey));
             jsonObject.put(JsonFormConstants.JSON_FORM_KEY.GLOBAL, new JSONObject(formGlobalValues));
-        } catch (Exception e) {
+        } catch (JSONException e) {
             Timber.e(e);
         }
     }
@@ -240,9 +242,8 @@ public class NewOpdProfileVisitsFragment extends BaseListFragment<ProfileHistory
                 Map<String, Object> map = ((Map<String, Object>) ruleObject);
                 globalKeys.addAll((List<String>) map.get(JsonFormConstants.FIELDS));
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             Timber.e(e);
-
         }
     }
 

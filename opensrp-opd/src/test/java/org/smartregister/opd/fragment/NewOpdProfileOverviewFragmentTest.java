@@ -91,7 +91,7 @@ public class NewOpdProfileOverviewFragmentTest extends BaseFragmentTest {
 
         fragment.loadGlobals(mapVisits);
         HashMap<String, String> formGlobalValues = ReflectionHelpers.getField(fragment, "formGlobalValues");
-        Assert.assertEquals(formGlobalValues.size(), globalKeys.size());
+        Assert.assertEquals(globalKeys.size(), formGlobalValues.size());
 
     }
 

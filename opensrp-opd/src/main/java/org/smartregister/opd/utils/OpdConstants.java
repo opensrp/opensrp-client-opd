@@ -247,6 +247,7 @@ public class OpdConstants extends AllConstants {
         public static final String OPD_CLOSE_REASON = "opd_close_reason";
         public static String TESTS_REPEATING_GROUP = "tests_repeating_group";
         public static final String DEATH_DATE = "deathdate";
+        public static final String DIAGNOSTIC_TEST_LAB_RESULT = "diagnostic_test_lab_results";
     }
 
     public static class JsonFormNameUtils {
