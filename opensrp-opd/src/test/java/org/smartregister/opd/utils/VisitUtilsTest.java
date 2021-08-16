@@ -97,7 +97,5 @@ public class VisitUtilsTest extends BaseFragmentTest {
         Assert.assertEquals("2020-10-10", formattedDate);
         String formattedDate2 = VisitUtils.getFormattedDate(VisitUtils.getSourceDateFormat(), VisitUtils.getSaveDateFormat(), "1628758829399");
         Assert.assertEquals("2021-08-12", formattedDate2);
-        String formattedDate3 = VisitUtils.getFormattedDate(VisitUtils.getSourceDateFormat(), VisitUtils.getSaveDateFormat(), null);
-        Assert.assertNull(formattedDate3);
     }
 }
