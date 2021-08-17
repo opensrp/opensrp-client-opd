@@ -525,7 +525,7 @@ public class OpdJsonFormUtils extends JsonFormUtils {
                 }
             }
             return testResults;
-        } catch (Exception e) {
+        } catch (JSONException e) {
             Timber.e(e, "OpdJsonFormUtils -> getLabResultsStringFromMap()");
             return "";
         }
@@ -546,57 +546,24 @@ public class OpdJsonFormUtils extends JsonFormUtils {
                 JSONObject medicine = new JSONObject(value);
                 medicineString = medicineString.concat(medicine.getString("text"));
             }
-        } catch (Exception e) {
+        } catch (JSONException e) {
             Timber.e(e, "getMedicineNoteString()");
         }
         return medicineString;
     }
 
-/*    public static HashMap<String,String> getLabRepeatingGroupValues(HashMap<String, String> savedValues) {
-        try {
-            HashMap<String,String> saveValuesMap = new HashMap<>();
-
-            String strRepeatingGroupMap = savedValues.get(OpdConstants.REPEATING_GROUP_MAP);
-            if (StringUtils.isNotBlank(strRepeatingGroupMap)) {
-                JSONObject jsonObject = new JSONObject(strRepeatingGroupMap);
-                Iterator<String> repeatingGroupKeys = jsonObject.keys();
-                while (repeatingGroupKeys.hasNext()) {
-                    JSONObject jsonTestObject = jsonObject.optJSONObject(repeatingGroupKeys.next());
-                    Iterator<String> testStringIterator = jsonTestObject.keys();
-                    String testName = "";
-                    String value = "";
-                    while (testStringIterator.hasNext()) {
-                        String resultKey = testStringIterator.next();
-                        if (OpdConstants.DIAGNOSTIC_TEST.equals(resultKey)) {
-                            testName = StringUtil.humanize(jsonTestObject.optString(resultKey));
-                            savedValues.put(OpdConstants.DIAGNOSTIC_TEST, testName);
-                        }
-                        if (resultKey.startsWith(OpdConstants.DIAGNOSTIC_TEST_RESULT)) {
-                             value = StringUtil.humanize(jsonTestObject.optString(resultKey));
-                            savedValues.put(OpdConstants.DIAGNOSTIC_TEST_RESULT, value);
-                        }
-                    }
-                }
-            }
-            return saveValuesMap;
-        } catch (Exception e) {
-            Timber.e(e, "OpdJsonFormUtils -> getLabResultsStringFromMap()");
-            return new HashMap<>();
-        }
-    }*/
-
     public static void patchMultiSelectList(Map<String, Object> values) {
-        if (values.containsKey("disease_code_primary"))
-            values.put("disease_code_primary", values.get("disease_code_object"));
+        if (values.containsKey(OpdConstants.JSON_FORM_KEY.DISEASE_CODE_PRIMARY))
+            values.put(OpdConstants.JSON_FORM_KEY.DISEASE_CODE_PRIMARY, values.get(OpdConstants.JSON_FORM_KEY.DISEASE_CODE_OBJECT));
 
-        if (values.containsKey("disease_code_final_diagn"))
-            values.put("disease_code_final_diagn", values.get("disease_code_object_final"));
+        if (values.containsKey(OpdConstants.JSON_FORM_KEY.DISEASE_CODE_FINAL_DIAGNOSIS))
+            values.put(OpdConstants.JSON_FORM_KEY.DISEASE_CODE_FINAL_DIAGNOSIS, values.get(OpdConstants.JSON_FORM_KEY.DISEASE_CODE_OBJECT_FINAL));
 
-        if (values.containsKey("medicine"))
-            values.put("medicine", values.get("medicine_object"));
+        if (values.containsKey(OpdConstants.JSON_FORM_KEY.MEDICINE))
+            values.put(OpdConstants.JSON_FORM_KEY.MEDICINE, values.get(OpdConstants.JSON_FORM_KEY.MEDICINE_OBJECT));
 
-        if (values.containsKey("medicine_pharmacy"))
-            values.put("medicine_pharmacy", values.get("medicine_pharmacy_object"));
+        if (values.containsKey(OpdConstants.JSON_FORM_KEY.MEDICINE_PHARMACY))
+            values.put(OpdConstants.JSON_FORM_KEY.MEDICINE_PHARMACY, values.get(OpdConstants.JSON_FORM_KEY.MEDICINE_PHARMACY_OBJECT));
     }
 
     public static void attachAgeAndGender(JSONObject jsonObject, CommonPersonObjectClient commonPersonObject) {

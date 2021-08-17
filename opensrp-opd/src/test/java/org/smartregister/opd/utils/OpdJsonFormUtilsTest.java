@@ -527,7 +527,7 @@ public class OpdJsonFormUtilsTest {
         String medicineValues = "[{\"key\":\"AA007840\",\"text\":\"Atenolol 50mg\",\"openmrs_entity\":\"\",\"openmrs_entity_id\":\"\",\"openmrs_entity_parent\":\"\",\"property\":{\"pack_size\":null,\"product_code\":\"AA007840\",\"dispensing_unit\":\"Tablet\",\"meta\":{\"duration\":\"78\",\"dosage\":\"12\",\"frequency\":\"3456\",\"info\":\"Dose: 12, Duration: 78, Frequency: 3456\"}}},{\"key\":\"FF006300\",\"text\":\"Bandage, WOW 10cm x 4m long, when stretched\",\"openmrs_entity\":\"\",\"openmrs_entity_id\":\"\",\"openmrs_entity_parent\":\"\",\"property\":{\"pack_size\":null,\"product_code\":\"FF006300\",\"dispensing_unit\":\"each\",\"meta\":{\"duration\":\"33\",\"dosage\":\"11\",\"frequency\":\"2244\",\"info\":\"Dose: 11, Duration: 33, Frequency: 2244\"}}}]\n";
         String result = OpdJsonFormUtils.getMedicineNoteString(medicineValues);
         String output = "Atenolol 50mg, Bandage, WOW 10cm x 4m long, when stretched";
-        Assert.assertEquals(result, output);
+        Assert.assertEquals(output, result);
     }
 
     @Test
@@ -542,7 +542,7 @@ public class OpdJsonFormUtilsTest {
         savedValues.put("diagnostic_test_result_24f8d3b0a73a49e9894c83d6d545b39f", "Negative");
         String result = OpdJsonFormUtils.getLabResultsStringFromMap(savedValues);
         String output = "Pregnancy test: { Status result: Negative, }, Ultra sound: , Specify result: Ultra}";
-        Assert.assertEquals(result, output);
+        Assert.assertEquals( output, result);
     }
 
     @Test
@@ -670,8 +670,8 @@ public class OpdJsonFormUtilsTest {
         OpdJsonFormUtils.attachAgeAndGender(json, commonPersonObject);
         String gender = JsonFormUtils.getFieldValue(json.toString(), "gender");
         String age = JsonFormUtils.getFieldValue(json.toString(), "age");
-        Assert.assertEquals(gender, "Female");
-        Assert.assertEquals(age, "61");
+        Assert.assertEquals("Female", gender);
+        Assert.assertEquals("61", age);
     }
 
     @Test
@@ -686,10 +686,10 @@ public class OpdJsonFormUtilsTest {
         values.put("medicine_object", "medicine_code");
         values.put("medicine_pharmacy_object", "medicine_code");
         OpdJsonFormUtils.patchMultiSelectList(values);
-        Assert.assertEquals(values.get("disease_code_primary"), "disease_code");
-        Assert.assertEquals(values.get("disease_code_final_diagn"), "disease_code");
-        Assert.assertEquals(values.get("medicine"), "medicine_code");
-        Assert.assertEquals(values.get("medicine_pharmacy"), "medicine_code");
+        Assert.assertEquals("disease_code", values.get("disease_code_primary"));
+        Assert.assertEquals("disease_code", values.get("disease_code_final_diagn"));
+        Assert.assertEquals("medicine_code", values.get("medicine"));
+        Assert.assertEquals("medicine_code", values.get("medicine_pharmacy"));
     }
 }
 

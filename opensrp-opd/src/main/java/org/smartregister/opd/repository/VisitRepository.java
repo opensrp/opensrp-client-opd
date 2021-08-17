@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 
 import net.sqlcipher.database.SQLiteDatabase;
+import net.sqlcipher.database.SQLiteException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.greenrobot.eventbus.EventBus;
@@ -92,7 +93,7 @@ public class VisitRepository extends BaseRepository {
         try {
             getWritableDatabase().delete(VISIT_TABLE, VISIT_ID + "= ?", new String[]{visitID});
             getWritableDatabase().delete(VisitDetailsRepository.VISIT_DETAILS_TABLE, VISIT_ID + "= ?", new String[]{visitID});
-        } catch (Exception e) {
+        } catch (SQLiteException | IllegalStateException e) {
             Timber.e(e);
         }
     }
@@ -117,7 +118,6 @@ public class VisitRepository extends BaseRepository {
                     visit.setCreatedAt(new Date(Long.parseLong(cursor.getString(cursor.getColumnIndex(CREATED_AT)))));
 
                     String updatedValue = cursor.getString(cursor.getColumnIndex(UPDATED_AT));
-                    //if (updatedValue != null)
                     visit.setUpdatedAt(new Date(Long.parseLong(updatedValue)));
 
                     String deletedValue = cursor.getString(cursor.getColumnIndex(DELETED_AT));
@@ -159,7 +159,7 @@ public class VisitRepository extends BaseRepository {
         try {
             cursor = getReadableDatabase().query(VISIT_TABLE, VISIT_COLUMNS, VISIT_GROUP + " = ? ", new String[]{visitGroup}, null, null, CREATED_AT + " ASC ", null);
             visits = readVisits(cursor);
-        } catch (Exception e) {
+        } catch (SQLiteException | IllegalStateException e) {
             Timber.e(e);
         } finally {
             if (cursor != null) {
@@ -173,11 +173,11 @@ public class VisitRepository extends BaseRepository {
         List<Visit> visits = new ArrayList<>();
         Cursor cursor = null;
         try {
-            String query = "select STRFTIME('%Y%m%d', datetime((" + VISIT_DATE + ")/1000,'unixepoch')) as d,* from " + VISIT_TABLE + " where " + VISIT_TYPE + " = '" + visitType + "' AND " +
-                    "" + BASE_ENTITY_ID + " = '" + baseEntityID + "'  group by d order by " + VISIT_DATE + " desc limit 3";
+            String query = "select STRFTIME('%Y%m%d', datetime((" + VISIT_DATE + ")/1000,'unixepoch')) as date,* from " + VISIT_TABLE + " where " + VISIT_TYPE + " = '" + visitType + "' AND " +
+                    "" + BASE_ENTITY_ID + " = '" + baseEntityID + "'  group by date order by " + VISIT_DATE + " desc limit 3";
             cursor = getReadableDatabase().rawQuery(query, null);
             visits = readVisits(cursor);
-        } catch (Exception e) {
+        } catch (SQLiteException | IllegalStateException e) {
             Timber.e(e);
         } finally {
             if (cursor != null) {
@@ -193,7 +193,7 @@ public class VisitRepository extends BaseRepository {
         try {
             cursor = getReadableDatabase().query(VISIT_TABLE, VISIT_COLUMNS, VISIT_ID + " = ? ", new String[]{visitID}, null, null, VISIT_DATE + " DESC ", null);
             visits = readVisits(cursor);
-        } catch (Exception e) {
+        } catch (SQLiteException | IllegalStateException e) {
             Timber.e(e);
         } finally {
             if (cursor != null) {
@@ -209,7 +209,7 @@ public class VisitRepository extends BaseRepository {
         try {
             cursor = getReadableDatabase().query(VISIT_TABLE, VISIT_COLUMNS, VISIT_ID + " = ? ", new String[]{visitID}, null, null, VISIT_DATE + " DESC ", null);
             visits = readVisits(cursor);
-        } catch (Exception e) {
+        } catch (SQLiteException | IllegalStateException e) {
             Timber.e(e);
         } finally {
             if (cursor != null) {
@@ -228,7 +228,7 @@ public class VisitRepository extends BaseRepository {
         try {
             cursor = getReadableDatabase().query(VISIT_TABLE, VISIT_COLUMNS, FORM_SUBMISSION_ID + " = ? ", new String[]{formSubmissionID}, null, null, VISIT_DATE + " DESC ", "1");
             visits = readVisits(cursor);
-        } catch (Exception e) {
+        } catch (SQLiteException | IllegalStateException e) {
             Timber.e(e);
         } finally {
             if (cursor != null) {
@@ -252,7 +252,7 @@ public class VisitRepository extends BaseRepository {
         try {
             cursor = sqLiteDatabase.query(VISIT_TABLE, VISIT_COLUMNS, BASE_ENTITY_ID + " = ? AND " + VISIT_TYPE + " = ? ", new String[]{baseEntityID, visitType}, null, null, VISIT_DATE + " DESC ", "1");
             visits = readVisits(cursor);
-        } catch (Exception e) {
+        } catch (SQLiteException | IllegalStateException e) {
             Timber.e(e);
         } finally {
             if (cursor != null) {
@@ -276,7 +276,7 @@ public class VisitRepository extends BaseRepository {
                 String date = cursor.getString(cursor.getColumnIndex(dateColumn));
                 return date;
             }
-        } catch (Exception e) {
+        } catch (SQLiteException | IllegalStateException e) {
             Timber.e(e);
         } finally {
             if (cursor != null) {

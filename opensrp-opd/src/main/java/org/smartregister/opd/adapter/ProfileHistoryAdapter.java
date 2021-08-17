@@ -67,7 +67,7 @@ public class ProfileHistoryAdapter extends GroupedListableAdapter<ProfileHistory
                 tvEvent.setOnClickListener(null);
 
                 //This might Change Depending on View Functionality
-                if(!history.getEventDate().equals(context().getStringResource(R.string.today))){
+                if(history.getEventDate() != null && !history.getEventDate().equals(context().getStringResource(R.string.today))){
                     tvEdit.setText(context().getStringResource(R.string.view));
                 }
                 else {
@@ -90,7 +90,7 @@ public class ProfileHistoryAdapter extends GroupedListableAdapter<ProfileHistory
 
         @Override
         public void bindHeader(ProfileHistory currentObject, @Nullable ProfileHistory previousObject, ListContract.View<ProfileHistory> view) {
-            if (previousObject == null || !currentObject.getEventDate().equals(previousObject.getEventDate())) {
+            if (previousObject == null || (currentObject.getEventDate() != null && !currentObject.getEventDate().equals(previousObject.getEventDate()))) {
                 tvHeader.setVisibility(View.VISIBLE);
                 tvHeader.setText(currentObject.getEventDate());
             }

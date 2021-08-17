@@ -248,6 +248,13 @@ public class OpdConstants extends AllConstants {
         public static String TESTS_REPEATING_GROUP = "tests_repeating_group";
         public static final String DEATH_DATE = "deathdate";
         public static final String DIAGNOSTIC_TEST_LAB_RESULT = "diagnostic_test_lab_results";
+        public static final String TEST_ORDERED_AVAILABLE = "test_ordered_avail";
+        public static final String DISEASE_CODE_PRIMARY = "disease_code_primary";
+        public static final String DISEASE_CODE_OBJECT = "disease_code_object";
+        public static final String DISEASE_CODE_FINAL_DIAGNOSIS = "disease_code_final_diagn";
+        public static final String DISEASE_CODE_OBJECT_FINAL = "disease_code_object_final";
+        public static final String MEDICINE_PHARMACY = "medicine_pharmacy";
+        public static final String MEDICINE_PHARMACY_OBJECT = "medicine_pharmacy_object";
     }
 
     public static class JsonFormNameUtils {
@@ -400,4 +407,9 @@ public class OpdConstants extends AllConstants {
     public static class FileUtils {
         public static final String OPD_GLOBALS = "opd-globals.yml";
     }
+
+    public static class ErrorConstants {
+        public static final String FORM_NOT_FOUND = "Form not found";
+    }
+
 }

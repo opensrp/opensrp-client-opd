@@ -49,8 +49,8 @@ public class VisitDaoTest extends VisitDao{
 
         Map<String, String> values = VisitDao.getSavedKeysForVisit("85e5dd54-ba27-46b1-b5c2-uwj20sk5m6hue");
 
-        Assert.assertEquals(values.size(), 1);
-        Assert.assertEquals(values.get("treatment_type"), "Medicine, Suturing, Wound dressing, Foreign body removal");
+        Assert.assertEquals(1, values.size());
+        Assert.assertEquals("Medicine, Suturing, Wound dressing, Foreign body removal", values.get("treatment_type"));
     }
 
     @Test
@@ -71,7 +71,7 @@ public class VisitDaoTest extends VisitDao{
 
         String value = VisitDao.getDateStringForId("7a6e450f-0b25-4e93-bf89-bd5eb58185a2");
 
-        Assert.assertEquals(value, "16 Jul 2021");
+        Assert.assertEquals("16 Jul 2021", value);
     }
 
     @Test

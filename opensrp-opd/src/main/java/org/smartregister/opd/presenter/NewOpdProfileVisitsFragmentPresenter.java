@@ -63,7 +63,7 @@ public class NewOpdProfileVisitsFragmentPresenter extends ListPresenter<ProfileH
                     if (jsonObject != null) {
                         view.startJsonForm(jsonObject);
                     } else {
-                        view.onFetchError(new IllegalArgumentException("Form not found"));
+                        view.onFetchError(new IllegalArgumentException(OpdConstants.ErrorConstants.FORM_NOT_FOUND));
                     }
                     view.setLoadingState(false);
                 }
@@ -87,7 +87,7 @@ public class NewOpdProfileVisitsFragmentPresenter extends ListPresenter<ProfileH
         }
         attachLocationHierarchy(jsonObject);
 
-        if (StringUtils.isEmpty(formSubmissionId)) return jsonObject;
+        if (StringUtils.isBlank(formSubmissionId)) return jsonObject;
 
         NativeFormProcessor processor = OpdLibrary.getInstance().getFormProcessorFactory().createInstance(jsonObject);
 
@@ -106,21 +106,11 @@ public class NewOpdProfileVisitsFragmentPresenter extends ListPresenter<ProfileH
         OpdJsonFormUtils.patchMultiSelectList(values);
 
         // inject values
-      /*  processor.populateValues(values, jsonObject1 -> {
-            try {
-                jsonObject1.put(JsonFormConstants.READ_ONLY, readonly);
-            } catch (JSONException e) {
-                Timber.e(e);
-            }
-        }, customElementLoaders(processor));*/
-
-
-        // inject values
         processor.populateValues(values, jsonObject1 -> {
             try {
-                String key = ((jsonObject1.has(JsonFormConstants.KEY)) ? jsonObject1.getString(JsonFormConstants.KEY) : "");
+                String key = jsonObject1.optString(JsonFormConstants.KEY);
                 //Repeating Group
-                if ((key.contains("test_ordered_avail")) || readonly) {
+                if ((key.contains(OpdConstants.JSON_FORM_KEY.TEST_ORDERED_AVAILABLE)) || readonly) {
                     jsonObject1.put(JsonFormConstants.READ_ONLY, true);
                 }
 
@@ -143,12 +133,12 @@ public class NewOpdProfileVisitsFragmentPresenter extends ListPresenter<ProfileH
 
     private void attachLocationHierarchy(JSONObject jsonObject) {
         try {
-            if (jsonObject.getString(ENCOUNTER_TYPE).equals(OpdConstants.OpdModuleEventConstants.OPD_PHARMACY)
-                    || jsonObject.getString(ENCOUNTER_TYPE).equals(OpdConstants.OpdModuleEventConstants.OPD_LABORATORY)
-                    || jsonObject.getString(ENCOUNTER_TYPE).equals(OpdConstants.OpdModuleEventConstants.OPD_FINAL_OUTCOME)) {
+            if (jsonObject.optString(ENCOUNTER_TYPE).equals(OpdConstants.OpdModuleEventConstants.OPD_PHARMACY)
+                    || jsonObject.optString(ENCOUNTER_TYPE).equals(OpdConstants.OpdModuleEventConstants.OPD_LABORATORY)
+                    || jsonObject.optString(ENCOUNTER_TYPE).equals(OpdConstants.OpdModuleEventConstants.OPD_FINAL_OUTCOME)) {
                 OpdJsonFormUtils.addRegLocHierarchyQuestions(jsonObject);
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             Timber.e(e, "NewOpdProfileOverviewFragmentPresenter -> attachLocationHierarchy()");
         }
 
@@ -177,7 +167,7 @@ public class NewOpdProfileVisitsFragmentPresenter extends ListPresenter<ProfileH
 
             Callable<Void> callable = () -> {
                 //JSONObject jsonObject = new JSONObject(jsonString);
-                String eventType = jsonObject.getString(ENCOUNTER_TYPE);
+                String eventType = jsonObject.optString(ENCOUNTER_TYPE);
 
                 // inject map value for repeating groups
                 if (eventType.equalsIgnoreCase(OpdConstants.OpdModuleEventConstants.OPD_LABORATORY)) {
@@ -191,7 +181,7 @@ public class NewOpdProfileVisitsFragmentPresenter extends ListPresenter<ProfileH
                         jsonObject.getString(OpdConstants.Properties.FORM_SUBMISSION_ID) : null;
 
                 // update metadata
-                processor.withBindType("ec_client")
+                processor.withBindType(OpdConstants.TableNameConstants.ALL_CLIENTS)
                         .withEncounterType(title)
                         .withFormSubmissionId(formSubmissionId)
                         .withEntityId(entityId)
@@ -234,18 +224,18 @@ public class NewOpdProfileVisitsFragmentPresenter extends ListPresenter<ProfileH
 
     private Map<String, NativeFormFieldProcessor> getFieldProcessorMap(){
         Map<String, NativeFormFieldProcessor> fieldProcessorMap = new HashMap<>();
-        fieldProcessorMap.put(OpdConstants.JsonFormWidget.MULTI_SELECT_DRUG_PICKER, (event, jsonObject1) -> {
+        fieldProcessorMap.put(OpdConstants.JsonFormWidget.MULTI_SELECT_DRUG_PICKER, (event, fieldJsonObject) -> {
             JSONArray valuesJsonArray;
             try {
-                valuesJsonArray = new JSONArray(jsonObject1.optString(VALUE));
+                valuesJsonArray = new JSONArray(fieldJsonObject.optString(VALUE));
                 for (int i = 0; i < valuesJsonArray.length(); i++) {
                     JSONObject jsonValObject = valuesJsonArray.optJSONObject(i);
                     String fieldType = jsonValObject.optString(OPENMRS_ENTITY);
-                    String fieldCode = jsonObject1.optString(OPENMRS_ENTITY_ID);
-                    String parentCode = jsonObject1.optString(OPENMRS_ENTITY_PARENT);
+                    String fieldCode = fieldJsonObject.optString(OPENMRS_ENTITY_ID);
+                    String parentCode = fieldJsonObject.optString(OPENMRS_ENTITY_PARENT);
                     String value = jsonValObject.optString(OPENMRS_ENTITY_ID);
                     String humanReadableValues = jsonValObject.optString(AllConstants.TEXT);
-                    String formSubmissionField = jsonObject1.optString(KEY);
+                    String formSubmissionField = fieldJsonObject.optString(KEY);
                     event.addObs(new Obs(fieldType, AllConstants.TEXT, fieldCode, parentCode, Collections.singletonList(value),
                             Collections.singletonList(humanReadableValues), "", formSubmissionField));
                 }

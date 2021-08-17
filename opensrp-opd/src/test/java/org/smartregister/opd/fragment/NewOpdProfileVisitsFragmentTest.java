@@ -93,7 +93,7 @@ public class NewOpdProfileVisitsFragmentTest extends BaseFragmentTest {
         fragment.populateGlobalsList(history);
 
         Map<String, Map<String, String>> formGlobalValuesMap = ReflectionHelpers.getField(fragment, "formGlobalValuesMap");
-        Assert.assertEquals(formGlobalValuesMap.get("Today").size(), globalKeys.size());
+        Assert.assertEquals(globalKeys.size(), formGlobalValuesMap.get("Today").size());
 
     }
 
@@ -105,35 +105,35 @@ public class NewOpdProfileVisitsFragmentTest extends BaseFragmentTest {
 
         history = new ProfileHistory().setEventType(OpdConstants.OpdModuleEventConstants.OPD_CHECK_IN);
         formName = fragment.getFormName(history);
-        Assert.assertEquals(formName, OpdConstants.JsonForm.OPD_CHECKIN);
+        Assert.assertEquals(OpdConstants.JsonForm.OPD_CHECKIN, formName);
 
         history = new ProfileHistory().setEventType(OpdConstants.OpdModuleEventConstants.OPD_VITAL_DANGER_SIGNS_CHECK);
         formName = fragment.getFormName(history);
-        Assert.assertEquals(formName, OpdConstants.JsonForm.VITAL_DANGER_SIGNS);
+        Assert.assertEquals(OpdConstants.JsonForm.VITAL_DANGER_SIGNS, formName);
 
         history = new ProfileHistory().setEventType(OpdConstants.OpdModuleEventConstants.OPD_DIAGNOSIS);
         formName = fragment.getFormName(history);
-        Assert.assertEquals(formName, OpdConstants.JsonForm.DIAGNOSIS);
+        Assert.assertEquals(OpdConstants.JsonForm.DIAGNOSIS, formName);
 
         history = new ProfileHistory().setEventType(OpdConstants.OpdModuleEventConstants.OPD_TREATMENT);
         formName = fragment.getFormName(history);
-        Assert.assertEquals(formName, OpdConstants.JsonForm.TREATMENT);
+        Assert.assertEquals(OpdConstants.JsonForm.TREATMENT, formName);
 
         history = new ProfileHistory().setEventType(OpdConstants.OpdModuleEventConstants.OPD_LABORATORY);
         formName = fragment.getFormName(history);
-        Assert.assertEquals(formName, OpdConstants.JsonForm.LAB_RESULTS);
+        Assert.assertEquals(OpdConstants.JsonForm.LAB_RESULTS, formName);
 
         history = new ProfileHistory().setEventType(OpdConstants.OpdModuleEventConstants.OPD_PHARMACY);
         formName = fragment.getFormName(history);
-        Assert.assertEquals(formName, OpdConstants.JsonForm.PHARMACY);
+        Assert.assertEquals(OpdConstants.JsonForm.PHARMACY, formName);
 
         history = new ProfileHistory().setEventType(OpdConstants.OpdModuleEventConstants.OPD_FINAL_OUTCOME);
         formName = fragment.getFormName(history);
-        Assert.assertEquals(formName, OpdConstants.JsonForm.FINAL_OUTCOME);
+        Assert.assertEquals(OpdConstants.JsonForm.FINAL_OUTCOME, formName);
 
         history = new ProfileHistory().setEventType(OpdConstants.OpdModuleEventConstants.OPD_SERVICE_CHARGE);
         formName = fragment.getFormName(history);
-        Assert.assertEquals(formName, OpdConstants.JsonForm.SERVICE_FEE);
+        Assert.assertEquals(OpdConstants.JsonForm.SERVICE_FEE, formName);
     }
 
     @Test(expected = IllegalArgumentException.class)

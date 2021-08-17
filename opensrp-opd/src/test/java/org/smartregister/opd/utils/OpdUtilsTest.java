@@ -252,9 +252,9 @@ public class OpdUtilsTest {
         HashMap<String, List<String>> map = OpdUtils.getDateToEventIdMap(history);
 
         assertNotNull(map.get("10 Aug 2021"));
-        assertEquals(map.get("10 Aug 2021").size(), 2);
-        assertEquals(map.get("10 Aug 2021").get(1), "4ea2ff13-ed0d-42a7-8fee-e3a82dff8d02");
-        assertEquals(map.get("10 Aug 2021").get(0), "3ih43ih4-ed0d-42a7-8fee-e3a82dff8d02");
+        assertEquals(2, map.get("10 Aug 2021").size());
+        assertEquals("4ea2ff13-ed0d-42a7-8fee-e3a82dff8d02", map.get("10 Aug 2021").get(1));
+        assertEquals("3ih43ih4-ed0d-42a7-8fee-e3a82dff8d02", map.get("10 Aug 2021").get(0));
     }
 
 

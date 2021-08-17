@@ -104,36 +104,35 @@ public class NewOpdProfileOverviewFragmentTest extends BaseFragmentTest {
 
         action = new ProfileAction(app.getString(R.string.opd_check_in), 0);
         formName = fragment.getFormName(action);
-        Assert.assertEquals(formName, OpdConstants.JsonForm.OPD_CHECKIN);
-
+        Assert.assertEquals(OpdConstants.JsonForm.OPD_CHECKIN, formName);
 
         action = new ProfileAction(app.getString(R.string.vital_danger_signs), 1);
         formName = fragment.getFormName(action);
-        Assert.assertEquals(formName, OpdConstants.JsonForm.VITAL_DANGER_SIGNS);
+        Assert.assertEquals(OpdConstants.JsonForm.VITAL_DANGER_SIGNS, formName);
 
         action = new ProfileAction(app.getString(R.string.opd_diagnosis), 2);
         formName = fragment.getFormName(action);
-        Assert.assertEquals(formName, OpdConstants.JsonForm.DIAGNOSIS);
+        Assert.assertEquals(OpdConstants.JsonForm.DIAGNOSIS, formName);
 
         action = new ProfileAction(app.getString(R.string.lab_reports), 3);
         formName = fragment.getFormName(action);
-        Assert.assertEquals(formName, OpdConstants.JsonForm.LAB_RESULTS);
+        Assert.assertEquals(OpdConstants.JsonForm.LAB_RESULTS, formName);
 
         action = new ProfileAction(app.getString(R.string.opd_treatment), 4);
         formName = fragment.getFormName(action);
-        Assert.assertEquals(formName, OpdConstants.JsonForm.TREATMENT);
+        Assert.assertEquals(OpdConstants.JsonForm.TREATMENT, formName);
 
         action = new ProfileAction(app.getString(R.string.pharmacy), 5);
         formName = fragment.getFormName(action);
-        Assert.assertEquals(formName, OpdConstants.JsonForm.PHARMACY);
+        Assert.assertEquals(OpdConstants.JsonForm.PHARMACY, formName);
 
         action = new ProfileAction(app.getString(R.string.final_outcome), 6);
         formName = fragment.getFormName(action);
-        Assert.assertEquals(formName, OpdConstants.JsonForm.FINAL_OUTCOME);
+        Assert.assertEquals(OpdConstants.JsonForm.FINAL_OUTCOME, formName);
 
         action = new ProfileAction(app.getString(R.string.service_fee), 7);
         formName = fragment.getFormName(action);
-        Assert.assertEquals(formName, OpdConstants.JsonForm.SERVICE_FEE);
+        Assert.assertEquals(OpdConstants.JsonForm.SERVICE_FEE, formName);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -171,7 +170,7 @@ public class NewOpdProfileOverviewFragmentTest extends BaseFragmentTest {
 
         Callable<List<ProfileAction>> callable = fragment.onStartCallable(null);
         List<ProfileAction> actions = callable.call();
-        Assert.assertEquals(actions.size(), 8);
+        Assert.assertEquals(8, actions.size());
     }
 
 }

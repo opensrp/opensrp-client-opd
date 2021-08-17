@@ -145,26 +145,36 @@ public class NewOpdProfileVisitsFragment extends BaseListFragment<ProfileHistory
     }
 
     protected String getFormName(ProfileHistory profileHistory) {
+        String formName;
         switch (profileHistory.getEventType()) {
             case OpdConstants.OpdModuleEventConstants.OPD_CHECK_IN:
-                return OpdConstants.JsonForm.OPD_CHECKIN;
+                formName = OpdConstants.JsonForm.OPD_CHECKIN;
+                break;
             case OpdConstants.OpdModuleEventConstants.OPD_VITAL_DANGER_SIGNS_CHECK:
-                return OpdConstants.JsonForm.VITAL_DANGER_SIGNS;
+                formName = OpdConstants.JsonForm.VITAL_DANGER_SIGNS;
+                break;
             case OpdConstants.OpdModuleEventConstants.OPD_DIAGNOSIS:
-                return OpdConstants.JsonForm.DIAGNOSIS;
+                formName = OpdConstants.JsonForm.DIAGNOSIS;
+                break;
             case OpdConstants.OpdModuleEventConstants.OPD_TREATMENT:
-                return OpdConstants.JsonForm.TREATMENT;
+                formName = OpdConstants.JsonForm.TREATMENT;
+                break;
             case OpdConstants.OpdModuleEventConstants.OPD_LABORATORY:
-                return OpdConstants.JsonForm.LAB_RESULTS;
+                formName = OpdConstants.JsonForm.LAB_RESULTS;
+                break;
             case OpdConstants.OpdModuleEventConstants.OPD_PHARMACY:
-                return OpdConstants.JsonForm.PHARMACY;
+                formName = OpdConstants.JsonForm.PHARMACY;
+                break;
             case OpdConstants.OpdModuleEventConstants.OPD_FINAL_OUTCOME:
-                return OpdConstants.JsonForm.FINAL_OUTCOME;
+                formName = OpdConstants.JsonForm.FINAL_OUTCOME;
+                break;
             case OpdConstants.OpdModuleEventConstants.OPD_SERVICE_CHARGE:
-                return OpdConstants.JsonForm.SERVICE_FEE;
+                formName = OpdConstants.JsonForm.SERVICE_FEE;
+                break;
             default:
                 throw new IllegalArgumentException("Unknown Form");
         }
+        return formName;
     }
 
     @Override

@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.commonregistry.CommonFtsObject;
 import org.smartregister.commonregistry.CommonRepository;
@@ -162,15 +163,6 @@ public class VisitUtils {
         }
     }
 
-    /* public static String getDetailsValue(VisitDetail detail, String val) {
-         String clean_val = cleanString(val);
-         if (detail.getVisitKey().contains("date")) {
-             return getFormattedDate(getSourceDateFormat(), getSaveDateFormat(), clean_val);
-         }
-
-         return clean_val;
-     }
- */
     public static String getDetailsValue(VisitDetail detail, String val) {
         String clean_val = cleanString(val);
         if (detail.getVisitKey().contains("date") && StringUtils.isNotBlank(clean_val) && isValidDate(clean_val)) {
@@ -201,7 +193,6 @@ public class VisitUtils {
                 Date date = new Date(Long.parseLong(value));
                 return destDateFormat.format(date);
             } catch (NumberFormatException | NullPointerException nfe) {
-                Timber.e(e);
                 Timber.e(nfe);
             }
             Timber.e(e);
@@ -225,26 +216,37 @@ public class VisitUtils {
     }
 
     public static String getTranslatedVisitTypeName(String name) {
+        String translatedName;
         switch (name) {
             case OpdConstants.OpdModuleEventConstants.OPD_CHECK_IN:
-                return context().getStringResource(R.string.opd_check_in);
+                translatedName = context().getStringResource(R.string.opd_check_in);
+                break;
             case OpdConstants.OpdModuleEventConstants.OPD_VITAL_DANGER_SIGNS_CHECK:
-                return context().getStringResource(R.string.vital_danger_signs);
+                translatedName = context().getStringResource(R.string.vital_danger_signs);
+                break;
             case OpdConstants.OpdModuleEventConstants.OPD_DIAGNOSIS:
-                return context().getStringResource(R.string.opd_diagnosis);
+                translatedName = context().getStringResource(R.string.opd_diagnosis);
+                break;
             case OpdConstants.OpdModuleEventConstants.OPD_TREATMENT:
-                return context().getStringResource(R.string.opd_treatment);
+                translatedName = context().getStringResource(R.string.opd_treatment);
+                break;
             case OpdConstants.OpdModuleEventConstants.OPD_LABORATORY:
-                return context().getStringResource(R.string.lab_reports);
+                translatedName = context().getStringResource(R.string.lab_reports);
+                break;
             case OpdConstants.OpdModuleEventConstants.OPD_PHARMACY:
-                return context().getStringResource(R.string.pharmacy);
+                translatedName = context().getStringResource(R.string.pharmacy);
+                break;
             case OpdConstants.OpdModuleEventConstants.OPD_FINAL_OUTCOME:
-                return context().getStringResource(R.string.final_outcome);
+                translatedName = context().getStringResource(R.string.final_outcome);
+                break;
             case OpdConstants.OpdModuleEventConstants.OPD_SERVICE_CHARGE:
-                return context().getStringResource(R.string.service_fee);
+                translatedName = context().getStringResource(R.string.service_fee);
+                break;
             default:
-                return null;
+                translatedName =  null;
+                break;
         }
+        return translatedName;
     }
 
     public static void addPreviousVisitHivStatus(JSONObject jsonObject, String baseEntityID) {
@@ -270,8 +272,7 @@ public class VisitUtils {
                     fields.put(i, field);
                 }
             }
-        } catch (
-                Exception e) {
+        } catch (JSONException e) {
             Timber.e(e, "NewOpdProfileOverviewFragmentPresenter -> addPreviousVisitHivStatus()");
         }
     }

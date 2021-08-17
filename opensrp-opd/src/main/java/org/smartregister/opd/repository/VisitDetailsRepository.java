@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 
 import net.sqlcipher.database.SQLiteDatabase;
+import net.sqlcipher.database.SQLiteException;
 
 import org.smartregister.opd.model.VisitDetail;
 import org.smartregister.repository.BaseRepository;
@@ -44,7 +45,7 @@ public class VisitDetailsRepository extends BaseRepository {
             + ");";
 
 
-    private String[] VISIT_DETAILS_COLUMNS = {VISIT_ID, VISIT_KEY, PARENT_CODE, VISIT_DETAILS_ID, HUMAN_READABLE, DETAILS, UPDATED_AT, CREATED_AT};
+    private final String[] VISIT_DETAILS_COLUMNS = {VISIT_ID, VISIT_KEY, PARENT_CODE, VISIT_DETAILS_ID, HUMAN_READABLE, DETAILS, UPDATED_AT, CREATED_AT};
 
     public static void createTable(SQLiteDatabase database) {
         database.execSQL(CREATE_VISIT_TABLE);
@@ -53,28 +54,26 @@ public class VisitDetailsRepository extends BaseRepository {
 
     private ContentValues createValues(VisitDetail visitDetail) {
         ContentValues values = new ContentValues();
-        values.put(VISIT_DETAILS_ID, visitDetail.getVisitDetailsId());
-        values.put(VISIT_ID, visitDetail.getVisitId());
-        values.put(VISIT_KEY, visitDetail.getVisitKey());
-        values.put(PARENT_CODE, visitDetail.getParentCode());
-        values.put(DETAILS, visitDetail.getDetails());
-        values.put(HUMAN_READABLE, visitDetail.getHumanReadable());
-        values.put(CREATED_AT, visitDetail.getCreatedAt().getTime());
-        if (visitDetail.getUpdatedAt() != null)
-            values.put(UPDATED_AT, visitDetail.getUpdatedAt().getTime());
+        if(visitDetail != null){
+            values.put(VISIT_DETAILS_ID, visitDetail.getVisitDetailsId());
+            values.put(VISIT_ID, visitDetail.getVisitId());
+            values.put(VISIT_KEY, visitDetail.getVisitKey());
+            values.put(PARENT_CODE, visitDetail.getParentCode());
+            values.put(DETAILS, visitDetail.getDetails());
+            values.put(HUMAN_READABLE, visitDetail.getHumanReadable());
+            values.put(CREATED_AT, visitDetail.getCreatedAt().getTime());
+            if (visitDetail.getUpdatedAt() != null)
+                values.put(UPDATED_AT, visitDetail.getUpdatedAt().getTime());
+        }
         return values;
     }
 
     public void addVisitDetails(VisitDetail visitDetail) {
-        addVisitDetails(visitDetail, getWritableDatabase());
-    }
-
-    public void addVisitDetails(VisitDetail visitDetail, SQLiteDatabase database) {
         if (visitDetail == null) {
             return;
         }
         // Handle updated home visit details
-        database.insert(VISIT_DETAILS_TABLE, null, createValues(visitDetail));
+        getWritableDatabase().insert(VISIT_DETAILS_TABLE, null, createValues(visitDetail));
     }
 
     public List<VisitDetail> getVisits(String visitID) {
@@ -83,7 +82,7 @@ public class VisitDetailsRepository extends BaseRepository {
         try {
             cursor = getReadableDatabase().query(VISIT_DETAILS_TABLE, VISIT_DETAILS_COLUMNS, VISIT_ID + " = ? ", new String[]{visitID}, null, null, null, null);
             visitDetails = readVisitDetails(cursor);
-        } catch (Exception e) {
+        } catch (SQLiteException | IllegalStateException e) {
             Timber.e(e);
         } finally {
             if (cursor != null) {
