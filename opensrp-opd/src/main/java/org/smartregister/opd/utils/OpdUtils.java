@@ -1,10 +1,16 @@
 package org.smartregister.opd.utils;
 
+import static com.vijay.jsonwizard.constants.JsonFormConstants.OPENMRS_ENTITY;
+import static com.vijay.jsonwizard.constants.JsonFormConstants.OPENMRS_ENTITY_ID;
+import static com.vijay.jsonwizard.constants.JsonFormConstants.OPENMRS_ENTITY_PARENT;
+
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -22,7 +28,11 @@ import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.smartregister.AllConstants;
+import org.smartregister.NativeFormFieldProcessor;
+import org.smartregister.clientandeventmodel.Obs;
 import org.smartregister.opd.OpdLibrary;
+import org.smartregister.opd.domain.ProfileHistory;
 import org.smartregister.opd.pojo.OpdMetadata;
 import org.smartregister.util.FormUtils;
 import org.smartregister.util.JsonFormUtils;
@@ -35,6 +45,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +53,11 @@ import java.util.Locale;
 import java.util.Map;
 
 import timber.log.Timber;
+
+import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_EXTRA.STEP1;
+import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_KEY.VALUE;
+import static org.smartregister.opd.utils.OpdConstants.KEY.KEY;
+import static org.smartregister.util.JsonFormUtils.gson;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-09-13
@@ -262,24 +278,26 @@ public class OpdUtils extends Utils {
         HashMap<String, HashMap<String, String>> repeatingGroupMap = new HashMap<>();
         if (jsonObject != null) {
             JSONArray jsonArray = jsonObject.optJSONArray(JsonFormConstants.VALUE);
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject valueField = jsonArray.optJSONObject(i);
-                String fieldKey = valueField.optString(JsonFormConstants.KEY);
-                keysArrayList.add(fieldKey);
-            }
+            if (jsonArray != null) {
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject valueField = jsonArray.optJSONObject(i);
+                    String fieldKey = valueField.optString(JsonFormConstants.KEY);
+                    keysArrayList.add(fieldKey);
+                }
 
-            for (int k = 0; k < fields.length(); k++) {
-                JSONObject valueField = fields.optJSONObject(k);
-                String fieldKey = valueField.optString(JsonFormConstants.KEY);
-                String fieldValue = valueField.optString(JsonFormConstants.VALUE);
+                for (int k = 0; k < fields.length(); k++) {
+                    JSONObject valueField = fields.optJSONObject(k);
+                    String fieldKey = valueField.optString(JsonFormConstants.KEY);
+                    String fieldValue = valueField.optString(JsonFormConstants.VALUE);
 
-                if (fieldKey.contains("_")) {
-                    fieldKey = fieldKey.substring(0, fieldKey.lastIndexOf("_"));
-                    if (keysArrayList.contains(fieldKey) && StringUtils.isNotBlank(fieldValue) && !fieldValue.equals(OpdConstants.TYPE_OF_TEXT_LABEL)) {
-                        String fieldKeyId = valueField.optString(JsonFormConstants.KEY).substring(fieldKey.length() + 1);
-                        HashMap<String, String> hashMap = repeatingGroupMap.get(fieldKeyId) == null ? new HashMap<>() : repeatingGroupMap.get(fieldKeyId);
-                        hashMap.put(fieldKey, fieldValue);
-                        repeatingGroupMap.put(fieldKeyId, hashMap);
+                    if (fieldKey.contains("_")) {
+                        fieldKey = fieldKey.substring(0, fieldKey.lastIndexOf("_"));
+                        if (keysArrayList.contains(fieldKey) && StringUtils.isNotBlank(fieldValue) && !fieldValue.equals(OpdConstants.TYPE_OF_TEXT_LABEL)) {
+                            String fieldKeyId = valueField.optString(JsonFormConstants.KEY).substring(fieldKey.length() + 1);
+                            HashMap<String, String> hashMap = repeatingGroupMap.get(fieldKeyId) == null ? new HashMap<>() : repeatingGroupMap.get(fieldKeyId);
+                            hashMap.put(fieldKey, fieldValue);
+                            repeatingGroupMap.put(fieldKeyId, hashMap);
+                        }
                     }
                 }
             }
@@ -388,5 +406,68 @@ public class OpdUtils extends Utils {
             return resultString;
         }
         return "";
+    }
+
+    public static HashMap<String, List<String>> getDateToEventIdMap(List<ProfileHistory> historyList) {
+        HashMap<String, List<String>> map = new HashMap<>();
+        // Reverse the list order so that the latest edited  values are used
+        ArrayList<ProfileHistory> reverseHistoryList = new ArrayList<>(historyList);
+        Collections.reverse(reverseHistoryList);
+        for (ProfileHistory profileHistory : reverseHistoryList) {
+            String date = profileHistory.getEventDate();
+            List<String> visitIds = new ArrayList<>();
+            if (map.containsKey(date)) {
+                List<String> oldIds = map.get(date);
+                if (oldIds != null)
+                    visitIds.addAll(oldIds);
+                visitIds.add(profileHistory.getID());
+            } else {
+                visitIds.add(profileHistory.getID());
+            }
+            map.put(date, visitIds);
+        }
+        return map;
+    }
+
+    public static void injectGroupMap(JSONObject jsonObject) throws JSONException {
+        JSONObject step = jsonObject.getJSONObject(STEP1);
+        JSONArray fields = step.optJSONArray(OpdJsonFormUtils.FIELDS);
+        HashMap<String, HashMap<String, String>> buildRepeatingGroupTests = buildRepeatingGroupTests(step);
+        if (!buildRepeatingGroupTests.isEmpty()) {
+            String strTest = gson.toJson(buildRepeatingGroupTests);
+            JSONObject repeatingGroupObj = new JSONObject();
+            repeatingGroupObj.put(JsonFormConstants.KEY, OpdConstants.REPEATING_GROUP_MAP);
+            repeatingGroupObj.put(JsonFormConstants.VALUE, strTest);
+            repeatingGroupObj.put(JsonFormConstants.TYPE, JsonFormConstants.HIDDEN);
+            if (fields != null) {
+                fields.put(repeatingGroupObj);
+                step.put(OpdJsonFormUtils.FIELDS, fields);
+                jsonObject.put(STEP1, step);
+            }
+        }
+    }
+
+    public static Map<String, NativeFormFieldProcessor> getFieldProcessorMap() {
+        Map<String, NativeFormFieldProcessor> fieldProcessorMap = new HashMap<>();
+        fieldProcessorMap.put(OpdConstants.JsonFormWidget.MULTI_SELECT_DRUG_PICKER, (event, fieldJsonObject) -> {
+            JSONArray valuesJsonArray;
+            try {
+                valuesJsonArray = new JSONArray(fieldJsonObject.optString(VALUE));
+                for (int i = 0; i < valuesJsonArray.length(); i++) {
+                    JSONObject jsonValObject = valuesJsonArray.optJSONObject(i);
+                    String fieldType = jsonValObject.optString(OPENMRS_ENTITY);
+                    String fieldCode = fieldJsonObject.optString(OPENMRS_ENTITY_ID);
+                    String parentCode = fieldJsonObject.optString(OPENMRS_ENTITY_PARENT);
+                    String value = jsonValObject.optString(OPENMRS_ENTITY_ID);
+                    String humanReadableValues = jsonValObject.optString(AllConstants.TEXT);
+                    String formSubmissionField = fieldJsonObject.optString(KEY);
+                    event.addObs(new Obs(fieldType, AllConstants.TEXT, fieldCode, parentCode, Collections.singletonList(value),
+                            Collections.singletonList(humanReadableValues), "", formSubmissionField));
+                }
+            } catch (JSONException e) {
+                Timber.e(e);
+            }
+        });
+        return fieldProcessorMap;
     }
 }

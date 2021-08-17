@@ -14,6 +14,10 @@ public class OpdConstants extends AllConstants {
     public static final String BIND_TYPE = "bind_type";
     public static final String VISIT_ID = "visit_id";
     public static final String VISIT_DATE = "visit_date";
+    public static final String METADATA = "metadata";
+
+    public static final String DETAILS = "details";
+    public static final String RELATIONSHIPS = "relationships";
 
     public interface StepTitle {
         String TEST_CONDUCTED = "Test Conducted";
@@ -191,6 +195,7 @@ public class OpdConstants extends AllConstants {
         public static final String SERVICE_FEE = "service_fee";
         public static final String VISIT_ID = "visitId";
         public static final String MEDICINE = "medicine";
+        public static final String MEDICINE_OBJECT = "medicine_object";
         public static final String DOSAGE = "dosage";
         public static final String DURATION = "duration";
         public static final String INFO = "info";
@@ -224,6 +229,8 @@ public class OpdConstants extends AllConstants {
         public static final String OPD_EDIT_FORM_TITLE = "Update Opd Registration";
         public static final String FORM_TITLE = "title";
         public static final String OPENSRP_ID = "opensrp_id";
+        public static final String FIELDS = "fields";
+        public static final String VALUE = "value";
 
         public static final String DIAGNOSTIC_TEST_RESULT_GLUCOSE = "diagnostic_test_result_glucose";
         public static final String DIAGNOSTIC_TEST_RESULT_SPINNER_BLOOD_TYPE = "diagnostic_test_result_spinner_blood_type";
@@ -240,6 +247,14 @@ public class OpdConstants extends AllConstants {
         public static final String OPD_CLOSE_REASON = "opd_close_reason";
         public static String TESTS_REPEATING_GROUP = "tests_repeating_group";
         public static final String DEATH_DATE = "deathdate";
+        public static final String DIAGNOSTIC_TEST_LAB_RESULT = "diagnostic_test_lab_results";
+        public static final String TEST_ORDERED_AVAILABLE = "test_ordered_avail";
+        public static final String DISEASE_CODE_PRIMARY = "disease_code_primary";
+        public static final String DISEASE_CODE_OBJECT = "disease_code_object";
+        public static final String DISEASE_CODE_FINAL_DIAGNOSIS = "disease_code_final_diagn";
+        public static final String DISEASE_CODE_OBJECT_FINAL = "disease_code_object_final";
+        public static final String MEDICINE_PHARMACY = "medicine_pharmacy";
+        public static final String MEDICINE_PHARMACY_OBJECT = "medicine_pharmacy_object";
     }
 
     public static class JsonFormNameUtils {
@@ -282,6 +297,9 @@ public class OpdConstants extends AllConstants {
         public static final String DOD = "dod";
         public static final String DATE_REMOVED = "date_removed";
         public static final String DIED = "died";
+        public static final String REFERRAL_FACILITY = "referral_facility_specify";
+        public static final String REFERRAL_LOCATION = "referral_location_med";
+        public static final String REFERRAL_LOCATION_LAB = "referral_location_med_lab";
     }
 
     public static class ENTITY {
@@ -313,4 +331,85 @@ public class OpdConstants extends AllConstants {
         public static final String OPD_CLOSE = "OPD Close";
         public static final String DEATH = "Death";
     }
+
+
+    //New OPD Module WorkFlow
+    public interface DateTimeFormat {
+        String HH_MM_AMPM = "h:mm a";
+        String YYYY_MM_dd_HH_mm_ss = "yyyy-MM-dd HH:mm:ss";
+        String dd_MMM_yyyy = "dd MMM yyyy";
+        String hh_mm_ss = "hh:mm:ss";
+        String hh_mm = "hh:mm";
+        String dd_MM_yyyy = "dd/MM/yyyy";
+        String ddMMyyyy = "ddMMyyyy";
+        String yyyy_MM_dd = "yyyy-MM-dd";
+    }
+
+
+    public static class OpdModuleEventConstants {
+        public static final String OPD_REGISTRATION = "OPD_Registration";
+        public static final String OPD_CHECK_IN = "OPD_Check_in";
+        public static final String OPD_VITAL_DANGER_SIGNS_CHECK = "OPD_Vital_Danger_signs_check";
+        public static final String OPD_DIAGNOSIS = "OPD_Diagnosis";
+        public static final String OPD_LABORATORY = "OPD_Laboratory";
+        public static final String OPD_TREATMENT = "OPD_Treatment";
+        public static final String OPD_PHARMACY = "OPD_Pharmacy";
+        public static final String OPD_FINAL_OUTCOME = "OPD_Final_Outcome";
+        public static final String OPD_SERVICE_CHARGE= "OPD_Service_Charge";
+        public static final String OPD_VISIT_GROUP = "opd_visit_group";
+
+    }
+
+    public interface Properties {
+        String TASK_IDENTIFIER = "taskIdentifier";
+        String TASK_BUSINESS_STATUS = "taskBusinessStatus";
+        String TASK_STATUS = "taskStatus";
+        String TASK_CODE = "taskCode";
+        String LOCATION_UUID = "locationUUID";
+        String LOCATION_VERSION = "locationVersion";
+        String LOCATION_TYPE = "locationType";
+        String LOCATION_PARENT = "locationParent";
+        String LOCATION_ID = "location_id";
+        String FEATURE_SELECT_TASK_BUSINESS_STATUS = "featureSelectTaskBusinessStatus";
+        String BASE_ENTITY_ID = "baseEntityId";
+        String FORM_SUBMISSION_ID = "formSubmissionId";
+        String STRUCTURE_NAME = "structure_name";
+        String APP_VERSION_NAME = "appVersionName";
+        String FORM_VERSION = "form_version";
+        String TASK_CODE_LIST = "task_code_list";
+        String FAMILY_MEMBER_NAMES = "family_member_names";
+        String PLAN_IDENTIFIER = "planIdentifier";
+        String LOCATION_STATUS = "status";
+        String LOCATION_NAME = "name";
+    }
+
+    public interface JsonForm {
+        // TODO
+        String OPD_CHECKIN = "json.form/opd_checkin.json";
+        String VITAL_DANGER_SIGNS = "json.form/opd_danger_signs.json";
+        String DIAGNOSIS = "json.form/opd_diagnosis.json";
+        String LAB_RESULTS = "json.form/opd_laboratory.json";
+        String TREATMENT = "json.form/opd_treatment.json";
+        String PHARMACY = "json.form/opd_pharmacy.json";
+        String FINAL_OUTCOME = "json.form/opd_outcome.json";
+        String SERVICE_FEE = "json.form/opd_service_fee.json";
+    }
+
+    public static class TableNameConstants {
+        public static final String ALL_CLIENTS = "ec_client";
+    }
+
+
+    public static class PropertyConstants {
+        public static final String USE_NEW_OPD_MODULE = "use.new.opd.module";
+    }
+
+    public static class FileUtils {
+        public static final String OPD_GLOBALS = "opd-globals.yml";
+    }
+
+    public static class ErrorConstants {
+        public static final String FORM_NOT_FOUND = "Form not found";
+    }
+
 }

@@ -28,6 +28,7 @@ import org.smartregister.Context;
 import org.smartregister.CoreLibrary;
 import org.smartregister.clientandeventmodel.Client;
 import org.smartregister.clientandeventmodel.Event;
+import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.domain.ProfileImage;
 import org.smartregister.domain.form.FormLocation;
 import org.smartregister.domain.tag.FormTag;
@@ -51,10 +52,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import id.zelory.compressor.Compressor;
 
-@PrepareForTest({OpdUtils.class, OpdLibrary.class})
+@PrepareForTest({OpdUtils.class, OpdLibrary.class, LocationHelper.class})
 @RunWith(PowerMockRunner.class)
 public class OpdJsonFormUtilsTest {
 
@@ -519,4 +521,175 @@ public class OpdJsonFormUtilsTest {
         Assert.assertEquals("/home/opensrp/2323-wxdfd9-34.JPEG", profileImage.getFilepath());
         Assert.assertEquals(ImageRepository.TYPE_Unsynced, profileImage.getSyncStatus());
     }
+
+    @Test
+    public void testMedicineNoteString() throws Exception {
+        String medicineValues = "[{\"key\":\"AA007840\",\"text\":\"Atenolol 50mg\",\"openmrs_entity\":\"\",\"openmrs_entity_id\":\"\",\"openmrs_entity_parent\":\"\",\"property\":{\"pack_size\":null,\"product_code\":\"AA007840\",\"dispensing_unit\":\"Tablet\",\"meta\":{\"duration\":\"78\",\"dosage\":\"12\",\"frequency\":\"3456\",\"info\":\"Dose: 12, Duration: 78, Frequency: 3456\"}}},{\"key\":\"FF006300\",\"text\":\"Bandage, WOW 10cm x 4m long, when stretched\",\"openmrs_entity\":\"\",\"openmrs_entity_id\":\"\",\"openmrs_entity_parent\":\"\",\"property\":{\"pack_size\":null,\"product_code\":\"FF006300\",\"dispensing_unit\":\"each\",\"meta\":{\"duration\":\"33\",\"dosage\":\"11\",\"frequency\":\"2244\",\"info\":\"Dose: 11, Duration: 33, Frequency: 2244\"}}}]\n";
+        String result = OpdJsonFormUtils.getMedicineNoteString(medicineValues);
+        String output = "Atenolol 50mg, Bandage, WOW 10cm x 4m long, when stretched";
+        Assert.assertEquals(output, result);
+    }
+
+    @Test
+    public void testGetLabResultsStringFromMap() throws Exception {
+        HashMap<String, String> savedValues = new HashMap<>();
+        savedValues.put("tests_repeating_group_count", "3");
+        savedValues.put("diagnostic_test_ba1ed23029a44fd980784093a5c6f746", "ultra_sound");
+        savedValues.put("diagnostic_test_24f8d3b0a73a49e9894c83d6d545b39f", "pregnancy_test");
+        savedValues.put("repeatingGroupMap", "{\"24f8d3b0a73a49e9894c83d6d545b39f\":{\"diagnostic_test_result\":\"Negative\",\"diagnostic_test\":\"pregnancy_test\"},\"ba1ed23029a44fd980784093a5c6f746\":{\"diagnostic_test\":\"ultra_sound\",\"diagnostic_test_result_specify\":\"Ultra\"}}");
+        savedValues.put("treatment_type", "Medicine, Suturing, Wound dressing, Foreign body removal");
+        savedValues.put("diagnostic_test_result_specify_ba1ed23029a44fd980784093a5c6f746", "Ultra");
+        savedValues.put("diagnostic_test_result_24f8d3b0a73a49e9894c83d6d545b39f", "Negative");
+        String result = OpdJsonFormUtils.getLabResultsStringFromMap(savedValues);
+        String output = "Pregnancy test: { Status result: Negative, }, Ultra sound: , Specify result: Ultra}";
+        Assert.assertEquals( output, result);
+    }
+
+    @Test
+    public void testAttachLocationHierarchy() throws Exception {
+        String form = "{\n  \"count\": \"1\",\n  \"encounter_type\": \"OPD_Laboratory\",\n  \"step1\": {\n    \"title\": \"Lab\",\n    \"fields\": [\n      {\n        \"key\": \"referral_lab\",\n        \"openmrs_entity_parent\": \"\",\n        \"openmrs_entity\": \"concept\",\n        \"openmrs_entity_id\": \"161360AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\",\n        \"label\": \"Was the client referred?\",\n        \"label_text_style\": \"bold\",\n        \"type\": \"native_radio\",\n        \"options\": [\n          {\n            \"key\": \"yes\",\n            \"text\": \"Yes\",\n            \"openmrs_entity_parent\": \"\",\n            \"openmrs_entity\": \"concept\",\n            \"openmrs_entity_id\": \"1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"\n          },\n          {\n            \"key\": \"no\",\n            \"text\": \"No\",\n            \"openmrs_entity_parent\": \"\",\n            \"openmrs_entity\": \"concept\",\n            \"openmrs_entity_id\": \"1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"\n          }\n        ]\n      },\n      {\n        \"key\": \"referral_location_med_lab\",\n        \"openmrs_entity_parent\": \"\",\n        \"openmrs_entity\": \"concept\",\n        \"openmrs_entity_id\": \"1272AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\",\n        \"hint\": \"Where were they referred to?\",\n        \"label_text_style\": \"bold\",\n        \"type\": \"tree\"\n      },\n      {\n        \"key\": \"visit_id\",\n        \"openmrs_entity_parent\": \"\",\n        \"openmrs_entity\": \"\",\n        \"openmrs_entity_id\": \"\",\n        \"type\": \"hidden\"\n      },\n      {\n        \"key\": \"visit_date\",\n        \"openmrs_entity_parent\": \"\",\n        \"openmrs_entity\": \"\",\n        \"openmrs_entity_id\": \"\",\n        \"type\": \"hidden\"\n      }\n    ]\n  },\n  \"baseEntityId\": \"d8c3e0bd-bfd1-448c-9236-ff887f56820d\"\n}";
+        JSONObject formObject = new JSONObject(form);
+        PowerMockito.mockStatic(OpdUtils.class);
+        PowerMockito.mockStatic(LocationHelper.class);
+        OpdMetadata mockOPdData = Mockito.spy(opdMetadata);
+        PowerMockito.doReturn(mockOPdData).when(OpdUtils.class, "metadata");
+        Set<String> key = new HashSet<>();
+        key.add("referral_location_med_lab");
+        PowerMockito.when(mockOPdData.getFieldsWithLocationHierarchy()).thenReturn(key);
+
+        LocationHelper locationHelper = Mockito.mock(LocationHelper.class);
+        PowerMockito.when(LocationHelper.getInstance()).thenReturn(locationHelper);
+
+        List<String> allLevels = new ArrayList<>();
+        allLevels.add("Country");
+        allLevels.add("Province");
+        allLevels.add("District");
+        allLevels.add("Facility");
+        allLevels.add("Village");
+        PowerMockito.doReturn(allLevels).when(mockOPdData).getLocationLevels();
+
+        List<String> healthFacilities = new ArrayList<>();
+        healthFacilities.add("Country");
+        healthFacilities.add("Province");
+        healthFacilities.add("District");
+        healthFacilities.add("Facility");
+        healthFacilities.add("Village");
+        PowerMockito.doReturn(healthFacilities).when(mockOPdData).getHealthFacilityLevels();
+
+        List<String> defaultLocation = new ArrayList<>();
+        defaultLocation.add("MOH MALAWI Govt");
+        defaultLocation.add("Central West Zone");
+        defaultLocation.add("Central West Zone");
+        defaultLocation.add("Ntcheu-DHO");
+        PowerMockito.doReturn(defaultLocation).when(locationHelper).generateDefaultLocationHierarchy(allLevels);
+
+
+        List<String> defaultFacility = new ArrayList<>();
+        defaultFacility.add("MOH MALAWI Govt");
+        defaultFacility.add("Central West Zon");
+        defaultFacility.add("Ntcheu-DHO");
+        defaultFacility.add("Bilila Health Centre");
+        PowerMockito.doReturn(defaultFacility).when(locationHelper).generateDefaultLocationHierarchy(healthFacilities);
+
+        FormLocation formLocationA = new FormLocation();
+        formLocationA.key = "MOH MALAWI Govt";
+        formLocationA.name = "MOH MALAWI Govt";
+
+        FormLocation formLocationB = new FormLocation();
+        formLocationB.key = "Central West Zon";
+        formLocationB.name = "Central West Zon";
+        ArrayList<FormLocation> nodes = new ArrayList<>();
+        nodes.add(formLocationA);
+        formLocationA.nodes = nodes;
+
+        OpdJsonFormUtils.addRegLocHierarchyQuestions(formObject);
+        JSONObject step1 = formObject.getJSONObject("step1");
+        JSONArray fields = step1.getJSONArray("fields");
+        JSONObject hierarchy = fields.optJSONObject(1);
+
+        Assert.assertTrue(hierarchy.has("default"));
+
+    }
+
+    @Test
+    public void testAttachAgeAndGender() throws Exception {
+        String jsonString = "{\n" +
+                "  \"count\": \"1\",\n" +
+                "  \"encounter_type\": \"OPD_Diagnosis\",\n" +
+                "  \"entity_id\": \"\",\n" +
+                "  \"step1\": {\n" +
+                "    \"title\": \"Diagnosis\",\n" +
+                "    \"fields\": [\n" +
+                "      {\n" +
+                "        \"key\": \"danger_signs_opd_note\",\n" +
+                "        \"openmrs_entity_parent\": \"\",\n" +
+                "        \"openmrs_entity\": \"\",\n" +
+                "        \"openmrs_entity_id\": \"\",\n" +
+                "        \"type\": \"toaster_notes\",\n" +
+                "        \"text\": \"Danger Signs {danger_signs}\",\n" +
+                "        \"toaster_type\": \"problem\",\n" +
+                "        \"relevance\": {\n" +
+                "          \"rules-engine\": {\n" +
+                "            \"ex-rules\": {\n" +
+                "              \"rules-file\": \"opd/opd_diagnosis_relevance_rules.yml\"\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        \"calculation\": {\n" +
+                "          \"rules-engine\": {\n" +
+                "            \"ex-rules\": {\n" +
+                "              \"rules-file\": \"opd/opd_diagnosis_calculation.yml\"\n" +
+                "            }\n" +
+                "          }\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"key\": \"gender\",\n" +
+                "        \"openmrs_entity_parent\": \"\",\n" +
+                "        \"openmrs_entity\": \"\",\n" +
+                "        \"openmrs_entity_id\": \"\",\n" +
+                "        \"type\": \"hidden\"\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"key\": \"age\",\n" +
+                "        \"openmrs_entity_parent\": \"\",\n" +
+                "        \"openmrs_entity\": \"\",\n" +
+                "        \"openmrs_entity_id\": \"\",\n" +
+                "        \"type\": \"hidden\"\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  },\n" +
+                "  \"baseEntityId\": \"43f2675c-a1f3-4d24-9788-a83c68ed48e5\"\n" +
+                "}";
+        JSONObject json = new JSONObject(jsonString);
+        HashMap<String, String> map = new HashMap<>();
+        map.put("gender", "Female");
+        map.put("dob", "1960-01-01T17:00:00.000+05:00");
+        CommonPersonObjectClient commonPersonObject = new CommonPersonObjectClient("", map, "");
+        commonPersonObject.setColumnmaps(map);
+        OpdJsonFormUtils.attachAgeAndGender(json, commonPersonObject);
+        String gender = JsonFormUtils.getFieldValue(json.toString(), "gender");
+        String age = JsonFormUtils.getFieldValue(json.toString(), "age");
+        Assert.assertEquals("Female", gender);
+        Assert.assertEquals("61", age);
+    }
+
+    @Test
+    public void testPatchMultiSelectList() {
+        HashMap<String, Object> values = new HashMap<>();
+        values.put("disease_code_primary", "");
+        values.put("disease_code_final_diagn", "");
+        values.put("medicine", "");
+        values.put("medicine_pharmacy", "");
+        values.put("disease_code_object", "disease_code");
+        values.put("disease_code_object_final", "disease_code");
+        values.put("medicine_object", "medicine_code");
+        values.put("medicine_pharmacy_object", "medicine_code");
+        OpdJsonFormUtils.patchMultiSelectList(values);
+        Assert.assertEquals("disease_code", values.get("disease_code_primary"));
+        Assert.assertEquals("disease_code", values.get("disease_code_final_diagn"));
+        Assert.assertEquals("medicine_code", values.get("medicine"));
+        Assert.assertEquals("medicine_code", values.get("medicine_pharmacy"));
+    }
 }
+
