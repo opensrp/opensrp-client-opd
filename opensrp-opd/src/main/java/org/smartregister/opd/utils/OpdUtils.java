@@ -1,5 +1,9 @@
 package org.smartregister.opd.utils;
 
+import static com.vijay.jsonwizard.constants.JsonFormConstants.OPENMRS_ENTITY;
+import static com.vijay.jsonwizard.constants.JsonFormConstants.OPENMRS_ENTITY_ID;
+import static com.vijay.jsonwizard.constants.JsonFormConstants.OPENMRS_ENTITY_PARENT;
+
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -24,6 +28,9 @@ import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.smartregister.AllConstants;
+import org.smartregister.NativeFormFieldProcessor;
+import org.smartregister.clientandeventmodel.Obs;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.domain.ProfileHistory;
 import org.smartregister.opd.pojo.OpdMetadata;
@@ -48,6 +55,8 @@ import java.util.Map;
 import timber.log.Timber;
 
 import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_EXTRA.STEP1;
+import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_KEY.VALUE;
+import static org.smartregister.opd.utils.OpdConstants.KEY.KEY;
 import static org.smartregister.util.JsonFormUtils.gson;
 
 /**
@@ -436,5 +445,29 @@ public class OpdUtils extends Utils {
                 jsonObject.put(STEP1, step);
             }
         }
+    }
+
+    public static Map<String, NativeFormFieldProcessor> getFieldProcessorMap() {
+        Map<String, NativeFormFieldProcessor> fieldProcessorMap = new HashMap<>();
+        fieldProcessorMap.put(OpdConstants.JsonFormWidget.MULTI_SELECT_DRUG_PICKER, (event, fieldJsonObject) -> {
+            JSONArray valuesJsonArray;
+            try {
+                valuesJsonArray = new JSONArray(fieldJsonObject.optString(VALUE));
+                for (int i = 0; i < valuesJsonArray.length(); i++) {
+                    JSONObject jsonValObject = valuesJsonArray.optJSONObject(i);
+                    String fieldType = jsonValObject.optString(OPENMRS_ENTITY);
+                    String fieldCode = fieldJsonObject.optString(OPENMRS_ENTITY_ID);
+                    String parentCode = fieldJsonObject.optString(OPENMRS_ENTITY_PARENT);
+                    String value = jsonValObject.optString(OPENMRS_ENTITY_ID);
+                    String humanReadableValues = jsonValObject.optString(AllConstants.TEXT);
+                    String formSubmissionField = fieldJsonObject.optString(KEY);
+                    event.addObs(new Obs(fieldType, AllConstants.TEXT, fieldCode, parentCode, Collections.singletonList(value),
+                            Collections.singletonList(humanReadableValues), "", formSubmissionField));
+                }
+            } catch (JSONException e) {
+                Timber.e(e);
+            }
+        });
+        return fieldProcessorMap;
     }
 }
