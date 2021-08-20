@@ -94,7 +94,7 @@
     <string name="vital_danger_signs">VITAL/DANGER SIGNS</string>
     <string name="opd_diagnosis">DIAGNOSIS</string>
     <string name="lab_reports">LABORATORY TESTS AND RESULTS</string>
-    <string name="opd_treatment">TREATMENT</string>
+    <string name="opd_treatment">FINAL DIAGNOSIS AND TREATMENT</string>
     <string name="pharmacy">PHARMACY</string>
     <string name="final_outcome">FINAL OUTCOME</string>
     <string name="service_fee">SERVICE FEE</string>
