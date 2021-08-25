@@ -83,8 +83,8 @@ public class VisitUtilsTest extends BaseFragmentTest {
 
         Assert.assertEquals("CHECK IN", VisitUtils.getTranslatedVisitTypeName(OpdConstants.OpdModuleEventConstants.OPD_CHECK_IN));
         Assert.assertEquals("VITAL/DANGER SIGNS", VisitUtils.getTranslatedVisitTypeName(OpdConstants.OpdModuleEventConstants.OPD_VITAL_DANGER_SIGNS_CHECK));
-        Assert.assertEquals("DIAGNOSIS", VisitUtils.getTranslatedVisitTypeName(OpdConstants.OpdModuleEventConstants.OPD_DIAGNOSIS));
-        Assert.assertEquals("TREATMENT", VisitUtils.getTranslatedVisitTypeName(OpdConstants.OpdModuleEventConstants.OPD_TREATMENT));
+        Assert.assertEquals("PRELIMINARY DIAGNOSIS", VisitUtils.getTranslatedVisitTypeName(OpdConstants.OpdModuleEventConstants.OPD_DIAGNOSIS));
+        Assert.assertEquals("FINAL DIAGNOSIS AND TREATMENT", VisitUtils.getTranslatedVisitTypeName(OpdConstants.OpdModuleEventConstants.OPD_TREATMENT));
         Assert.assertEquals("LABORATORY TESTS AND RESULTS", VisitUtils.getTranslatedVisitTypeName(OpdConstants.OpdModuleEventConstants.OPD_LABORATORY));
         Assert.assertEquals("PHARMACY", VisitUtils.getTranslatedVisitTypeName(OpdConstants.OpdModuleEventConstants.OPD_PHARMACY));
         Assert.assertEquals("FINAL OUTCOME", VisitUtils.getTranslatedVisitTypeName(OpdConstants.OpdModuleEventConstants.OPD_FINAL_OUTCOME ));

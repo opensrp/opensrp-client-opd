@@ -27,11 +27,15 @@ public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements 
     private Button opd_btn_save_drug;
 
     @Override
-    protected void handleClickEventOnListData(@NonNull MultiSelectItem multiSelectItem) {
-        createAdditionalDetailsDialog(multiSelectItem);
+    protected void handleClickEventOnListData(@NonNull MultiSelectItem multiSelectItem, String key) {
+        // Make sure its not called for other multi-select fields
+        if (key.equals(OpdConstants.JSON_FORM_KEY.MEDICINE) || key.equals(OpdConstants.JSON_FORM_KEY.MEDICINE_PHARMACY))
+            createAdditionalDetailsDialog(multiSelectItem, key);
+        else
+            super.handleClickEventOnListData(multiSelectItem, key);
     }
 
-    private void createAdditionalDetailsDialog(@NonNull final MultiSelectItem multiSelectItem) {
+    private void createAdditionalDetailsDialog(@NonNull final MultiSelectItem multiSelectItem, final String currentAdapterKey) {
         LayoutInflater inflater = LayoutInflater.from(getContext());
         View view = inflater.inflate(R.layout.opd_drug_instructions_layout, null);
         ImageView imgClose = view.findViewById(R.id.multiSelectListCloseDialog);
@@ -83,18 +87,18 @@ public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements 
                 }
 
 
-                writeAdditionalDetails(duration, dosage, frequency, multiSelectItem);
+                writeAdditionalDetails(duration, dosage, frequency, multiSelectItem, currentAdapterKey);
 
                 writeToForm(currentAdapterKey);
 
                 alertDialog.dismiss();
 
-                getAlertDialog().dismiss();
+                getAlertDialog(currentAdapterKey).dismiss();
             }
         });
     }
 
-    protected void writeAdditionalDetails(@NonNull String duration, @NonNull String dosage, @NonNull String frequency, @NonNull MultiSelectItem multiSelectItem) {
+    protected void writeAdditionalDetails(@NonNull String duration, @NonNull String dosage, @NonNull String frequency, @NonNull MultiSelectItem multiSelectItem, String currentAdapterKey) {
         String multiSelectValue = multiSelectItem.getValue();
         String msg = String.format(getContext().getString(R.string.opd_drug_instructions_text), dosage, duration, frequency);
         JSONObject jsonObject = new JSONObject();
@@ -112,7 +116,7 @@ public class OpdMultiSelectDrugPicker extends MultiSelectListFactory implements 
         }
 
         multiSelectItem.setValue(jsonObject.toString());
-        updateSelectedData(multiSelectItem, false);
+        updateSelectedData(multiSelectItem, false, currentAdapterKey);
     }
 
     @Override
