@@ -118,4 +118,24 @@ public class VisitDaoTest extends VisitDao{
         Assert.assertEquals(1, history.size());
     }
 
+    @Test
+    public void testHIVStatus() {
+        doReturn(database).when(repository).getReadableDatabase();
+        MatrixCursor matrixCursor = new MatrixCursor(new String[]{
+                "visit_details_id", "visit_id", "visit_key", "parent_code",
+                "details", "human_readable_details", "updated_at", "created_at"
+        });
+
+        matrixCursor.addRow(new Object[]{
+                "85e5dd54-ba27-46b1-b5c2-2bab06fd77e2", "7a6e450f-0b25-4e93-bf89-bd5eb58185a2", "medical_conditions", "",
+                "", "HIV", "", "1626451003565"
+        });
+
+        doReturn(matrixCursor).when(database).rawQuery(Mockito.any(), Mockito.any());
+
+        boolean hivStatus = VisitDao.hasPreviousHIVStatus("009c16d8-e905-4ce9-a4e3-5083a0c23e31");
+
+        Assert.assertTrue(hivStatus);
+    }
+
 }
