@@ -146,8 +146,6 @@ public class VisitDao extends AbstractDao {
         String sql = "SELECT visit_key, details,  human_readable_details FROM opd_client_visit_details WHERE visit_id = '" + visitId + "'";
 
         DataMap<Void> dataMap = cursor -> {
-
-
             String key = getCursorValue(cursor, "visit_key");
             String value = "";
             String humanReadableValue = getCursorValue(cursor, "human_readable_details");
@@ -246,7 +244,7 @@ public class VisitDao extends AbstractDao {
                 ") AND visit_key =='medical_conditions' AND human_readable_details = 'HIV'";
 
         DataMap<Boolean> dataMap = cursor -> cursor.getCount() > 0;
-        return readData(sql, dataMap).get(0);
+        return readData(sql, dataMap).size() > 0;
     }
 
     private static String getVisitIdQuery(String baseEntityId) {
