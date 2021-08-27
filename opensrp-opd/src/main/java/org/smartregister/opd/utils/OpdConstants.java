@@ -401,7 +401,8 @@ public class OpdConstants extends AllConstants {
 
 
     public static class PropertyConstants {
-        public static final String USE_NEW_OPD_MODULE = "use.new.opd.module";
+        public static final String OPD_VERSION = "opd.version";
+        public static final String OPD_VERSION_V2 = "V2";
     }
 
     public static class FileUtils {

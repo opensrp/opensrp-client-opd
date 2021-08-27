@@ -366,7 +366,7 @@ public class BaseOpdProfileActivity extends BaseProfileActivity implements OpdPr
 
     @Override
     protected ViewPager setupViewPager(ViewPager viewPager) {
-        if (OpdLibrary.getInstance().getProperties().hasProperty(OpdConstants.PropertyConstants.USE_NEW_OPD_MODULE)) {
+        if (OpdLibrary.getInstance().shouldUseOpdV2()) {
             return setupNewOpdModuleViewPager(viewPager);
         }
         return setupLegacyViewPager(viewPager);
