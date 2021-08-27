@@ -677,16 +677,13 @@ public class OpdJsonFormUtilsTest {
     @Test
     public void testPatchMultiSelectList() {
         HashMap<String, Object> values = new HashMap<>();
-        values.put("disease_code_primary", "");
         values.put("disease_code_final_diagn", "");
         values.put("medicine", "");
         values.put("medicine_pharmacy", "");
-        values.put("disease_code_object", "disease_code");
         values.put("disease_code_object_final", "disease_code");
         values.put("medicine_object", "medicine_code");
         values.put("medicine_pharmacy_object", "medicine_code");
         OpdJsonFormUtils.patchMultiSelectList(values);
-        Assert.assertEquals("disease_code", values.get("disease_code_primary"));
         Assert.assertEquals("disease_code", values.get("disease_code_final_diagn"));
         Assert.assertEquals("medicine_code", values.get("medicine"));
         Assert.assertEquals("medicine_code", values.get("medicine_pharmacy"));
