@@ -1,6 +1,7 @@
 package org.smartregister.opd;
 
 import android.content.Intent;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
@@ -115,11 +116,11 @@ public class OpdLibrary {
         }
     }
 
-    public static void initializeFormFactory(NativeFormProcessorFactory nativeFormProcessorFactory){
+    public static void initializeFormFactory(NativeFormProcessorFactory nativeFormProcessorFactory) {
         instance.formProcessorFactory = nativeFormProcessorFactory;
     }
 
-    public NativeFormProcessorFactory getFormProcessorFactory(){
+    public NativeFormProcessorFactory getFormProcessorFactory() {
         return instance.formProcessorFactory;
     }
 
@@ -375,6 +376,13 @@ public class OpdLibrary {
         return getDateNow().before(date.getTime());
     }
 
+
+    public boolean shouldUseOpdV2() {
+        return getProperties().hasProperty(OpdConstants.PropertyConstants.OPD_VERSION)
+                && getProperties().getProperty(OpdConstants.PropertyConstants.OPD_VERSION)
+                .equalsIgnoreCase(OpdConstants.PropertyConstants.OPD_VERSION_V2);
+    }
+
     @VisibleForTesting
     @NonNull
     protected Date getDateNow() {
@@ -422,8 +430,10 @@ public class OpdLibrary {
 
 
     public interface NativeFormProcessorFactory {
-        NativeFormProcessor createInstance(String jsonString) throws JSONException ;
+        NativeFormProcessor createInstance(String jsonString) throws JSONException;
+
         NativeFormProcessor createInstance(JSONObject jsonObject);
-        NativeFormProcessor createInstanceFromAsset(String filePath) throws JSONException ;
+
+        NativeFormProcessor createInstanceFromAsset(String filePath) throws JSONException;
     }
 }

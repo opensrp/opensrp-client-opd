@@ -111,7 +111,7 @@ public class NewOpdProfileVisitsFragment extends BaseListFragment<ProfileHistory
                     }
                     if (savedValues.containsKey(OpdConstants.REPEATING_GROUP_MAP)) {
                         String testResults = OpdJsonFormUtils.getLabResultsStringFromMap(savedValues);
-                        formGlobalValues.put("diagnostic_test_lab_results", testResults);
+                        formGlobalValues.put(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_LAB_RESULT, testResults);
                     }
 
                 }
