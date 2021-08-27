@@ -553,9 +553,6 @@ public class OpdJsonFormUtils extends JsonFormUtils {
     }
 
     public static void patchMultiSelectList(Map<String, Object> values) {
-        if (values.containsKey(OpdConstants.JSON_FORM_KEY.DISEASE_CODE_PRIMARY))
-            values.put(OpdConstants.JSON_FORM_KEY.DISEASE_CODE_PRIMARY, values.get(OpdConstants.JSON_FORM_KEY.DISEASE_CODE_OBJECT));
-
         if (values.containsKey(OpdConstants.JSON_FORM_KEY.DISEASE_CODE_FINAL_DIAGNOSIS))
             values.put(OpdConstants.JSON_FORM_KEY.DISEASE_CODE_FINAL_DIAGNOSIS, values.get(OpdConstants.JSON_FORM_KEY.DISEASE_CODE_OBJECT_FINAL));
 
