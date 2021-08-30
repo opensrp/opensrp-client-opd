@@ -200,7 +200,8 @@ public class NewOpdProfileVisitsFragment extends BaseListFragment<ProfileHistory
 
     @Override
     public void onActionReceive() {
-        //DO NOTHING
+        //Refresh data
+        reloadFromSource();
     }
 
     @NonNull

@@ -232,7 +232,8 @@ public class NewOpdProfileOverviewFragment extends BaseListFragment<ProfileActio
 
     @Override
     public void onActionReceive() {
-        //DO Nothing
+        //Refresh data
+        reloadFromSource();
     }
 
     @NonNull
