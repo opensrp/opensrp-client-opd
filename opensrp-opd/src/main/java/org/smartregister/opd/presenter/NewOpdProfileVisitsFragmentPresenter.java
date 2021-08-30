@@ -1,6 +1,7 @@
 package org.smartregister.opd.presenter;
 
 import android.content.Context;
+import android.widget.Toast;
 
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 
@@ -9,6 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.domain.Event;
 import org.smartregister.opd.OpdLibrary;
+import org.smartregister.opd.R;
 import org.smartregister.opd.contract.OpdProfileFragmentContract;
 import org.smartregister.opd.dao.VisitDao;
 import org.smartregister.opd.domain.ProfileHistory;
@@ -152,6 +154,11 @@ public class NewOpdProfileVisitsFragmentPresenter extends ListPresenter<ProfileH
         try {
             JSONObject jsonObject = new JSONObject(jsonString);
             String title = jsonObject.getString(ENCOUNTER_TYPE);
+            if (OpdJsonFormUtils.isFormReadOnly(jsonObject)) {
+                Toast.makeText(context, context.getString(R.string.err_read_only_form), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             CallableInteractor myInteractor = getCallableInteractor();
 
             Callable<Void> callable = () -> {

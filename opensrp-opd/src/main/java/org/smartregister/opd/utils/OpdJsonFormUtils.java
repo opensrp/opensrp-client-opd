@@ -1,7 +1,9 @@
 package org.smartregister.opd.utils;
 
 import android.graphics.Bitmap;
+
 import androidx.annotation.NonNull;
+
 import android.text.TextUtils;
 
 import com.google.common.reflect.TypeToken;
@@ -24,6 +26,7 @@ import org.smartregister.domain.form.FormLocation;
 import org.smartregister.domain.tag.FormTag;
 import org.smartregister.location.helper.LocationHelper;
 import org.smartregister.opd.OpdLibrary;
+import org.smartregister.opd.dao.VisitDao;
 import org.smartregister.opd.pojo.OpdEventClient;
 import org.smartregister.opd.pojo.OpdMetadata;
 import org.smartregister.repository.AllSharedPreferences;
@@ -39,11 +42,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -504,7 +510,7 @@ public class OpdJsonFormUtils extends JsonFormUtils {
                             testName = StringUtil.humanize(OpdUtils.removeHyphen(jsonTestObject.optString(resultKey)));
                         }
                         if (resultKey.startsWith(OpdConstants.DIAGNOSTIC_TEST_RESULT)) {
-                            String value = StringUtil.humanize(OpdUtils.createTestName(resultKey))+" result: "+jsonTestObject.optString(resultKey);
+                            String value = StringUtil.humanize(OpdUtils.createTestName(resultKey)) + " result: " + jsonTestObject.optString(resultKey);
                             if (!value.isEmpty()) {
                                 if (testResult.isEmpty()) {
                                     testResult = "{ ";
@@ -521,7 +527,7 @@ public class OpdJsonFormUtils extends JsonFormUtils {
                     if (repeatingGroupKeys.hasNext()) {
                         testResult = testResult.concat(", ");
                     }
-                    testResults = testResults.concat(testName + ": "+testResult);
+                    testResults = testResults.concat(testName + ": " + testResult);
                 }
             }
             return testResults;
@@ -582,5 +588,23 @@ public class OpdJsonFormUtils extends JsonFormUtils {
         } catch (Exception e) {
             Timber.e(e);
         }
+    }
+
+    public static boolean isFormReadOnly(JSONObject jsonObject) {
+        try {
+            final String formSubmissionId = jsonObject.optString(OpdConstants.Properties.FORM_SUBMISSION_ID);
+            if (!StringUtils.isBlank(formSubmissionId)) {
+                String eventJson = VisitDao.fetchEventByFormSubmissionId(formSubmissionId);
+                JSONObject savedEvent = new JSONObject(eventJson);
+                org.smartregister.domain.Event event = OpdLibrary.getInstance().getEcSyncHelper().convert(savedEvent, org.smartregister.domain.Event.class);
+                SimpleDateFormat sdfDate = new SimpleDateFormat(OpdConstants.DateTimeFormat.dd_MMM_yyyy, Locale.ENGLISH);
+                boolean readonly = !sdfDate.format(event.getEventDate().toDate()).equals(sdfDate.format(new Date()));
+                if (readonly)
+                    return true;
+            }
+        } catch (JSONException e) {
+            Timber.e(e);
+        }
+        return false;
     }
 }

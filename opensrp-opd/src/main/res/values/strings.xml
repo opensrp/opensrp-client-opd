@@ -104,7 +104,7 @@
     <string name="seen_today">Seen Today</string>
     <string name="edit">EDIT</string>
     <string name="view">VIEW</string>
-
+    <string name="err_read_only_form">Cannot save a read-only form</string>
 
 
 </resources>
