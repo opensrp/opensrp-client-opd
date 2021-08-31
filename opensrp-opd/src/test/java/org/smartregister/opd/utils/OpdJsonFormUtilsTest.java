@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 
 import org.apache.commons.lang3.tuple.Triple;
+import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,6 +38,7 @@ import org.smartregister.opd.BuildConfig;
 import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.configuration.OpdConfiguration;
 import org.smartregister.opd.configuration.OpdRegisterQueryProviderTest;
+import org.smartregister.opd.dao.VisitDao;
 import org.smartregister.opd.pojo.OpdMetadata;
 import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.repository.ImageRepository;
@@ -56,7 +58,7 @@ import java.util.Set;
 
 import id.zelory.compressor.Compressor;
 
-@PrepareForTest({OpdUtils.class, OpdLibrary.class, LocationHelper.class})
+@PrepareForTest({OpdUtils.class, OpdLibrary.class, LocationHelper.class, VisitDao.class})
 @RunWith(PowerMockRunner.class)
 public class OpdJsonFormUtilsTest {
 
@@ -688,5 +690,28 @@ public class OpdJsonFormUtilsTest {
         Assert.assertEquals("medicine_code", values.get("medicine"));
         Assert.assertEquals("medicine_code", values.get("medicine_pharmacy"));
     }
+
+
+    @Test
+    public void testIsFormReadOnly() throws Exception {
+        JSONObject form = new JSONObject("{\"count\":\"1\",\"encounter_type\":\"OPD_Laboratory\",\"step1\":{\"title\":\"Lab\",\"fields\":[]},\"baseEntityId\":\"d8c3e0bd-bfd1-448c-9236-ff887f56820d\",\"formSubmissionId\":\"abc-123\"}");
+        PowerMockito.mockStatic(VisitDao.class);
+        PowerMockito.doReturn("{}").when(VisitDao.class, "fetchEventByFormSubmissionId", "abc-123");
+        PowerMockito.mockStatic(OpdLibrary.class);
+        PowerMockito.when(OpdLibrary.getInstance()).thenReturn(opdLibrary);
+        ECSyncHelper ecSyncHelper = Mockito.mock(ECSyncHelper.class);
+        PowerMockito.when(opdLibrary.getEcSyncHelper()).thenReturn(ecSyncHelper);
+
+        org.smartregister.domain.Event event = Mockito.mock(org.smartregister.domain.Event.class);
+        DateTime date = DateTime.parse("2007-03-12T00:00:00.000+01:00");
+        PowerMockito.when(event.getEventDate()).thenReturn(date);
+        PowerMockito.when(ecSyncHelper.convert(Mockito.any(JSONObject.class), Mockito.eq(org.smartregister.domain.Event.class))).thenReturn(event);
+        Assert.assertTrue(OpdJsonFormUtils.isFormReadOnly(form));
+
+        PowerMockito.when(event.getEventDate()).thenReturn(new DateTime());
+        Assert.assertFalse(OpdJsonFormUtils.isFormReadOnly(form));
+
+    }
+
 }
 
