@@ -8,12 +8,16 @@ import com.vijay.jsonwizard.constants.JsonFormConstants;
 
 import org.json.JSONObject;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.util.ReflectionHelpers;
-import org.smartregister.opd.BaseFragmentTest;
+import org.smartregister.opd.BaseUnitTest;
 import org.smartregister.opd.R;
 import org.smartregister.opd.dao.VisitDao;
 import org.smartregister.opd.domain.ProfileAction;
@@ -28,13 +32,18 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 
-public class NewOpdProfileOverviewFragmentTest extends BaseFragmentTest {
+@PrepareForTest({VisitDao.class, OpdUtils.class})
+public class NewOpdProfileOverviewFragmentTest extends BaseUnitTest {
 
     private NewOpdProfileOverviewFragment fragment;
 
-    @Override
+    @Rule
+    public PowerMockRule rule = new PowerMockRule();
+
+    @Before
     public void setUp() {
-        super.setUp();
+        PowerMockito.mockStatic(VisitDao.class);
+        PowerMockito.mockStatic(OpdUtils.class);
         fragment = Mockito.spy(NewOpdProfileOverviewFragment.newInstance(null));
     }
 

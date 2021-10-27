@@ -6,15 +6,19 @@ import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.robolectric.RuntimeEnvironment;
 import org.smartregister.Context;
 import org.smartregister.client.utils.constants.JsonFormConstants;
-import org.smartregister.domain.Obs;
-import org.smartregister.opd.BaseFragmentTest;
 import org.smartregister.domain.Event;
+import org.smartregister.domain.Obs;
+import org.smartregister.opd.BaseUnitTest;
 import org.smartregister.opd.dao.VisitDao;
 import org.smartregister.opd.domain.HIVStatus;
 import org.smartregister.opd.model.Visit;
@@ -24,11 +28,16 @@ import java.util.ArrayList;
 import java.util.Date;
 
 
-public class VisitUtilsTest extends BaseFragmentTest {
+@PrepareForTest({VisitDao.class, OpdUtils.class})
+public class VisitUtilsTest extends BaseUnitTest {
 
-    @Override
+    @Rule
+    public PowerMockRule rule = new PowerMockRule();
+
+    @Before
     public void setUp() {
-        super.setUp();
+        PowerMockito.mockStatic(VisitDao.class);
+        PowerMockito.mockStatic(OpdUtils.class);
     }
 
     @Test
@@ -87,8 +96,8 @@ public class VisitUtilsTest extends BaseFragmentTest {
         Assert.assertEquals("FINAL DIAGNOSIS AND TREATMENT", VisitUtils.getTranslatedVisitTypeName(OpdConstants.OpdModuleEventConstants.OPD_TREATMENT));
         Assert.assertEquals("LABORATORY TESTS AND RESULTS", VisitUtils.getTranslatedVisitTypeName(OpdConstants.OpdModuleEventConstants.OPD_LABORATORY));
         Assert.assertEquals("PHARMACY", VisitUtils.getTranslatedVisitTypeName(OpdConstants.OpdModuleEventConstants.OPD_PHARMACY));
-        Assert.assertEquals("FINAL OUTCOME", VisitUtils.getTranslatedVisitTypeName(OpdConstants.OpdModuleEventConstants.OPD_FINAL_OUTCOME ));
-        Assert.assertEquals("SERVICE FEE", VisitUtils.getTranslatedVisitTypeName(OpdConstants.OpdModuleEventConstants.OPD_SERVICE_CHARGE  ));
+        Assert.assertEquals("FINAL OUTCOME", VisitUtils.getTranslatedVisitTypeName(OpdConstants.OpdModuleEventConstants.OPD_FINAL_OUTCOME));
+        Assert.assertEquals("SERVICE FEE", VisitUtils.getTranslatedVisitTypeName(OpdConstants.OpdModuleEventConstants.OPD_SERVICE_CHARGE));
         Assert.assertEquals(null, VisitUtils.getTranslatedVisitTypeName(""));
     }
 

@@ -165,10 +165,13 @@ dependencies {
 
     implementation group: 'io.fabric.sdk.android', name: 'fabric', version: '1.4.8'
 
-    testImplementation 'org.mockito:mockito-core:3.1.0'
-    testImplementation 'org.robolectric:robolectric:4.3.1'
-    testImplementation 'org.robolectric:shadows-multidex:4.3.1'
-    testImplementation "org.json:json:20190722"
+    def robolectricVersion = '4.3.1'
+    testImplementation("org.robolectric:robolectric:$robolectricVersion") {
+        exclude group: 'com.google.auto.service', module: 'auto-service'
+        exclude group: 'com.android.support'
+    }
+    testImplementation "org.robolectric:shadows-multidex:$robolectricVersion"
+    testImplementation "org.robolectric:shadows-support-v4:3.3.2"
 
     testImplementation 'com.ibm.fhir:fhir-model:4.7.0'
 
