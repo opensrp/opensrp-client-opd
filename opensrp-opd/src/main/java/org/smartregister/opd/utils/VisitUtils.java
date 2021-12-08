@@ -239,9 +239,6 @@ public class VisitUtils {
             case OpdConstants.OpdModuleEventConstants.OPD_FINAL_OUTCOME:
                 translatedName = context().getStringResource(R.string.final_outcome);
                 break;
-            case OpdConstants.OpdModuleEventConstants.OPD_SERVICE_CHARGE:
-                translatedName = context().getStringResource(R.string.service_fee);
-                break;
             default:
                 translatedName =  null;
                 break;
