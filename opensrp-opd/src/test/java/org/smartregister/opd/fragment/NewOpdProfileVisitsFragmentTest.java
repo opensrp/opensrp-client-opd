@@ -130,10 +130,6 @@ public class NewOpdProfileVisitsFragmentTest extends BaseFragmentTest {
         history = new ProfileHistory().setEventType(OpdConstants.OpdModuleEventConstants.OPD_FINAL_OUTCOME);
         formName = fragment.getFormName(history);
         Assert.assertEquals(OpdConstants.JsonForm.FINAL_OUTCOME, formName);
-
-        history = new ProfileHistory().setEventType(OpdConstants.OpdModuleEventConstants.OPD_SERVICE_CHARGE);
-        formName = fragment.getFormName(history);
-        Assert.assertEquals(OpdConstants.JsonForm.SERVICE_FEE, formName);
     }
 
     @Test(expected = IllegalArgumentException.class)

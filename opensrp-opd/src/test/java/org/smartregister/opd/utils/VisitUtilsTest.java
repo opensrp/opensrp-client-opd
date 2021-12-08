@@ -88,7 +88,6 @@ public class VisitUtilsTest extends BaseFragmentTest {
         Assert.assertEquals("LABORATORY TESTS AND RESULTS", VisitUtils.getTranslatedVisitTypeName(OpdConstants.OpdModuleEventConstants.OPD_LABORATORY));
         Assert.assertEquals("PHARMACY", VisitUtils.getTranslatedVisitTypeName(OpdConstants.OpdModuleEventConstants.OPD_PHARMACY));
         Assert.assertEquals("FINAL OUTCOME", VisitUtils.getTranslatedVisitTypeName(OpdConstants.OpdModuleEventConstants.OPD_FINAL_OUTCOME ));
-        Assert.assertEquals("SERVICE FEE", VisitUtils.getTranslatedVisitTypeName(OpdConstants.OpdModuleEventConstants.OPD_SERVICE_CHARGE  ));
         Assert.assertEquals(null, VisitUtils.getTranslatedVisitTypeName(""));
     }
 

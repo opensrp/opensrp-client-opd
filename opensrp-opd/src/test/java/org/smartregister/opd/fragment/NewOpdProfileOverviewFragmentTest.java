@@ -129,10 +129,6 @@ public class NewOpdProfileOverviewFragmentTest extends BaseFragmentTest {
         action = new ProfileAction(app.getString(R.string.final_outcome), 6);
         formName = fragment.getFormName(action);
         Assert.assertEquals(OpdConstants.JsonForm.FINAL_OUTCOME, formName);
-
-        action = new ProfileAction(app.getString(R.string.service_fee), 7);
-        formName = fragment.getFormName(action);
-        Assert.assertEquals(OpdConstants.JsonForm.SERVICE_FEE, formName);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -170,7 +166,7 @@ public class NewOpdProfileOverviewFragmentTest extends BaseFragmentTest {
 
         Callable<List<ProfileAction>> callable = fragment.onStartCallable(null);
         List<ProfileAction> actions = callable.call();
-        Assert.assertEquals(8, actions.size());
+        Assert.assertEquals(7, actions.size());
     }
 
 }
