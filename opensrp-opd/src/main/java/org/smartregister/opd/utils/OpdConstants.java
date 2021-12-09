@@ -23,7 +23,6 @@ public class OpdConstants extends AllConstants {
         String TEST_CONDUCTED = "Test Conducted";
         String DIAGNOSIS = "Diagnosis";
         String TREATMENT = "Treatment";
-        String SERVICE_FEE = "Service Fee";
     }
 
     public interface IntentKey {
@@ -355,7 +354,6 @@ public class OpdConstants extends AllConstants {
         public static final String OPD_TREATMENT = "OPD_Treatment";
         public static final String OPD_PHARMACY = "OPD_Pharmacy";
         public static final String OPD_FINAL_OUTCOME = "OPD_Final_Outcome";
-        public static final String OPD_SERVICE_CHARGE= "OPD_Service_Charge";
         public static final String OPD_VISIT_GROUP = "opd_visit_group";
 
     }
@@ -392,7 +390,6 @@ public class OpdConstants extends AllConstants {
         String TREATMENT = "json.form/opd_treatment.json";
         String PHARMACY = "json.form/opd_pharmacy.json";
         String FINAL_OUTCOME = "json.form/opd_outcome.json";
-        String SERVICE_FEE = "json.form/opd_service_fee.json";
     }
 
     public static class TableNameConstants {

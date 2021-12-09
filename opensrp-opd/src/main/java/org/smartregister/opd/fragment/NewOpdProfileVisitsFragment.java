@@ -168,9 +168,6 @@ public class NewOpdProfileVisitsFragment extends BaseListFragment<ProfileHistory
             case OpdConstants.OpdModuleEventConstants.OPD_FINAL_OUTCOME:
                 formName = OpdConstants.JsonForm.FINAL_OUTCOME;
                 break;
-            case OpdConstants.OpdModuleEventConstants.OPD_SERVICE_CHARGE:
-                formName = OpdConstants.JsonForm.SERVICE_FEE;
-                break;
             default:
                 throw new IllegalArgumentException("Unknown Form");
         }

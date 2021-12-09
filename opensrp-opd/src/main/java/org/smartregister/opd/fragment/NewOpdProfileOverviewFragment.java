@@ -109,10 +109,6 @@ public class NewOpdProfileOverviewFragment extends BaseListFragment<ProfileActio
                     new ProfileAction(getString(R.string.final_outcome), 6)
                             .setVisits(mapVisit.get(OpdConstants.OpdModuleEventConstants.OPD_FINAL_OUTCOME))
             );
-            profileActions.add(
-                    new ProfileAction(getString(R.string.service_fee), 7)
-                            .setVisits(mapVisit.get(OpdConstants.OpdModuleEventConstants.OPD_SERVICE_CHARGE))
-            );
             return profileActions;
         };
     }
@@ -199,9 +195,6 @@ public class NewOpdProfileOverviewFragment extends BaseListFragment<ProfileActio
                 break;
             case 6:
                 formName = OpdConstants.JsonForm.FINAL_OUTCOME;
-                break;
-            case 7:
-                formName = OpdConstants.JsonForm.SERVICE_FEE;
                 break;
             default:
                 throw new IllegalArgumentException("Unknown Form");

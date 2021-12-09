@@ -11,22 +11,29 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.opd.BaseFragmentTest;
+import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
 import org.smartregister.opd.dao.VisitDao;
 import org.smartregister.opd.domain.ProfileAction;
 import org.smartregister.opd.presenter.NewOpdProfileOverviewFragmentPresenter;
 import org.smartregister.opd.utils.OpdConstants;
+import org.yaml.snakeyaml.Yaml;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 
+@PrepareForTest({OpdLibrary.class, Yaml.class})
 public class NewOpdProfileOverviewFragmentTest extends BaseFragmentTest {
 
     private NewOpdProfileOverviewFragment fragment;
@@ -129,10 +136,6 @@ public class NewOpdProfileOverviewFragmentTest extends BaseFragmentTest {
         action = new ProfileAction(app.getString(R.string.final_outcome), 6);
         formName = fragment.getFormName(action);
         Assert.assertEquals(OpdConstants.JsonForm.FINAL_OUTCOME, formName);
-
-        action = new ProfileAction(app.getString(R.string.service_fee), 7);
-        formName = fragment.getFormName(action);
-        Assert.assertEquals(OpdConstants.JsonForm.SERVICE_FEE, formName);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -170,7 +173,43 @@ public class NewOpdProfileOverviewFragmentTest extends BaseFragmentTest {
 
         Callable<List<ProfileAction>> callable = fragment.onStartCallable(null);
         List<ProfileAction> actions = callable.call();
-        Assert.assertEquals(8, actions.size());
+        Assert.assertEquals(7, actions.size());
+    }
+
+    @Test
+    public void testGetGlobalKeysFromConfig() throws Exception {
+        OpdLibrary opdLibrary = Mockito.mock(OpdLibrary.class);
+        PowerMockito.mockStatic(OpdLibrary.class);
+        PowerMockito.when(OpdLibrary.getInstance()).thenReturn(opdLibrary);
+        LinkedHashMap<String, Object> globals = new LinkedHashMap<>();
+        ArrayList<String> keys = new ArrayList<>();
+        keys.add("opd_danger_signs");
+        globals.put("form", "opd_diagnosis");
+        globals.put("fields", keys);
+        ArrayList<Object> opdGlobals = new ArrayList<>();
+        opdGlobals.add(globals);
+
+        Iterable<Object>  iterable = new YamlIterable(opdGlobals.iterator());
+
+        PowerMockito.when(opdLibrary.readYaml(Mockito.eq(OpdConstants.FileUtils.OPD_GLOBALS), Mockito.any(Yaml.class))).thenReturn(iterable);
+
+        fragment.getGlobalKeysFromConfig();
+        Set<String> globalKeys = ReflectionHelpers.getField(fragment, "globalKeys");
+        Assert.assertFalse(globalKeys.isEmpty());
+        Assert.assertEquals("opd_danger_signs", globalKeys.iterator().next());
+    }
+
+    public static class YamlIterable implements Iterable<Object> {
+        private Iterator<Object> iterator;
+
+        public YamlIterable(Iterator<Object> iterator) {
+            this.iterator = iterator;
+        }
+
+        @Override
+        public Iterator<Object> iterator() {
+            return iterator;
+        }
     }
 
 }
