@@ -8,21 +8,27 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.opd.BaseFragmentTest;
+import org.smartregister.opd.OpdLibrary;
 import org.smartregister.opd.R;
 import org.smartregister.opd.dao.VisitDao;
 import org.smartregister.opd.domain.ProfileHistory;
 import org.smartregister.opd.presenter.NewOpdProfileVisitsFragmentPresenter;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdUtils;
+import org.yaml.snakeyaml.Yaml;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+@PrepareForTest({OpdLibrary.class, Yaml.class})
 public class NewOpdProfileVisitsFragmentTest extends BaseFragmentTest {
 
     private NewOpdProfileVisitsFragment fragment;
@@ -158,5 +164,26 @@ public class NewOpdProfileVisitsFragmentTest extends BaseFragmentTest {
         Assert.assertTrue(form.has(JsonFormConstants.JSON_FORM_KEY.GLOBAL));
     }
 
+    @Test
+    public void testGetGlobalKeysFromConfig() throws Exception {
+        OpdLibrary opdLibrary = Mockito.mock(OpdLibrary.class);
+        PowerMockito.mockStatic(OpdLibrary.class);
+        PowerMockito.when(OpdLibrary.getInstance()).thenReturn(opdLibrary);
+        LinkedHashMap<String, Object> globals = new LinkedHashMap<>();
+        ArrayList<String> keys = new ArrayList<>();
+        keys.add("opd_danger_signs");
+        globals.put("form", "opd_diagnosis");
+        globals.put("fields", keys);
+        ArrayList<Object> opdGlobals = new ArrayList<>();
+        opdGlobals.add(globals);
 
+        Iterable<Object>  iterable = new NewOpdProfileOverviewFragmentTest.YamlIterable(opdGlobals.iterator());
+
+        PowerMockito.when(opdLibrary.readYaml(Mockito.eq(OpdConstants.FileUtils.OPD_GLOBALS), Mockito.any(Yaml.class))).thenReturn(iterable);
+
+        fragment.getGlobalKeysFromConfig();
+        Set<String> globalKeys = ReflectionHelpers.getField(fragment, "globalKeys");
+        Assert.assertFalse(globalKeys.isEmpty());
+        Assert.assertEquals("opd_danger_signs", globalKeys.iterator().next());
+    }
 }
