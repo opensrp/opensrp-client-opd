@@ -139,9 +139,14 @@ public class OpdJsonFormUtils extends JsonFormUtils {
     }
 
     public static void addRegLocHierarchyQuestions(@NonNull JSONObject form) {
+        addRegLocHierarchyQuestions(form, 5);
+    }
+
+    public static void addRegLocHierarchyQuestions(@NonNull JSONObject form, int locationLevel) {
         try {
             JSONArray questions = com.vijay.jsonwizard.utils.FormUtils.getMultiStepFormFields(form);
             ArrayList<String> allLevels = OpdUtils.metadata().getLocationLevels();
+            allLevels = new ArrayList<>(allLevels.subList(0, locationLevel));
             ArrayList<String> healthFacilities = OpdUtils.metadata().getHealthFacilityLevels();
 
             List<String> defaultLocation = LocationHelper.getInstance().generateDefaultLocationHierarchy(allLevels);

@@ -127,7 +127,7 @@ public class NewOpdProfileVisitsFragmentPresenter extends ListPresenter<ProfileH
             if (jsonObject.optString(ENCOUNTER_TYPE).equals(OpdConstants.OpdModuleEventConstants.OPD_PHARMACY)
                     || jsonObject.optString(ENCOUNTER_TYPE).equals(OpdConstants.OpdModuleEventConstants.OPD_LABORATORY)
                     || jsonObject.optString(ENCOUNTER_TYPE).equals(OpdConstants.OpdModuleEventConstants.OPD_FINAL_OUTCOME)) {
-                OpdJsonFormUtils.addRegLocHierarchyQuestions(jsonObject);
+                OpdJsonFormUtils.addRegLocHierarchyQuestions(jsonObject, 4);
             }
         } catch (RuntimeException e) {
             Timber.e(e, "NewOpdProfileOverviewFragmentPresenter -> attachLocationHierarchy()");
