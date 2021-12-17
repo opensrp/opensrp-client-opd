@@ -538,11 +538,13 @@ public class OpdJsonFormUtilsTest {
         savedValues.put("tests_repeating_group_count", "3");
         savedValues.put("diagnostic_test_ba1ed23029a44fd980784093a5c6f746", "ultra_sound");
         savedValues.put("diagnostic_test_24f8d3b0a73a49e9894c83d6d545b39f", "pregnancy_test");
-        savedValues.put("repeatingGroupMap", "{\"24f8d3b0a73a49e9894c83d6d545b39f\":{\"diagnostic_test_result\":\"Negative\",\"diagnostic_test\":\"pregnancy_test\"},\"ba1ed23029a44fd980784093a5c6f746\":{\"diagnostic_test\":\"ultra_sound\",\"diagnostic_test_result_specify\":\"Ultra\"}}");
+        savedValues.put("testsRepeatingGroupKey", "{\"24f8d3b0a73a49e9894c83d6d545b39f\":{\"diagnostic_test_result\":\"Negative\",\"diagnostic_test\":\"pregnancy_test\"},\"ba1ed23029a44fd980784093a5c6f746\":{\"diagnostic_test\":\"ultra_sound\",\"diagnostic_test_result_specify\":\"Ultra\"}}");
         savedValues.put("treatment_type", "Medicine, Suturing, Wound dressing, Foreign body removal");
         savedValues.put("diagnostic_test_result_specify_ba1ed23029a44fd980784093a5c6f746", "Ultra");
         savedValues.put("diagnostic_test_result_24f8d3b0a73a49e9894c83d6d545b39f", "Negative");
-        String result = OpdJsonFormUtils.getLabResultsStringFromMap(savedValues);
+
+        String repeatingGroupMapKey = OpdUtils.generateRepeatingGroupKey(OpdConstants.KEY.TESTS_REPEATING_GROUP);
+        String result = OpdJsonFormUtils.getLabResultsStringFromMap(savedValues.get(repeatingGroupMapKey));
         String output = "Pregnancy test: { Status result: Negative, }, Ultra sound: , Specify result: Ultra}";
         Assert.assertEquals( output, result);
     }
