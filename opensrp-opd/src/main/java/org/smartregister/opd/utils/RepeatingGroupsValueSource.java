@@ -71,7 +71,7 @@ public class RepeatingGroupsValueSource implements NativeFormProcessorFieldSourc
 
                     updateField(repeatingGrpField, entry.getValue());
                     repeatingGrpField.put(JsonFormConstants.KEY, repeatingGrpFieldKey + "_" + entry.getKey());
-                    stepFields.put(++mPos, repeatingGrpField);
+                    addToPos(++mPos, repeatingGrpField, stepFields);
                 }
             }
         }
@@ -121,6 +121,13 @@ public class RepeatingGroupsValueSource implements NativeFormProcessorFieldSourc
         if (type.equals(JsonFormConstants.CHECK_BOX) || type.equals(JsonFormConstants.NATIVE_RADIO_BUTTON) || type.equals(JsonFormConstants.SPINNER)) {
             repeatingGrpField.put(JsonFormConstants.VALUE, entryMap.get(JsonFormConstants.VALUE));
         }
+    }
+
+    private void addToPos(int pos, JSONObject jsonObj, JSONArray jsonArr) throws JSONException {
+        for (int i = jsonArr.length(); i > pos; i--){
+            jsonArr.put(i, jsonArr.get(i-1));
+        }
+        jsonArr.put(pos, jsonObj);
     }
 
 }

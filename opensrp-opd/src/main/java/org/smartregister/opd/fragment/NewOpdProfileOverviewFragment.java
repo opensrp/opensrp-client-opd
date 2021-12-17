@@ -27,6 +27,7 @@ import org.smartregister.opd.presenter.NewOpdProfileOverviewFragmentPresenter;
 import org.smartregister.opd.utils.FormProcessor;
 import org.smartregister.opd.utils.OpdConstants;
 import org.smartregister.opd.utils.OpdJsonFormUtils;
+import org.smartregister.opd.utils.OpdUtils;
 import org.smartregister.util.AppExecutors;
 import org.smartregister.view.adapter.ListableAdapter;
 import org.smartregister.view.fragment.BaseListFragment;
@@ -44,7 +45,7 @@ import java.util.concurrent.Callable;
 
 import timber.log.Timber;
 
-public class NewOpdProfileOverviewFragment extends BaseListFragment<ProfileAction> implements OnSendActionToFragment, OpdProfileFragmentContract.View<ProfileAction>, FormProcessor.Requester , OnViewStateChanged {
+public class NewOpdProfileOverviewFragment extends BaseListFragment<ProfileAction> implements OnSendActionToFragment, OpdProfileFragmentContract.View<ProfileAction>, FormProcessor.Requester, OnViewStateChanged {
 
     private String baseEntityID;
     private CommonPersonObjectClient commonPersonObjectClient;
@@ -140,8 +141,8 @@ public class NewOpdProfileOverviewFragment extends BaseListFragment<ProfileActio
                     formGlobalValues.put(globalKey, "");
                 }
             }
-            if (savedValues.containsKey(OpdConstants.REPEATING_GROUP_MAP)) {
-                String testResults = OpdJsonFormUtils.getLabResultsStringFromMap(savedValues);
+            if (savedValues.containsKey(OpdUtils.generateRepeatingGroupKey(OpdConstants.KEY.TESTS_REPEATING_GROUP))) {
+                String testResults = OpdJsonFormUtils.getLabResultsStringFromMap(savedValues.get(OpdUtils.generateRepeatingGroupKey(OpdConstants.KEY.TESTS_REPEATING_GROUP)));
                 formGlobalValues.put(OpdConstants.JSON_FORM_KEY.DIAGNOSTIC_TEST_LAB_RESULT, testResults);
             }
         }

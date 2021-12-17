@@ -10,12 +10,14 @@ import android.graphics.Bitmap;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.collection.LongSparseArray;
 
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.widget.TextView;
 
+import com.google.common.base.CaseFormat;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.domain.Form;
 
@@ -36,6 +38,7 @@ import org.smartregister.opd.domain.ProfileHistory;
 import org.smartregister.opd.pojo.OpdMetadata;
 import org.smartregister.util.FormUtils;
 import org.smartregister.util.JsonFormUtils;
+import org.smartregister.util.StringUtil;
 import org.smartregister.util.Utils;
 
 import java.io.File;
@@ -57,6 +60,8 @@ import timber.log.Timber;
 import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_EXTRA.STEP1;
 import static org.smartregister.opd.utils.OpdConstants.JSON_FORM_KEY.VALUE;
 import static org.smartregister.opd.utils.OpdConstants.KEY.KEY;
+import static org.smartregister.util.JsonFormUtils.REPEATING_GROUP;
+import static org.smartregister.util.JsonFormUtils.TYPE;
 import static org.smartregister.util.JsonFormUtils.gson;
 
 /**
@@ -272,9 +277,13 @@ public class OpdUtils extends Utils {
     }
 
     public static HashMap<String, HashMap<String, String>> buildRepeatingGroupTests(@NonNull JSONObject stepJsonObject) throws JSONException {
+        return buildRepeatingGroupTests(stepJsonObject, OpdConstants.JSON_FORM_KEY.TESTS_REPEATING_GROUP);
+    }
+
+    public static HashMap<String, HashMap<String, String>> buildRepeatingGroupTests(@NonNull JSONObject stepJsonObject, String field) {
         ArrayList<String> keysArrayList = new ArrayList<>();
         JSONArray fields = stepJsonObject.optJSONArray(OpdJsonFormUtils.FIELDS);
-        JSONObject jsonObject = JsonFormUtils.getFieldJSONObject(fields, OpdConstants.JSON_FORM_KEY.TESTS_REPEATING_GROUP);
+        JSONObject jsonObject = JsonFormUtils.getFieldJSONObject(fields, field);
         HashMap<String, HashMap<String, String>> repeatingGroupMap = new HashMap<>();
         if (jsonObject != null) {
             JSONArray jsonArray = jsonObject.optJSONArray(JsonFormConstants.VALUE);
@@ -432,11 +441,28 @@ public class OpdUtils extends Utils {
     public static void injectGroupMap(JSONObject jsonObject) throws JSONException {
         JSONObject step = jsonObject.getJSONObject(STEP1);
         JSONArray fields = step.optJSONArray(OpdJsonFormUtils.FIELDS);
-        HashMap<String, HashMap<String, String>> buildRepeatingGroupTests = buildRepeatingGroupTests(step);
+        for (int i=0; i<fields.length(); i++) {
+            JSONObject object = fields.getJSONObject(i);
+            String type = object.optString(TYPE);
+            if (type.equalsIgnoreCase(REPEATING_GROUP)) {
+                String key = object.optString(KEY);
+                HashMap<String, HashMap<String, String>> buildRepeatingGroupTestsConducted = buildRepeatingGroupTests(step, key);
+                String repeatingGroupKey = generateRepeatingGroupKey(key);
+                populateJsonWithRepeatingGroupMap(buildRepeatingGroupTestsConducted, fields, step, repeatingGroupKey, jsonObject);
+            }
+        }
+    }
+
+    public static String generateRepeatingGroupKey(String key) {
+        return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, key) + "Key";
+    }
+
+    private static void populateJsonWithRepeatingGroupMap(HashMap<String, HashMap<String, String>> buildRepeatingGroupTests,
+                                                          JSONArray fields, JSONObject step, String key, JSONObject jsonObject) throws JSONException{
         if (!buildRepeatingGroupTests.isEmpty()) {
             String strTest = gson.toJson(buildRepeatingGroupTests);
             JSONObject repeatingGroupObj = new JSONObject();
-            repeatingGroupObj.put(JsonFormConstants.KEY, OpdConstants.REPEATING_GROUP_MAP);
+            repeatingGroupObj.put(JsonFormConstants.KEY, key);
             repeatingGroupObj.put(JsonFormConstants.VALUE, strTest);
             repeatingGroupObj.put(JsonFormConstants.TYPE, JsonFormConstants.HIDDEN);
             if (fields != null) {
