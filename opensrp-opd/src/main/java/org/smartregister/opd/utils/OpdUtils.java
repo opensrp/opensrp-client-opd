@@ -10,7 +10,6 @@ import android.graphics.Bitmap;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.collection.LongSparseArray;
 
 import android.text.Html;
 import android.text.TextUtils;
@@ -38,7 +37,6 @@ import org.smartregister.opd.domain.ProfileHistory;
 import org.smartregister.opd.pojo.OpdMetadata;
 import org.smartregister.util.FormUtils;
 import org.smartregister.util.JsonFormUtils;
-import org.smartregister.util.StringUtil;
 import org.smartregister.util.Utils;
 
 import java.io.File;
