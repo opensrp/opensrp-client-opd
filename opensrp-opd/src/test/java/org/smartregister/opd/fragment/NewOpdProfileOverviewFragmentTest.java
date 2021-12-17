@@ -19,6 +19,7 @@ import org.smartregister.opd.dao.VisitDao;
 import org.smartregister.opd.domain.ProfileAction;
 import org.smartregister.opd.presenter.NewOpdProfileOverviewFragmentPresenter;
 import org.smartregister.opd.utils.OpdConstants;
+import org.smartregister.opd.utils.OpdUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,6 +47,8 @@ public class NewOpdProfileOverviewFragmentTest extends BaseFragmentTest {
 
     @Test
     public void testLoadGlobals() throws Exception {
+        PowerMockito.doReturn("testsRepeatingGroupKey").when(OpdUtils.class, "generateRepeatingGroupKey", Mockito.anyString());
+
         HashSet<String> globalKeys = new HashSet<>();
         globalKeys.add("opd_danger_signs_value");
         globalKeys.add("respiratory_rate");
@@ -75,7 +78,7 @@ public class NewOpdProfileOverviewFragmentTest extends BaseFragmentTest {
         savedValues.put("test_ordered_avail", "yes");
         savedValues.put("diagnostic_test_ba1ed23029a44fd980784093a5c6f746", "ultra_sound");
         savedValues.put("diagnostic_test_24f8d3b0a73a49e9894c83d6d545b39f", "pregnancy_test");
-        savedValues.put("repeatingGroupMap", "{\"24f8d3b0a73a49e9894c83d6d545b39f\":{\"diagnostic_test_result\":\"Negative\",\"diagnostic_test\":\"pregnancy_test\"},\"ba1ed23029a44fd980784093a5c6f746\":{\"diagnostic_test\":\"ultra_sound\",\"diagnostic_test_result_specify\":\"Ultra\"}}");
+        savedValues.put("testsRepeatingGroupKey", "{\"24f8d3b0a73a49e9894c83d6d545b39f\":{\"diagnostic_test_result\":\"Negative\",\"diagnostic_test\":\"pregnancy_test\"},\"ba1ed23029a44fd980784093a5c6f746\":{\"diagnostic_test\":\"ultra_sound\",\"diagnostic_test_result_specify\":\"Ultra\"}}");
         savedValues.put("treatment_type", "Medicine, Suturing, Wound dressing, Foreign body removal");
         savedValues.put("medicine", "[{\"key\":\"AA007840\",\"text\":\"Atenolol 50mg\",\"openmrs_entity\":\"\",\"openmrs_entity_id\":\"\",\"openmrs_entity_parent\":\"\",\"property\":{\"pack_size\":null,\"product_code\":\"AA007840\",\"dispensing_unit\":\"Tablet\",\"meta\":{\"duration\":\"78\",\"dosage\":\"12\",\"frequency\":\"3456\",\"info\":\"Dose: 12, Duration: 78, Frequency: 3456\"}}},{\"key\":\"FF006300\",\"text\":\"Bandage, WOW 10cm x 4m long, when stretched\",\"openmrs_entity\":\"\",\"openmrs_entity_id\":\"\",\"openmrs_entity_parent\":\"\",\"property\":{\"pack_size\":null,\"product_code\":\"FF006300\",\"dispensing_unit\":\"each\",\"meta\":{\"duration\":\"33\",\"dosage\":\"11\",\"frequency\":\"2244\",\"info\":\"Dose: 11, Duration: 33, Frequency: 2244\"}}}]");
         savedValues.put("diagnostic_test_result_specify_ba1ed23029a44fd980784093a5c6f746", "Ultra");

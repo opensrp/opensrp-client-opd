@@ -228,7 +228,7 @@ public class OpdUtilsTest {
         OpdUtils.injectGroupMap(formObject);
         JSONArray fields = formObject.getJSONObject("step1").getJSONArray("fields");
         JSONObject repeatingGroup = fields.optJSONObject(fields.length() - 1);
-        assertTrue(repeatingGroup != null);
+        assertNotNull(repeatingGroup);
     }
 
     @Test
