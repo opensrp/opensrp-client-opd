@@ -492,10 +492,9 @@ public class OpdJsonFormUtils extends JsonFormUtils {
         }
     }
 
-    public static String getLabResultsStringFromMap(HashMap<String, String> savedValues) {
+    public static String getLabResultsStringFromMap(String strRepeatingGroupMap) {
         try {
             String testResults = "";
-            String strRepeatingGroupMap = savedValues.get(OpdConstants.REPEATING_GROUP_MAP);
             if (StringUtils.isNotBlank(strRepeatingGroupMap)) {
                 JSONObject jsonObject = new JSONObject(strRepeatingGroupMap);
                 Iterator<String> repeatingGroupKeys = jsonObject.keys();

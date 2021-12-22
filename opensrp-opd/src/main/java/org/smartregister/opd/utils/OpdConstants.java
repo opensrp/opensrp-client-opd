@@ -300,6 +300,10 @@ public class OpdConstants extends AllConstants {
         public static final String REFERRAL_FACILITY = "referral_facility_specify";
         public static final String REFERRAL_LOCATION = "referral_location_med";
         public static final String REFERRAL_LOCATION_LAB = "referral_location_med_lab";
+        public static final String REPEATING_GROUP_BUTTON_TEXT = "repeating_group_btn_text";
+        public static final String REPEATING_GROUP_BUTTON_TEXT_COLOR = "repeating_group_btn_text_color";
+        public static final String TESTS_REPEATING_GROUP = "tests_repeating_group";
+        public static final String TESTS_NOT_DONE_REPEATING_GROUP = "test_not_done_repeating_group";
     }
 
     public static class ENTITY {
