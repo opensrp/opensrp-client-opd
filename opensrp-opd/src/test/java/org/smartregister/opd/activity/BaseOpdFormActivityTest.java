@@ -63,7 +63,7 @@ public class BaseOpdFormActivityTest extends BaseActivityUnitTest {
     }
 
     @Test
-    public void testSaveFormFillSessionShouldInvokeFormDelete() throws InterruptedException {
+    public void testSaveFormFillSessionShouldInvokeFormSaveOrUpdate() throws InterruptedException {
         doReturn(treatmentFormRepository).when(opdLibrary).getOpdDiagnosisAndTreatmentFormRepository();
         ReflectionHelpers.setStaticField(OpdLibrary.class, "instance", opdLibrary);
         activity.saveFormFillSession();

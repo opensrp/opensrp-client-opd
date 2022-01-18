@@ -1,5 +1,10 @@
 package org.smartregister.opd.presenter;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+
 import androidx.core.util.Pair;
 
 import org.jeasy.rules.api.Facts;
@@ -11,25 +16,27 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.robolectric.util.ReflectionHelpers;
-import org.smartregister.opd.BaseTest;
+import org.smartregister.opd.BaseUnitTest;
 import org.smartregister.opd.R;
 import org.smartregister.opd.contract.OpdProfileVisitsFragmentContract;
+import org.smartregister.opd.domain.YamlConfig;
+import org.smartregister.opd.domain.YamlConfigItem;
 import org.smartregister.opd.domain.YamlConfigWrapper;
 import org.smartregister.opd.pojo.OpdVisitSummary;
 import org.smartregister.opd.pojo.OpdVisitSummaryResultModel;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
  * Created by Ephraim Kigamba - ekigamba@ona.io on 2019-12-02
  */
 
-public class OpdProfileVisitsFragmentPresenterTest extends BaseTest {
+public class OpdProfileVisitsFragmentPresenterTest extends BaseUnitTest {
 
     private OpdProfileVisitsFragmentPresenter presenter;
 
@@ -45,7 +52,7 @@ public class OpdProfileVisitsFragmentPresenterTest extends BaseTest {
     @Test
     public void onDestroyShouldCallInteractorOnDestroy() {
         boolean isChangingConfiguration = false;
-        OpdProfileVisitsFragmentContract.Interactor interactor = Mockito.mock(OpdProfileVisitsFragmentContract.Interactor.class);
+        OpdProfileVisitsFragmentContract.Interactor interactor = mock(OpdProfileVisitsFragmentContract.Interactor.class);
         ReflectionHelpers.setField(presenter, "mProfileInteractor", interactor);
 
         presenter.onDestroy(isChangingConfiguration);
@@ -57,12 +64,12 @@ public class OpdProfileVisitsFragmentPresenterTest extends BaseTest {
     @Test
     public void loadVisitsShouldCallInteractorFetchVisits() {
         String baseEntityId = "98-sd-ewsdf";
-        OpdProfileVisitsFragmentContract.Interactor interactor = Mockito.mock(OpdProfileVisitsFragmentContract.Interactor.class);
+        OpdProfileVisitsFragmentContract.Interactor interactor = mock(OpdProfileVisitsFragmentContract.Interactor.class);
         ReflectionHelpers.setField(presenter, "mProfileInteractor", interactor);
         ReflectionHelpers.setField(presenter, "currentPageNo", 0);
         final List<OpdVisitSummary> opdVisitSummaries = new ArrayList<>();
 
-        OpdProfileVisitsFragmentContract.Presenter.OnFinishedCallback onFinishedCallback = Mockito.mock(OpdProfileVisitsFragmentContract.Presenter.OnFinishedCallback.class);
+        OpdProfileVisitsFragmentContract.Presenter.OnFinishedCallback onFinishedCallback = mock(OpdProfileVisitsFragmentContract.Presenter.OnFinishedCallback.class);
         Mockito.doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
@@ -83,7 +90,7 @@ public class OpdProfileVisitsFragmentPresenterTest extends BaseTest {
     @Test
     public void loadPageCounterShouldCallUpdatePageCounterAndViewMethodsWhenInteractorIsNotNull() {
         String baseEntityId = "98-sd-ewsdf";
-        OpdProfileVisitsFragmentContract.Interactor interactor = Mockito.mock(OpdProfileVisitsFragmentContract.Interactor.class);
+        OpdProfileVisitsFragmentContract.Interactor interactor = mock(OpdProfileVisitsFragmentContract.Interactor.class);
         ReflectionHelpers.setField(presenter, "mProfileInteractor", interactor);
         ReflectionHelpers.setField(presenter, "currentPageNo", 0);
 
@@ -172,7 +179,7 @@ public class OpdProfileVisitsFragmentPresenterTest extends BaseTest {
     }
 
     @Test
-    public void generateTestText() {
+    public void testGenerateTestTextShouldGenerateTextCorrectly() {
         HashMap<String, List<OpdVisitSummaryResultModel.Test>> tests = new HashMap<>();
         List<OpdVisitSummaryResultModel.Test> hepatitisBTests = new ArrayList<>();
         OpdVisitSummaryResultModel.Test test = new OpdVisitSummaryResultModel.Test();
@@ -190,7 +197,7 @@ public class OpdProfileVisitsFragmentPresenterTest extends BaseTest {
 
         tests.put("Hepatitis B", hepatitisBTests);
         tests.put("Hepatitis C", hepatitisCTests);
-        OpdProfileVisitsFragmentContract.View view = Mockito.mock(OpdProfileVisitsFragmentContract.View.class);
+        OpdProfileVisitsFragmentContract.View view = mock(OpdProfileVisitsFragmentContract.View.class);
         Mockito.when(view.getString(R.string.single_test_result_visit_preview_summary))
                 .thenReturn("%s%s");
         Mockito.when(view.getString(R.string.single_test_visit_preview_summary))
@@ -200,5 +207,50 @@ public class OpdProfileVisitsFragmentPresenterTest extends BaseTest {
         String result = profileVisitsFragmentPresenter.generateTestText(tests);
         String expected = "<![CDATA[<b><font color=\\'black\\'>Hepatitis C</font><br/></b>]]>negative<br/><br/><![CDATA[<b><font color=\\'black\\'>Hepatitis B</font><br/></b>]]>negative<br/><br/>";
         assertEquals(expected, result);
+    }
+
+    @Test
+    public void testPopulateWrapperDataAndFactsShouldPopulateDataWrapper() throws Exception {
+        OpdVisitSummaryResultModel.Treatment treatment = new OpdVisitSummaryResultModel.Treatment();
+        treatment.setDosage("500mg");
+        treatment.setDuration("20 days");
+        treatment.setMedicine("Cetrizen");
+        treatment.setFrequency("1 x 1");
+        OpdVisitSummary opdVisitSummary = new OpdVisitSummary();
+        opdVisitSummary.setVisitDate(new Date());
+        opdVisitSummary.setDiagnosis("No Diagnosis");
+        opdVisitSummary.setDiagnosisType("referred");
+        opdVisitSummary.setIsDiagnosisSame("no");
+        opdVisitSummary.setTreatmentType("referred");
+        opdVisitSummary.setTreatmentTypeSpecify("other");
+        opdVisitSummary.addTreatment(treatment);
+
+        ArrayList<Pair<YamlConfigWrapper, Facts>> items = new ArrayList<>();
+
+        YamlConfigItem yamlConfigItem = new YamlConfigItem();
+        yamlConfigItem.setHtml(true);
+        yamlConfigItem.setTemplate("{diagnosis_same_label}: {diagnosis_same}");
+        yamlConfigItem.setIsMultiWidget(false);
+
+        YamlConfig yamlConfig = new YamlConfig();
+        yamlConfig.setGroup("Group A");
+        yamlConfig.setTestResults("none");
+        yamlConfig.setFields(Collections.singletonList(yamlConfigItem));
+
+        Mockito.doReturn(getString(R.string.single_medicine_visit_preview_summary)).when(presenter).getString(eq(R.string.single_medicine_visit_preview_summary));
+        Mockito.doReturn(getString(R.string.dose_or_duration_html)).when(presenter).getString(eq(R.string.dose_or_duration_html));
+        Mockito.doReturn(getString(R.string.medication_frequency)).when(presenter).getString(eq(R.string.medication_frequency));
+        Mockito.doReturn(getString(R.string.medication_duration)).when(presenter).getString(eq(R.string.medication_duration));
+
+        Mockito.doReturn(Collections.singletonList(yamlConfig)).when(presenter).getVisitRowRuleObjects();
+
+        presenter.populateWrapperDataAndFacts(Collections.singletonList(opdVisitSummary), items);
+
+        assertEquals(1, items.size());
+        assertEquals(yamlConfig.getGroup(), items.get(0).first.getGroup());
+        assertEquals(opdVisitSummary.getDiagnosisType(), items.get(0).second.get("diagnosis_type"));
+        assertEquals(opdVisitSummary.getTreatmentType(), items.get(0).second.get("treatment_type"));
+        assertEquals(opdVisitSummary.getTreatmentTypeSpecify(), items.get(0).second.get("treatment_type_specify"));
+        assertEquals(String.format("<b><font color='black'>%s</font><br/></b><font color='#7f7f7f'>Duration: %s Frequency: %s</font>", treatment.getMedicine(), treatment.getDuration(), treatment.getFrequency()), items.get(0).second.get("treatment"));
     }
 }

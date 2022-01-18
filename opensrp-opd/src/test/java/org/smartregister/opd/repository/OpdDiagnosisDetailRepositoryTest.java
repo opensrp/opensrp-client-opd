@@ -33,7 +33,7 @@ public class OpdDiagnosisDetailRepositoryTest extends BaseUnitTest {
     }
 
     @Test
-    public void testCreateTableShouldInvokeExecSqlThreeTimes() {
+    public void testCreateTableShouldInvokeExecSqlThrice() {
         OpdDiagnosisDetailRepository.createTable(sqLiteDatabase);
         verify(sqLiteDatabase).execSQL(eq(OpdDiagnosisDetailRepository.INDEX_BASE_ENTITY_ID));
         verify(sqLiteDatabase).execSQL(eq(OpdDiagnosisDetailRepository.INDEX_VISIT_ID));

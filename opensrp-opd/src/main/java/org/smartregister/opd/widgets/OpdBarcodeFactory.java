@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
 
 import com.google.android.gms.vision.barcode.Barcode;
 import com.rengwuxian.materialedittext.MaterialEditText;
@@ -32,7 +33,13 @@ public class OpdBarcodeFactory extends BarcodeFactory {
     @Override
     public List<View> getViewsFromJson(@NonNull String stepName, @NonNull Context context, @NonNull JsonFormFragment formFragment,
                                        @NonNull JSONObject jsonObject, @NonNull CommonListener listener) throws Exception {
-        List<View> viewList = super.getViewsFromJson(stepName, context, formFragment, jsonObject, listener);
+        return getViewsFromJson(stepName, context, formFragment, jsonObject, listener, false);
+    }
+
+    @Override
+    public List<View> getViewsFromJson(@NonNull String stepName, @NonNull Context context, @NonNull JsonFormFragment formFragment, @NonNull JSONObject jsonObject,
+                                       @NonNull CommonListener listener, boolean popup) throws Exception {
+        List<View> viewList = getParentViewsFromJson(stepName, context, formFragment, jsonObject, listener, popup);
         this.jsonFormFragment = formFragment;
         try {
             this.forLookUp = jsonObject.has(OpdConstants.KEY.LOOK_UP) &&
@@ -43,18 +50,9 @@ public class OpdBarcodeFactory extends BarcodeFactory {
         return viewList;
     }
 
-    @Override
-    public List<View> getViewsFromJson(@NonNull String stepName, @NonNull Context context, @NonNull JsonFormFragment formFragment, @NonNull JSONObject jsonObject,
-                                       @NonNull CommonListener listener, boolean popup) throws Exception {
-        List<View> viewList = super.getViewsFromJson(stepName, context, formFragment, jsonObject, listener, popup);
-        this.jsonFormFragment = formFragment;
-        try {
-            this.forLookUp = jsonObject.has(OpdConstants.KEY.LOOK_UP) &&
-                    jsonObject.get(OpdConstants.KEY.LOOK_UP).toString().equalsIgnoreCase(Boolean.TRUE.toString());
-        } catch (JSONException e) {
-            Timber.e(e);
-        }
-        return viewList;
+    @VisibleForTesting
+    protected List<View> getParentViewsFromJson(@NonNull String stepName, @NonNull Context context, @NonNull JsonFormFragment formFragment, @NonNull JSONObject jsonObject, @NonNull CommonListener listener, boolean popup) throws Exception {
+        return super.getViewsFromJson(stepName, context, formFragment, jsonObject, listener, popup);
     }
 
     @Override

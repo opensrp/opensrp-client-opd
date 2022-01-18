@@ -30,6 +30,7 @@ import org.smartregister.opd.pojo.OpdMetadata;
 import org.smartregister.receiver.SyncStatusBroadcastReceiver;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -86,6 +87,7 @@ public class BaseOpdRegisterFragmentTest extends BaseUnitTest {
 
     @Test
     public void testCountExecuteShouldUpdateAdapterAccordingly() {
+        assertNotNull(fragmentScenario);
         fragmentScenario.onFragment(fragment -> {
             Fragment spyFragment = spy(fragment);
             RecyclerViewPaginatedAdapter adapter = ReflectionHelpers.getField(spyFragment, "clientAdapter");

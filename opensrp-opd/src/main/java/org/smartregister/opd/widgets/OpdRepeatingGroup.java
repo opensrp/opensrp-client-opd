@@ -6,6 +6,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
+
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.vijay.jsonwizard.domain.WidgetArgs;
 import com.vijay.jsonwizard.fragments.JsonFormFragment;
@@ -23,7 +26,7 @@ public class OpdRepeatingGroup extends RepeatingGroupFactory {
 
     @Override
     public List<View> getViewsFromJson(String stepName, Context context, JsonFormFragment formFragment, JSONObject jsonObject, CommonListener listener, boolean popup) throws Exception {
-        List<View> viewList = super.getViewsFromJson(stepName, context, formFragment, jsonObject, listener, popup);
+        List<View> viewList = getParentViewsFromJson(stepName, context, formFragment, jsonObject, listener, popup);
         View root = viewList.isEmpty() ? null : viewList.get(0);
         if (root != null) {
             final WidgetArgs widgetArgs = new WidgetArgs()
@@ -50,6 +53,11 @@ public class OpdRepeatingGroup extends RepeatingGroupFactory {
             });
         }
         return viewList;
+    }
+
+    @VisibleForTesting
+    protected List<View> getParentViewsFromJson(@NonNull String stepName, @NonNull Context context, @NonNull JsonFormFragment formFragment, @NonNull JSONObject jsonObject, @NonNull CommonListener listener, boolean popup) throws Exception {
+        return super.getViewsFromJson(stepName, context, formFragment, jsonObject, listener, popup);
     }
 
     @Override
