@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.widget.Toolbar;
 
 import com.vijay.jsonwizard.activities.JsonWizardFormActivity;
@@ -140,12 +141,14 @@ public class BaseOpdFormActivity extends JsonWizardFormActivity {
         }
     }
 
+    @VisibleForTesting
     protected void clearSavedSession() {
         final OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm = new OpdDiagnosisAndTreatmentForm(OpdUtils.getIntentValue(getIntent(), OpdConstants.IntentKey.BASE_ENTITY_ID));
         final OpdDiagnosisAndTreatmentFormDao opdDiagnosisAndTreatmentFormDao = OpdLibrary.getInstance().getOpdDiagnosisAndTreatmentFormRepository();
         new AppExecutors().diskIO().execute(() -> opdDiagnosisAndTreatmentFormDao.delete(opdDiagnosisAndTreatmentForm));
     }
 
+    @VisibleForTesting
     protected void saveFormFillSession() {
         JSONObject jsonObject = getmJSONObject();
         final OpdDiagnosisAndTreatmentForm opdDiagnosisAndTreatmentForm = new OpdDiagnosisAndTreatmentForm(0, OpdUtils.getIntentValue(getIntent(), OpdConstants.IntentKey.BASE_ENTITY_ID),
