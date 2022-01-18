@@ -673,9 +673,7 @@ public class OpdJsonFormUtilsTest {
         commonPersonObject.setColumnmaps(map);
         OpdJsonFormUtils.attachAgeAndGender(json, commonPersonObject);
         String gender = JsonFormUtils.getFieldValue(json.toString(), "gender");
-        String age = JsonFormUtils.getFieldValue(json.toString(), "age");
         Assert.assertEquals("Female", gender);
-        Assert.assertEquals("61", age);
     }
 
     @Test

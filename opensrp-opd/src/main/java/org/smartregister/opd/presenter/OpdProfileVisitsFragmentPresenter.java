@@ -4,6 +4,7 @@ package org.smartregister.opd.presenter;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+import androidx.annotation.VisibleForTesting;
 import androidx.core.util.Pair;
 import android.text.TextUtils;
 
@@ -111,7 +112,7 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
             Iterable<Object> ruleObjects = null;
 
             try {
-                ruleObjects = OpdLibrary.getInstance().readYaml(FilePath.FILE.OPD_VISIT_ROW);
+                ruleObjects = getVisitRowRuleObjects();
             } catch (IOException e) {
                 Timber.e(e);
             }
@@ -142,6 +143,11 @@ public class OpdProfileVisitsFragmentPresenter implements OpdProfileVisitsFragme
                 }
             }
         }
+    }
+
+    @VisibleForTesting
+    protected Iterable<Object> getVisitRowRuleObjects() throws IOException {
+        return OpdLibrary.getInstance().readYaml(FilePath.FILE.OPD_VISIT_ROW);
     }
 
     @Override
