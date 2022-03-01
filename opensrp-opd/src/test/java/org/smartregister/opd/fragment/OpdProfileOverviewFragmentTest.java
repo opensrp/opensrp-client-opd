@@ -1,5 +1,6 @@
 package org.smartregister.opd.fragment;
 
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -57,6 +58,7 @@ public class OpdProfileOverviewFragmentTest extends BaseUnitTest {
 
     @Test
     public void testShowDiagnoseAndTreatBtnShouldOpenForm() {
+        assertNotNull(fragmentScenario);
         fragmentScenario.onFragment(opdProfileOverviewFragment -> {
             try {
                 OpdProfileOverviewFragment spyOpdProfileOverviewFragment = spy(opdProfileOverviewFragment);
@@ -76,6 +78,7 @@ public class OpdProfileOverviewFragmentTest extends BaseUnitTest {
 
     @Test
     public void testShowCheckInBtnShouldOpenForm() {
+        assertNotNull(fragmentScenario);
         fragmentScenario.onFragment(opdProfileOverviewFragment -> {
             try {
                 OpdProfileOverviewFragment spyOpdProfileOverviewFragment = spy(opdProfileOverviewFragment);
