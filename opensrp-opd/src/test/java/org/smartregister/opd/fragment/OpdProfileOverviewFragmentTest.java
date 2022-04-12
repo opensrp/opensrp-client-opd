@@ -60,19 +60,19 @@ public class OpdProfileOverviewFragmentTest extends BaseUnitTest {
     public void testShowDiagnoseAndTreatBtnShouldOpenForm() {
         assertNotNull(fragmentScenario);
         fragmentScenario.onFragment(opdProfileOverviewFragment -> {
+            OpdProfileOverviewFragment spyOpdProfileOverviewFragment = spy(opdProfileOverviewFragment);
+            BaseOpdProfileActivity mockBaseOpdProfileActivity = mock(BaseOpdProfileActivity.class);
+            Resources resources = opdProfileOverviewFragment.getResources();
+            doReturn(resources).when(mockBaseOpdProfileActivity).getResources();
+            doReturn(mockBaseOpdProfileActivity).when(spyOpdProfileOverviewFragment).getActivity();
             try {
-                OpdProfileOverviewFragment spyOpdProfileOverviewFragment = spy(opdProfileOverviewFragment);
-                BaseOpdProfileActivity mockBaseOpdProfileActivity = mock(BaseOpdProfileActivity.class);
-                Resources resources = opdProfileOverviewFragment.getResources();
-                doReturn(resources).when(mockBaseOpdProfileActivity).getResources();
-                doReturn(mockBaseOpdProfileActivity).when(spyOpdProfileOverviewFragment).getActivity();
                 WhiteboxImpl.invokeMethod(spyOpdProfileOverviewFragment, "showDiagnoseAndTreatBtn");
-                Button checkInDiagnoseAndTreatBtn = ReflectionHelpers.getField(spyOpdProfileOverviewFragment, "checkInDiagnoseAndTreatBtn");
-                checkInDiagnoseAndTreatBtn.performClick();
-                verify(mockBaseOpdProfileActivity).openDiagnoseAndTreatForm();
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            Button checkInDiagnoseAndTreatBtn = ReflectionHelpers.getField(spyOpdProfileOverviewFragment, "checkInDiagnoseAndTreatBtn");
+            checkInDiagnoseAndTreatBtn.performClick();
+            verify(mockBaseOpdProfileActivity).openDiagnoseAndTreatForm();
         });
     }
 
@@ -80,19 +80,19 @@ public class OpdProfileOverviewFragmentTest extends BaseUnitTest {
     public void testShowCheckInBtnShouldOpenForm() {
         assertNotNull(fragmentScenario);
         fragmentScenario.onFragment(opdProfileOverviewFragment -> {
+            OpdProfileOverviewFragment spyOpdProfileOverviewFragment = spy(opdProfileOverviewFragment);
+            BaseOpdProfileActivity mockBaseOpdProfileActivity = mock(BaseOpdProfileActivity.class);
+            Resources resources = opdProfileOverviewFragment.getResources();
+            doReturn(resources).when(mockBaseOpdProfileActivity).getResources();
+            doReturn(mockBaseOpdProfileActivity).when(spyOpdProfileOverviewFragment).getActivity();
             try {
-                OpdProfileOverviewFragment spyOpdProfileOverviewFragment = spy(opdProfileOverviewFragment);
-                BaseOpdProfileActivity mockBaseOpdProfileActivity = mock(BaseOpdProfileActivity.class);
-                Resources resources = opdProfileOverviewFragment.getResources();
-                doReturn(resources).when(mockBaseOpdProfileActivity).getResources();
-                doReturn(mockBaseOpdProfileActivity).when(spyOpdProfileOverviewFragment).getActivity();
                 WhiteboxImpl.invokeMethod(spyOpdProfileOverviewFragment, "showCheckInBtn");
-                Button checkInDiagnoseAndTreatBtn = ReflectionHelpers.getField(spyOpdProfileOverviewFragment, "checkInDiagnoseAndTreatBtn");
-                checkInDiagnoseAndTreatBtn.performClick();
-                verify(mockBaseOpdProfileActivity).openCheckInForm();
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            Button checkInDiagnoseAndTreatBtn = ReflectionHelpers.getField(spyOpdProfileOverviewFragment, "checkInDiagnoseAndTreatBtn");
+            checkInDiagnoseAndTreatBtn.performClick();
+            verify(mockBaseOpdProfileActivity).openCheckInForm();
         });
     }
 }
